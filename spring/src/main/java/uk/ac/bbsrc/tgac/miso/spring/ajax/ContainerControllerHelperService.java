@@ -177,6 +177,9 @@ public class ContainerControllerHelperService {
         else if (pt.equals(PlatformType.PACBIO)) {
           return changePacBioContainer(session, json);
         }
+        else if (pt.equals(PlatformType.OXFORD_NANOPORE)) {
+          return changeOxfordNanoporeContainer(session, json);
+        }
         else {
           return JSONUtils.SimpleJSONError("Unsupported platform type: " + platform);
         }
@@ -206,7 +209,6 @@ public class ContainerControllerHelperService {
         b.append("<table class='in'>");
         b.append("<th>Lane No.</th>");
         b.append("<th>Pool</th>");
-
         b.append("<tr><td>1 </td><td width='90%'><div id='p_div-0'><ul class='runPartitionDroppable' bind='partitions[0].pool' partition='0' ondblclick='Container.partition.populatePartition(this);'></ul></div></td></tr>");
         b.append("</table>");
         b.append("</div>");
@@ -352,6 +354,40 @@ public class ContainerControllerHelperService {
     b.append("<div id='containerdiv0'> </div>");
     b.append("</div>");
     return JSONUtils.SimpleJSONResponse(b.toString());
+  }
+
+  public JSONObject changeOxfordNanoporeContainer(HttpSession session, JSONObject json) {
+    long seqRefId = json.getLong("sequencerReferenceId");
+    StringBuilder b = new StringBuilder();
+    try {
+      SequencerReference sr = requestManager.getSequencerReferenceById(seqRefId);
+      b.append("<h2>Container</h2>");
+      b.append("<table class='in'>");
+      b.append("<tr><td>ID:</td><td><input type='text' id='identificationBarcode' name='identificationBarcode'/><input type='hidden' value='on' name='_identificationBarcode'><button onclick='Container.lookupContainer(this);' type='button' class='right-button ui-state-default ui-corner-all'>Lookup</button></td></tr>");
+      b.append("<tr><td>Location:</td><td><input type='text' id='locationBarcode' name='locationBarcode'/><input type='hidden' value='on' name='_locationBarcode'></td></tr>");
+      b.append("<tr><td>Validation:</td><td><input type='text' id='validationBarcode' name='validationBarcode'/><input type='hidden' value='on' name='_validationBarcode'></td></tr>");
+      b.append("</table>");
+      b.append("<div id='partitionErrorDiv'> </div>");
+      b.append("<div id='partitionDiv'>");
+      b.append("<i class='italicInfo'>Click in a partition box to beep/type in barcodes, or double click a pool on the right to sequentially add pools to the container</i>");
+      b.append("<table class='in'>");
+      b.append("<th>Lane No.</th>");
+      b.append("<th>Pool</th>");
+      b.append("<tr><td>1 </td><td width='90%'><div id='p_div-0'><ul class='runPartitionDroppable' bind='partitions[0].pool' partition='0' ondblclick='Container.partition.populatePartition(this);'></ul></div></td></tr>");
+      b.append("</table>");
+      b.append("</div>");
+
+      SequencerPartitionContainer<SequencerPoolPartition> lf =
+          (SequencerPartitionContainer<SequencerPoolPartition>) session.getAttribute("container_" + json.getString("container_cId"));
+      lf.setPlatform(sr.getPlatform());
+      lf.setPartitionLimit(1);
+      lf.initEmptyPartitions();
+      return JSONUtils.SimpleJSONResponse(b.toString());
+    }
+    catch (IOException e) {
+      e.printStackTrace();
+      return JSONUtils.SimpleJSONError("No sequencer reference defined");
+    }
   }
 
   public JSONObject changeChamber(HttpSession session, JSONObject json) {

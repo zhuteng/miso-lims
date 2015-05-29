@@ -78,17 +78,17 @@ public class SequencerReferenceControllerHelperService {
     try {
       Collection<SequencerReference> sr = requestManager.listAllSequencerReferences();
       StringBuilder sb = new StringBuilder();
-        JSONObject sequencers = new JSONObject();
-        JSONArray sequencers_list = new JSONArray();
+      JSONObject sequencers = new JSONObject();
+      JSONArray sequencers_list = new JSONArray();
       for (SequencerReference s : sr) {
-          JSONObject each_sequencer = new JSONObject();
-          each_sequencer.put("id",s.getId());
-          each_sequencer.put("name_model",s.getPlatform().getNameAndModel());
-          each_sequencer.put("name",s.getName());
-          sequencers_list.add(each_sequencer);
-//          sb.append("<option value="+s.getId()+">"+s.getPlatform().getNameAndModel()+" - "+s.getName()+"</option>");
+        JSONObject each_sequencer = new JSONObject();
+        each_sequencer.put("id",s.getId());
+        each_sequencer.put("name_model",s.getPlatform().getNameAndModel());
+        each_sequencer.put("name",s.getName());
+        sequencers_list.add(each_sequencer);
+//      sb.append("<option value="+s.getId()+">"+s.getPlatform().getNameAndModel()+" - "+s.getName()+"</option>");
       }
-        sequencers.put("sequencers", sequencers_list);
+      sequencers.put("sequencers", sequencers_list);
       return sequencers;
     }
     catch (IOException e) {

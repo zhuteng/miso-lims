@@ -39,6 +39,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.*;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.*;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.illumina.IlluminaRun;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ls454.LS454Run;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.nanopore.OxfordNanoporeRun;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.pacbio.PacBioRun;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.solid.SolidRun;
 import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
@@ -200,6 +201,9 @@ public class RunControllerHelperService {
         }
         else if (pt.equals(PlatformType.PACBIO)) {
           return changePacBioContainer(session, json);
+        }
+        else if (pt.equals(PlatformType.OXFORD_NANOPORE)) {
+          return changeOxfordNanoporeContainer(session, json);
         }
         else {
           return JSONUtils.SimpleJSONError("Unrecognised platform type: " + platform);
@@ -511,6 +515,36 @@ public class RunControllerHelperService {
     }
     b.append("</table>");
 
+    return JSONUtils.SimpleJSONResponse(b.toString());
+  }
+
+  public JSONObject changeOxfordNanoporeContainer(HttpSession session, JSONObject json) {
+    StringBuilder b = new StringBuilder();
+    OxfordNanoporeRun run = (OxfordNanoporeRun) session.getAttribute("run_" + json.getString("run_cId"));
+    run.getSequencerPartitionContainers().clear();
+    String instrumentModel = run.getSequencerReference().getPlatform().getInstrumentModel();
+    if ("MinION".equals(instrumentModel)) {
+      b.append("<h2>Container 1</h2>");
+      b.append("<table class='in'>");
+      b.append("<tr><td>ID:</td><td><button onclick='Run.container.lookupContainer(this, 0);' type='button' class='right-button ui-state-default ui-corner-all'>Lookup</button><div style='overflow:hidden'><input type='text' id='sequencerPartitionContainers[0].identificationBarcode' name='sequencerPartitionContainers[0].identificationBarcode'/></div></td></tr>");
+      b.append("<tr><td>Location:</td><td><input type='text' id='sequencerPartitionContainers[0].locationBarcode' name='sequencerPartitionContainers[0].locationBarcode'/></td></tr>");
+      b.append("</table>");
+      b.append("<div id='partitionErrorDiv'> </div>");
+      b.append("<div id='partitionDiv'>");
+      b.append("<table class='in'>");
+      b.append("<th>Lane No.</th>");
+      b.append("<th>Pool</th>");
+
+      b.append("<tr><td>1 </td><td width='90%'><div id='p_div_0-0' class='elementListDroppableDiv'><ul class='runPartitionDroppable' bind='sequencerPartitionContainers[0].partitions[0].pool' partition='0_0'></ul></div></td></tr>");
+      b.append("</table>");
+      b.append("</div>");
+
+      SequencerPartitionContainer<SequencerPoolPartition> f = dataObjectFactory.getSequencerPartitionContainer();
+      f.setPlatform(run.getSequencerReference().getPlatform());
+      f.setPartitionLimit(1);
+      f.initEmptyPartitions();
+      run.addSequencerPartitionContainer(f);
+    }
     return JSONUtils.SimpleJSONResponse(b.toString());
   }
 
