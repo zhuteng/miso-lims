@@ -25,16 +25,15 @@ package uk.ac.bbsrc.tgac.miso.core.data;
 
 //import com.fasterxml.jackson.annotation.*;
 //import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 import org.codehaus.jackson.annotate.JsonTypeInfo;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 import com.eaglegenomics.simlims.core.Note;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
+
+import java.time.LocalDate;
 import java.util.Collection;
-import java.util.Date;
 
 /**
- * A Kit represents a consumable that can be used as part of a lab procedure, whereby its type is described by a
+ * A KitComponent represents a consumable that can be used as part of a lab procedure, whereby its type is described by a
  * {@link KitDescriptor} and its actual existence by a lot number. {@link Note} objects can be added to Kits.
  *
  * @author Rob Davey
@@ -43,90 +42,125 @@ import java.util.Date;
 @JsonSerialize(typing = JsonSerialize.Typing.STATIC, include = JsonSerialize.Inclusion.NON_NULL)
 //@JsonIdentityInfo(generator = ObjectIdGenerators.IntSequenceGenerator.class, property = "@id")
 @JsonTypeInfo(use=JsonTypeInfo.Id.CLASS, include= JsonTypeInfo.As.PROPERTY, property="@class")
-public interface Kit extends Comparable, Barcodable, Locatable {
+public interface KitComponent extends Comparable, Barcodable, Locatable {
   /**
-   * Returns the kitId of this Kit object.
+   * Returns the kitId of this KitComponent object.
    *
    * @return Long kitId.
    */
   @Deprecated
-  Long getKitId();
+  Long getKitComponentId();
 
   /**
-   * Sets the kitId of this Kit object.
+   * Sets the kitId of this KitComponent object.
    *
-   * @param kitId the id of this Kit object.
+   * @param kitId the id of this KitComponent object.
    *
    */
   @Deprecated
-  void setKitId(Long kitId);
+  void setKitComponentId(Long kitId);
 
   public void setId(long id);
 
   /**
-   * Returns the lotNumber of this Kit object.
+   * Returns the lotNumber of this KitComponent object.
    *
    * @return String lotNumber.
    */
   String getLotNumber();
 
   /**
-   * Sets the lotNumber of this Kit object.
+   * Sets the lotNumber of this KitComponent object.
    *
-   * @param lotNumber the Kit lot number.
+   * @param lotNumber the KitComponent lot number.
    *
    */
   void setLotNumber(String lotNumber);
 
   /**
-   * Returns the kitDate of this Kit object.
+   * Returns the kitDate of this KitComponent object.
    *
-   * @return Date kitDate.
+   * @return LocalDate kitDate.
    */
-  Date getKitDate();
+  LocalDate getKitReceivedDate();
 
   /**
-   * Sets the kitDate of this Kit object.
+   * Sets the kitDate of this KitComponent object.
    *
-   * @param kitDate kitDate.
+   * @param kitReceivedDate kitDate.
    *
    */
-  void setKitDate(Date kitDate);
+  void setKitReceivedDate(LocalDate kitReceivedDate);
 
   /**
-   * Returns the notes of this Kit object.
+   * Returns the notes of this KitComponent object.
    *
    * @return Collection<Note> notes.
    */
+
+  /**
+   * Returns the kitExpiryDate of this KitComponent object.
+   *
+   * @return Date kitExpiryDate.
+   */
+  LocalDate getKitExpiryDate();
+
+  /**
+   * Sets the kitExpiryDate of this KitComponent object.
+   *
+   * @param kitExpiryDate kitExpiryDate.
+   *
+   */
+  void setKitExpiryDate(LocalDate kitExpiryDate);
+
+  /**
+   * Returns the notes of this KitComponent object.
+   *
+   * @return Collection<Note> notes.
+   */
+
   Collection<Note> getNotes();
 
   /**
-   * Returns the kitDescriptor of this Kit object.
+   * Returns the kitDescriptor of this KitComponent object.
    *
    * @return {@link KitDescriptor} kitDescriptor.
-   */
-  KitDescriptor getKitDescriptor();
-
-  /**
-   * Sets the kitDescriptor of this Kit object.
-   *
-   * @param kd kitDescriptor.
-   *
-   */
-  void setKitDescriptor(KitDescriptor kd);
-
-  /**
-   * Sets the notes of this Kit object.
-   *
-   * @param notes notes.
-   *
    */
   void setNotes(Collection<Note> notes);
 
   /**
-   * Add a note to this Kit
+   * Add a note to this KitComponent
    *
    * @param note of type {@link Note}
    */
   void addNote(Note note);
+
+  /**
+   * Sets this KitComponent as exhausted/not exhausted
+   * @param exhausted (true/false)
+   */
+  void setExhausted(boolean exhausted);
+
+
+  /**
+   * Returns the current exhaustion state of this KitComponent
+   * @return true if exhausted, false if not exhausted
+   */
+  boolean isExhausted();
+
+  /**
+   * Returns the KitComponentDescriptor assigned to this KitComponent
+   * @return KitComponentDescriptor KitComponentDescriptor
+   */
+  KitComponentDescriptor getKitComponentDescriptor();
+
+
+  /**
+   * Sets the kitComponentDescriptor of this kitComponent
+   *
+   * @param kitComponentDescriptor kitComponentDescriptor
+   */
+  void setKitComponentDescriptor(KitComponentDescriptor kitComponentDescriptor);
+
+
 }

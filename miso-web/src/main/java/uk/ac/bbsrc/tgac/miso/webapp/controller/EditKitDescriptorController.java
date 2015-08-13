@@ -35,7 +35,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.servlet.ModelAndView;
 
-import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
+import uk.ac.bbsrc.tgac.miso.core.data.KitDescriptor;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptorImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.KitType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
@@ -58,11 +59,17 @@ public class EditKitDescriptorController {
         return Arrays.asList(KitType.values());
     }
 
-    @ModelAttribute("platformTypes")
+    /*@ModelAttribute("platformTypes")
     public Collection<PlatformType> populatePlatformTypes() {
         return Arrays.asList(PlatformType.values());
     }
-    
+    */
+
+    @ModelAttribute("platformTypes")
+    public Collection<String> populatePlatformTypes() {
+        return PlatformType.getKeys();
+    }
+
     public void setDataObjectFactory(DataObjectFactory dataObjectFactory) {
         this.dataObjectFactory = dataObjectFactory;
     }
@@ -74,7 +81,7 @@ public class EditKitDescriptorController {
     @RequestMapping(value = "/new", method = RequestMethod.GET)
     public ModelAndView setupForm(ModelMap model) throws IOException {
         model.addAttribute("kitDescriptor", null);
-        return setupForm(KitDescriptor.UNSAVED_ID, model);
+        return setupForm(KitDescriptorImpl.UNSAVED_ID, model);
     }
 
     @RequestMapping(value = "/{kitDescriptorId}", method = RequestMethod.GET)
@@ -82,8 +89,8 @@ public class EditKitDescriptorController {
                                   ModelMap model) throws IOException {
         try {
             KitDescriptor kitDescriptor = null;
-            if (kitDescriptorId == kitDescriptor.UNSAVED_ID) {
-                kitDescriptor = new KitDescriptor();
+            if (kitDescriptorId == KitDescriptorImpl.UNSAVED_ID) {
+                kitDescriptor = new KitDescriptorImpl();
                 model.put("title", "New Kit Descriptor");
             } else {
                 kitDescriptor = requestManager.getKitDescriptorById(kitDescriptorId);
@@ -96,6 +103,7 @@ public class EditKitDescriptorController {
 
             model.put("formObj", kitDescriptor);
             model.put("kitDescriptor", kitDescriptor);
+
             return new ModelAndView("/pages/editKitDescriptor.jsp", model);
         }
         catch (IOException ex) {
@@ -113,11 +121,13 @@ public class EditKitDescriptorController {
             requestManager.saveKitDescriptor(kitDescriptor);
             session.setComplete();
             model.clear();
-            return "redirect:/miso/kitdescriptor/" + kitDescriptor.getKitDescriptorId();
+
+            //SEND TO THE PAGE WITH COMPONENTS
+            return "redirect:/miso/kitcomponentdescriptor/kit" + kitDescriptor.getKitDescriptorId() + "/new";
         }
         catch (IOException ex) {
             if (log.isDebugEnabled()) {
-                log.debug("Failed to save Kit Descriptor", ex);
+                log.debug("Failed to save KitComponent Descriptor", ex);
             }
             throw ex;
         }

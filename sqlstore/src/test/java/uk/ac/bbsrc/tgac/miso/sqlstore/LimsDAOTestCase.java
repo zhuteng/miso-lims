@@ -39,13 +39,16 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.jdbc.support.lob.DefaultLobHandler;
 import org.springframework.jdbc.support.lob.LobHandler;
-import uk.ac.bbsrc.tgac.miso.core.data.EntityGroup;
+import uk.ac.bbsrc.tgac.miso.core.data.KitComponent;
+import uk.ac.bbsrc.tgac.miso.core.data.KitComponentDescriptor;
+import uk.ac.bbsrc.tgac.miso.core.data.KitDescriptor;
 import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.factory.TgacDataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.manager.BarcodePrintManager;
 import uk.ac.bbsrc.tgac.miso.core.manager.PrintManager;
 import uk.ac.bbsrc.tgac.miso.core.service.printing.MisoPrintContextResolverService;
 import uk.ac.bbsrc.tgac.miso.core.service.printing.MisoPrintService;
+import uk.ac.bbsrc.tgac.miso.core.store.KitDescriptorStore;
 import uk.ac.bbsrc.tgac.miso.core.store.Store;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.DaoLookup;
 
@@ -84,8 +87,9 @@ public abstract class LimsDAOTestCase extends DatabaseTestCase {
     "EntityGroup_Elements",
     "Experiment",
     "Experiment_Kit",
-    "Kit",
+    "KitComponent",
     "KitDescriptor",
+          "KitComponentDescriptor",
     "Kit_Note",
     "Library",
     "LibraryDilution",
@@ -159,9 +163,14 @@ public abstract class LimsDAOTestCase extends DatabaseTestCase {
   private SQLEmPCRDAO emPCRDAO;
   private SQLEmPCRDilutionDAO emPCRDilutionDAO;
   private SQLExperimentDAO experimentDAO;
-  private SQLKitDAO kitDAO;
+  private SQLKitDescriptorDAO kitDescriptorDAO;
+  private SQLKitComponentDescriptorDAO kitComponentDescriptorDAO;
+  private SQLKitComponentDAO kitComponentDAO;
   private SQLLibraryDAO libraryDAO;
   private SQLLibraryQCDAO libraryQcDAO;
+
+
+
   private SQLNoteDAO noteDAO;
   private SQLSequencerPoolPartitionDAO partitionDAO;
   private SQLPlateDAO plateDAO;
@@ -213,6 +222,7 @@ public abstract class LimsDAOTestCase extends DatabaseTestCase {
     }
   }
 
+
   public SQLLibraryDilutionDAO getLibraryDilutionDAO() {
     if (libraryDilutionDAO != null) {
       return libraryDilutionDAO;
@@ -259,13 +269,29 @@ public abstract class LimsDAOTestCase extends DatabaseTestCase {
     }
   }
 
-  public SQLKitDAO getKitDAO() {
-    if (kitDAO != null) {
-      return kitDAO;
+  public SQLKitComponentDAO getKitComponentDAO() {
+    if (kitComponentDAO != null) {
+      System.out.println("SQLKITCOMPONENTDAO IS NOT NULL IN LIMSDAOTESTCASE");
+      return kitComponentDAO;
     }
     else {
       return null;
     }
+  }
+
+  public SQLKitDescriptorDAO getKitDescriptorDAO() {
+    if(kitDescriptorDAO!=null){
+      return kitDescriptorDAO;
+    }
+    return null;
+  }
+
+  public SQLKitComponentDescriptorDAO getKitComponentDescriptorDAO() {
+    if(kitComponentDescriptorDAO !=null) {
+      System.out.println("SQLKITCOMPONENTDESCRIPTOR IS NOT NULL IN LIMSDAOTESTCASE");
+      return kitComponentDescriptorDAO;
+    }
+    return null;
   }
 
   public SQLLibraryDAO getLibraryDAO() {
@@ -529,7 +555,9 @@ public abstract class LimsDAOTestCase extends DatabaseTestCase {
     emPCRDAO = new SQLEmPCRDAO();
     emPCRDilutionDAO = new SQLEmPCRDilutionDAO();
     experimentDAO = new SQLExperimentDAO();
-    kitDAO = new SQLKitDAO();
+    kitDescriptorDAO = new SQLKitDescriptorDAO();
+    kitComponentDescriptorDAO = new SQLKitComponentDescriptorDAO();
+    kitComponentDAO = new SQLKitComponentDAO();
     libraryDAO = new SQLLibraryDAO();
     libraryQcDAO = new SQLLibraryQCDAO();
     noteDAO = new SQLNoteDAO();
@@ -595,7 +623,7 @@ public abstract class LimsDAOTestCase extends DatabaseTestCase {
 
     experimentDAO.setJdbcTemplate(template);
     experimentDAO.setSecurityProfileDAO(securityProfileDAO);
-    experimentDAO.setKitDAO(kitDAO);
+    experimentDAO.setKitComponentDAO(kitComponentDAO);
     experimentDAO.setPlatformDAO(platformDAO);
     experimentDAO.setPoolDAO(poolDAO);
     experimentDAO.setRunDAO(runDAO);
@@ -605,11 +633,30 @@ public abstract class LimsDAOTestCase extends DatabaseTestCase {
     experimentDAO.setDataObjectFactory(dataObjectFactory);
     daos.put(uk.ac.bbsrc.tgac.miso.core.data.Experiment.class, experimentDAO);
 
-    kitDAO.setJdbcTemplate(template);
-    kitDAO.setNoteDAO(noteDAO);
-    kitDAO.setCascadeType(CascadeType.PERSIST);
-    kitDAO.setDataObjectFactory(dataObjectFactory);
-    daos.put(uk.ac.bbsrc.tgac.miso.core.data.Kit.class, kitDAO);
+
+    kitDescriptorDAO.setJdbcTemplate(template);
+    kitDescriptorDAO.setNoteDAO(noteDAO);
+    kitDescriptorDAO.setCascadeType(CascadeType.PERSIST);
+    kitDescriptorDAO.setDataObjectFactory(dataObjectFactory);
+    daos.put(KitDescriptor.class, kitDescriptorDAO);
+
+    kitComponentDescriptorDAO.setJdbcTemplate(template);
+    kitComponentDescriptorDAO.setNoteDAO(noteDAO);
+    kitComponentDescriptorDAO.setCascadeType(CascadeType.PERSIST);
+    kitComponentDescriptorDAO.setDataObjectFactory(dataObjectFactory);
+    //ONE WAY
+    kitComponentDescriptorDAO.setKitDescriptorDAO((SQLKitDescriptorDAO)daos.get(KitDescriptor.class));
+    //SECOND WAY
+    kitComponentDescriptorDAO.setKitDescriptorDAO(kitDescriptorDAO);
+    daos.put(KitComponentDescriptor.class, kitComponentDescriptorDAO);
+
+    kitComponentDAO.setJdbcTemplate(template);
+    kitComponentDAO.setNoteDAO(noteDAO);
+    kitComponentDAO.setCascadeType(CascadeType.PERSIST);
+    kitComponentDAO.setDataObjectFactory(dataObjectFactory);
+    kitComponentDAO.setKitComponentDescriptorDAO((SQLKitComponentDescriptorDAO)daos.get(KitComponentDescriptor.class));
+    daos.put(KitComponent.class, kitComponentDAO);
+
 
     libraryDAO.setJdbcTemplate(template);
     libraryDAO.setSecurityProfileDAO(securityProfileDAO);
@@ -777,16 +824,16 @@ public abstract class LimsDAOTestCase extends DatabaseTestCase {
     System.out.println("Creating test database tables...");
 
     runStatement(conn,
-                 "CREATE TABLE Alert (" +
-                 "alertId BIGINT NOT NULL," +
-                 "title VARCHAR(100) NOT NULL," +
-                 "text LONGVARCHAR NOT NULL," +
-                 "userId BIGINT NOT NULL," +
-                 "date DATE NOT NULL," +
-                 "isRead BIT NOT NULL," +
-                 "level VARCHAR(8) NOT NULL," +
-                 "PRIMARY KEY (alertId)" +
-                 ");");
+            "CREATE TABLE Alert (" +
+                    "alertId BIGINT NOT NULL," +
+                    "title VARCHAR(100) NOT NULL," +
+                    "text LONGVARCHAR NOT NULL," +
+                    "userId BIGINT NOT NULL," +
+                    "date DATE NOT NULL," +
+                    "isRead BIT NOT NULL," +
+                    "level VARCHAR(8) NOT NULL," +
+                    "PRIMARY KEY (alertId)" +
+                    ");");
 
     runStatement(conn,
                  "CREATE TABLE EntityGroup (" +
@@ -825,28 +872,42 @@ public abstract class LimsDAOTestCase extends DatabaseTestCase {
                  ");");
 
     runStatement(conn,
-                 "CREATE TABLE Kit (" +
-                 "kitId BIGINT NOT NULL," +
+            "CREATE TABLE KitDescriptor (" +
+                    "kitDescriptorId BIGINT NOT NULL," +
+                    "name VARCHAR(255) NOT NULL," +
+                    "version INT(3) default NULL," +
+                    "manufacturer VARCHAR(100) NOT NULL," +
+                    "partNumber VARCHAR(50) NOT NULL," +
+                    "kitType VARCHAR(30) NOT NULL," +
+                    "platformType VARCHAR(20) NOT NULL," +
+                    "units varchar(20) NOT NULL," +
+                    "kitValue FLOAT(7,2) NOT NULL"+
+                    "PRIMARY KEY  (kitDescriptorId)" +
+                    ");");
+
+    runStatement(conn,
+            "CREATE TABLE KitComponentDescriptor (" +
+                    "kitComponentDescriptorId BIGINT NOT NULL," +
+                    "name VARCHAR(255) NOT NULL," +
+                    "referenceNumber VARCHAR(50) default NULL," +
+                    "kitDescriptorId BIGINT(20) NOT NULL," +
+                    "PRIMARY KEY  (kitComponentDescriptorId)" +
+                    ");");
+
+
+    runStatement(conn,
+                 "CREATE TABLE KitComponent (" +
+                 "kitComponentId BIGINT NOT NULL," +
                  "identificationBarcode VARCHAR(255) default NULL," +
                  "locationBarcode VARCHAR(255) default NULL," +
                  "lotNumber VARCHAR(30) NOT NULL," +
-                 "kitDate DATE NOT NULL," +
-                 "kitDescriptorId BIGINT NOT NULL," +
-                 "PRIMARY KEY  (kitId)" +
+                 "kitReceivedDate DATE NOT NULL," +
+                         "kitExpiryDate DATE NOT NULL," +
+                         "exhausted tinyint(1)," +
+                 "kitComponentDescriptorId BIGINT(20) NOT NULL," +
+                 "PRIMARY KEY  (kitComponentId)" +
                  ");");
 
-    runStatement(conn,
-                 "CREATE TABLE KitDescriptor (" +
-                 "kitDescriptorId BIGINT NOT NULL," +
-                 "name VARCHAR(255) default NULL," +
-                 "version INT default NULL," +
-                 "manufacturer VARCHAR(100) NOT NULL," +
-                 "partNumber VARCHAR(50) NOT NULL," +
-                 "stockLevel INT NOT NULL," +
-                 "kitType VARCHAR(30) NOT NULL," +
-                 "platformType VARCHAR(20) NOT NULL," +
-                 "PRIMARY KEY  (kitDescriptorId)" +
-                 ");");
 
     runStatement(conn,
                  "CREATE TABLE Kit_Note (" +

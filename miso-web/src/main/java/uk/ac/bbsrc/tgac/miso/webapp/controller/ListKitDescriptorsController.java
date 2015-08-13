@@ -70,7 +70,7 @@ public class ListKitDescriptorsController {
     }
     catch (IOException ex) {
       if (log.isDebugEnabled()) {
-        log.debug("Failed to list Kit Descriptors", ex);
+        log.debug("Failed to list KitComponent Descriptors", ex);
       }
       throw ex;
     }

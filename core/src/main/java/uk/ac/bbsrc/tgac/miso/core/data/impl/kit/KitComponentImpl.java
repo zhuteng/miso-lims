@@ -21,26 +21,28 @@
  * *********************************************************************
  */
 
-package uk.ac.bbsrc.tgac.miso.core.data;
+package uk.ac.bbsrc.tgac.miso.core.data.impl.kit;
 
 import com.eaglegenomics.simlims.core.Note;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
+import uk.ac.bbsrc.tgac.miso.core.data.KitComponent;
+import uk.ac.bbsrc.tgac.miso.core.data.KitComponentDescriptor;
+
 import javax.persistence.*;
+import java.time.LocalDate;
 import java.util.Collection;
-import java.util.Date;
 import java.util.HashSet;
 
 /**
- * Skeleton implementation of a Kit
+ * Skeleton implementation of a KitComponent
  *
- * @author Rob Davey
+ * @author Rob Davey, Michal Zak
  * @since 0.0.2
  */
-public abstract class AbstractKit implements Kit {
+public class KitComponentImpl implements KitComponent {
   public static final Long UNSAVED_ID = 0L;
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
-  private long kitId = AbstractKit.UNSAVED_ID;
+  private long kitComponentId = KitComponentImpl.UNSAVED_ID;
   private String identificationBarcode;
   private String locationBarcode;
 
@@ -48,54 +50,73 @@ public abstract class AbstractKit implements Kit {
   @Enumerated(EnumType.STRING)
   private Collection<Note> notes = new HashSet<Note>();
   private String lotNumber;
-  private Date kitDate;
-  private KitDescriptor kitDescriptor;
+  private LocalDate kitReceivedDate;
+  private LocalDate kitExpiryDate;
+  private boolean exhausted;
+
+
+
+  private KitComponentDescriptor kitComponentDescriptor;
 
   @Deprecated
-  public Long getKitId() {
-    return kitId;
+  public Long getKitComponentId() {
+    return kitComponentId;
   }
 
   @Deprecated
-  public void setKitId(Long kitId) {
-    this.kitId = kitId;
+  public void setKitComponentId(Long kitComponentId) {
+    this.kitComponentId = kitComponentId;
   }
 
   @Override
+  public void setExhausted(boolean exhausted){
+    this.exhausted = exhausted;
+  }
+
+  public boolean isExhausted(){
+   return exhausted;
+
+}
   public long getId() {
-    return kitId;
+    return kitComponentId;
   }
 
   public void setId(long id) {
-    this.kitId = id;
+    this.kitComponentId = id;
   }
 
   public String getLotNumber() {
     return lotNumber;
   }
+  public LocalDate getKitExpiryDate() {
+    return kitExpiryDate;
+  }
 
+  public void setKitExpiryDate(LocalDate kitExpiryDate) {
+    this.kitExpiryDate = kitExpiryDate;
+  }
   public void setLotNumber(String lotNumber) {
     this.lotNumber = lotNumber;
   }
 
-  public Date getKitDate() {
-    return kitDate;
+  public LocalDate getKitReceivedDate() {
+    return kitReceivedDate;
   }
 
-  public void setKitDate(Date kitDate) {
-    this.kitDate = kitDate;
+  public void setKitReceivedDate(LocalDate kitReceivedDate) {
+    this.kitReceivedDate = kitReceivedDate;
   }
 
   public Collection<Note> getNotes() {
     return notes;
   }
 
-  public KitDescriptor getKitDescriptor() {
-    return kitDescriptor;
+  public KitComponentDescriptor getKitComponentDescriptor() {
+    return kitComponentDescriptor;
   }
 
-  public void setKitDescriptor(KitDescriptor kitDescriptor) {
-    this.kitDescriptor = kitDescriptor;
+  public void setKitComponentDescriptor(KitComponentDescriptor kitComponentDescriptor) {
+    this.kitComponentDescriptor = kitComponentDescriptor;
   }
 
   public void setNotes(Collection<Note> notes) {
@@ -121,10 +142,15 @@ public abstract class AbstractKit implements Kit {
   public void setLocationBarcode(String locationBarcode) {
     this.locationBarcode = locationBarcode;
   }
+  
 
+
+  //TODO: NOT SURE ABOUT THIS ONE
   @Override
   public String getName() {
-    return getKitDescriptor().getName();
+
+    //it should be KitDescriptor.name + kitComponentDescriptor.name
+    return getKitComponentDescriptor().getName();
   }
 
   public String getLabelText() {
@@ -133,7 +159,7 @@ public abstract class AbstractKit implements Kit {
 
   @Override
   public int compareTo(Object o) {
-    Kit t = (Kit)o;
+    KitComponent t = (KitComponent)o;
     if (getId() < t.getId()) return -1;
     if (getId() > t.getId()) return 1;
     return 0;
@@ -144,11 +170,22 @@ public abstract class AbstractKit implements Kit {
     StringBuilder sb = new StringBuilder();
     sb.append(getId());
     sb.append(" : ");
-    sb.append(getLotNumber());
+    sb.append(getIdentificationBarcode());
+    sb.append(" : ");
+    sb.append(getLocationBarcode());
+    sb.append(" : ");
+    sb.append(getKitReceivedDate());
+    sb.append(" : ");
+    sb.append(getKitExpiryDate());
+    sb.append(" : ");
+    sb.append(isExhausted());
     sb.append(" : ");
     sb.append(getIdentificationBarcode());
     sb.append(" : ");
-    sb.append(getKitDate());
+    sb.append(getKitReceivedDate());
+    sb.append("  : ");
+    sb.append(getKitComponentDescriptor().getKitComponentDescriptorId());
+
     return sb.toString();
   }
 }
