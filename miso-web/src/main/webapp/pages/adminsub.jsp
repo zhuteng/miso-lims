@@ -32,6 +32,13 @@
     <%--</form>--%>
     <%--</span><br/>--%>
 
+    <h2>Kits</h2>
+    <ul class="bullets">
+        <li><a href="<c:url value="/miso/kitdescriptor/new"/>">Create a Kit</a></li>
+        <li><a href="<c:url value="/miso/kitcomponent/new"/>">Log a Kit</a></li>
+    </ul>
+
+
     <h2>Sample Processing</h2>
     <ul class="bullets">
         <li><a href="<c:url value="/miso/sample/receipt"/>">Receive Samples</a></li>

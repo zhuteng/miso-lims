@@ -35,15 +35,6 @@ public class EditKitComponentController {
     @Autowired
     private DataObjectFactory dataObjectFactory;
 
-    @ModelAttribute("kitTypes")
-    public Collection<KitType> populateKitTypes() {
-        return Arrays.asList(KitType.values());
-    }
-
-    @ModelAttribute("platformTypes")
-    public Collection<PlatformType> populatePlatformTypes() {
-        return Arrays.asList(PlatformType.values());
-    }
 
     public void setDataObjectFactory(DataObjectFactory dataObjectFactory) {
         this.dataObjectFactory = dataObjectFactory;
@@ -55,39 +46,17 @@ public class EditKitComponentController {
 
     @RequestMapping(value = "/new", method = RequestMethod.GET)
     public ModelAndView setupForm(ModelMap model) throws IOException {
-        model.addAttribute("kitComponent", null);
+
         return setupForm(KitComponentImpl.UNSAVED_ID, model);
     }
 
     @RequestMapping(value = "/{kitComponentId}", method = RequestMethod.GET)
     public ModelAndView setupForm(@PathVariable Long kitComponentId,
                                   ModelMap model) throws IOException {
-        try {
-            KitComponent kitComponent = null;
-            if (kitComponentId == KitComponentImpl.UNSAVED_ID) {
-                kitComponent = new KitComponentImpl();
-                model.put("title", "New Kit Descriptor");
-            } else {
-                kitComponent = requestManager.getKitComponentById(kitComponentId);
-                model.put("title", "Kit Descriptor " + kitComponentId);
-            }
-
-            if (kitComponent == null) {
-                throw new SecurityException("No such Kit Component Descriptor");
-            }
-
-            model.put("formObj", kitComponent);
-            model.put("kitComponent", kitComponent);
 
             return new ModelAndView("/pages/editKitComponent.jsp", model);
-        }
-        catch (IOException ex) {
-            if (log.isDebugEnabled()) {
-                log.debug("Failed to show Kit Descriptor", ex);
-            }
-            throw ex;
-        }
     }
+
 
     @RequestMapping(method = RequestMethod.POST)
     public String processSubmit(@ModelAttribute("kitComponent") KitComponent kitComponent,
@@ -104,6 +73,7 @@ public class EditKitComponentController {
             }
             throw ex;
         }
+
     }
 
 }
