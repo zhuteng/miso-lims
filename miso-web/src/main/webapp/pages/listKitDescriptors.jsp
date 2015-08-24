@@ -57,9 +57,10 @@
       <th>Version</th>
       <th>Manufacturer</th>
       <th>Part Number</th>
-      <th>Stock Level</th>
       <th>Type</th>
       <th>Platform</th>
+      <th>Units</th>
+      <th>Value</th>
       <th class="fit">Edit</th>
     </tr>
     </thead>
@@ -377,11 +378,11 @@
     });
 
     function writeTotalNo() {
-      jQuery('#SequencingtotalCount').html(jQuery('#table1>tbody>tr:visible').length.toString() + " Sequencing Kit");
-      jQuery('#EMPCRtotalCount').html(jQuery('#table2>tbody>tr:visible').length.toString() + " EMPCR Kit");
-      jQuery('#LibrarytotalCount').html(jQuery('#table3>tbody>tr:visible').length.toString() + " Library Kit");
-      jQuery('#ClusteringtotalCount').html(jQuery('#table4>tbody>tr:visible').length.toString() + " Clustring Kit");
-      jQuery('#MultiplexingtotalCount').html(jQuery('#table5>tbody>tr:visible').length.toString() + " Multiplexing Kit");
+      jQuery('#SequencingtotalCount').html(jQuery('#table1>tbody>tr:visible').length.toString() + " Sequencing KitComponent");
+      jQuery('#EMPCRtotalCount').html(jQuery('#table2>tbody>tr:visible').length.toString() + " EMPCR KitComponent");
+      jQuery('#LibrarytotalCount').html(jQuery('#table3>tbody>tr:visible').length.toString() + " Library KitComponent");
+      jQuery('#ClusteringtotalCount').html(jQuery('#table4>tbody>tr:visible').length.toString() + " Clustring KitComponent");
+      jQuery('#MultiplexingtotalCount').html(jQuery('#table5>tbody>tr:visible').length.toString() + " Multiplexing KitComponent");
     }
   </script>
 </div>

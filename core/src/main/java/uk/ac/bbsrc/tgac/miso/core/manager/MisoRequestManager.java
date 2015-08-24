@@ -1290,6 +1290,8 @@ public class MisoRequestManager implements RequestManager {
     }
   }
 
+
+
   @Override
   public Collection<KitDescriptor> listKitDescriptorsByManufacturer(String manufacturer) throws IOException {
     if (kitDescriptorStore != null) {
@@ -2565,7 +2567,6 @@ public class MisoRequestManager implements RequestManager {
       throw new IOException("No kitComponentDescriptorStore available. Check that it has been declared in the Spring config.");
     }
   }
-
 
 
 

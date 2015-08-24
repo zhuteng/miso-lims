@@ -46,34 +46,17 @@ public class EditKitComponentController {
 
     @RequestMapping(value = "/new", method = RequestMethod.GET)
     public ModelAndView setupForm(ModelMap model) throws IOException {
-
-        return setupForm(KitComponentImpl.UNSAVED_ID, model);
-    }
-
-    @RequestMapping(value = "/{kitComponentId}", method = RequestMethod.GET)
-    public ModelAndView setupForm(@PathVariable Long kitComponentId,
-                                  ModelMap model) throws IOException {
-
-            return new ModelAndView("/pages/editKitComponent.jsp", model);
-    }
-
-
-    @RequestMapping(method = RequestMethod.POST)
-    public String processSubmit(@ModelAttribute("kitComponent") KitComponent kitComponent,
-                                ModelMap model, SessionStatus session) throws IOException {
         try {
-            requestManager.saveKitComponent(kitComponent);
-            session.setComplete();
-            model.clear();
-            return "redirect:/miso/kitcomponent/" + kitComponent.getId();
+            return new ModelAndView("/pages/editKitComponent.jsp", model);
         }
-        catch (IOException ex) {
+        catch (Exception ex) {
             if (log.isDebugEnabled()) {
-                log.debug("Failed to save KitComponent Descriptor", ex);
+                log.debug("Failed to show sample", ex);
             }
             throw ex;
         }
-
     }
+
+
 
 }

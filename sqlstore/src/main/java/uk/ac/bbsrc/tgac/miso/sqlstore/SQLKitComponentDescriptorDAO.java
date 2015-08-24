@@ -75,6 +75,13 @@ public class SQLKitComponentDescriptorDAO implements KitComponentDescriptorStore
                     "SET name=:name, referenceNumber=:referenceNumber, kitDescriptorId=:kitDescriptorId " +
                     "WHERE kitComponentDescriptorId=:kitComponentDescriptorId";
 
+    public static final String JOIN_KIT_FULL_NAME = "SELECT KitDescriptor.name, KitComponentDescriptor.name " +
+            "FROM KitDescriptor, KitComponentDescriptor " +
+            "WHERE KitComponentDescriptor.kitDescriptorId = KitDescriptor.kitDescriptorId "+
+            "AND kitcomponentdescriptor.kitcomponentdescriptorId= ?";
+
+
+
 
     protected static final Logger log = LoggerFactory.getLogger(SQLKitComponentDescriptorDAO.class);
     private JdbcTemplate template;
@@ -146,6 +153,9 @@ public class SQLKitComponentDescriptorDAO implements KitComponentDescriptorStore
     public List<KitComponentDescriptor> listKitComponentDescriptorsByKitDescriptorId(long kitDescriptorId) throws IOException {
         return template.query(KIT_COMPONENT_DESCRIPTOR_SELECT_BY_KIT_DESCRIPTOR_ID, new Object[]{kitDescriptorId}, new KitComponentDescriptorMapper());
     }
+
+
+
 
     public Collection<KitComponentDescriptor> listAll() throws IOException {
         return template.query(KIT_COMPONENT_DESCRIPTOR_SELECT, new KitComponentDescriptorMapper());

@@ -18,6 +18,7 @@ public interface KitComponentDescriptorStore extends Store<KitComponentDescripto
     KitComponentDescriptor getKitComponentDescriptorById(long kitComponentDescriptorId) throws IOException;
     KitComponentDescriptor getKitComponentDescriptorByReferenceNumber(String referenceNumber) throws IOException;
     List<KitComponentDescriptor> listKitComponentDescriptorsByKitDescriptorId(long kitDescriptorId) throws IOException;
+    //String getKitFullNameByKitComponentDescriptorId(long kitComponentDescriptorId) throws IOException;
 
 
 }

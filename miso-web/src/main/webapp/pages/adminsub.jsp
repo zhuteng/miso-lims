@@ -36,6 +36,8 @@
     <ul class="bullets">
         <li><a href="<c:url value="/miso/kitdescriptor/new"/>">Create a Kit</a></li>
         <li><a href="<c:url value="/miso/kitcomponent/new"/>">Log a Kit</a></li>
+        <li><a href="<c:url value="/miso/exhaustComponent/"/>">Exhaust a Kit</a></li>
+        <li><a href="<c:url value="/miso/listkitcomponents/"/>">List Kits</a></li>
     </ul>
 
 

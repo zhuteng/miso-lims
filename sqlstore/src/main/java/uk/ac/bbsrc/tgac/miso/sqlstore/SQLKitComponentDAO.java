@@ -302,37 +302,19 @@ public class SQLKitComponentDAO implements KitComponentStore {
     public KitComponent mapRow(ResultSet rs, int rowNum) throws SQLException {
       long id = rs.getLong("kitComponentId");
 
-      /*if (isCacheEnabled() && lookupCache(cacheManager) != null) {
-        Element element;
-        if ((element = lookupCache(cacheManager).get(DbUtils.hashCodeCacheKeyFor(id))) != null) {
-          log.debug("Cache hit on map for KitComponent " + id);
-          return (KitComponent)element.getObjectValue();
-        }
-      }
-      */
+
       KitComponent kitComponent = new KitComponentImpl();
 
       try {
 
-
-
-            //TESTING THE LAZY GET
-
           if(!lazy) {
               long kitComponentDescriptorId = rs.getLong("kitComponentDescriptorId");
               System.out.println("kitComponentDescriptorId = " + kitComponentDescriptorId);
-              System.out.println("TRYING TO GET KITCOMPONENTDESCRIPTOR IN SQLKITCOMPONENTDAO");
               KitComponentDescriptor kcd = kitComponentDescriptorDAO.getKitComponentDescriptorById(kitComponentDescriptorId);
 
-              if (kcd != null) {
-                  System.out.println("THE KIT COMPONENT DESCRIPTOR IN SQLKITCOMPONENTDAO IS NOT NULL");
-              } else {
-                  System.out.println("THE KIT COMPONENT DESCRIPTOR IN SQLKITCOMPONENTDAO IS  NULL");
-              }
               kitComponent.setKitComponentDescriptor(kcd);
           }
-
-        kitComponent.setId(id);
+              kitComponent.setId(id);
               kitComponent.setIdentificationBarcode(rs.getString("identificationBarcode"));
               kitComponent.setLocationBarcode(rs.getString("locationBarcode"));
               kitComponent.setLotNumber(rs.getString("lotNumber"));

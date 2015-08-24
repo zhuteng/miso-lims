@@ -118,6 +118,9 @@ public class MenuController implements ServletContextAware {
     return "/pages/projectMenu.jsp";
   }
 
+  @RequestMapping("/exhaustComponent")
+  public String exhaustComponent() { return "/pages/exhaustKitComponent.jsp";}
+
   @RequestMapping("/activity/menu")
   public String activityMenu() {
     return "/pages/activityMenu.jsp";

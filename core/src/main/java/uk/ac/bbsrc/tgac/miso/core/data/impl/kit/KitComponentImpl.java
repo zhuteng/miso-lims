@@ -24,8 +24,10 @@
 package uk.ac.bbsrc.tgac.miso.core.data.impl.kit;
 
 import com.eaglegenomics.simlims.core.Note;
+import org.springframework.format.annotation.DateTimeFormat;
 import uk.ac.bbsrc.tgac.miso.core.data.KitComponent;
 import uk.ac.bbsrc.tgac.miso.core.data.KitComponentDescriptor;
+import uk.ac.bbsrc.tgac.miso.core.util.DateUtils;
 
 import javax.persistence.*;
 import java.time.LocalDate;
@@ -50,7 +52,9 @@ public class KitComponentImpl implements KitComponent {
   @Enumerated(EnumType.STRING)
   private Collection<Note> notes = new HashSet<Note>();
   private String lotNumber;
+  @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
   private LocalDate kitReceivedDate;
+  @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
   private LocalDate kitExpiryDate;
   private boolean exhausted;
 
@@ -106,6 +110,18 @@ public class KitComponentImpl implements KitComponent {
   public void setKitReceivedDate(LocalDate kitReceivedDate) {
     this.kitReceivedDate = kitReceivedDate;
   }
+
+
+  //STRING OVERLOADS FOR FRONT-END
+  public void setKitExpiryDate(String kitExpiryDate) {
+
+    this.kitExpiryDate = DateUtils.asLocalDate(kitExpiryDate);
+  }
+
+  public void setKitReceivedDate(String kitReceivedDate) {
+    this.kitReceivedDate = DateUtils.asLocalDate(kitReceivedDate);
+  }
+
 
   public Collection<Note> getNotes() {
     return notes;

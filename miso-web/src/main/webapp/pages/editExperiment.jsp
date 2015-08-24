@@ -35,9 +35,7 @@
 
 <div id="maincontent">
 <div id="contentcolumn">
-<form:form action="/miso/experiment" method="POST" commandName="experiment" autocomplete="off"
-           onsubmit="return validate_experiment(this);">
-<sessionConversation:insertSessionConversationId attributeName="experiment"/>
+<ed
 <h1>
   <c:choose>
     <c:when test="${experiment.id != 0}">Edit</c:when>
@@ -243,12 +241,12 @@
 <div id="tab-2">
   <h1>Consumables</h1>
 
-  <div id="addKitDialog" title="Assign a kit to this experiment"></div>
+  <div id="addKitDialog" title="Assign a kitComponent to this experiment"></div>
 
   <h2>Library Kit</h2>
 
   <a href='javascript:void(0);' class="add"
-     onclick="Experiment.kit.showLibraryKitDialog(${experiment.id},
+     onclick="Experiment.kitComponent.showLibraryKitDialog(${experiment.id},
      <c:choose>
      <c:when test="${fn:length(experiment.pool.dilutions) > 1}">
          true
@@ -271,12 +269,12 @@
       </thead>
       <tbody>
       <c:if test="${not empty libraryKits}">
-        <c:forEach items="${libraryKits}" var="kit">
+        <c:forEach items="${libraryKits}" var="kitComponent">
           <tr onMouseOver="this.className='highlightrow'" onMouseOut="this.className='normalrow'">
-            <td>${kit.kitDescriptor.name}</td>
-            <td>${kit.kitDescriptor.partNumber}</td>
-            <td>${kit.lotNumber}</td>
-            <td>${kit.kitDate}</td>
+            <td>${kitComponent.kitDescriptor.name}</td>
+            <td>${kitComponent.kitDescriptor.partNumber}</td>
+            <td>${kitComponent.lotNumber}</td>
+            <td>${kitComponent.kitReceivedDate}</td>
           </tr>
         </c:forEach>
       </c:if>
@@ -288,7 +286,7 @@
     <c:when test="${experiment.platform.platformType.key ne 'Illumina'}">
       <h2>EmPCR Kit</h2>
       <a href='javascript:void(0);' class="add"
-         onclick="Experiment.kit.showEmPcrKitDialog(${experiment.id}); return false;">Add EmPCR Kit</a><br/>
+         onclick="Experiment.kitComponent.showEmPcrKitDialog(${experiment.id}); return false;">Add EmPCR Kit</a><br/>
 
       <form id='addEmPcrKitForm'>
         <table class="list" id="emPcrKitTable">
@@ -302,12 +300,12 @@
           </thead>
           <tbody>
           <c:if test="${not empty emPcrKits}">
-            <c:forEach items="${emPcrKits}" var="kit">
+            <c:forEach items="${emPcrKits}" var="kitComponent">
               <tr onMouseOver="this.className='highlightrow'" onMouseOut="this.className='normalrow'">
-                <td class="fit">${kit.kitDescriptor.name}</td>
-                <td>${kit.kitDescriptor.partNumber}</td>
-                <td>${kit.lotNumber}</td>
-                <td>${kit.kitDate}</td>
+                <td class="fit">${kitComponent.kitDescriptor.name}</td>
+                <td>${kitComponent.kitDescriptor.partNumber}</td>
+                <td>${kitComponent.lotNumber}</td>
+                <td>${kitComponent.kitReceivedDate}</td>
               </tr>
             </c:forEach>
           </c:if>
@@ -318,7 +316,7 @@
     <c:otherwise>
       <h2>Clustering Kit</h2>
       <a href='javascript:void(0);' class="add"
-         onclick="Experiment.kit.showClusteringKitDialog(${experiment.id}); return false;">Add Clustering Kit</a><br/>
+         onclick="Experiment.kitComponent.showClusteringKitDialog(${experiment.id}); return false;">Add Clustering Kit</a><br/>
 
       <form id='addClusteringKitForm'>
         <table class="list" id="clusteringKitTable">
@@ -332,12 +330,12 @@
           </thead>
           <tbody>
           <c:if test="${not empty clusteringKits}">
-            <c:forEach items="${clusteringKits}" var="kit">
+            <c:forEach items="${clusteringKits}" var="kitComponent">
               <tr onMouseOver="this.className='highlightrow'" onMouseOut="this.className='normalrow'">
-                <td class="fit">${kit.kitDescriptor.name}</td>
-                <td>${kit.kitDescriptor.partNumber}</td>
-                <td>${kit.lotNumber}</td>
-                <td>${kit.kitDate}</td>
+                <td class="fit">${kitComponent.kitDescriptor.name}</td>
+                <td>${kitComponent.kitDescriptor.partNumber}</td>
+                <td>${kitComponent.lotNumber}</td>
+                <td>${kitComponent.kitReceivedDate}</td>
               </tr>
             </c:forEach>
           </c:if>
@@ -349,7 +347,7 @@
 
   <h2>Sequencing Kit</h2>
   <a href='javascript:void(0);' class="add"
-     onclick="Experiment.kit.showSequencingKitDialog(${experiment.id}); return false;">Add Sequencing Kit</a><br/>
+     onclick="Experiment.kitComponent.showSequencingKitDialog(${experiment.id}); return false;">Add Sequencing Kit</a><br/>
 
   <form id='addSequencingKitForm'>
     <table class="list" id="sequencingKitTable">
@@ -363,12 +361,12 @@
       </thead>
       <tbody>
       <c:if test="${not empty sequencingKits}">
-        <c:forEach items="${sequencingKits}" var="kit">
+        <c:forEach items="${sequencingKits}" var="kitComponent">
           <tr onMouseOver="this.className='highlightrow'" onMouseOut="this.className='normalrow'">
-            <td class="fit">${kit.kitDescriptor.name}</td>
-            <td>${kit.kitDescriptor.partNumber}</td>
-            <td>${kit.lotNumber}</td>
-            <td>${kit.kitDate}</td>
+            <td class="fit">${kitComponent.kitDescriptor.name}</td>
+            <td>${kitComponent.kitDescriptor.partNumber}</td>
+            <td>${kitComponent.lotNumber}</td>
+            <td>${kitComponent.kitReceivedDate}</td>
           </tr>
         </c:forEach>
       </c:if>

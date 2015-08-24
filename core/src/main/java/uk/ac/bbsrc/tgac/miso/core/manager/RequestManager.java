@@ -133,7 +133,7 @@ public interface RequestManager {
   public KitComponentDescriptor getKitComponentDescriptorByReferenceNumber(String referenceNumber) throws IOException;
   public KitDescriptor getKitDescriptorById(long kitDescriptorId) throws IOException;
   public KitDescriptor getKitDescriptorByPartNumber(String partNumber) throws IOException;
-
+  //public String getKitFullNameByKitComponentDescriptorId(long kitComponentDescriptorId) throws IOException;
 
   public QcType getSampleQcTypeById(long qcTypeId) throws IOException;
   public QcType getSampleQcTypeByName(String qcName) throws IOException;

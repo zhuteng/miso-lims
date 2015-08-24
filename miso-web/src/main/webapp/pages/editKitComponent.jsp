@@ -24,61 +24,288 @@
 <div id="maincontent">
     <div id="contentcolumn">
 
-        <form:form action="/miso/kitcomponent" method="POST" commandName="kitcomponent" autocomplete="off">
 
-            <sessionConversation:insertSessionConversationId attributeName="kitComponent"/>
-        </form:form>
-        <form>
-            <h1>Log a Kit Componenta
+        <h1>Log Kit Component(s)
+        </h1>
+        <div id="locationEntered"></div>
 
-            </h1>
+        <div id="kitInfo" style="display: none;"></div>
 
-            Enter reference number: <input type="text" id="referenceNumber" onkeyup="getKitInfoByReferenceNumber();"/>
+
+        <div id="locationForm">
+
+            Scan location barcode and   press Enter to start the logging session
+            <table class="in">
+                <tr>
+                    <td class="h">Location Barcode</td>
+                    <td><input type="text" id="locationBarcode" name="locationBarcode"/></td>
+                </tr>
+            </table>
+
+
+        </div>
+
+
+
+
+
+
+
+        <form action="#" name="addComponent" id="addComponentForm">
+            <div id="addComponent" style="display:none">
+                <table class="in">
+                    <tr>
+                        <td class="h">Scan REF barcode</td>
+                        <td><input type="text" id="referenceNumber" name="referenceNumber"/>
+                    </tr>
+                    <tr>
+                        <td class="h">Scan LOT barcode:</td>
+                        <td><input type="text" id="lotNumber" name="lotNumber"/></td>
+                    </tr>
+                    <tr>
+                        <td class="h">Scan identification barcode:</td>
+                        <td><input type="text" id="identificationBarcode" name="identificationBarcode"/></td>
+                    </tr>
+                    <tr>
+                        <td class="h">Enter expiry date:</td>
+                        <td><input  type="text" id="expiryDate" name="expiryDate" class="date-picker-element"/></td>
+                    </tr>
+                    <tr>
+                        <td class="h">Received date (<i>default:today</i>):</td>
+                        <td><input  type="text" id="receivedDate" name="receivedDate" class="date-picker-element"/></td>
+                    </tr>
+                </table>
+
+                <button type="button" name="submit" id="addComponentButton">Add</button>
+
         </form>
 
-            <p id="kitInfo"></p>
 
 
-        <script type="text/javascript">
-            //document.getElementById("referenceNumber").onkeyup = function() {getKitInfoByReferenceNumber()};
-            // jQuery('#referenceNumber').keyup('getKitInfoByReferenceNumber');
-            function getKitInfoByReferenceNumber(){
-
-                // jQuery('#kitInfo').html("test");
-                var referenceNumber = jQuery("#referenceNumber").val();
-
-                Fluxion.doAjax(
-                        'kitComponentControllerHelperService',
-                        'getKitInfoByReferenceNumber',
-
-                        {
-                            'referenceNumber':referenceNumber,
-                            'url': ajaxurl
-                        },
-                        {'doOnSuccess': function (json) {
-
-                            //TODO: error checking
-
-                                    var htmlStrResult = "Name: \t" + json.name + "<br>" +
-                                            "Component: \t" + json.componentName + "<br>" +
-                                            "Version: \t" + json.version + "<br>" +
-                                            "Manufacturer: \t" + json.manufacturer + "<br>" +
-                                            "Part Number: \t" + json.partNumber + "<br>" +
-                                            "Type: \t" + json.kitType + "<br>" +
-                                            "Platform: \t" + json.platformType + "<br>" +
-                                            "Units: \t" + json.units + "<br>" +
-                                            "Value: \t" + json.kitValue + "<br>";
 
 
-                                    jQuery('#kitInfo').html(htmlStrResult);
+        <h1>Components already added</h1>
+        <button type='button' id="saveKits" style="display:none">Save</button>
+        <div id="componentsList">
+            <span id="noComponents"><i>You haven't added any components yet</i></span>
+            <ol type="1"id="orderedComponentsList">
+            </ol>
+        </div>
+    </div>
 
-                        }
+    <script type="text/javascript">
 
-                        });
+        var currentComponentFullName;
+        var locationBarcode;
+        var components = [];
+
+
+
+        //datepicker
+        jQuery(function() {
+            jQuery( ".date-picker-element" ).datepicker({
+                        dateFormat: "yy-mm-dd",
+                        defaultDate: 0
+
+                    }
+            );
+
+            jQuery("#receivedDate").datepicker('setDate', new Date());
+        });
+
+        //prevent from submitting form with empty fields
+        jQuery("#addComponentButton").click(function() {
+            var empty = jQuery(this).parent().find("input").filter(function() {
+                return this.value === "";
+            });
+            if(empty.length) {
+                alert("Please fill out all the fields");
+            }else{
+                addKitComponent();
+            }
+        });
+
+
+
+        //show/hide component details
+        jQuery("#componentsList").on('click', ".collapsedComponent", function(){
+            jQuery(this).children().toggle();
+        });
+
+
+        //press enter to show the rest of the form
+        jQuery("#locationBarcode").keypress(function(e){
+            if(e.which==13){
+                locationBarcode = jQuery(this).val();
+
+                jQuery("#locationForm").hide();
+                jQuery("#locationEntered").html("<h2>Storage Location</h2><br>" + jQuery("#locationBarcode").val() + "<br> <br>");
+                jQuery("#addComponent").show();
+                jQuery("#referenceNumber").focus();
             }
 
-        </script>
-    </div>
+        });
+
+        jQuery("#addComponentForm").keypress(function(e){
+            if(e.which==13){
+                jQuery("#addComponentButton").click();
+            }
+        });
+
+        //show the kit info based on reference number
+        jQuery("#referenceNumber").blur(function(){
+            if(jQuery(this).val()!=""){
+                getKitInfoByReferenceNumber();
+            }
+        });
+
+        jQuery('#saveKits').click(function(){
+            saveKitComponents();
+        });
+
+        function addKitComponent(){
+            jQuery('#saveKits').show();
+
+            //json object
+            var component ={};
+
+            var fields = jQuery("#addComponentForm").serializeArray();  //get the data from the form
+
+            //convert the data into JSON object
+            jQuery.each(fields, function(){
+                if(component[this.name] !== undefined){
+                    if(component[this.name].push){
+                        component[this.name] = [component[this.name]];
+                    }
+                    component[this.name].push(this.value || "");
+                }else{
+                    component[this.name] =this.value || "";
+                }
+            });
+
+            //add two more keys/values
+            component.fullName = currentComponentFullName;
+            component.locationBarcode = locationBarcode;
+
+            //add to the components list
+            components.push(component);
+
+
+
+
+            //INFO DISPLAY
+            //we have some components - remove the text
+            jQuery("#noComponents").html("");
+
+            //create a div holding the name of the component
+            var listElement = document.createElement('li');
+            var collapsedDiv = document.createElement('div');
+            collapsedDiv.className="collapsedComponent";
+            //collapsedDiv.id="collapsedComponent" + components.length;
+            listElement.appendChild(collapsedDiv);
+            document.getElementById('orderedComponentsList').appendChild(listElement);
+
+
+            var htmlComponentDetails = "<b>Identification Barcode:</b> \t" + component.identificationBarcode + "<br>" +
+                    "<b>Lot Number:</b> \t" + component.lotNumber + "<br>" +
+                    "<b>Expiry Date:</b> \t" + component.expiryDate + "<br>" +
+                    "<b>Received Date:</b> \t" + component.receivedDate + "<br>" +
+                    "<b>Reference Number:</b> \t" + component.referenceNumber + "<br>";
+
+
+
+            //add the name
+            collapsedDiv.innerHTML= component.fullName;
+
+            //create an inner div holding the rest of the details
+            var expandedDiv = document.createElement('div');
+            expandedDiv.className="expandedComponent";
+            expandedDiv.id="expandedComponent" + components.length;
+            collapsedDiv.appendChild(expandedDiv);
+            //add the details
+            expandedDiv.innerHTML = htmlComponentDetails;
+
+
+
+
+            //clear the fields
+            jQuery('#addComponentForm').trigger("reset");
+            //set today's date for receivedDate
+            jQuery("#receivedDate").datepicker('setDate', new Date());
+            //hide the kit info
+            jQuery('#kitInfo').hide();
+        };
+
+        function saveKitComponents(){
+            console.log("yass");
+            Fluxion.doAjax(
+                    'kitComponentControllerHelperService',
+                    'saveKitComponents',
+
+                    {
+                        'components':components,
+                        'url': ajaxurl
+                    },
+                    {'doOnSuccess': function () {
+
+                        alert("The component(s) have been succesfully logged");
+
+                        location.reload(true); //reload the page from the server
+
+
+                    }
+
+                    });
+
+        };
+
+
+        function getKitInfoByReferenceNumber(){
+
+
+            var referenceNumber = jQuery("#referenceNumber").val();
+
+            Fluxion.doAjax(
+                    'kitComponentControllerHelperService',
+                    'getKitInfoByReferenceNumber',
+
+                    {
+                        'referenceNumber':referenceNumber,
+                        'url': ajaxurl
+                    },
+                    {'doOnSuccess': function (json) {
+
+                        //TODO: error checking
+
+
+                        if(jQuery.isEmptyObject(json)){
+                            alert("The reference number is not recognised");
+                        }else{
+                            var htmlStrResult = "<h2>Kit Info </h2><br><b>Name:</b> \t" + json.name + "<br>" +
+                                    "<b>Component:</b> \t" + json.componentName + "<br>" +
+                                    "<b>Version:</b> \t" + json.version + "<br>" +
+                                    "<b>Manufacturer:</b> \t" + json.manufacturer + "<br>" +
+                                    "<b>Part Number:</b> \t" + json.partNumber + "<br>" +
+                                    "<b>Type:</b> \t" + json.kitType + "<br>" +
+                                    "<b>Platform:</b> \t" + json.platformType + "<br>" +
+                                    "<b>Units:</b> \t" + json.units + "<br>" +
+                                    "<b>Value: </b>\t" + json.kitValue + "<br><br>";
+
+                            currentComponentFullName = json.name + " " + json.componentName;
+
+
+                            jQuery('#kitInfo').html(htmlStrResult);
+
+                            jQuery('#kitInfo').show();
+                        }
+
+                    }
+
+                    });
+        };
+
+    </script>
+</div>
 </div>
 
 <%@ include file="adminsub.jsp" %>
