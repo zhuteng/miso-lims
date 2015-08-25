@@ -50,9 +50,9 @@
 
 
 
-
+        <div id="addComponent" style="display:none">
         <form action="#" name="addComponent" id="addComponentForm">
-            <div id="addComponent" style="display:none">
+
                 <table class="in">
                     <tr>
                         <td class="h">Scan REF barcode</td>
@@ -99,7 +99,9 @@
         var locationBarcode;
         var components = [];
 
-
+        jQuery(document).ready(function(){
+            jQuery("#locationBarcode").focus();
+        })
 
         //datepicker
         jQuery(function() {

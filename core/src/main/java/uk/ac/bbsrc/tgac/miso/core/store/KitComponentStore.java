@@ -23,6 +23,8 @@
 
 package uk.ac.bbsrc.tgac.miso.core.store;
 
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
 import uk.ac.bbsrc.tgac.miso.core.data.KitComponent;
 import uk.ac.bbsrc.tgac.miso.core.data.type.KitType;
 
@@ -51,6 +53,9 @@ public interface KitComponentStore extends Store<KitComponent> {
   List<KitComponent> listByExperiment(long experimentId) throws IOException;
   List<KitComponent> listByManufacturer(String manufacturerName) throws IOException;
   List<KitComponent> listByType(KitType kitType) throws IOException;
+
+  long saveChangeLog(JSONObject changeLog) throws IOException;
+  JSONArray getKitChangeLog() throws IOException;
 
 
 }

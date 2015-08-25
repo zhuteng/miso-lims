@@ -25,78 +25,84 @@
 
 <div id="maincontent">
   <div id="contentcolumn">
-    <h1>Exhaust a kit component</h1>
+    <h1>Change Kit's Location</h1>
 
     <div id="kitInfo">
     </div>
-      <div id="identificationBarcodeForm">
-    Scan the identification barcode and press Enter
-    <input type="text" name="identificationBarcode" id="identificationBarcode"/>
-      </div>
+    <div id="identificationBarcodeForm">
+      Scan the identification barcode and press Enter
+      <input type="text" name="identificationBarcode" id="identificationBarcode"/>
+    </div>
 
-      <div id="locationBarcodeForm" style="display:none">
-          New location: (Leave blank if the kit has been used up)
-          <input type="text" name="locationBarcode" id="locationBarcode"/>
-      </div>
-        <br>
-      <button type="button" id="exhaustComponentButton" style="display:none">Exhaust</button>
+    <div id="locationBarcodeForm" style="display:none">
+      New location:
+      <input type="text" name="locationBarcode" id="locationBarcode"/>
+    </div>
+    <br>
+    <button type="button" id="changeLocationButton" style="display:none">Change Location</button>
   </div>
 </div>
 
 <script>
 
-    var identificationBarcode;
-    var locationBarcodeOld;
+  var identificationBarcode;
+  var locationBarcodeOld;
+
+  jQuery(document).ready(function(){
+    jQuery("#identificationBarcode").focus();
+  })
 
 
-    jQuery(document).ready(function(){
-       jQUery("#identificationBarcode").focus();
-    });
     //press enter to show the rest of the form
-    jQuery("#identificationBarcode").keypress(function(e){
-        if(e.which==13){
-            identificationBarcode = jQuery(this).val();
+  jQuery("#identificationBarcode").keypress(function(e){
+    if(e.which==13){
+      identificationBarcode = jQuery(this).val();
 
 
-           getKitInfoByIdentificationNumber();
+      getKitInfoByIdentificationNumber();
+
+      jQuery("#locationBarcode").focus();
 
 
 
-        }
-
-    });
-
-    jQuery("#exhaustComponentButton").click(function(){
-            exhaustKitComponent();
-    });
-
-    function exhaustKitComponent(){
-        var locationBarcodeNew = jQuery("#locationBarcode").val();
-
-        Fluxion.doAjax(
-                'kitComponentControllerHelperService',
-                'exhaustKitComponent',
-
-                {
-                    'identificationBarcode':identificationBarcode,
-                    'locationBarcodeNew': locationBarcodeNew,
-                    'locationBarcodeOld': locationBarcodeOld,
-                    'url': ajaxurl
-                },
-                {
-                    'doOnSuccess': function (json) {
-
-                        alert("The kit component has been successfully exhausted");
-                        location.reload(true);
-                    }
-                });
     }
+
+  });
+
+  jQuery("#changeLocationButton").click(function(){
+    changeKitLocation();
+  });
+  
+
+
+  function changeKitLocation(){
+    var locationBarcodeNew = jQuery("#locationBarcode").val();
+
+
+    Fluxion.doAjax(
+            'kitComponentControllerHelperService',
+            'changeLocation',
+
+            {
+              'identificationBarcode':identificationBarcode,
+              'locationBarcodeNew': locationBarcodeNew,
+              'locationBarcodeOld': locationBarcodeOld,
+              'url': ajaxurl
+            },
+            {
+              'doOnSuccess': function (json) {
+
+                alert("The kit component has been successfuly relocated");
+                location.reload(true);
+              }
+            });
+  }
 
 
   function getKitInfoByIdentificationNumber(){
 
 
-      identificationBarcode = jQuery("#identificationBarcode").val();
+    identificationBarcode = jQuery("#identificationBarcode").val();
 
     Fluxion.doAjax(
             'kitComponentControllerHelperService',
@@ -117,7 +123,7 @@
                 alert("This kit has already been exhausted");
               }else{
 
-                  console.log(json);
+                console.log(json);
                 var htmlStrResult = "<h2>Kit Info </h2><br><b>Name:</b> \t" + json.name +" " + json.componentName +  "<br>" +
                         "<b>Reference Number:</b> \t" + json.referenceNumber + "<br>" +
                         "<b>Lot Number:</b> \t" + json.lotNumber + "<br>" +
@@ -126,16 +132,16 @@
                         "<b>Location Barcode:</b> \t" + json.locationBarcode + "<br><br><br>";
 
 
-                  //HIDE/SHOW PARTS OF THE LAYOUT
-                  jQuery("#identificationBarcodeForm").hide();
-                  jQuery("#locationBarcodeForm").show();
-                  jQuery("#exhaustComponentButton").show();
+                //HIDE/SHOW PARTS OF THE LAYOUT
+                jQuery("#identificationBarcodeForm").hide();
+                jQuery("#locationBarcodeForm").show();
+                jQuery("#changeLocationButton").show();
 
                 jQuery('#kitInfo').html(htmlStrResult);
 
                 jQuery('#kitInfo').show();
 
-                  locationBarcodeOld = json.locationBarcode;
+                locationBarcodeOld = json.locationBarcode;
               }
 
             }

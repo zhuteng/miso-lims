@@ -137,9 +137,9 @@ public class SQLKitComponentDescriptorDAO implements KitComponentDescriptorStore
     }
 
     public KitComponentDescriptor getKitComponentDescriptorById(long id) throws IOException {
-        System.out.println("TRYING TO GETKIMPONENTDESCRIPTORBYID IN SQLKITCOMPONENTDESCRIPTORDAO");
+
         List eResults = template.query(KIT_COMPONENT_DESCRIPTOR_SELECT_BY_ID, new Object[]{id}, new KitComponentDescriptorMapper());
-        System.out.println("SUCCESS");
+
         return eResults.size() > 0 ? (KitComponentDescriptor) eResults.get(0) : null;
     }
 

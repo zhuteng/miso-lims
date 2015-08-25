@@ -28,13 +28,12 @@
             <sessionConversation:insertSessionConversationId attributeName="kitDescriptor"/>
 
             <h1>New Kit
-                <button type="submit" class="fg-button ui-state-default ui-corner-all">Save</button>
             </h1>
             <h2>Information</h2>
             <table class="in">
                 <tr>
                     <td class="h">Name:</td>
-                    <td><form:input path="name"/></td>
+                    <td><form:input path="name" id="name"/></td>
                 </tr>
                 <tr>
                     <td class="h">Version:</td>
@@ -77,6 +76,12 @@
 
     </div>
 </div>
+
+<script>
+    jQuery(document).ready(function(){
+        jQuery("#name").focus();
+    })
+</script>
 
 <%@ include file="adminsub.jsp" %>
 

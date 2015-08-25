@@ -25,6 +25,8 @@ package uk.ac.bbsrc.tgac.miso.core.manager;
 
 import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.SecurityProfile;
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -1993,6 +1995,17 @@ public class MisoRequestManager implements RequestManager {
     }
   }
 
+
+  @Override
+  public long saveKitChangeLog(JSONObject changeLog) throws IOException {
+    if (kitComponentStore != null){
+      return kitComponentStore.saveChangeLog(changeLog);
+    }
+    else {
+      throw new IOException("No KitComponentStore available. Check that it has been declared in the Spring config.");
+    }
+  }
+
   @Override
   public <T extends List<S>, S extends Plateable> long savePlate(Plate<T, S> plate) throws IOException {
     if (plateStore != null) {
@@ -2024,6 +2037,17 @@ public class MisoRequestManager implements RequestManager {
   }
 
   //GETS
+
+
+  @Override
+  public JSONArray getKitChangeLog() throws IOException {
+    if(kitComponentStore !=null){
+      return kitComponentStore.getKitChangeLog();
+    }else{
+      throw new IOException("No KitComponentStore available. Check that it has been declared in the Spring config");
+    }
+  }
+
   @Override
   public Project getProjectById(long projectId) throws IOException {
     if (projectStore != null) {

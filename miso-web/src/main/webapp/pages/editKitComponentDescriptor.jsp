@@ -71,21 +71,21 @@
 
             <h1>Components</h1>
             <c:forEach items="${kitComponentDescriptors}" var="component">
-            <table class="in">
-                <tr>
-                    <td class="h">Name:</td>
-                    <td>${component.name}</td>
-                </tr>
-                <tr>
-                    <td class="h">Reference Number:</td>
-                    <td>${component.referenceNumber}</td>
-                </tr>
-            </table>
+                <table class="in">
+                    <tr>
+                        <td class="h">Name:</td>
+                        <td>${component.name}</td>
+                    </tr>
+                    <tr>
+                        <td class="h">Reference Number:</td>
+                        <td>${component.referenceNumber}</td>
+                    </tr>
+                </table>
                 <br>
             </c:forEach>
 
 
-            <h1>Add a new component</h1>
+            <h2>Add a new component</h2>
             <table class="in">
                 <tr>
                     <td class="h">Name:</td>
@@ -95,13 +95,25 @@
                 <tr>
                     <td class="h">Reference Number:</td>
                     <td><form:input path="referenceNumber"/></td>
-                </tr>edit
+                </tr>
+
+
             </table>
 
             <button type="submit" class="fg-button ui-state-default ui-corner-all">Add</button>
         </form:form>
+        <br>
+        <button type="button" id="done">Save and return to Home</button>
     </div>
 </div>
+
+<script>
+
+    jQuery("#done").click(function(){
+        //redirect to Home
+        jQuery(location).attr('href', '/miso/mainMenu');
+    })
+</script>
 
 <%@ include file="adminsub.jsp" %>
 

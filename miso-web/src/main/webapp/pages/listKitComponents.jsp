@@ -26,27 +26,27 @@
         </tr>
         <tr>
           <td>
-            <input type="checkbox" name="showMore" value="2"> Version
+            <input type="checkbox" name="showMore" value="3"> Version
           </td>
           <td>
-            <input type="checkbox" name="showMore" value="4"> Part Number
+            <input type="checkbox" name="showMore" value="5"> Part Number
           </td>
           <td>
-            <input type="checkbox" name="showMore" value="5"> Type
+            <input type="checkbox" name="showMore" value="6"> Type
+          </td>
+          <td>9
+            <input type="checkbox" name="showMore" value="7"> Platform
           </td>
           <td>
-            <input type="checkbox" name="showMore" value="6"> Platform
+            <input type="checkbox" name="showMore" value="8"> Units
           </td>
           <td>
-            <input type="checkbox" name="showMore" value="7"> Units
+            <input type="checkbox" name="showMore" value="9"> Value
           </td>
           <td>
-            <input type="checkbox" name="showMore" value="8"> Value
+            <input type="checkbox" name="showMore" value="10"> Reference Number
           </td>
-          <td>
-            <input type="checkbox" name="showMore" value="9"> Reference Number
-          </td>
-        </tr>
+        </tr>v
         <tr>
           <td>
             <button type="button" id="showMoreButton">Apply</button>
@@ -80,6 +80,15 @@
             <button type="button" id="selectExpiryDisplayButton">Apply</button>
           </td>
         </tr>
+        <tr>
+          <th>Search by ID</th>
+          <td>
+          <input type="number" id="searchId">
+          </td>
+          <td>
+          <button type="button" id='searchIdButton'>Find</button>
+          </td>
+        </tr>
 
       </table>
 
@@ -110,6 +119,11 @@
   var table;
   var exhaustedToggled = true;
 
+
+  jQuery("#searchIdButton").click(function(){
+    var id = jQuery("#searchIdButton").val();
+    table.column(0).search(id).draw(); //0 is index od ID column
+  })
 
   jQuery(document).ready(function(){
     listAllKitComponentsForTable();
@@ -146,7 +160,7 @@
 
     var selected = jQuery("#selectExpiryDisplay").val();
     console.log(selected);
-    var expiryStateColumn = 16; //index (by default that columns is hidden)
+    var expiryStateColumn = 17; //index (by default that columns is hidden)
 
     switch(selected){
 
@@ -169,11 +183,11 @@
   }
 
   function toggleVisibilityExhausted(){
-    if(exhaustedToggled){
-      table.column(15).search("false").draw();
+    if(exhaustedToggled){ //16 -index of exhausted column
+      table.column(16).search("false").draw();
       exhaustedToggled = false;
     }else{
-      table.column(15).search("").draw();
+      table.column(16).search("").draw();
       exhaustedToggled = true;
     }
   }
@@ -205,6 +219,7 @@
 
       data: components,
       columns:[
+        { data: 'ID', title: "ID"},
         { data: 'Kit Name', title: "Kit Name"},
         { data: 'Component Name', title: "Component Name"},
         { data: 'Version', title: "Version", visible:false},
@@ -229,7 +244,6 @@
 
 
     })};
-
 
 
 

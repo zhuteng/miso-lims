@@ -29,6 +29,8 @@ import java.util.Collection;
 import java.util.List;
 
 import com.eaglegenomics.simlims.core.Note;
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import com.eaglegenomics.simlims.core.SecurityProfile;
 
@@ -74,6 +76,7 @@ public interface RequestManager {
   public long saveKitComponent(KitComponent kitComponent) throws IOException;
   public long saveKitComponentDescriptor(KitComponentDescriptor kitComponentDescriptor) throws IOException;
   public long saveKitDescriptor(KitDescriptor kitDescriptor) throws IOException;
+  public long saveKitChangeLog(JSONObject changeLog) throws IOException;
   public <T extends List<S>, S extends Plateable> long savePlate(Plate<T, S> plate) throws IOException;
   public long saveAlert(Alert alert) throws IOException;
   public long saveEntityGroup(EntityGroup<? extends Nameable, ? extends Nameable> entityGroup) throws IOException;
@@ -126,6 +129,7 @@ public interface RequestManager {
   public SequencerReference getSequencerReferenceById(long referenceId) throws IOException;
   public SequencerReference getSequencerReferenceByName(String referenceName) throws IOException;
   public SequencerReference getSequencerReferenceByRunId(long runId) throws IOException;
+  public JSONArray getKitChangeLog() throws IOException;
 
   public KitComponent getKitComponentById(long kitId) throws IOException;
   public KitComponent getKitComponentByIdentificationBarcode(String barcode) throws IOException;

@@ -1,9 +1,14 @@
 package uk.ac.bbsrc.tgac.miso.core.util;
 
+import net.sf.json.JSONObject;
+
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.Period;
 import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
 import java.util.Date;
 
 /**
@@ -46,9 +51,7 @@ public class DateUtils {
 
     public static ExpiryState getExpiryState(LocalDate date){
         LocalDate today = LocalDate.now();
-        Period period = Period.between(today, date);
-        int periodDays = period.getDays();
-
+        long periodDays = ChronoUnit.DAYS.between(today,date);
         if(periodDays < 0){
             return ExpiryState.EXPIRED;
         }else if(periodDays < EXPIRY_THRESHOLD_DAYS){
@@ -57,6 +60,21 @@ public class DateUtils {
             return ExpiryState.GOOD_TO_USE;
         }
 
+    }
+
+    public static Timestamp getTimeStampFromJSON(JSONObject timestampJSON){
+        long millis = timestampJSON.getLong("time");
+
+        return new Timestamp(millis);
+
+        
+
+    }
+
+    public static String getStringFromTimeStamp(Timestamp timestamp){
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+        String string  = dateFormat.format(timestamp);
+        return string;
     }
 
 }

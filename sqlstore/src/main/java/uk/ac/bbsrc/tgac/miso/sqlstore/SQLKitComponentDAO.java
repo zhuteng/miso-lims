@@ -26,6 +26,8 @@ package uk.ac.bbsrc.tgac.miso.sqlstore;
 import com.eaglegenomics.simlims.core.Note;
 import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Element;
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,6 +52,7 @@ import javax.persistence.CascadeType;
 import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
@@ -224,7 +227,7 @@ public class SQLKitComponentDAO implements KitComponentStore {
     return template.query(KIT_COMPONENT_SELECT_BY_EXPIRY_DATE, new Object[]{DateUtils.asDate(expiryDate)}, new KitComponentMapper());
   }
 
-  //TODO: NOT SURE ABOUT THE CONVERSION TO MYSQL TINYINT FROM BOOLEAN. NEEDS TO BE TESTED
+
   public List<KitComponent> listKitComponentsByExhausted(boolean exhausted) throws IOException {
     return template.query(KIT_COMPONENT_SELECT_BY_EXHAUSTED, new Object[]{KitUtils.toInt(exhausted)}, new KitComponentMapper());
   }
@@ -309,7 +312,6 @@ public class SQLKitComponentDAO implements KitComponentStore {
 
           if(!lazy) {
               long kitComponentDescriptorId = rs.getLong("kitComponentDescriptorId");
-              System.out.println("kitComponentDescriptorId = " + kitComponentDescriptorId);
               KitComponentDescriptor kcd = kitComponentDescriptorDAO.getKitComponentDescriptorById(kitComponentDescriptorId);
 
               kitComponent.setKitComponentDescriptor(kcd);
@@ -329,7 +331,67 @@ public class SQLKitComponentDAO implements KitComponentStore {
       }
       return kitComponent;
     }
+
+
+
+
+
+
+      
   }
+
+    @Override
+    public long saveChangeLog(JSONObject changeLog) throws IOException {
+
+
+        MapSqlParameterSource params = new MapSqlParameterSource();
+        params.addValue("userId", changeLog.getLong("userId"))
+                .addValue("kitComponentId", changeLog.getLong("kitComponentId"))
+                .addValue("locationBarcodeOld", changeLog.getString("locationBarcodeOld"))
+                .addValue("locationBarcodeNew", changeLog.getString("locationBarcodeNew"))
+                .addValue("exhausted", changeLog.getBoolean("exhausted"))
+                .addValue("logDate", DateUtils.getTimeStampFromJSON((JSONObject)changeLog.get("logDate")));
+
+        //NO UPDATE - ALWAYS INSERT
+
+            SimpleJdbcInsert insert = new SimpleJdbcInsert(template)
+                    .withTableName("KitChangeLog")
+                    .usingGeneratedKeyColumns("kitChangeLogId");
+            Number newId = insert.executeAndReturnKey(params);
+
+
+
+        return (long) newId;
+
+
+    }
+
+    @Override
+    public JSONArray getKitChangeLog() throws IOException {
+        List<JSONObject> changeLogs = template.query(
+                "select * from KitChangeLog",
+                new RowMapper<JSONObject>() {
+                    public JSONObject mapRow(ResultSet rs, int rowNum) throws SQLException {
+                        JSONObject changeLog = new JSONObject();
+                        changeLog.put("userId", rs.getLong("userId"));
+                        changeLog.put("kitComponentId", rs.getLong("kitComponentId"));
+                        changeLog.put("locationBarcodeOld", rs.getString("locationBarcodeOld"));
+                        changeLog.put("locationBarcodeNew", rs.getString("locationBarcodeNew"));
+                        changeLog.put("exhausted", rs.getBoolean("exhausted"));
+                        changeLog.put("logDate", DateUtils.getStringFromTimeStamp(rs.getTimestamp("logDate")));
+                        return changeLog;
+                    }
+                });
+
+        JSONArray result = new JSONArray();
+        for(JSONObject log : changeLogs){
+            result.add(log);
+        }
+
+        return result;
+
+
+    }
 
 
 }

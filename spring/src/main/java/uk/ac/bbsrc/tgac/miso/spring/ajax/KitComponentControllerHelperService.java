@@ -67,8 +67,10 @@ import javax.servlet.http.HttpSession;
 import java.awt.image.RenderedImage;
 import java.io.File;
 import java.io.IOException;
+import java.sql.Timestamp;
 import java.text.*;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
@@ -108,6 +110,8 @@ public class KitComponentControllerHelperService {
                 kitComponentDescriptor = kitComponent.getKitComponentDescriptor();
                 kitDescriptor = kitComponentDescriptor.getKitDescriptor();
 
+
+                component.put("ID", kitComponent.getId());
                 component.put("Kit Name", kitDescriptor.getName());
                 component.put("Component Name", kitComponentDescriptor.getName());
                 component.put("Version", kitDescriptor.getVersion());
@@ -131,13 +135,13 @@ public class KitComponentControllerHelperService {
 
 
                 componentsArr.add(component);
-                //convert ArrayList to array (should be easier for DataTables.js)
+
 
 
 
             }
             JSONObject jsonComponents = new JSONObject();
-            jsonComponents.put("components", componentsArr);
+            jsonComponents.put("components", componentsArr);    //nesting might not be necessary
             return jsonComponents;
         }
 
@@ -216,16 +220,27 @@ public class KitComponentControllerHelperService {
     }
 
     public JSONObject exhaustKitComponent(HttpSession session, JSONObject json){
-            String identificationBarcode = json.getString("identificationBarcode");
-            String locationBarcode = json.getString("locationBarcode");
 
+            String identificationBarcode = json.getString("identificationBarcode");
+            String locationBarcode = json.getString("locationBarcodeNew");
 
             try{
             KitComponent kitComponent = requestManager.getKitComponentByIdentificationBarcode(identificationBarcode);
 
+
                 kitComponent.setExhausted(true);
                 kitComponent.setLocationBarcode(locationBarcode);
                 requestManager.saveKitComponent(kitComponent);
+
+                //log the change
+                JSONObject logObject = new JSONObject();
+                logObject.put("kitComponentId", kitComponent.getId());
+                logObject.put("locationBarcodeNew", json.getString("locationBarcodeNew"));
+                logObject.put("locationBarcodeOld", json.getString("locationBarcodeOld"));
+                logObject.put("exhausted", true);
+
+                //LOG
+                logLocationChange(logObject);
 
             } catch (IOException e) {
                 e.printStackTrace();
@@ -235,6 +250,59 @@ public class KitComponentControllerHelperService {
         return JSONUtils.SimpleJSONResponse("ok");
 
     }
+
+    public JSONObject changeLocation(HttpSession session, JSONObject json){
+        String identificationBarcode = json.getString("identificationBarcode");
+        String locationBarcode = json.getString("locationBarcodeNew");
+
+
+        try{
+            KitComponent kitComponent = requestManager.getKitComponentByIdentificationBarcode(identificationBarcode);
+
+            kitComponent.setLocationBarcode(locationBarcode);
+            requestManager.saveKitComponent(kitComponent);
+
+            //log the change
+            JSONObject logObject = new JSONObject();
+            logObject.put("kitComponentId", kitComponent.getId());
+            logObject.put("locationBarcodeNew", json.getString("locationBarcodeNew"));
+            logObject.put("locationBarcodeOld", json.getString("locationBarcodeOld"));
+            logObject.put("exhausted", false);
+            //LOG
+            logLocationChange(logObject);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            return JSONUtils.SimpleJSONError("Something went wrong");
+        }
+
+        return JSONUtils.SimpleJSONResponse("ok");
+
+    }
+
+    public void logLocationChange (JSONObject json) throws IOException {
+        User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
+        long userId = user.getUserId();
+
+        LocalDateTime now = LocalDateTime.now();
+
+        Timestamp nowTimestamp = Timestamp.valueOf(now);
+
+        json.put("userId", userId);
+        json.put("logDate", nowTimestamp);
+
+        try{
+            requestManager.saveKitChangeLog(json);
+        }catch (IOException e){
+            e.printStackTrace();
+        }
+
+
+
+
+
+    }
+
 
 
     public JSONObject saveKitComponents(HttpSession session, JSONObject json){
@@ -263,12 +331,39 @@ public class KitComponentControllerHelperService {
                 kitComponent.setKitComponentDescriptor(requestManager.getKitComponentDescriptorByReferenceNumber(referenceNumber));
                 requestManager.saveKitComponent(kitComponent);
 
+                //log the change
+                JSONObject logObject = new JSONObject();
+                logObject.put("kitComponentId", kitComponent.getId());
+                logObject.put("locationBarcodeNew", locationBarcode);
+                logObject.put("locationBarcodeOld", "N/A (KIT WAS NOT LOGGED BEFORE)");
+                logObject.put("exhausted", false);
+                //LOG
+                logLocationChange(logObject);
+
             } catch (IOException e) {
                 e.printStackTrace();
                 return JSONUtils.SimpleJSONError("Something went wrong");
             }
         }
         return JSONUtils.SimpleJSONResponse("ok");
+
+    }
+
+    public JSONObject getKitChangeLog(HttpSession session, JSONObject json){
+        JSONObject result = new JSONObject();
+        try {
+            JSONArray changeLog = requestManager.getKitChangeLog();
+
+
+            result.put("changeLog", changeLog);
+
+        }catch (IOException e) {
+            e.printStackTrace();
+            return JSONUtils.SimpleJSONError("Something went wrong");
+        }
+
+        return result;
+
 
     }
 

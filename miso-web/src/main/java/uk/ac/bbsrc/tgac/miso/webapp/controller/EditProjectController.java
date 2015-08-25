@@ -111,7 +111,7 @@ public class EditProjectController {
     if (projectId != AbstractProject.UNSAVED_ID) {
       Project p = requestManager.getProjectById(projectId);
       if (p != null) {
-        //User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
+        User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
         Map<Integer, String> fileMap = new HashMap<Integer, String>();
         for (String s : filesManager.getFileNames(Project.class, projectId.toString())) {
           fileMap.put(s.hashCode(), s);

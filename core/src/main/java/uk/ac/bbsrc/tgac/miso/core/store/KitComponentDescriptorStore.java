@@ -21,5 +21,6 @@ public interface KitComponentDescriptorStore extends Store<KitComponentDescripto
     //String getKitFullNameByKitComponentDescriptorId(long kitComponentDescriptorId) throws IOException;
 
 
+
 }
 
