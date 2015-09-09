@@ -118,22 +118,20 @@ public class MenuController implements ServletContextAware {
     return "/pages/projectMenu.jsp";
   }
 
-  @RequestMapping("/exhaustComponent")
-  public String exhaustComponent() { return "/pages/exhaustKitComponent.jsp";}
+  @RequestMapping("/kitComponentManagement")
+  public String exhaustComponent() { return "/pages/kitComponentManagement.jsp";}
 
   @RequestMapping("/listKitChangeLog")
   public String listKitChangeLog(){ return "/pages/listKitChangeLog.jsp";
-  }
-
-  @RequestMapping("/changeComponentLocation")
-  public String changeComponentLocation(){
-    return "/pages/changeKitComponentLocation.jsp";
   }
 
   @RequestMapping("/activity/menu")
   public String activityMenu() {
     return "/pages/activityMenu.jsp";
   }
+
+  @RequestMapping("/kitDescriptorManagement")
+  public String kitManagement(){ return "/pages/KitDescriptorManagement.jsp";}
 
   @Override
   public void setServletContext(ServletContext servletContext) {

@@ -30,6 +30,7 @@ import net.sf.ehcache.Cache;
 import net.sf.json.JSON;
 import net.sf.json.JSONArray;
 import org.apache.commons.codec.binary.Base64;
+import org.apache.http.protocol.HTTP;
 import org.krysalis.barcode4j.BarcodeDimension;
 import org.krysalis.barcode4j.BarcodeGenerator;
 import uk.ac.bbsrc.tgac.miso.core.data.*;
@@ -95,6 +96,88 @@ public class KitComponentControllerHelperService {
     private DataObjectFactory dataObjectFactory;
 
 
+    public int countNonExhaustedComponentsByKitComponentDescriptorId(long kitComponentDescriptorId){
+        int count = 0;
+        try{
+            Collection<KitComponent> kitComponents = requestManager.listKitComponentsByKitComponentDescriptorId(kitComponentDescriptorId);
+
+            for(KitComponent kitComponent: kitComponents){
+                if(!kitComponent.isExhausted()){
+                   count++;
+                }
+            }
+            return count;
+        }catch (IOException e) {
+            e.printStackTrace();
+            return 0;
+        }
+    }
+    public JSONObject listKitComponentDescriptorsByKitDescriptorId(HttpSession session, JSONObject json){
+        JSONArray componentDescriptorsArr = new JSONArray();
+
+        long kitDescriptorId = json.getLong("kitDescriptorId");
+
+        try{
+            Collection<KitComponentDescriptor> kitComponentDescriptors = requestManager.listKitComponentDescriptorsByKitDescriptorId(kitDescriptorId);
+
+            JSONObject componentDescriptor = new JSONObject();
+
+
+            for(KitComponentDescriptor kitComponentDescriptor : kitComponentDescriptors){
+                componentDescriptor.put("kitComponentDescriptorId", kitComponentDescriptor.getKitComponentDescriptorId());
+                componentDescriptor.put("name", kitComponentDescriptor.getName());
+                componentDescriptor.put("referenceNumber", kitComponentDescriptor.getReferenceNumber());
+
+                int stockLevel = countNonExhaustedComponentsByKitComponentDescriptorId(kitComponentDescriptor.getKitComponentDescriptorId());
+                componentDescriptor.put("stockLevel", stockLevel);
+                componentDescriptorsArr.add(componentDescriptor);
+            }
+
+            JSONObject jsonDescriptors = new JSONObject();
+            jsonDescriptors.put("componentDescriptors", componentDescriptorsArr);    //nesting might not be necessary
+            return jsonDescriptors;
+
+
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            return JSONUtils.SimpleJSONError("error");
+        }
+    }
+    public JSONObject listAllKitDescriptors(HttpSession session, JSONObject json){
+        JSONArray descriptorsArr = new JSONArray();
+
+        try{
+            Collection<KitDescriptor> kitDescriptors = requestManager.listAllKitDescriptors();
+
+            JSONObject descriptor = new JSONObject();
+            NumberFormat formatter = new DecimalFormat("£#0.00");
+
+            for(KitDescriptor kitDescriptor : kitDescriptors){
+                descriptor.put("kitDescriptorId", kitDescriptor.getKitDescriptorId());
+                descriptor.put("name", kitDescriptor.getName());
+                descriptor.put("version", kitDescriptor.getVersion());
+                descriptor.put("manufacturer", kitDescriptor.getManufacturer());
+                descriptor.put("partNumber", kitDescriptor.getPartNumber());
+                descriptor.put("kitType", kitDescriptor.getKitType().getKey());
+                descriptor.put("platformType", kitDescriptor.getPlatformType().getKey());
+                descriptor.put("units", kitDescriptor.getUnits());
+                descriptor.put("kitValue", formatter.format(kitDescriptor.getKitValue()));
+
+                descriptorsArr.add(descriptor);
+            }
+
+            JSONObject jsonDescriptors = new JSONObject();
+            jsonDescriptors.put("descriptors", descriptorsArr);    //nesting might not be necessary
+            return jsonDescriptors;
+
+
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            return JSONUtils.SimpleJSONError("error");
+        }
+    }
     public JSONObject listAllKitComponentsForTable(HttpSession session, JSONObject json){
 
         JSONArray componentsArr = new JSONArray();
@@ -205,11 +288,13 @@ public class KitComponentControllerHelperService {
                 //kit component descriptor info
                 response.put("componentName", kitComponentDescriptor.getName());
                 response.put("referenceNumber", kitComponentDescriptor.getReferenceNumber());
+                //kit component info
                 response.put("lotNumber", kitComponent.getLotNumber());
                 response.put("receivedDate", kitComponent.getKitReceivedDate().toString());
                 response.put("expiryDate", kitComponent.getKitExpiryDate().toString());
                 response.put("locationBarcode", kitComponent.getLocationBarcode());
                 response.put("exhausted", kitComponent.isExhausted());
+                response.put("kitComponentId", kitComponent.getId());
             }
             return response;
         }
@@ -296,14 +381,29 @@ public class KitComponentControllerHelperService {
         }catch (IOException e){
             e.printStackTrace();
         }
+    }
 
+    public JSONObject isKitComponentAlreadyLogged(HttpSession session, JSONObject json) throws IOException{
+        String identificationBarcode = json.getString("identificationBarcode");
+        boolean isLogged = false;
+
+        try{
+             isLogged = requestManager.isKitComponentAlreadyLogged(identificationBarcode);
+        }catch (IOException e){
+            e.printStackTrace();
+        }
+
+
+        JSONObject result = new JSONObject();
+
+        result.put("isLogged", isLogged);
+
+        return result;
 
 
 
 
     }
-
-
 
     public JSONObject saveKitComponents(HttpSession session, JSONObject json){
         JSONArray a = JSONArray.fromObject(json.get("components"));
@@ -367,8 +467,42 @@ public class KitComponentControllerHelperService {
 
     }
 
+    public JSONObject getKitChangeLogByKitComponentId(HttpSession session, JSONObject json){
+        JSONObject result = new JSONObject();
+        try {
+
+            JSONArray changeLog = requestManager.getKitChangeLogByKitComponentId(json.getLong("kitComponentId"));
 
 
+            result.put("changeLog", changeLog);
+
+        }catch (IOException e) {
+            e.printStackTrace();
+            return JSONUtils.SimpleJSONError("Something went wrong");
+        }
+
+        return result;
+
+
+    }
+
+    public JSONObject getKitDescriptorByPartNumber(HttpSession session, JSONObject json){
+        JSONObject result = new JSONObject();
+        try {
+
+             KitDescriptor kitDescriptor  = requestManager.getKitDescriptorByPartNumber(json.getString("partNumber"));
+
+
+            result.put("kitDescriptor", kitDescriptor);
+
+        }catch (IOException e) {
+            e.printStackTrace();
+            return JSONUtils.SimpleJSONError("Something went wrong");
+        }
+
+        return result;
+
+    }
 
     public void setSecurityManager(SecurityManager securityManager) {
         this.securityManager = securityManager;

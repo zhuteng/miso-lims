@@ -1,5 +1,5 @@
 <%--
-  ~ Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
+  ~ Copyright (c) 2015. The Genome Analysis Centre, Norwich, UK
   ~ MISO project contacts: Robert Davey, Mario Caccamo @ TGAC
   ~ **********************************************************************
   ~
@@ -20,10 +20,11 @@
   ~
   ~ **********************************************************************
   --%>
+
 <%@ include file="../header.jsp" %>
 <div id="maincontent">
     <div id="contentcolumn">
-        <form:form action="/miso/kitdescriptor" method="POST" commandName="kitDescriptor" autocomplete="off">
+        <form:form action="/miso/kitdescriptor" method="POST" commandName="kitDescriptor" autocomplete="off" id="addDescriptorForm">
 
             <sessionConversation:insertSessionConversationId attributeName="kitDescriptor"/>
 
@@ -45,7 +46,7 @@
                 </tr>
                 <tr>
                     <td class="h">Part Number:</td>
-                    <td><form:input path="partNumber"/></td>
+                    <td><form:input path="partNumber" id="partNumber"/></td>
                 </tr>
                 <tr>
                     <td class="h">Units:</td>
@@ -69,7 +70,8 @@
                 </tr>
             </table>
 
-            <button type="submit" class="fg-button ui-state-default ui-corner-all">Save and proceed to add components
+            <div id="fillTheForm"><br><i>To continue you have to fill out all the fields.</i></div>
+            <button type="submit" class="fg-button ui-state-default ui-corner-all" id="submit" style="display:none">Save and proceed to add components
             </button>
         </form:form>
 
@@ -78,9 +80,63 @@
 </div>
 
 <script>
+
+    //trigger:  keyup on addDescriptorForm
+    //action:   check if fields have been filled in
+    //feedback: show submit button on success
+    jQuery("#addDescriptorForm").keyup(function(){
+        var empty= jQuery(this).find("input").filter(function(){
+            return this.value === "";
+        });
+
+        if(!(empty.length)){
+            jQuery("#submit").show();
+            jQuery("#fillTheForm").hide();
+        }else{
+            jQuery("#submit").hide();
+            jQuery("#fillTheForm").show();
+        }
+
+    });
+
+    //trigger:  page load
+    //action:   focus on name field
     jQuery(document).ready(function(){
         jQuery("#name").focus();
     })
+
+    //trigger:  keyup on partNumber
+    //action:   isPartNumberAlreadyInDB()
+    //feedback: alert and clear field if true
+    jQuery("#partNumber").keyup(function(){
+        isPartNumberAlreadyInDB(jQuery(this).val());
+
+
+    })
+
+    //description:  check if there is kit descriptor with this part number in db
+    //action:       return true/false accordingly
+    function isPartNumberAlreadyInDB(partNumber){
+
+        Fluxion.doAjax(
+                'kitComponentControllerHelperService',
+                'getKitDescriptorByPartNumber',
+
+                {
+                    'partNumber': partNumber,
+                    'url': ajaxurl
+
+                },
+                {'doOnSuccess': function (json) {
+
+                    if(!jQuery.isEmptyObject(json)){
+                        alert("This part number is already registered in the database");
+                        jQuery('#partNumber').val('');
+                    }
+                }
+
+                });
+    };
 </script>
 
 <%@ include file="adminsub.jsp" %>

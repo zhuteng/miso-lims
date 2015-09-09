@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
+ * Copyright (c) 2015. The Genome Analysis Centre, Norwich, UK
  * MISO project contacts: Robert Davey, Mario Caccamo @ TGAC
  * *********************************************************************
  *
@@ -56,7 +56,6 @@ public class SQLKitComponentDescriptorDAO implements KitComponentDescriptorStore
 
     private static final String TABLE_NAME = "KitComponentDescriptor";
 
-
     public static final String KIT_COMPONENT_DESCRIPTOR_SELECT =
             "SELECT kitComponentDescriptorId, name, referenceNumber, kitDescriptorId " +
                     "FROM " + TABLE_NAME;
@@ -75,20 +74,11 @@ public class SQLKitComponentDescriptorDAO implements KitComponentDescriptorStore
                     "SET name=:name, referenceNumber=:referenceNumber, kitDescriptorId=:kitDescriptorId " +
                     "WHERE kitComponentDescriptorId=:kitComponentDescriptorId";
 
-    public static final String JOIN_KIT_FULL_NAME = "SELECT KitDescriptor.name, KitComponentDescriptor.name " +
-            "FROM KitDescriptor, KitComponentDescriptor " +
-            "WHERE KitComponentDescriptor.kitDescriptorId = KitDescriptor.kitDescriptorId "+
-            "AND kitcomponentdescriptor.kitcomponentdescriptorId= ?";
-
-
-
-
     protected static final Logger log = LoggerFactory.getLogger(SQLKitComponentDescriptorDAO.class);
     private JdbcTemplate template;
     private NoteStore noteDAO;
     private CascadeType cascadeType;
     private KitDescriptorStore kitDescriptorDAO;
-
 
     @Autowired
     private CacheManager cacheManager;
@@ -124,7 +114,6 @@ public class SQLKitComponentDescriptorDAO implements KitComponentDescriptorStore
         this.kitDescriptorDAO = kitDescriptorDAO;
     }
 
-
     public KitComponentDescriptor get(long id) throws IOException {
         List eResults = template.query(KIT_COMPONENT_DESCRIPTOR_SELECT_BY_ID, new Object[]{id}, new KitComponentDescriptorMapper());
         return eResults.size() > 0 ? (KitComponentDescriptor) eResults.get(0) : null;
@@ -148,14 +137,9 @@ public class SQLKitComponentDescriptorDAO implements KitComponentDescriptorStore
         return eResults.size() > 0 ? (KitComponentDescriptor) eResults.get(0) : null;
     }
 
-
-
     public List<KitComponentDescriptor> listKitComponentDescriptorsByKitDescriptorId(long kitDescriptorId) throws IOException {
         return template.query(KIT_COMPONENT_DESCRIPTOR_SELECT_BY_KIT_DESCRIPTOR_ID, new Object[]{kitDescriptorId}, new KitComponentDescriptorMapper());
     }
-
-
-
 
     public Collection<KitComponentDescriptor> listAll() throws IOException {
         return template.query(KIT_COMPONENT_DESCRIPTOR_SELECT, new KitComponentDescriptorMapper());
@@ -169,6 +153,7 @@ public class SQLKitComponentDescriptorDAO implements KitComponentDescriptorStore
     public long saveKitComponentDescriptor(KitComponentDescriptor kcd) throws IOException {
         return save(kcd);
     }
+
     public long save(KitComponentDescriptor kcd) throws IOException {
         //log.info("Saving " + kd.toString() + " : " + kd.getKitType() + " : " + kd.getPlatformType());
         MapSqlParameterSource params = new MapSqlParameterSource();
@@ -193,9 +178,6 @@ public class SQLKitComponentDescriptorDAO implements KitComponentDescriptorStore
         return kcd.getKitComponentDescriptorId();
     }
 
-
-
-
     public class KitComponentDescriptorMapper implements RowMapper<KitComponentDescriptor> {
 
         private boolean lazy = false;
@@ -210,16 +192,6 @@ public class SQLKitComponentDescriptorDAO implements KitComponentDescriptorStore
 
         public KitComponentDescriptor mapRow(ResultSet rs, int rowNum) throws SQLException {
             long id = rs.getLong("kitComponentDescriptorId");
-
-            /*if (isCacheEnabled() && lookupCache(cacheManager) != null) {
-                Element element;
-                if ((element = lookupCache(cacheManager).get(DbUtils.hashCodeCacheKeyFor(id))) != null) {
-                    log.debug("Cache hit on map for KitComponentDescriptor " + id);
-                    return (KitComponentDescriptor)element.getObjectValue();
-                }
-            }
-
-            */
 
             KitComponentDescriptor kitComponentDescriptor = new KitComponentDescriptorImpl();
             try{

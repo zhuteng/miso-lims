@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
+ * Copyright (c) 2015. The Genome Analysis Centre, Norwich, UK
  * MISO project contacts: Robert Davey, Mario Caccamo @ TGAC
  * *********************************************************************
  *
@@ -31,8 +31,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
 /**
- * A KitComponentDescriptor handles information about a consumable element that is part of a kit. Every element of that type has a name and reference number and uses KitDescriptor. KitComponents use
- *  KitComponentDescriptors, which in turn use KitDescriptors, to represent a real-world manifestation of a consumable kit.
+ * A skeleton implementation of KitComponentDescriptor
  *
  * @author  Michal Zak
  * @since 0.0.2

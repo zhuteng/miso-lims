@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
+ * Copyright (c) 2015. The Genome Analysis Centre, Norwich, UK
  * MISO project contacts: Robert Davey, Mario Caccamo @ TGAC
  * *********************************************************************
  *
@@ -160,8 +160,6 @@ public class KitComponentImpl implements KitComponent {
   }
   
 
-
-  //TODO: NOT SURE ABOUT THIS ONE
   @Override
   public String getName() {
 

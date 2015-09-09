@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
+ * Copyright (c) 2015. The Genome Analysis Centre, Norwich, UK
  * MISO project contacts: Robert Davey, Mario Caccamo @ TGAC
  * *********************************************************************
  *
@@ -43,20 +43,53 @@ import java.io.Serializable;
 @JsonTypeInfo(use=JsonTypeInfo.Id.CLASS, include= JsonTypeInfo.As.PROPERTY, property="@class")
 public interface KitComponentDescriptor extends Nameable{
 
+    /**
+     * Returns Kit Component Descriptor's ID
+     * @return id long
+     */
     long getKitComponentDescriptorId();
 
+    /**
+     * Sets Kit Component Descriptor's ID
+     * @param kitComponentDescriptorId
+     */
     void setKitComponentDescriptorId(long kitComponentDescriptorId);
 
+    /**
+     * Returns Kit Component Descriptor's name
+     * @return name String
+     */
     String getName();
 
+    /**
+     * Sets this Kit Component Descriptor's name
+     * @param name
+     */
     void setName(String name);
 
+
+    /**
+     * Gets this Kit Component Descriptor's reference number
+     * @return referenceNumber String
+     */
     String getReferenceNumber();
 
+    /**
+     * Sets this Kit Component Descriptor's reference number
+     * @param referenceNumber
+     */
     void setReferenceNumber(String referenceNumber);
 
+    /**
+     * Returns Kit Descriptor referenced by this Kit Component Descriptor
+     * @return kitDescriptor KitDescriptor
+     */
     KitDescriptor getKitDescriptor();
 
+    /**
+     * Sets this Kit Component Descriptor's Kit Descriptor
+     * @param kitDescriptor
+     */
     void setKitDescriptor(KitDescriptor kitDescriptor);
 
     @Override
