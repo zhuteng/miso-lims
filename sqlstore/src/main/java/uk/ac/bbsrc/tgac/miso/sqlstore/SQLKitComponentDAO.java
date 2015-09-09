@@ -314,6 +314,7 @@ public class SQLKitComponentDAO implements KitComponentStore {
               long kitComponentDescriptorId = rs.getLong("kitComponentDescriptorId");
               KitComponentDescriptor kcd = kitComponentDescriptorDAO.getKitComponentDescriptorById(kitComponentDescriptorId);
 
+
               kitComponent.setKitComponentDescriptor(kcd);
           }
               kitComponent.setId(id);
@@ -392,6 +393,38 @@ public class SQLKitComponentDAO implements KitComponentStore {
 
 
     }
+    @Override
+    public JSONArray getKitChangeLogByKitComponentId(long kitComponentId) throws IOException{
+        List<JSONObject> changeLogs = template.query(
+                "select * from KitChangeLog WHERE kitComponentId=?",new Object[]{kitComponentId},
+                new RowMapper<JSONObject>() {
+                    public JSONObject mapRow(ResultSet rs, int rowNum) throws SQLException {
+                        JSONObject changeLog = new JSONObject();
+                        changeLog.put("userId", rs.getLong("userId"));
+                        changeLog.put("locationBarcodeOld", rs.getString("locationBarcodeOld"));
+                        changeLog.put("locationBarcodeNew", rs.getString("locationBarcodeNew"));
+                        changeLog.put("exhausted", rs.getBoolean("exhausted"));
+                        changeLog.put("logDate", DateUtils.getStringFromTimeStamp(rs.getTimestamp("logDate")));
+                        return changeLog;
+                    }
+                });
+
+        JSONArray result = new JSONArray();
+        for(JSONObject log : changeLogs){
+            result.add(log);
+        }
+
+        return result;
+    }
+
+    @Override
+    public boolean isKitComponentAlreadyLogged(String identificationBarcode) throws IOException {
+
+        KitComponent kitComponent = getKitComponentByIdentificationBarcode(identificationBarcode);
+        boolean result = (kitComponent==null) ? false : true;
 
 
+
+        return result;
+    }
 }

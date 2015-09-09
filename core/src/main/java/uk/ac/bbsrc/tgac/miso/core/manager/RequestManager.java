@@ -43,6 +43,8 @@ import uk.ac.bbsrc.tgac.miso.core.event.Alert;
 
 public interface RequestManager {
 
+  public boolean isKitComponentAlreadyLogged(String identificationBarcode) throws IOException;
+
   //SAVES
   public long saveProject(Project project) throws IOException;
   public long saveProjectOverview(ProjectOverview overview) throws IOException;
@@ -130,6 +132,7 @@ public interface RequestManager {
   public SequencerReference getSequencerReferenceByName(String referenceName) throws IOException;
   public SequencerReference getSequencerReferenceByRunId(long runId) throws IOException;
   public JSONArray getKitChangeLog() throws IOException;
+  public JSONArray getKitChangeLogByKitComponentId(long kitComponentId) throws IOException;
 
   public KitComponent getKitComponentById(long kitId) throws IOException;
   public KitComponent getKitComponentByIdentificationBarcode(String barcode) throws IOException;

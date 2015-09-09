@@ -1682,7 +1682,17 @@ public class MisoRequestManager implements RequestManager {
     }
   }
 
-//SAVES
+  @Override
+  public boolean isKitComponentAlreadyLogged(String identificationBarcode) throws IOException {
+    if (kitComponentStore != null) {
+      return kitComponentStore.isKitComponentAlreadyLogged(identificationBarcode);
+    }
+    else {
+      throw new IOException("No kitComponentStore available. Check that it has been declared in the Spring config.");
+    }
+  }
+
+  //SAVES
 
   @Override
   public long saveProject(Project project) throws IOException {
@@ -2043,6 +2053,15 @@ public class MisoRequestManager implements RequestManager {
   public JSONArray getKitChangeLog() throws IOException {
     if(kitComponentStore !=null){
       return kitComponentStore.getKitChangeLog();
+    }else{
+      throw new IOException("No KitComponentStore available. Check that it has been declared in the Spring config");
+    }
+  }
+
+  @Override
+  public JSONArray getKitChangeLogByKitComponentId(long kitComponentId) throws IOException {
+    if(kitComponentStore !=null){
+      return kitComponentStore.getKitChangeLogByKitComponentId(kitComponentId);
     }else{
       throw new IOException("No KitComponentStore available. Check that it has been declared in the Spring config");
     }

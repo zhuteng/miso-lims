@@ -34,12 +34,12 @@
 
     <h2>Kits</h2>
     <ul class="bullets">
-        <li><a href="<c:url value="/miso/kitdescriptor/new"/>">Create a Kit (ADMIN)</a></li>
-        <li><a href="<c:url value="/miso/listKitChangeLog/"/>">See Kit Change Log (ADMIN)</a></li>
-        <li><a href="<c:url value="/miso/kitcomponent/new"/>">Log a Kit</a></li>
-        <li><a href="<c:url value="/miso/exhaustComponent/"/>">Exhaust a Kit</a></li>
-        <li><a href="<c:url value="/miso/changeComponentLocation/"/>">Change Kit's Location</a></li>
-        <li><a href="<c:url value="/miso/listkitcomponents/"/>">List All Kits</a></li>
+        <li><a href="<c:url value="/miso/kitDescriptorManagement"/>">ADMIN::<br>Kit Descriptor Management</a></li>
+        <li><a href="<c:url value="/miso/kitdescriptor/new"/>">ADMIN::<br>Create a Kit Descriptor</a></li>
+        <li><a href="<c:url value="/miso/listKitChangeLog/"/>">ADMIN::<br>Kit Components Change Log</a></li>
+        <li><a href="<c:url value="/miso/kitcomponent/new"/>">Log a Kit Component</a></li>
+        <li><a href="<c:url value="/miso/kitComponentManagement/"/>">Kit Component Management</a></li>
+        <li><a href="<c:url value="/miso/listkitcomponents/"/>">List Kit Components</a></li>
     </ul>
 
 

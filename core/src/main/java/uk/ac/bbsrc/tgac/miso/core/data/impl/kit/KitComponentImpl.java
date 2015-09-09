@@ -160,8 +160,6 @@ public class KitComponentImpl implements KitComponent {
   }
   
 
-
-  //TODO: NOT SURE ABOUT THIS ONE
   @Override
   public String getName() {
 

@@ -1,5 +1,5 @@
 <%--
-  ~ Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
+  ~ Copyright (c) 2015. The Genome Analysis Centre, Norwich, UK
   ~ MISO project contacts: Robert Davey, Mario Caccamo @ TGAC
   ~ **********************************************************************
   ~
@@ -25,7 +25,7 @@
     <div id="contentcolumn">
 
 
-        <form:form action="/miso/kitcomponentdescriptor" method="POST" commandName="kitComponentDescriptor"
+        <form:form action="/miso/kitcomponentdescriptor" method="POST" commandName="kitComponentDescriptor" id="addComponentDescriptorForm"
                    autocomplete="off">
             <sessionConversation:insertSessionConversationId attributeName="kitComponentDescriptor"/>
             <h1>Kit ID: ${kitDescriptor.id}</h1>
@@ -89,18 +89,18 @@
             <table class="in">
                 <tr>
                     <td class="h">Name:</td>
-                    <td><form:input path="name"/></td>
+                    <td><form:input path="name" id="name"/></td>
                 </tr>
 
                 <tr>
                     <td class="h">Reference Number:</td>
-                    <td><form:input path="referenceNumber"/></td>
+                    <td><form:input path="referenceNumber" id="refNumber"/></td>
                 </tr>
 
 
             </table>
-
-            <button type="submit" class="fg-button ui-state-default ui-corner-all">Add</button>
+            <div id="fillTheForm"><br><i>To add this component you have to fill out all the fields.</i></div>
+            <button type="submit" id="submit" class="fg-button ui-state-default ui-corner-all" style='display:none'>Add</button>
         </form:form>
         <br>
         <button type="button" id="done">Save and return to Home</button>
@@ -109,10 +109,31 @@
 
 <script>
 
+    //trigger:      click on done button
+    //action:       redirect to mainMenu
     jQuery("#done").click(function(){
         //redirect to Home
         jQuery(location).attr('href', '/miso/mainMenu');
     })
+
+    //trigger:  keyup on addDescriptionForm
+    //action:   check if fields have been filled in
+    //feedback: show submit button on success
+    jQuery("#addComponentDescriptorForm").keyup(function(){
+        var empty= jQuery(this).find("input").filter(function(){
+            return this.value === "";
+        });
+
+        if(!(empty.length)){
+            jQuery("#submit").show();
+            jQuery("#fillTheForm").hide();
+        }else{
+            jQuery("#submit").hide();
+            jQuery("#fillTheForm").show();
+
+        }
+
+    });
 </script>
 
 <%@ include file="adminsub.jsp" %>
