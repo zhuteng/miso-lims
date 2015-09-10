@@ -133,6 +133,7 @@ public class MenuController implements ServletContextAware {
   @RequestMapping("/kitDescriptorManagement")
   public String kitManagement(){ return "/pages/KitDescriptorManagement.jsp";}
 
+
   @RequestMapping("/listkitcomponents")
   public String listKitComponents(){ return "/pages/listKitComponents.jsp";}
 

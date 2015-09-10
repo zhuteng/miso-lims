@@ -416,8 +416,6 @@ public class SQLKitComponentDAO implements KitComponentStore {
         KitComponent kitComponent = getKitComponentByIdentificationBarcode(identificationBarcode);
         boolean result = (kitComponent==null) ? false : true;
 
-
-
         return result;
     }
 }
