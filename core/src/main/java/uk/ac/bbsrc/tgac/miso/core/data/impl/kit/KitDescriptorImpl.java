@@ -29,6 +29,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.math.BigDecimal;
 
 /**
  * A KitDescriptor handles information about a consumable element that is generally typed by a name, manufacturer and part number. KitComponents use
@@ -39,7 +40,6 @@ import java.io.Serializable;
  */
 @Entity
 public class KitDescriptorImpl implements KitDescriptor, Serializable {
-
   /** Field UNSAVED_ID  */
   public static final Long UNSAVED_ID = 0L;
 
@@ -51,7 +51,41 @@ public class KitDescriptorImpl implements KitDescriptor, Serializable {
   private String manufacturer = "";
   private String partNumber = "";
   private String units ="";
-  private float kitValue;
+  private BigDecimal kitValue;
+
+  @Enumerated(EnumType.STRING)
+  private KitType kitType;
+
+  @Enumerated(EnumType.STRING)
+  private PlatformType platformType;
+
+  @Override
+  public long getId() {
+    return this.kitDescriptorId;
+  }
+
+  @Override
+  public void setId(long kitDescriptorId) {
+    this.kitDescriptorId = kitDescriptorId;
+  }
+
+  /**
+   * Returns the name of this KitDescriptor object.
+   *
+   * @return String name.
+   */
+  public String getName() {
+    return name;
+  }
+
+  /**
+   * Sets the name of this KitDescriptor object.
+   *
+   * @param name name.
+   */
+  public void setName(String name) {
+    this.name = name;
+  }
 
   /**
    * Returns the units in which we measure this KitDescriptor object
@@ -73,7 +107,7 @@ public class KitDescriptorImpl implements KitDescriptor, Serializable {
    * Returns the monetary value of this KitDescriptor object in pounds
    * @return value float
    */
-  public float getKitValue() {
+  public BigDecimal getKitValue() {
     return kitValue;
   }
 
@@ -83,55 +117,8 @@ public class KitDescriptorImpl implements KitDescriptor, Serializable {
    * @param kitValue value
    */
 
-  public void setKitValue(float kitValue) {
+  public void setKitValue(BigDecimal kitValue) {
     this.kitValue = kitValue;
-  }
-
-  @Enumerated(EnumType.STRING)
-  private KitType kitType;
-  
-  @Enumerated(EnumType.STRING)
-  private PlatformType platformType;
-
-  /**
-   * Returns the kitDescriptorId of this KitDescriptor object.
-   *
-   * @return Long kitDescriptorId.
-   */
-  public Long getKitDescriptorId() {
-    return kitDescriptorId;
-  }
-
-  /**
-   * Sets the kitDescriptorId of this KitDescriptor object.
-   *
-   * @param kitDescriptorId kitDescriptorId.
-   */
-  public void setKitDescriptorId(Long kitDescriptorId) {
-    this.kitDescriptorId = kitDescriptorId;
-  }
-
-  /**
-   * Returns the name of this KitDescriptor object.
-   *
-   * @return String name.
-   */
-  public String getName() {
-    return name;
-  }
-
-  @Override
-  public long getId() {
-    return this.kitDescriptorId;
-  }
-
-  /**
-   * Sets the name of this KitDescriptor object.
-   *
-   * @param name name.
-   */
-  public void setName(String name) {
-    this.name = name;
   }
 
   /**
@@ -193,7 +180,6 @@ public class KitDescriptorImpl implements KitDescriptor, Serializable {
    *
    * @return Integer stockLevel.
    */
-
   public KitType getKitType() {
     return kitType;
   }
@@ -233,7 +219,7 @@ public class KitDescriptorImpl implements KitDescriptor, Serializable {
   @Override
   public String toString() {
     StringBuffer sb = new StringBuffer();
-    sb.append(getKitDescriptorId());
+    sb.append(getId());
     sb.append(" : ");
     sb.append(getName());
     sb.append(" : ");
@@ -250,12 +236,6 @@ public class KitDescriptorImpl implements KitDescriptor, Serializable {
     sb.append(getUnits());
     sb.append(" : ");
     sb.append(getKitValue());
-    sb.append(" : ");
     return sb.toString();
-  }
-
-  @Override
-  public Long getUNSAVEDID() {
-    return UNSAVED_ID;
   }
 }

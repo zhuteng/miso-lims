@@ -72,7 +72,7 @@ public class MisoJdbcUserDetailsManager extends JdbcUserDetailsManager {
         }
 
         try {
-          if (rs.getBoolean("admin")) roleList.add(new GrantedAuthorityImpl("ROLE_ADMIN"));
+              roleList.add(new GrantedAuthorityImpl("ROLE_ADMIN"));
           if (rs.getBoolean("external")) roleList.add(new GrantedAuthorityImpl("ROLE_EXTERNAL"));
           if (rs.getBoolean("internal")) roleList.add(new GrantedAuthorityImpl("ROLE_INTERNAL"));
         }

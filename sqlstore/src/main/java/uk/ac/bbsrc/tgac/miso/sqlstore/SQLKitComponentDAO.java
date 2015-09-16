@@ -28,6 +28,7 @@ import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Element;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
+import org.joda.time.LocalDate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,21 +40,16 @@ import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitComponentImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.KitComponent;
 import uk.ac.bbsrc.tgac.miso.core.data.KitComponentDescriptor;
-import uk.ac.bbsrc.tgac.miso.core.data.KitDescriptor;
 import uk.ac.bbsrc.tgac.miso.core.data.type.KitType;
 import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.store.KitComponentDescriptorStore;
 import uk.ac.bbsrc.tgac.miso.core.store.KitComponentStore;
 import uk.ac.bbsrc.tgac.miso.core.store.NoteStore;
-import uk.ac.bbsrc.tgac.miso.sqlstore.cache.CacheAwareRowMapper;
-import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.DateUtils;
 import javax.persistence.CascadeType;
 import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Timestamp;
-import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
 import uk.ac.bbsrc.tgac.miso.core.util.KitUtils;
@@ -69,89 +65,87 @@ public class SQLKitComponentDAO implements KitComponentStore {
   private static final String TABLE_NAME = "KitComponent";
 
   public static final String KIT_COMPONENTS_SELECT =
-          "SELECT kitComponentId, identificationBarcode, locationBarcode, lotNumber, kitReceivedDate, kitExpiryDate, exhausted, kitComponentDescriptorId " +
-          "FROM "+TABLE_NAME;
+    "SELECT kitComponentId, identificationBarcode, locationBarcode, lotNumber, kitReceivedDate, kitExpiryDate, exhausted, kitComponentDescriptorId " +
+    "FROM "+TABLE_NAME;
+
+  public static final String KIT_CHANGE_LOG_SELECT =
+    "SELECT * FROM KitChangeLog";
 
   public static final String KIT_COMPONENTS_SELECT_JOIN =
-          KIT_COMPONENTS_SELECT + ", kitComponentDescriptor";
+    KIT_COMPONENTS_SELECT + ", kitComponentDescriptor";
 
   public static final String KIT_COMPONENT_SELECT_BY_ID =
-          KIT_COMPONENTS_SELECT + " WHERE kitComponentId = ?";
+    KIT_COMPONENTS_SELECT + " WHERE kitComponentId = ?";
 
   public static final String KIT_COMPONENT_SELECT_BY_IDENTIFICATION_BARCODE =
-          KIT_COMPONENTS_SELECT + " WHERE identificationBarcode = ?";
+    KIT_COMPONENTS_SELECT + " WHERE identificationBarcode = ?";
 
   public static final String KIT_COMPONENT_SELECT_BY_LOCATION_BARCODE =
-          KIT_COMPONENTS_SELECT + " WHERE locationBarcode = ?";
+    KIT_COMPONENTS_SELECT + " WHERE locationBarcode = ?";
 
   public static final String KIT_COMPONENT_SELECT_BY_LOT_NUMBER =
-          KIT_COMPONENTS_SELECT + " WHERE lotNumber = ?";
+    KIT_COMPONENTS_SELECT + " WHERE lotNumber = ?";
 
   public static final String KIT_COMPONENT_SELECT_BY_RECEIVED_DATE =
-          KIT_COMPONENTS_SELECT + " WHERE kitReceivedDate = ?";
+    KIT_COMPONENTS_SELECT + " WHERE kitReceivedDate = ?";
 
   public static final String KIT_COMPONENT_SELECT_BY_EXPIRY_DATE =
-          KIT_COMPONENTS_SELECT + " WHERE kitExpiryDate = ?";
+    KIT_COMPONENTS_SELECT + " WHERE kitExpiryDate = ?";
 
   public static final String KIT_COMPONENT_SELECT_BY_EXHAUSTED =
-          KIT_COMPONENTS_SELECT + " WHERE exhausted = ?";
+    KIT_COMPONENTS_SELECT + " WHERE exhausted = ?";
 
   public static final String KIT_COMPONENT_SELECT_BY_KIT_COMPONENT_DESCRIPTOR_ID =
-          KIT_COMPONENTS_SELECT + " WHERE kitComponentDescriptorId = ?";
+    KIT_COMPONENTS_SELECT + " WHERE kitComponentDescriptorId = ?";
 
   public static final String KIT_COMPONENT_SELECT_BY_KIT_DESCRIPTOR_ID =
-          KIT_COMPONENTS_SELECT_JOIN + " WHERE kitComponentDescriptor.kitDescriptorId = ?";
+    KIT_COMPONENTS_SELECT_JOIN + " WHERE kitComponentDescriptor.kitDescriptorId = ?";
 
   public static final String KIT_COMPONENTS_SELECT_BY_TYPE =
-          "SELECT k.kitComponentId, k.identificationBarcode, k.locationBarcode, k.lotNumber, k.kitReceivedDate, k.kitExpiryDate, k.exhausted, k.kitComponentDescriptorId, ek.experiments_experimentId " +
-          "FROM "+TABLE_NAME+" k, Experiment_Kit ek " +
-          "WHERE ek.kitComponents_kitComponentId=k.kitComponentId " +
-          "AND ek.experiments_experimentId=?";
+    "SELECT k.kitComponentId, k.identificationBarcode, k.locationBarcode, k.lotNumber, k.kitReceivedDate, k.kitExpiryDate, k.exhausted, k.kitComponentDescriptorId, ek.experiments_experimentId " +
+    "FROM "+TABLE_NAME+" k, Experiment_Kit ek " +
+    "WHERE ek.experiments_experimentId=? AND ek.kitComponents_kitComponentId=k.kitComponentId";
 
   public static final String KIT_COMPONENT_UPDATE =
-          "UPDATE "+TABLE_NAME+" " +
-                  "SET identificationBarcode=:identificationBarcode, locationBarcode=:locationBarcode, lotNumber=:lotNumber, kitReceivedDate=:kitReceivedDate, kitExpiryDate=:kitExpiryDate, exhausted=:exhausted,kitComponentDescriptorId=:kitComponentDescriptorId " +
-                  "WHERE kitComponentId=:kitComponentId";
-
+    "UPDATE "+TABLE_NAME+" " +
+    "SET identificationBarcode=:identificationBarcode, locationBarcode=:locationBarcode, lotNumber=:lotNumber, kitReceivedDate=:kitReceivedDate, kitExpiryDate=:kitExpiryDate, exhausted=:exhausted, kitComponentDescriptorId=:kitComponentDescriptorId " +
+    "WHERE kitComponentId=:kitComponentId";
 
   //TODO: NOT SURE ABOUT THESE
   public static final String KIT_COMPONENTS_SELECT_BY_MANUFACTURER =
-          "SELECT k.kitComponentId, k.identificationBarcode, k.locationBarcode, k.lotNumber, k.kitReceivedDate, k.kitExpiryDate, k.exhausted, k.kitComponentDescriptorId, ek.experiments_experimentId " +
-          "FROM "+TABLE_NAME+" k, Experiment_Kit ek " +
-          "WHERE ek.kitComponents_kitComponentId=k.kitComponentId " +
-          "AND ek.experiments_experimentId=?";
+    "SELECT k.kitComponentId, k.identificationBarcode, k.locationBarcode, k.lotNumber, k.kitReceivedDate, k.kitExpiryDate, k.exhausted, k.kitComponentDescriptorId, ek.experiments_experimentId " +
+    "FROM "+TABLE_NAME+" k, Experiment_Kit ek " +
+    "WHERE ek.kitComponents_kitComponentId=k.kitComponentId " +
+    "AND ek.experiments_experimentId=?";
+
   //TODO: NOT SURE ABOUT THESE
   public static final String KIT_COMPONENTS_SELECT_BY_RELATED_EXPERIMENT =
-          "SELECT k.kitComponentId, k.identificationBarcode, k.locationBarcode, k.lotNumber, k.kitReceivedDate, k.kitExpiryDate, k.exhausted, k.kitComponentDescriptorId, ek.experiments_experimentId " +
-          "FROM "+TABLE_NAME+" k, Experiment_Kit ek " +
-          "WHERE ek.kitComponents_kitComponentId=k.kitComponentId " +
-          "AND ek.experiments_experimentId=?";
+    "SELECT k.kitComponentId, k.identificationBarcode, k.locationBarcode, k.lotNumber, k.kitReceivedDate, k.kitExpiryDate, k.exhausted, k.kitComponentDescriptorId, ek.experiments_experimentId " +
+    "FROM "+TABLE_NAME+" k, Experiment_Kit ek " +
+    "WHERE ek.kitComponents_kitComponentId=k.kitComponentId " +
+    "AND ek.experiments_experimentId=?";
 
   //TODO: THERE'S NO Library_Kit TABLE IN THE DB
   public static final String KIT_COMPONENTS_SELECT_BY_RELATED_LIBRARY =
-          "SELECT k.kitComponentId, k.identificationBarcode, k.locationBarcode, k.lotNumber, k.kitReceivedDate, k.kitExpiryDate, k.exhausted, k.kitComponentDescriptorId, ek.experiments_experimentId " +
-          "FROM "+TABLE_NAME+" k, Library_Kit lk " +
-          "WHERE lk.kits_kitComponentId=k.kitComponentId " +
-          "AND lk.libraries_libraryId=?";
+    "SELECT k.kitComponentId, k.identificationBarcode, k.locationBarcode, k.lotNumber, k.kitReceivedDate, k.kitExpiryDate, k.exhausted, k.kitComponentDescriptorId, ek.experiments_experimentId " +
+    "FROM "+TABLE_NAME+" k, Library_Kit lk " +
+    "WHERE lk.kits_kitComponentId=k.kitComponentId " +
+    "AND lk.libraries_libraryId=?";
 
-
-
-
-  
   protected static final Logger log = LoggerFactory.getLogger(SQLKitComponentDAO.class);
   private JdbcTemplate template;
   private NoteStore noteDAO;
   private CascadeType cascadeType;
-    private KitComponentDescriptorStore kitComponentDescriptorDAO;
+  private KitComponentDescriptorStore kitComponentDescriptorDAO;
 
   @Autowired
   private CacheManager cacheManager;
 
-    public KitComponentDescriptorStore getKitComponentDescriptorDAO() {
-        return kitComponentDescriptorDAO;
-    }
+  public KitComponentDescriptorStore getKitComponentDescriptorDAO() {
+    return kitComponentDescriptorDAO;
+  }
 
-    public void setCacheManager(CacheManager cacheManager) {
+  public void setCacheManager(CacheManager cacheManager) {
     this.cacheManager = cacheManager;
   }
 
@@ -166,9 +160,9 @@ public class SQLKitComponentDAO implements KitComponentStore {
     this.noteDAO = noteDAO;
   }
 
-    public void setKitComponentDescriptorDAO(KitComponentDescriptorStore kitComponentDescriptorDAO) {
-        this.kitComponentDescriptorDAO = kitComponentDescriptorDAO;
-    }
+  public void setKitComponentDescriptorDAO(KitComponentDescriptorStore kitComponentDescriptorDAO) {
+    this.kitComponentDescriptorDAO = kitComponentDescriptorDAO;
+  }
 
   public JdbcTemplate getJdbcTemplate() {
     return template;
@@ -181,8 +175,6 @@ public class SQLKitComponentDAO implements KitComponentStore {
   public void setCascadeType(CascadeType cascadeType) {
     this.cascadeType = cascadeType;
   }
-
-
 
   @Override
   public int count() throws IOException {
@@ -205,8 +197,6 @@ public class SQLKitComponentDAO implements KitComponentStore {
     return eResults.size() > 0 ? (KitComponent) eResults.get(0) : null;
   }
 
-
-
   public Collection<KitComponent> listAll() throws IOException {
     return template.query(KIT_COMPONENTS_SELECT, new KitComponentMapper());
   }
@@ -227,7 +217,6 @@ public class SQLKitComponentDAO implements KitComponentStore {
     return template.query(KIT_COMPONENT_SELECT_BY_EXPIRY_DATE, new Object[]{DateUtils.asDate(expiryDate)}, new KitComponentMapper());
   }
 
-
   public List<KitComponent> listKitComponentsByExhausted(boolean exhausted) throws IOException {
     return template.query(KIT_COMPONENT_SELECT_BY_EXHAUSTED, new Object[]{KitUtils.toInt(exhausted)}, new KitComponentMapper());
   }
@@ -239,7 +228,6 @@ public class SQLKitComponentDAO implements KitComponentStore {
   public List<KitComponent> listKitComponentsByKitDescriptorId(long kitDescriptorId) throws IOException {
     return template.query(KIT_COMPONENT_SELECT_BY_KIT_DESCRIPTOR_ID, new Object[]{kitDescriptorId}, new KitComponentMapper());
   }
-
 
   //TODO: DON'T WANT TO MESS WITH THOSE
   public List<KitComponent> listByExperiment(long experimentId) throws IOException {
@@ -266,7 +254,7 @@ public class SQLKitComponentDAO implements KitComponentStore {
             .addValue("kitReceivedDate", DateUtils.asDate(kitComponent.getKitReceivedDate()))
             .addValue("kitExpiryDate", DateUtils.asDate(kitComponent.getKitExpiryDate()))
             .addValue("exhausted", KitUtils.toInt(kitComponent.isExhausted()))
-            .addValue("kitComponentDescriptorId", kitComponent.getKitComponentDescriptor().getKitComponentDescriptorId());
+            .addValue("kitComponentDescriptorId", kitComponent.getKitComponentDescriptor().getId());
 
     if (kitComponent.getId() == KitComponentImpl.UNSAVED_ID) {
       SimpleJdbcInsert insert = new SimpleJdbcInsert(template)
@@ -292,38 +280,34 @@ public class SQLKitComponentDAO implements KitComponentStore {
   }
 
   public class KitComponentMapper implements RowMapper<KitComponent> {
-      private boolean lazy = false;
+    private boolean lazy = false;
 
-      public KitComponentMapper(){
-          super();
-      }
-      public KitComponentMapper(boolean lazy){
-          super();
-          this.lazy = lazy;
-      }
+    public KitComponentMapper(){
+      super();
+    }
+    public KitComponentMapper(boolean lazy){
+      super();
+      this.lazy = lazy;
+    }
 
     public KitComponent mapRow(ResultSet rs, int rowNum) throws SQLException {
       long id = rs.getLong("kitComponentId");
 
-
       KitComponent kitComponent = new KitComponentImpl();
 
       try {
-
-          if(!lazy) {
-              long kitComponentDescriptorId = rs.getLong("kitComponentDescriptorId");
-              KitComponentDescriptor kcd = kitComponentDescriptorDAO.getKitComponentDescriptorById(kitComponentDescriptorId);
-
-
-              kitComponent.setKitComponentDescriptor(kcd);
-          }
-              kitComponent.setId(id);
-              kitComponent.setIdentificationBarcode(rs.getString("identificationBarcode"));
-              kitComponent.setLocationBarcode(rs.getString("locationBarcode"));
-              kitComponent.setLotNumber(rs.getString("lotNumber"));
-              kitComponent.setKitReceivedDate(DateUtils.asLocalDate(rs.getDate("kitReceivedDate")));
-              kitComponent.setKitExpiryDate(DateUtils.asLocalDate(rs.getDate("kitExpiryDate")));
-              kitComponent.setExhausted(KitUtils.toBoolean(rs.getInt("exhausted")));
+        if(!lazy) {
+          long kitComponentDescriptorId = rs.getLong("kitComponentDescriptorId");
+          KitComponentDescriptor kcd = kitComponentDescriptorDAO.getKitComponentDescriptorById(kitComponentDescriptorId);
+          kitComponent.setKitComponentDescriptor(kcd);
+        }
+        kitComponent.setId(id);
+        kitComponent.setIdentificationBarcode(rs.getString("identificationBarcode"));
+        kitComponent.setLocationBarcode(rs.getString("locationBarcode"));
+        kitComponent.setLotNumber(rs.getString("lotNumber"));
+        kitComponent.setKitReceivedDate(DateUtils.asLocalDate(rs.getDate("kitReceivedDate")));
+        kitComponent.setKitExpiryDate(DateUtils.asLocalDate(rs.getDate("kitExpiryDate")));
+        kitComponent.setExhausted(KitUtils.toBoolean(rs.getInt("exhausted")));
 
         kitComponent.setNotes(noteDAO.listByKit(rs.getLong("kitComponentId")));
       }
@@ -334,88 +318,80 @@ public class SQLKitComponentDAO implements KitComponentStore {
     }
   }
 
-    @Override
-    public long saveChangeLog(JSONObject changeLog) throws IOException {
+  @Override
+  public long saveChangeLog(JSONObject changeLog) throws IOException {
+    MapSqlParameterSource params = new MapSqlParameterSource();
+    params.addValue("userId", changeLog.getLong("userId"))
+            .addValue("kitComponentId", changeLog.getLong("kitComponentId"))
+            .addValue("locationBarcodeOld", changeLog.getString("locationBarcodeOld"))
+            .addValue("locationBarcodeNew", changeLog.getString("locationBarcodeNew"))
+            .addValue("exhausted", changeLog.getBoolean("exhausted"))
+            .addValue("logDate", DateUtils.getTimeStampFromJSON((JSONObject)changeLog.get("logDate")));
 
+    //NO UPDATE - ALWAYS INSERT
 
-        MapSqlParameterSource params = new MapSqlParameterSource();
-        params.addValue("userId", changeLog.getLong("userId"))
-                .addValue("kitComponentId", changeLog.getLong("kitComponentId"))
-                .addValue("locationBarcodeOld", changeLog.getString("locationBarcodeOld"))
-                .addValue("locationBarcodeNew", changeLog.getString("locationBarcodeNew"))
-                .addValue("exhausted", changeLog.getBoolean("exhausted"))
-                .addValue("logDate", DateUtils.getTimeStampFromJSON((JSONObject)changeLog.get("logDate")));
-
-        //NO UPDATE - ALWAYS INSERT
-
-            SimpleJdbcInsert insert = new SimpleJdbcInsert(template)
-                    .withTableName("KitChangeLog")
-                    .usingGeneratedKeyColumns("kitChangeLogId");
-            Number newId = insert.executeAndReturnKey(params);
+        SimpleJdbcInsert insert = new SimpleJdbcInsert(template)
+                .withTableName("KitChangeLog")
+                .usingGeneratedKeyColumns("kitChangeLogId");
+        Number newId = insert.executeAndReturnKey(params);
 
 
 
-        return (long) newId;
+    return (long) newId;
+  }
 
+  @Override
+  public JSONArray getKitChangeLog() throws IOException {
+      List<JSONObject> changeLogs = template.query(
+              "select * from KitChangeLog",
+              new RowMapper<JSONObject>() {
+                  public JSONObject mapRow(ResultSet rs, int rowNum) throws SQLException {
+                      JSONObject changeLog = new JSONObject();
+                      changeLog.put("userId", rs.getLong("userId"));
+                      changeLog.put("kitComponentId", rs.getLong("kitComponentId"));
+                      changeLog.put("locationBarcodeOld", rs.getString("locationBarcodeOld"));
+                      changeLog.put("locationBarcodeNew", rs.getString("locationBarcodeNew"));
+                      changeLog.put("exhausted", rs.getBoolean("exhausted"));
+                      changeLog.put("logDate", DateUtils.getStringFromTimeStamp(rs.getTimestamp("logDate")));
+                      return changeLog;
+                  }
+              });
 
-    }
+      JSONArray result = new JSONArray();
+      for(JSONObject log : changeLogs){
+          result.add(log);
+      }
 
-    @Override
-    public JSONArray getKitChangeLog() throws IOException {
-        List<JSONObject> changeLogs = template.query(
-                "select * from KitChangeLog",
-                new RowMapper<JSONObject>() {
-                    public JSONObject mapRow(ResultSet rs, int rowNum) throws SQLException {
-                        JSONObject changeLog = new JSONObject();
-                        changeLog.put("userId", rs.getLong("userId"));
-                        changeLog.put("kitComponentId", rs.getLong("kitComponentId"));
-                        changeLog.put("locationBarcodeOld", rs.getString("locationBarcodeOld"));
-                        changeLog.put("locationBarcodeNew", rs.getString("locationBarcodeNew"));
-                        changeLog.put("exhausted", rs.getBoolean("exhausted"));
-                        changeLog.put("logDate", DateUtils.getStringFromTimeStamp(rs.getTimestamp("logDate")));
-                        return changeLog;
-                    }
-                });
-
-        JSONArray result = new JSONArray();
-        for(JSONObject log : changeLogs){
-            result.add(log);
+      return result;
+  }
+  @Override
+  public JSONArray getKitChangeLogByKitComponentId(long kitComponentId) throws IOException{
+    List<JSONObject> changeLogs = template.query(
+      "select * from KitChangeLog WHERE kitComponentId=?",new Object[]{kitComponentId},
+      new RowMapper<JSONObject>() {
+        public JSONObject mapRow(ResultSet rs, int rowNum) throws SQLException {
+          JSONObject changeLog = new JSONObject();
+          changeLog.put("userId", rs.getLong("userId"));
+          changeLog.put("locationBarcodeOld", rs.getString("locationBarcodeOld"));
+          changeLog.put("locationBarcodeNew", rs.getString("locationBarcodeNew"));
+          changeLog.put("exhausted", rs.getBoolean("exhausted"));
+          changeLog.put("logDate", DateUtils.getStringFromTimeStamp(rs.getTimestamp("logDate")));
+          return changeLog;
         }
+      }
+    );
 
-        return result;
-
-
-    }
-    @Override
-    public JSONArray getKitChangeLogByKitComponentId(long kitComponentId) throws IOException{
-        List<JSONObject> changeLogs = template.query(
-                "select * from KitChangeLog WHERE kitComponentId=?",new Object[]{kitComponentId},
-                new RowMapper<JSONObject>() {
-                    public JSONObject mapRow(ResultSet rs, int rowNum) throws SQLException {
-                        JSONObject changeLog = new JSONObject();
-                        changeLog.put("userId", rs.getLong("userId"));
-                        changeLog.put("locationBarcodeOld", rs.getString("locationBarcodeOld"));
-                        changeLog.put("locationBarcodeNew", rs.getString("locationBarcodeNew"));
-                        changeLog.put("exhausted", rs.getBoolean("exhausted"));
-                        changeLog.put("logDate", DateUtils.getStringFromTimeStamp(rs.getTimestamp("logDate")));
-                        return changeLog;
-                    }
-                });
-
-        JSONArray result = new JSONArray();
-        for(JSONObject log : changeLogs){
-            result.add(log);
-        }
-
-        return result;
+    JSONArray result = new JSONArray();
+    for(JSONObject log : changeLogs){
+        result.add(log);
     }
 
-    @Override
-    public boolean isKitComponentAlreadyLogged(String identificationBarcode) throws IOException {
+    return result;
+  }
 
-        KitComponent kitComponent = getKitComponentByIdentificationBarcode(identificationBarcode);
-        boolean result = (kitComponent==null) ? false : true;
-
-        return result;
-    }
+  @Override
+  public boolean isKitComponentAlreadyLogged(String identificationBarcode) throws IOException {
+    KitComponent kitComponent = getKitComponentByIdentificationBarcode(identificationBarcode);
+    return (kitComponent==null) ? false : true;
+  }
 }

@@ -23,34 +23,23 @@ public class LogKitComponentController {
 
     protected static final Logger log = LoggerFactory.getLogger(LogKitComponentController.class);
 
-    @Autowired
-    private RequestManager requestManager;
+  @Autowired
+  private RequestManager requestManager;
 
-    @Autowired
-    private DataObjectFactory dataObjectFactory;
+  public void setRequestManager(RequestManager requestManager) {
+    this.requestManager = requestManager;
+  }
 
-
-    public void setDataObjectFactory(DataObjectFactory dataObjectFactory) {
-        this.dataObjectFactory = dataObjectFactory;
-    }
-
-    public void setRequestManager(RequestManager requestManager) {
-        this.requestManager = requestManager;
-    }
-
-    @RequestMapping(value = "/new", method = RequestMethod.GET)
-    public ModelAndView setupForm(ModelMap model) throws IOException {
-        try {
-            return new ModelAndView("/pages/logKitComponent.jsp", model);
-        }
-        catch (Exception ex) {
-            if (log.isDebugEnabled()) {
-                log.debug("Failed to show sample", ex);
-            }
-            throw ex;
-        }
-    }
-
-
-
+  @RequestMapping(value = "/new", method = RequestMethod.GET)
+  public ModelAndView setupForm(ModelMap model) throws IOException {
+      try {
+          return new ModelAndView("/pages/logKitComponent.jsp", model);
+      }
+      catch (Exception ex) {
+          if (log.isDebugEnabled()) {
+              log.debug("Failed to show sample", ex);
+          }
+          throw ex;
+      }
+  }
 }

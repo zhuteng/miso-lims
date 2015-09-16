@@ -28,8 +28,8 @@ package uk.ac.bbsrc.tgac.miso.core.data;
 import org.codehaus.jackson.annotate.JsonTypeInfo;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 import com.eaglegenomics.simlims.core.Note;
+import org.joda.time.LocalDate;
 
-import java.time.LocalDate;
 import java.util.Collection;
 
 /**
@@ -60,7 +60,7 @@ public interface KitComponent extends Comparable, Barcodable, Locatable {
   @Deprecated
   void setKitComponentId(Long kitId);
 
-  public void setId(long id);
+  void setId(long kitId);
 
   /**
    * Returns the lotNumber of this KitComponent object.
@@ -118,7 +118,6 @@ public interface KitComponent extends Comparable, Barcodable, Locatable {
    *
    * @return Collection<Note> notes.
    */
-
   Collection<Note> getNotes();
 
   /**
@@ -141,7 +140,6 @@ public interface KitComponent extends Comparable, Barcodable, Locatable {
    */
   void setExhausted(boolean exhausted);
 
-
   /**
    * Returns the current exhaustion state of this KitComponent
    * @return true if exhausted, false if not exhausted
@@ -154,13 +152,10 @@ public interface KitComponent extends Comparable, Barcodable, Locatable {
    */
   KitComponentDescriptor getKitComponentDescriptor();
 
-
   /**
    * Sets the kitComponentDescriptor of this kitComponent
    *
    * @param kitComponentDescriptor kitComponentDescriptor
    */
   void setKitComponentDescriptor(KitComponentDescriptor kitComponentDescriptor);
-
-
 }

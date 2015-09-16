@@ -23,29 +23,30 @@
 
 package uk.ac.bbsrc.tgac.miso.webapp.controller;
 
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
-import uk.ac.bbsrc.tgac.miso.core.data.Library;
-import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
+import java.io.IOException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 
-import java.io.IOException;
-import java.util.Collection;
+import uk.ac.bbsrc.tgac.miso.core.data.type.KitType;
+import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
+import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
-/**
- * Controller for listing libraries
- *
- * @author Rob Davey
- * @since 0.0.2
- */
 @Controller
-public class ListLibrariesController {
-  protected static final Logger log = LoggerFactory.getLogger(ListLibrariesController.class);
+public class ListKitDescriptorsController {
+  protected static final Logger log = LoggerFactory.getLogger(ListKitDescriptorsController.class);
+
+  @Autowired
+  private SecurityManager securityManager;
+
+  public void setSecurityManager(SecurityManager securityManager) {
+    this.securityManager = securityManager;
+  }
 
   @Autowired
   private RequestManager requestManager;
@@ -54,14 +55,22 @@ public class ListLibrariesController {
     this.requestManager = requestManager;
   }
 
-  @Deprecated
-  @RequestMapping(value = "/libraries/rest/", method = RequestMethod.GET)
-  public @ResponseBody Collection<Library> jsonRest() throws IOException {
-    return requestManager.listAllLibraries();
-  }
+  @RequestMapping("/kitdescriptors")
+  public ModelAndView listKitDescriptors(ModelMap model) throws IOException {
+    try {
+      model.addAttribute("sequencing", requestManager.listKitDescriptorsByType(KitType.SEQUENCING));
+      model.addAttribute("empcr", requestManager.listKitDescriptorsByType(KitType.EMPCR));
+      model.addAttribute("library",requestManager.listKitDescriptorsByType(KitType.LIBRARY));
+      model.addAttribute("clustering",requestManager.listKitDescriptorsByType(KitType.CLUSTERING));
+      model.addAttribute("multiplexing",requestManager.listKitDescriptorsByType(KitType.MULTIPLEXING));
 
-  @RequestMapping("/libraries")
-  public ModelAndView listLibraries() throws Exception {
-    return new ModelAndView("/pages/listLibraries.jsp");
+      return new ModelAndView("/pages/listKitDescriptors.jsp", model);
+    }
+    catch (IOException ex) {
+      if (log.isDebugEnabled()) {
+        log.debug("Failed to list KitComponent Descriptors", ex);
+      }
+      throw ex;
+    }
   }
 }

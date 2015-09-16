@@ -148,7 +148,6 @@ public class DaoUtils {
     kitDescriptorDAO.setDataObjectFactory(dataObjectFactory);
 
     kitComponentDescriptorDAO.setJdbcTemplate(jt);
-    kitComponentDescriptorDAO.setNoteDAO(noteDAO);
     kitComponentDescriptorDAO.setCascadeType(CascadeType.PERSIST);
     kitComponentDescriptorDAO.setDataObjectFactory(dataObjectFactory);
     kitComponentDescriptorDAO.setKitDescriptorDAO(kitDescriptorDAO);
@@ -200,7 +199,6 @@ public class DaoUtils {
 
     runDAO.setJdbcTemplate(jt);
     runDAO.setSecurityProfileDAO(securityProfileDAO);
-    //runDAO.setFlowcellDAO(flowcellDAO);
     runDAO.setSequencerPartitionContainerDAO(sequencerPartitionContainerDAO);
     runDAO.setSequencerReferenceDAO(sequencerReferenceDAO);
     runDAO.setStatusDAO(statusDAO);

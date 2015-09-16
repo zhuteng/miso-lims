@@ -31,7 +31,8 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
 /**
- * A skeleton implementation of KitComponentDescriptor
+ * A KitComponentDescriptor handles information about a consumable element that is part of a kit. Every element of that type has a name and reference number and uses KitDescriptor. KitComponents use
+ *  KitComponentDescriptors, which in turn use KitDescriptors, to represent a real-world manifestation of a consumable kit.
  *
  * @author  Michal Zak
  * @since 0.0.2
@@ -48,21 +49,18 @@ public class KitComponentDescriptorImpl implements KitComponentDescriptor {
 
     private KitDescriptor kitDescriptor;
 
-    public long getKitComponentDescriptorId() {
-        return kitComponentDescriptorId;
+    @Override
+    public long getId() {
+      return kitComponentDescriptorId;
     }
 
-    public void setKitComponentDescriptorId(long kitComponentDescriptorId) {
-        this.kitComponentDescriptorId = kitComponentDescriptorId;
-    }
-
-    public String getName() {
-        return name;
+    public void setId(long kitComponentDescriptorId) {
+      this.kitComponentDescriptorId = kitComponentDescriptorId;
     }
 
     @Override
-    public long getId() {
-        return kitComponentDescriptorId;
+    public String getName() {
+        return name;
     }
 
     public void setName(String name) {
@@ -88,13 +86,13 @@ public class KitComponentDescriptorImpl implements KitComponentDescriptor {
     @Override
     public String toString() {
         StringBuffer sb = new StringBuffer();
-        sb.append(getKitComponentDescriptorId());
+        sb.append(getId());
         sb.append(" : ");
         sb.append(getName());
         sb.append(" : ");
         sb.append(getReferenceNumber());
         sb.append(" : ");
-        sb.append(getKitDescriptor().getKitDescriptorId());
+        sb.append(getKitDescriptor().getId());
         sb.append(" : ");
         return sb.toString();
     }

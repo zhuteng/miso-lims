@@ -35,7 +35,9 @@
 
 <div id="maincontent">
 <div id="contentcolumn">
-<ed
+<form:form action="/miso/experiment" method="POST" commandName="experiment" autocomplete="off"
+           onsubmit="return validate_experiment(this);">
+<sessionConversation:insertSessionConversationId attributeName="experiment"/>
 <h1>
   <c:choose>
     <c:when test="${experiment.id != 0}">Edit</c:when>

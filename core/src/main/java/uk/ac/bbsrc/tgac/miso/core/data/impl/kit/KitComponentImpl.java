@@ -24,13 +24,13 @@
 package uk.ac.bbsrc.tgac.miso.core.data.impl.kit;
 
 import com.eaglegenomics.simlims.core.Note;
+import org.joda.time.LocalDate;
 import org.springframework.format.annotation.DateTimeFormat;
 import uk.ac.bbsrc.tgac.miso.core.data.KitComponent;
 import uk.ac.bbsrc.tgac.miso.core.data.KitComponentDescriptor;
 import uk.ac.bbsrc.tgac.miso.core.util.DateUtils;
 
 import javax.persistence.*;
-import java.time.LocalDate;
 import java.util.Collection;
 import java.util.HashSet;
 
@@ -58,8 +58,6 @@ public class KitComponentImpl implements KitComponent {
   private LocalDate kitExpiryDate;
   private boolean exhausted;
 
-
-
   private KitComponentDescriptor kitComponentDescriptor;
 
   @Deprecated
@@ -73,14 +71,6 @@ public class KitComponentImpl implements KitComponent {
   }
 
   @Override
-  public void setExhausted(boolean exhausted){
-    this.exhausted = exhausted;
-  }
-
-  public boolean isExhausted(){
-   return exhausted;
-
-}
   public long getId() {
     return kitComponentId;
   }
@@ -89,9 +79,17 @@ public class KitComponentImpl implements KitComponent {
     this.kitComponentId = id;
   }
 
+  //TODO: NOT SURE ABOUT THIS ONE
+  @Override
+  public String getName() {
+    //it should be KitDescriptor.name + kitComponentDescriptor.name
+    return getKitComponentDescriptor().getName();
+  }
+
   public String getLotNumber() {
     return lotNumber;
   }
+
   public LocalDate getKitExpiryDate() {
     return kitExpiryDate;
   }
@@ -99,6 +97,7 @@ public class KitComponentImpl implements KitComponent {
   public void setKitExpiryDate(LocalDate kitExpiryDate) {
     this.kitExpiryDate = kitExpiryDate;
   }
+
   public void setLotNumber(String lotNumber) {
     this.lotNumber = lotNumber;
   }
@@ -111,17 +110,23 @@ public class KitComponentImpl implements KitComponent {
     this.kitReceivedDate = kitReceivedDate;
   }
 
+  @Override
+  public void setExhausted(boolean exhausted){
+    this.exhausted = exhausted;
+  }
+
+  public boolean isExhausted(){
+   return exhausted;
+  }
 
   //STRING OVERLOADS FOR FRONT-END
   public void setKitExpiryDate(String kitExpiryDate) {
-
     this.kitExpiryDate = DateUtils.asLocalDate(kitExpiryDate);
   }
 
   public void setKitReceivedDate(String kitReceivedDate) {
     this.kitReceivedDate = DateUtils.asLocalDate(kitReceivedDate);
   }
-
 
   public Collection<Note> getNotes() {
     return notes;
@@ -158,14 +163,6 @@ public class KitComponentImpl implements KitComponent {
   public void setLocationBarcode(String locationBarcode) {
     this.locationBarcode = locationBarcode;
   }
-  
-
-  @Override
-  public String getName() {
-
-    //it should be KitDescriptor.name + kitComponentDescriptor.name
-    return getKitComponentDescriptor().getName();
-  }
 
   public String getLabelText() {
     return getLotNumber();
@@ -198,7 +195,7 @@ public class KitComponentImpl implements KitComponent {
     sb.append(" : ");
     sb.append(getKitReceivedDate());
     sb.append("  : ");
-    sb.append(getKitComponentDescriptor().getKitComponentDescriptorId());
+    sb.append(getKitComponentDescriptor().getId());
 
     return sb.toString();
   }

@@ -89,7 +89,7 @@ public abstract class LimsDAOTestCase extends DatabaseTestCase {
     "Experiment_Kit",
     "KitComponent",
     "KitDescriptor",
-          "KitComponentDescriptor",
+    "KitComponentDescriptor",
     "Kit_Note",
     "Library",
     "LibraryDilution",
@@ -168,9 +168,6 @@ public abstract class LimsDAOTestCase extends DatabaseTestCase {
   private SQLKitComponentDAO kitComponentDAO;
   private SQLLibraryDAO libraryDAO;
   private SQLLibraryQCDAO libraryQcDAO;
-
-
-
   private SQLNoteDAO noteDAO;
   private SQLSequencerPoolPartitionDAO partitionDAO;
   private SQLPlateDAO plateDAO;
@@ -222,7 +219,6 @@ public abstract class LimsDAOTestCase extends DatabaseTestCase {
     }
   }
 
-
   public SQLLibraryDilutionDAO getLibraryDilutionDAO() {
     if (libraryDilutionDAO != null) {
       return libraryDilutionDAO;
@@ -271,7 +267,6 @@ public abstract class LimsDAOTestCase extends DatabaseTestCase {
 
   public SQLKitComponentDAO getKitComponentDAO() {
     if (kitComponentDAO != null) {
-      System.out.println("SQLKITCOMPONENTDAO IS NOT NULL IN LIMSDAOTESTCASE");
       return kitComponentDAO;
     }
     else {
@@ -288,7 +283,6 @@ public abstract class LimsDAOTestCase extends DatabaseTestCase {
 
   public SQLKitComponentDescriptorDAO getKitComponentDescriptorDAO() {
     if(kitComponentDescriptorDAO !=null) {
-      System.out.println("SQLKITCOMPONENTDESCRIPTOR IS NOT NULL IN LIMSDAOTESTCASE");
       return kitComponentDescriptorDAO;
     }
     return null;
@@ -641,12 +635,9 @@ public abstract class LimsDAOTestCase extends DatabaseTestCase {
     daos.put(KitDescriptor.class, kitDescriptorDAO);
 
     kitComponentDescriptorDAO.setJdbcTemplate(template);
-    kitComponentDescriptorDAO.setNoteDAO(noteDAO);
     kitComponentDescriptorDAO.setCascadeType(CascadeType.PERSIST);
     kitComponentDescriptorDAO.setDataObjectFactory(dataObjectFactory);
-    //ONE WAY
-    kitComponentDescriptorDAO.setKitDescriptorDAO((SQLKitDescriptorDAO)daos.get(KitDescriptor.class));
-    //SECOND WAY
+    //kitComponentDescriptorDAO.setKitDescriptorDAO((SQLKitDescriptorDAO)daos.get(KitDescriptor.class));
     kitComponentDescriptorDAO.setKitDescriptorDAO(kitDescriptorDAO);
     daos.put(KitComponentDescriptor.class, kitComponentDescriptorDAO);
 
@@ -824,23 +815,23 @@ public abstract class LimsDAOTestCase extends DatabaseTestCase {
     System.out.println("Creating test database tables...");
 
     runStatement(conn,
-            "CREATE TABLE Alert (" +
-                    "alertId BIGINT NOT NULL," +
-                    "title VARCHAR(100) NOT NULL," +
-                    "text LONGVARCHAR NOT NULL," +
-                    "userId BIGINT NOT NULL," +
-                    "date DATE NOT NULL," +
-                    "isRead BIT NOT NULL," +
-                    "level VARCHAR(8) NOT NULL," +
-                    "PRIMARY KEY (alertId)" +
-                    ");");
+                 "CREATE TABLE Alert (" +
+                 "alertId BIGINT NOT NULL," +
+                 "title VARCHAR(100) NOT NULL," +
+                 "text LONGVARCHAR NOT NULL," +
+                 "userId BIGINT NOT NULL," +
+                 "date DATE NOT NULL," +
+                 "isRead BIT NOT NULL," +
+                 "level VARCHAR(8) NOT NULL," +
+                 "PRIMARY KEY (alertId)" +
+                 ");");
 
     runStatement(conn,
                  "CREATE TABLE EntityGroup (" +
                  "entityGroupId BIGINT NOT NULL, " +
                  "parentId BIGINT NOT NULL, " +
                  "parentType VARCHAR(255) NOT NULL," +
-                 "PRIMARY KEY  (entityGroupId, parentId)" +
+                 "PRIMARY KEY (entityGroupId, parentId)" +
                  ");");
 
     runStatement(conn,
@@ -848,7 +839,7 @@ public abstract class LimsDAOTestCase extends DatabaseTestCase {
                  "entityGroup_entityGroupId BIGINT NOT NULL, " +
                  "entityId BIGINT NOT NULL, " +
                  "entityType VARCHAR(255) NOT NULL," +
-                 "PRIMARY KEY  (entityGroup_entityGroupId,entityId)" +
+                 "PRIMARY KEY (entityGroup_entityGroupId,entityId)" +
                  ");");
 
     runStatement(conn,
@@ -872,28 +863,27 @@ public abstract class LimsDAOTestCase extends DatabaseTestCase {
                  ");");
 
     runStatement(conn,
-            "CREATE TABLE KitDescriptor (" +
-                    "kitDescriptorId BIGINT NOT NULL," +
-                    "name VARCHAR(255) NOT NULL," +
-                    "version INT(3) default NULL," +
-                    "manufacturer VARCHAR(100) NOT NULL," +
-                    "partNumber VARCHAR(50) NOT NULL," +
-                    "kitType VARCHAR(30) NOT NULL," +
-                    "platformType VARCHAR(20) NOT NULL," +
-                    "units varchar(20) NOT NULL," +
-                    "kitValue FLOAT(7,2) NOT NULL"+
-                    "PRIMARY KEY  (kitDescriptorId)" +
-                    ");");
+                  "CREATE TABLE KitDescriptor (" +
+                  "kitDescriptorId BIGINT NOT NULL," +
+                  "name VARCHAR(255) NOT NULL," +
+                  "version INT(3) default NULL," +
+                  "manufacturer VARCHAR(100) NOT NULL," +
+                  "partNumber VARCHAR(50) NOT NULL," +
+                  "kitType VARCHAR(30) NOT NULL," +
+                  "platformType VARCHAR(20) NOT NULL," +
+                  "units varchar(20) NOT NULL," +
+                  "kitValue DECIMAL NOT NULL"+
+                  "PRIMARY KEY (kitDescriptorId)" +
+                  ");");
 
     runStatement(conn,
-            "CREATE TABLE KitComponentDescriptor (" +
-                    "kitComponentDescriptorId BIGINT NOT NULL," +
-                    "name VARCHAR(255) NOT NULL," +
-                    "referenceNumber VARCHAR(50) default NULL," +
-                    "kitDescriptorId BIGINT(20) NOT NULL," +
-                    "PRIMARY KEY  (kitComponentDescriptorId)" +
-                    ");");
-
+                  "CREATE TABLE KitComponentDescriptor (" +
+                  "kitComponentDescriptorId BIGINT NOT NULL," +
+                  "name VARCHAR(255) NOT NULL," +
+                  "referenceNumber VARCHAR(50) default NULL," +
+                  "kitDescriptorId BIGINT(20) NOT NULL," +
+                  "PRIMARY KEY (kitComponentDescriptorId)" +
+                  ");");
 
     runStatement(conn,
                  "CREATE TABLE KitComponent (" +
@@ -902,12 +892,11 @@ public abstract class LimsDAOTestCase extends DatabaseTestCase {
                  "locationBarcode VARCHAR(255) default NULL," +
                  "lotNumber VARCHAR(30) NOT NULL," +
                  "kitReceivedDate DATE NOT NULL," +
-                         "kitExpiryDate DATE NOT NULL," +
-                         "exhausted tinyint(1)," +
+                 "kitExpiryDate DATE NOT NULL," +
+                 "exhausted tinyint(1)," +
                  "kitComponentDescriptorId BIGINT(20) NOT NULL," +
-                 "PRIMARY KEY  (kitComponentId)" +
+                 "PRIMARY KEY (kitComponentId)" +
                  ");");
-
 
     runStatement(conn,
                  "CREATE TABLE Kit_Note (" +

@@ -122,7 +122,7 @@ public class MenuController implements ServletContextAware {
   public String exhaustComponent() { return "/pages/kitComponentManagement.jsp";}
 
   @RequestMapping("/listKitChangeLog")
-  public String listKitChangeLog(){ return "/pages/listKitChangeLog.jsp";
+  public String listKitChangeLog() { return "/pages/listKitChangeLog.jsp";
   }
 
   @RequestMapping("/activity/menu")

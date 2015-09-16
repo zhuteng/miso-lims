@@ -55,7 +55,6 @@
   //description:  get change log
   //feedback:     on success - prepareChangeLogTable()
   function listChangeLogForTable(){
-
     Fluxion.doAjax(
             'kitComponentControllerHelperService',
             'getKitChangeLog',
@@ -80,19 +79,17 @@
     jQuery.fn.dataTable.moment('DD-MM-YYYY HH:mm:SS');
 
     table = jQuery("#changeLogTable").DataTable({
-
       data: changeLog,
       columns:[
         { data: 'userId', title: "User ID"},
         { data: 'kitComponentId', title: "Kit Component ID"},
         { data: 'exhausted', title: "Exhausted"},
-        { data: 'locationBarcodeOld', title: "Location Barcode Before Change"},
-        { data: 'locationBarcodeNew', title: "Location Barcode After Change"},
+        { data: 'locationBarcodeOld', title: "Previous Location Barcode"},
+        { data: 'locationBarcodeNew', title: "Location Barcode"},
         { data: 'logDate', title: "Date of Change"}
       ],
       paging: false,
       order: [[ 5, "desc" ]]
-
     })};
 
 </script>
