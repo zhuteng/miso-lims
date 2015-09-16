@@ -185,7 +185,7 @@ public class ExperimentControllerHelperService {
         KitDescriptor kitDescriptor = requestManager.getKitDescriptorByPartNumber(partNumber);
         if (kitDescriptor != null) {
           Map<String, Object> m = new HashMap<String, Object>();
-          m.put("id", kitDescriptor.getKitDescriptorId());
+          m.put("id", kitDescriptor.getId());
           m.put("name", kitDescriptor.getName());
           return JSONUtils.JSONObjectResponse(m);
         }
@@ -212,7 +212,7 @@ public class ExperimentControllerHelperService {
         int count = 0;
         for (KitDescriptor k : kits) {
           if (e.getPlatform().getPlatformType().equals(k.getPlatformType())) {
-            lkits.append("{'name':'"+k.getName()+"', 'id':'"+k.getKitDescriptorId()+"', 'partNumber':'"+k.getPartNumber()+"'}");
+            lkits.append("{'name':'"+k.getName()+"', 'id':'"+k.getId()+"', 'partNumber':'"+k.getPartNumber()+"'}");
             if (count < kits.size()) lkits.append(",");
             count++;
           }
@@ -227,7 +227,7 @@ public class ExperimentControllerHelperService {
           count = 0;
           for (KitDescriptor k : mkitds) {
             if (e.getPlatform().getPlatformType().equals(k.getPlatformType())) {
-              mkits.append("{'name':'"+k.getName()+"', 'id':'"+k.getKitDescriptorId()+"', 'partNumber':'"+k.getPartNumber()+"'}");
+              mkits.append("{'name':'"+k.getName()+"', 'id':'"+k.getId()+"', 'partNumber':'"+k.getPartNumber()+"'}");
               if (count < mkitds.size()) mkits.append(",");
               count++;
             }
@@ -296,7 +296,7 @@ public class ExperimentControllerHelperService {
         int count = 0;
         for (KitDescriptor k : kits) {
           if (e.getPlatform().getPlatformType().equals(k.getPlatformType())) {
-            sb.append("{'name':'"+k.getName()+"', 'id':'"+k.getKitDescriptorId()+"', 'partNumber':'"+k.getPartNumber()+"'}");
+            sb.append("{'name':'"+k.getName()+"', 'id':'"+k.getId()+"', 'partNumber':'"+k.getPartNumber()+"'}");
             if (count < kits.size()) sb.append(",");
             count++;
           }
@@ -360,7 +360,7 @@ public class ExperimentControllerHelperService {
         int count = 0;
         for (KitDescriptor k : kits) {
           if (e.getPlatform().getPlatformType().equals(k.getPlatformType())) {
-            sb.append("{'name':'"+k.getName()+"', 'id':'"+k.getKitDescriptorId()+"', 'partNumber':'"+k.getPartNumber()+"'}");
+            sb.append("{'name':'"+k.getName()+"', 'id':'"+k.getId()+"', 'partNumber':'"+k.getPartNumber()+"'}");
             if (count < kits.size()) sb.append(",");
             count++;
           }
@@ -424,7 +424,7 @@ public class ExperimentControllerHelperService {
         int count = 0;
         for (KitDescriptor k : kits) {
           if (e.getPlatform().getPlatformType().equals(k.getPlatformType())) {
-            sb.append("{'name':'"+k.getName()+"', 'id':'"+k.getKitDescriptorId()+"', 'partNumber':'"+k.getPartNumber()+"'}");
+            sb.append("{'name':'"+k.getName()+"', 'id':'"+k.getId()+"', 'partNumber':'"+k.getPartNumber()+"'}");
             if (count < kits.size()) sb.append(",");
             count++;
           }

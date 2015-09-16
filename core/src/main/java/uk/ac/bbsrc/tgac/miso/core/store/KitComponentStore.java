@@ -25,11 +25,11 @@ package uk.ac.bbsrc.tgac.miso.core.store;
 
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
+import org.joda.time.LocalDate;
 import uk.ac.bbsrc.tgac.miso.core.data.KitComponent;
 import uk.ac.bbsrc.tgac.miso.core.data.type.KitType;
 
 import java.io.IOException;
-import java.time.LocalDate;
 import java.util.List;
 
 /**
@@ -39,7 +39,6 @@ import java.util.List;
  * @since 0.0.2
  */
 public interface KitComponentStore extends Store<KitComponent> {
-
   KitComponent getKitComponentByIdentificationBarcode(String barcode) throws IOException;
   List<KitComponent> listKitComponentsByLocationBarcode(String barcode) throws IOException;
   List<KitComponent> listKitComponentsByLotNumber(String lotNumber) throws IOException;

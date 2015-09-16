@@ -208,10 +208,6 @@ public class LimsDAO extends LimsDAOTestCase {
     }
   }
 
-
-
-
-
   @Test
   public void testKitDescriptors() {
     try {
@@ -226,14 +222,11 @@ public class LimsDAO extends LimsDAOTestCase {
 
       System.out.println(
               "Expected number of Kit Descriptors: " + expected + ", actual: " + actual);
-      System.out.println("@@@@@@@@ BEFORE THE LOOP @@@@@@@@@@@");
+
       for (KitDescriptor d : random(getKitDescriptorDAO(), actual, 5)) {
-        System.out.println("@@@@@@@@ IN THE LOOP @@@@@@@@@@@");
         TestCase.assertNotNull(d);
         TestCase.assertNotNull(d.getId());
       }
-
-      System.out.println("@@@@@@@ AFTER THE LOOP @@@@@@");
     }
     catch (Exception e) {
       e.printStackTrace();
@@ -256,13 +249,10 @@ public class LimsDAO extends LimsDAOTestCase {
       System.out.println(
               "Expected number of Kit Component Descriptors: " + expected + ", actual: " + actual);
 
-      System.out.println("@@@@@@@@ BEFORE THE LOOP @@@@@@@@@@@");
       for (KitComponentDescriptor d : random(getKitComponentDescriptorDAO(), actual, 5)) {
-        System.out.println("@@@@@@@@ IN THE LOOP @@@@@@@@@@@");
         TestCase.assertNotNull(d);
         TestCase.assertNotNull(d.getId());
       }
-      System.out.println("@@@@@@@ AFTER THE LOOP @@@@@@");
     }
     catch (Exception e) {
       e.printStackTrace();
@@ -284,13 +274,11 @@ public class LimsDAO extends LimsDAOTestCase {
 
       System.out.println(
               "Expected number of Kit Components: " + expected + ", actual: " + actual);
-      System.out.println("@@@@@@@@ BEFORE THE LOOP @@@@@@@@@@@");
+
       for (KitComponent d : random(getKitComponentDAO(), actual, 5)) {
-        System.out.println("@@@@@@@@ IN THE LOOP @@@@@@@@@@@");
         TestCase.assertNotNull(d);
         TestCase.assertNotNull(d.getId());
       }
-      System.out.println("@@@@@@@ AFTER THE LOOP @@@@@@");
     }
     catch (Exception e) {
       e.printStackTrace();

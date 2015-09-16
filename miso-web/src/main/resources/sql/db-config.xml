@@ -373,11 +373,9 @@
     <property name="cascadeType">
       <value type="javax.persistence.CascadeType">PERSIST</value>
     </property>
-    <property name="noteDAO" ref="sqlNoteDAO"/>
     <property name="kitDescriptorDAO" ref="sqlKitDescriptorDAO"/>
     <property name="jdbcTemplate" ref="interfaceTemplate"/>
   </bean>
-
 
   <bean id="sqlKitComponentDAO"
         class="uk.ac.bbsrc.tgac.miso.sqlstore.SQLKitComponentDAO">
@@ -731,7 +729,6 @@
       </list>
     </property>
   </bean>
-
 
   <bean name="plateStore" class="org.springframework.aop.framework.ProxyFactoryBean">
     <property name="proxyInterfaces">

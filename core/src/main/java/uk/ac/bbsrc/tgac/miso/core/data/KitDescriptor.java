@@ -25,12 +25,10 @@ package uk.ac.bbsrc.tgac.miso.core.data;
 
 import org.codehaus.jackson.annotate.JsonTypeInfo;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
-import uk.ac.bbsrc.tgac.miso.core.data.Nameable;
 import uk.ac.bbsrc.tgac.miso.core.data.type.KitType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 
-import javax.persistence.*;
-import java.io.Serializable;
+import java.math.BigDecimal;
 
 /**
  * A KitDescriptor handles information about a consumable element that is generally typed by a name, manufacturer and part number. KitComponents use
@@ -42,9 +40,7 @@ import java.io.Serializable;
 @JsonSerialize(typing = JsonSerialize.Typing.STATIC, include = JsonSerialize.Inclusion.NON_NULL)
 //@JsonIdentityInfo(generator = ObjectIdGenerators.IntSequenceGenerator.class, property = "@id")
 @JsonTypeInfo(use=JsonTypeInfo.Id.CLASS, include= JsonTypeInfo.As.PROPERTY, property="@class")
- public interface KitDescriptor extends Nameable {
-
-
+public interface KitDescriptor extends Nameable {
   /**
    * Returns the units in which we measure this KitDescriptor object
    * @return units String
@@ -61,34 +57,21 @@ import java.io.Serializable;
    * Returns the monetary value of this KitDescriptor object in pounds
    * @return value float
    */
-  float getKitValue();
+  BigDecimal getKitValue();
 
   /**
    * Sets the monetary value of this KitDescriptor object in pounds
    * mySQL:: FLOAT(7,2) precision
    * @param kitValue value
    */
-  void setKitValue(float kitValue);
-
-  /**
-   * Returns the kitDescriptorId of this KitDescriptor object.
-   *
-   * @return Long kitDescriptorId.
-   */
-   Long getKitDescriptorId();
+  void setKitValue(BigDecimal kitValue);
 
   /**
    * Sets the kitDescriptorId of this KitDescriptor object.
    *
    * @param kitDescriptorId kitDescriptorId.
    */
-   void setKitDescriptorId(Long kitDescriptorId);
-  /**
-   * Returns the name of this KitDescriptor object.
-   *
-   * @return String name.
-   */
-   String getName();
+   void setId(long kitDescriptorId);
 
   /**
    * Sets the name of this KitDescriptor object.
@@ -144,7 +127,6 @@ import java.io.Serializable;
    *
    * @return Integer stockLevel.
    */
-
    KitType getKitType();
 
   /**
@@ -174,8 +156,5 @@ import java.io.Serializable;
    * @return String
    */
   @Override
-    String toString();
-
-  Long getUNSAVEDID();
-
+  String toString();
 }

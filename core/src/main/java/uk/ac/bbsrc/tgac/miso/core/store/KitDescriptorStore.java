@@ -6,8 +6,6 @@ package uk.ac.bbsrc.tgac.miso.core.store;
  * @author Michal Zak
  * @since 0.0.2
  */
-
-
 import uk.ac.bbsrc.tgac.miso.core.data.KitDescriptor;
 import uk.ac.bbsrc.tgac.miso.core.data.type.KitType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
@@ -22,5 +20,4 @@ public interface KitDescriptorStore extends Store<KitDescriptor>{
     List<KitDescriptor> listKitDescriptorsByPlatform(PlatformType platformType) throws IOException;
     List<KitDescriptor> listKitDescriptorsByUnits(String units) throws IOException;
     List<KitDescriptor> listKitDescriptorsByType(KitType kitType) throws IOException;
-
 }

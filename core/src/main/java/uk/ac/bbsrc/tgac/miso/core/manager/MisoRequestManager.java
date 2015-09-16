@@ -27,6 +27,7 @@ import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
+import org.joda.time.LocalDate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,7 +41,6 @@ import uk.ac.bbsrc.tgac.miso.core.event.Alert;
 import uk.ac.bbsrc.tgac.miso.core.store.*;
 
 import java.io.IOException;
-import java.time.LocalDate;
 import java.util.*;
 
 /**
@@ -51,7 +51,6 @@ import java.util.*;
  */
 public class MisoRequestManager implements RequestManager {
   protected static final Logger log = LoggerFactory.getLogger(MisoRequestManager.class);
-
 
   @Autowired
   private AlertStore alertStore;
@@ -1282,7 +1281,6 @@ public class MisoRequestManager implements RequestManager {
     }
   }
 
-
   @Override
   public Collection<KitComponentDescriptor> listKitComponentDescriptorsByKitDescriptorId(long kitDescriptorId) throws IOException {
     if (kitComponentDescriptorStore != null) {
@@ -1291,8 +1289,6 @@ public class MisoRequestManager implements RequestManager {
       throw new IOException("No kitComponentDescriptorStore available. Check that it has been declared in the Spring config.");
     }
   }
-
-
 
   @Override
   public Collection<KitDescriptor> listKitDescriptorsByManufacturer(String manufacturer) throws IOException {
@@ -1994,7 +1990,6 @@ public class MisoRequestManager implements RequestManager {
     }
   }
 
-
   @Override
   public long saveKitDescriptor(KitDescriptor kitDescriptor) throws IOException {
     if (kitDescriptorStore != null) {
@@ -2004,7 +1999,6 @@ public class MisoRequestManager implements RequestManager {
       throw new IOException("No kitDescriptorStore available. Check that it has been declared in the Spring config.");
     }
   }
-
 
   @Override
   public long saveKitChangeLog(JSONObject changeLog) throws IOException {
@@ -2047,13 +2041,11 @@ public class MisoRequestManager implements RequestManager {
   }
 
   //GETS
-
-
   @Override
   public JSONArray getKitChangeLog() throws IOException {
-    if(kitComponentStore !=null){
+    if(kitComponentStore != null) {
       return kitComponentStore.getKitChangeLog();
-    }else{
+    } else {
       throw new IOException("No KitComponentStore available. Check that it has been declared in the Spring config");
     }
   }
@@ -2071,6 +2063,16 @@ public class MisoRequestManager implements RequestManager {
   public Project getProjectById(long projectId) throws IOException {
     if (projectStore != null) {
       return projectStore.get(projectId);
+    }
+    else {
+      throw new IOException("No projectStore available. Check that it has been declared in the Spring config.");
+    }
+  }
+
+  @Override
+  public Project getProjectByAlias(String projectAlias) throws IOException {
+    if (projectStore != null) {
+      return projectStore.getByAlias(projectAlias);
     }
     else {
       throw new IOException("No projectStore available. Check that it has been declared in the Spring config.");
@@ -2568,9 +2570,6 @@ public class MisoRequestManager implements RequestManager {
     }
   }
 
-
-
-
   @Override
   public KitComponent getKitComponentById(long kitId) throws IOException {
     if (kitComponentStore != null) {
@@ -2611,8 +2610,6 @@ public class MisoRequestManager implements RequestManager {
     }
   }
 
-
-
   @Override
   public KitDescriptor getKitDescriptorById(long kitDescriptorId) throws IOException {
     if (kitDescriptorStore != null) {
@@ -2632,13 +2629,6 @@ public class MisoRequestManager implements RequestManager {
       throw new IOException("No kitDescriptorStore available. Check that it has been declared in the Spring config.");
     }
   }
-
-
-
-
-
-
-
 
   @Override
   public QcType getSampleQcTypeById(long qcTypeId) throws IOException {

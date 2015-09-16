@@ -25,11 +25,6 @@ package uk.ac.bbsrc.tgac.miso.core.data;
 
 import org.codehaus.jackson.annotate.JsonTypeInfo;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
-import uk.ac.bbsrc.tgac.miso.core.data.KitDescriptor;
-import uk.ac.bbsrc.tgac.miso.core.data.Nameable;
-
-import javax.persistence.*;
-import java.io.Serializable;
 
 /**
  * A KitComponentDescriptor handles information about a consumable element that is part of a kit. Every element of that type has a name and reference number and uses KitDescriptor. KitComponents use
@@ -41,25 +36,8 @@ import java.io.Serializable;
 @JsonSerialize(typing = JsonSerialize.Typing.STATIC, include = JsonSerialize.Inclusion.NON_NULL)
 //@JsonIdentityInfo(generator = ObjectIdGenerators.IntSequenceGenerator.class, property = "@id")
 @JsonTypeInfo(use=JsonTypeInfo.Id.CLASS, include= JsonTypeInfo.As.PROPERTY, property="@class")
-public interface KitComponentDescriptor extends Nameable{
-
-    /**
-     * Returns Kit Component Descriptor's ID
-     * @return id long
-     */
-    long getKitComponentDescriptorId();
-
-    /**
-     * Sets Kit Component Descriptor's ID
-     * @param kitComponentDescriptorId
-     */
-    void setKitComponentDescriptorId(long kitComponentDescriptorId);
-
-    /**
-     * Returns Kit Component Descriptor's name
-     * @return name String
-     */
-    String getName();
+public interface KitComponentDescriptor extends Nameable {
+    void setId(long kitComponentDescriptorId);
 
     /**
      * Sets this Kit Component Descriptor's name

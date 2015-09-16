@@ -40,8 +40,7 @@ public enum PlatformType {
   SOLID("Solid"),
   IONTORRENT("IonTorrent"),
   PACBIO("PacBio"),
-  OXFORD_NANOPORE("OxfordNanopore"),
-  MI_SEQ("MiSeq");
+  OXFORD_NANOPORE("OxfordNanopore");
 
   /**
    * Field key

@@ -89,18 +89,18 @@
             <table class="in">
                 <tr>
                     <td class="h">Name:</td>
-                    <td><form:input path="name" id="name"/></td>
+                    <td><form:input path="name"/></td>
                 </tr>
 
                 <tr>
                     <td class="h">Reference Number:</td>
-                    <td><form:input path="referenceNumber" id="refNumber"/></td>
+                    <td><form:input path="referenceNumber"/></td>
                 </tr>
 
 
             </table>
             <div id="fillTheForm"><br><i>To add this component you have to fill out all the fields.</i></div>
-            <button type="submit" id="submit" class="fg-button ui-state-default ui-corner-all" style='display:none'>Add</button>
+            <button type="submit" class="fg-button ui-state-default ui-corner-all">Add</button>
         </form:form>
         <br>
         <button type="button" id="done">Save and return to Home</button>
