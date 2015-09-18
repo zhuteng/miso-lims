@@ -25,6 +25,7 @@ package uk.ac.bbsrc.tgac.miso.core.data;
 
 //import com.fasterxml.jackson.annotation.*;
 //import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 import org.codehaus.jackson.annotate.JsonTypeInfo;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
@@ -49,143 +50,139 @@ import java.util.Date;
  */
 @JsonSerialize(typing = JsonSerialize.Typing.STATIC, include = JsonSerialize.Inclusion.NON_NULL)
 //@JsonIdentityInfo(generator = ObjectIdGenerators.IntSequenceGenerator.class, property = "@id")
-@JsonTypeInfo(use=JsonTypeInfo.Id.CLASS, include= JsonTypeInfo.As.PROPERTY, property="@class")
-@JsonIgnoreProperties({"securityProfile"})
-public interface Project extends com.eaglegenomics.simlims.core.Project,
-                                 Comparable,
-                                 SecurableByProfile,
-                                 Submittable<Document>,
-                                 Reportable,
-                                 Deletable,
-                                 Watchable,
-                                 Nameable,
-                                 Alertable {
-  /** Field PREFIX  */
-  public static final String PREFIX = "PRO";
+@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
+@JsonIgnoreProperties({ "securityProfile" })
+public interface Project
+    extends com.eaglegenomics.simlims.core.Project, Comparable, SecurableByProfile, Submittable<Document>, Reportable, Deletable, Watchable,
+    Nameable, Alertable {
+    /**
+     * Field PREFIX
+     */
+    public static final String PREFIX = "PRO";
 
-  public void setId(long id);
+    public void setId(long id);
 
-  /**
-   * Returns the alias of this Project object.
-   *
-   * @return String alias.
-   */
-  String getAlias();
+    /**
+     * Returns the alias of this Project object.
+     *
+     * @return String alias.
+     */
+    String getAlias();
 
-  /**
-   * Sets the alias of this Project object.
-   *
-   * @param alias alias.
-   */
-  void setAlias(String alias);
+    /**
+     * Sets the alias of this Project object.
+     *
+     * @param alias alias.
+     */
+    void setAlias(String alias);
 
-  /**
-   * Returns the progress of this Project object.
-   *
-   * @return ProgressType progress.
-   */
-  ProgressType getProgress();
+    /**
+     * Returns the progress of this Project object.
+     *
+     * @return ProgressType progress.
+     */
+    ProgressType getProgress();
 
-  /**
-   * Sets the progress of this Project object.
-   *
-   * @param progress progress.
-   */
-  void setProgress(ProgressType progress);
+    /**
+     * Sets the progress of this Project object.
+     *
+     * @param progress progress.
+     */
+    void setProgress(ProgressType progress);
 
-  /**
-   * Returns the registered samples of this Project object.
-   *
-   * @return Collection<Sample> samples.
-   */
-  Collection<Sample> getSamples();
+    /**
+     * Returns the registered samples of this Project object.
+     *
+     * @return Collection<Sample> samples.
+     */
+    Collection<Sample> getSamples();
 
-  /**
-   * Returns the registered samples of this Project object.
-   *
-   * @return Collection<Run> runs.
-   */
-  Collection<Run> getRuns();
+    /**
+     * Returns the registered samples of this Project object.
+     *
+     * @return Collection<Run> runs.
+     */
+    Collection<Run> getRuns();
 
-  /**
-   * Returns the registered studies of this Project object.
-   *
-   * @return Collection<Study> studies.
-   */
-  Collection<Study> getStudies();
+    /**
+     * Returns the registered studies of this Project object.
+     *
+     * @return Collection<Study> studies.
+     */
+    Collection<Study> getStudies();
 
-  /**
-   * Returns the overviews of this Project object.
-   *
-   * @return Collection<ProjectOverview> overviews.
-   */
-  Collection<ProjectOverview> getOverviews();
+    /**
+     * Returns the overviews of this Project object.
+     *
+     * @return Collection<ProjectOverview> overviews.
+     */
+    Collection<ProjectOverview> getOverviews();
 
-  /**
-   * Returns the overview of this Project object with the given ID
-   *
-   * @param overviewId of type Long
-   * @return ProjectOverview overview.
-   */
-  ProjectOverview getOverviewById(Long overviewId);
+    /**
+     * Returns the overview of this Project object with the given ID
+     *
+     * @param overviewId of type Long
+     * @return ProjectOverview overview.
+     */
+    ProjectOverview getOverviewById(Long overviewId);
 
-  /**
-   * Registers a collection of samples to this Project object.
-   *
-   * @param samples samples.
-   */
-  void setSamples(Collection<Sample> samples);
+    /**
+     * Registers a collection of samples to this Project object.
+     *
+     * @param samples samples.
+     */
+    void setSamples(Collection<Sample> samples);
 
-  /**
-   * Registers a collection of samples to this Project object.
-   *
-   * @param runs runs.
-   */
-  void setRuns(Collection<Run> runs);
+    /**
+     * Registers a collection of samples to this Project object.
+     *
+     * @param runs runs.
+     */
+    void setRuns(Collection<Run> runs);
 
-  /**
-   * Register that a Sample has been recieved in relation to this Project
-   *
-   * @param sample of type Sample
-   */
-  void addSample(Sample sample);
+    /**
+     * Register that a Sample has been recieved in relation to this Project
+     *
+     * @param sample of type Sample
+     */
+    void addSample(Sample sample);
 
-  /**
-   * Registers a collection of studies to this Project object.
-   *
-   * @param studies studies.
-   */
-  void setStudies(Collection<Study> studies);
+    /**
+     * Registers a collection of studies to this Project object.
+     *
+     * @param studies studies.
+     */
+    void setStudies(Collection<Study> studies);
 
-  /**
-   * Registers a collection of project overviews to this Project object.
-   *
-   * @param overviews overviews.
-   */
-  void setOverviews(Collection<ProjectOverview> overviews);
+    /**
+     * Registers a collection of project overviews to this Project object.
+     *
+     * @param overviews overviews.
+     */
+    void setOverviews(Collection<ProjectOverview> overviews);
 
-  /**
-   * Returns the associated issue keys of this Project object.
-   *
-   * @return Collection<String> issueKeys.
-   */
-  Collection<String> getIssueKeys();
+    /**
+     * Returns the associated issue keys of this Project object.
+     *
+     * @return Collection<String> issueKeys.
+     */
+    Collection<String> getIssueKeys();
 
-  /**
-   * Registers a collection of issue keys from an issue tracker to this Project object.
-   *
-   * @param issueKeys issueKeys.
-   */
-  void setIssueKeys(Collection<String> issueKeys);
+    /**
+     * Registers a collection of issue keys from an issue tracker to this Project object.
+     *
+     * @param issueKeys issueKeys.
+     */
+    void setIssueKeys(Collection<String> issueKeys);
 
-  /**
-   * Registers an issue key from an issue tracker to this Project object.
-   *
-   * @param issueKey issueKey.
-   */
-  void addIssueKey(String issueKey);
+    /**
+     * Registers an issue key from an issue tracker to this Project object.
+     *
+     * @param issueKey issueKey.
+     */
+    void addIssueKey(String issueKey);
 
-  Date getLastUpdated();
+    Date getLastUpdated();
 
-  void setLastUpdated(Date lastUpdated);
+    void setLastUpdated(Date lastUpdated);
 }

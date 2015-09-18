@@ -33,14 +33,14 @@ package uk.ac.bbsrc.tgac.miso.core.exception;
  * @since 0.1.6RC
  */
 public class AlertingException extends Exception {
-  public AlertingException(String s) {
-    super(s);
-  }
-
-  public AlertingException(String s, Throwable cause) {
-    super(s);
-    if (cause != null) {
-        initCause(cause);
+    public AlertingException(String s) {
+        super(s);
     }
-  }
+
+    public AlertingException(String s, Throwable cause) {
+        super(s);
+        if (cause != null) {
+            initCause(cause);
+        }
+    }
 }

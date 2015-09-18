@@ -35,60 +35,61 @@ import java.lang.reflect.Method;
  * @since 0.1.3
  */
 public class AliasComparator extends AlphanumericComparator {
-  private Method method;
-  private boolean isAscending = true;
-  private boolean isNullsLast = true;
-  private static final Object[] EMPTY_OBJECT_ARRAY = new Object[]{};
+    private Method method;
+    private boolean isAscending = true;
+    private boolean isNullsLast = true;
+    private static final Object[] EMPTY_OBJECT_ARRAY = new Object[] { };
 
-  public AliasComparator(Class c) throws NoSuchMethodException, IllegalArgumentException {
-    method = c.getMethod("getAlias");
-    Class returnClass = method.getReturnType();
-    if (returnClass.getName().equals("void")) {
-      String message = method.getName() + " has a void return type";
-      throw new IllegalArgumentException(message);
-    }
-  }
-
-  @Override
-  public int compare(Object object1, Object object2) {
-    String alias1 = null;
-    String alias2 = null;
-
-    try {
-      alias1 = (String)method.invoke(object1, EMPTY_OBJECT_ARRAY);
-      alias2 = (String)method.invoke(object2, EMPTY_OBJECT_ARRAY);
-    }
-    catch (Exception e) {
-      throw new RuntimeException(e);
+    public AliasComparator(Class c) throws NoSuchMethodException, IllegalArgumentException {
+        method = c.getMethod("getAlias");
+        Class returnClass = method.getReturnType();
+        if (returnClass.getName().equals("void")) {
+            String message = method.getName() + " has a void return type";
+            throw new IllegalArgumentException(message);
+        }
     }
 
-    // Treat empty strings like nulls
-    if (alias1.length() == 0) {
-      alias1 = null;
+    @Override
+    public int compare(Object object1, Object object2) {
+        String alias1 = null;
+        String alias2 = null;
+
+        try {
+            alias1 = (String) method.invoke(object1, EMPTY_OBJECT_ARRAY);
+            alias2 = (String) method.invoke(object2, EMPTY_OBJECT_ARRAY);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+        // Treat empty strings like nulls
+        if (alias1.length() == 0) {
+            alias1 = null;
+        }
+
+        if (alias2.length() == 0) {
+            alias2 = null;
+        }
+
+        // Handle sorting of null values
+        if (alias1 == null && alias2 == null)
+            return 0;
+        if (alias1 == null)
+            return isNullsLast ? 1 : -1;
+        if (alias2 == null)
+            return isNullsLast ? -1 : 1;
+
+        //  Compare objects
+        String c1;
+        String c2;
+
+        if (isAscending) {
+            c1 = alias1;
+            c2 = alias2;
+        } else {
+            c1 = alias2;
+            c2 = alias1;
+        }
+
+        return super.compare(c1, c2);
     }
-
-    if (alias2.length() == 0) {
-      alias2 = null;
-    }
-
-    // Handle sorting of null values
-    if (alias1 == null && alias2 == null) return 0;
-    if (alias1 == null) return isNullsLast ? 1 : -1;
-    if (alias2 == null) return isNullsLast ? -1 : 1;
-
-    //  Compare objects
-    String c1;
-    String c2;
-
-    if (isAscending) {
-      c1 = alias1;
-      c2 = alias2;
-    }
-    else {
-      c1 = alias2;
-      c2 = alias1;
-    }
-
-    return super.compare(c1, c2);
-  }
 }

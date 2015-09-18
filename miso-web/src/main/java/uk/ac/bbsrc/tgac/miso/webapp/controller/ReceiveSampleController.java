@@ -33,18 +33,17 @@ import org.springframework.web.servlet.ModelAndView;
 @Controller
 @RequestMapping("/sample/receipt")
 public class ReceiveSampleController {
-  protected static final Logger log = LoggerFactory.getLogger(EditSampleController.class);
+    protected static final Logger log = LoggerFactory.getLogger(EditSampleController.class);
 
-  @RequestMapping(method = RequestMethod.GET)
-  public ModelAndView setupForm(ModelMap model) throws Exception {
-    try {
-      return new ModelAndView("/pages/sampleReceipt.jsp", model);
+    @RequestMapping(method = RequestMethod.GET)
+    public ModelAndView setupForm(ModelMap model) throws Exception {
+        try {
+            return new ModelAndView("/pages/sampleReceipt.jsp", model);
+        } catch (Exception ex) {
+            if (log.isDebugEnabled()) {
+                log.debug("Failed to show sample", ex);
+            }
+            throw ex;
+        }
     }
-    catch (Exception ex) {
-      if (log.isDebugEnabled()) {
-        log.debug("Failed to show sample", ex);
-      }
-      throw ex;
-    }
-  }
 }

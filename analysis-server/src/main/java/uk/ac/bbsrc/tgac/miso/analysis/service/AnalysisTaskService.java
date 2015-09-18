@@ -45,23 +45,18 @@ import java.util.Map;
  */
 public class AnalysisTaskService extends DefaultTaskService {
 
-  @Override
-  public void extractConanParameters(Map<ConanParameter, String> parameters,
-                                     Map<String, String> inputValues,
-                                     ConanProcess process) {
-    for (ConanParameter param : process.getParameters()) {
-      if ((param instanceof Optionable && ((Optionable)param).isOptional()) ||
-          inputValues.get(param.getName()) != null) {
-        if (!parameters.containsKey(param)) {
-          parameters.put(param, inputValues.get(param.getName()));
+    @Override
+    public void extractConanParameters(Map<ConanParameter, String> parameters, Map<String, String> inputValues, ConanProcess process) {
+        for (ConanParameter param : process.getParameters()) {
+            if ((param instanceof Optionable && ((Optionable) param).isOptional()) || inputValues.get(param.getName()) != null) {
+                if (!parameters.containsKey(param)) {
+                    parameters.put(param, inputValues.get(param.getName()));
+                }
+            } else {
+                throw new MissingRequiredParameterException("Required parameter '" + param.getName() + "' not supplied, " +
+                                                            "required for process '" + process.getName() + "'");
+            }
         }
-      }
-      else {
-        throw new MissingRequiredParameterException(
-                "Required parameter '" + param.getName() + "' not supplied, " +
-                "required for process '" + process.getName() + "'");
-      }
-    }
 
     /*
     //finally, map in any parameters that need to be used, but not saved
@@ -78,5 +73,5 @@ public class AnalysisTaskService extends DefaultTaskService {
       }
     }
     */
-  }
+    }
 }

@@ -39,16 +39,16 @@ import java.io.Serializable;
  */
 @Deprecated
 public class emPCRPool extends PoolImpl<LibraryDilution> implements Serializable {
-  public static final String PREFIX = "EPO";
-  private final String units = "nM";
+    public static final String PREFIX = "EPO";
+    private final String units = "nM";
 
-  public emPCRPool(PlatformType platformType) {
-    setSecurityProfile(new SecurityProfile());
-    setPlatformType(platformType);
-  }
+    public emPCRPool(PlatformType platformType) {
+        setSecurityProfile(new SecurityProfile());
+        setPlatformType(platformType);
+    }
 
-  public emPCRPool(User user, PlatformType platformType) {
-    setSecurityProfile(new SecurityProfile(user));
-    setPlatformType(platformType);
-  }
+    public emPCRPool(User user, PlatformType platformType) {
+        setSecurityProfile(new SecurityProfile(user));
+        setPlatformType(platformType);
+    }
 }

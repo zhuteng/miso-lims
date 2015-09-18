@@ -25,6 +25,7 @@ package uk.ac.bbsrc.tgac.miso.core.data;
 
 //import com.fasterxml.jackson.annotation.*;
 //import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 import org.codehaus.jackson.annotate.JsonTypeInfo;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
@@ -44,23 +45,23 @@ import java.util.Queue;
  */
 @JsonSerialize(typing = JsonSerialize.Typing.STATIC, include = JsonSerialize.Inclusion.NON_NULL)
 //@JsonIdentityInfo(generator = ObjectIdGenerators.IntSequenceGenerator.class, property = "@id")
-@JsonTypeInfo(use=JsonTypeInfo.Id.CLASS, include= JsonTypeInfo.As.PROPERTY, property="@class")
+@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
 public interface PrintJob extends Comparable {
-  void setJobId(Long jobId);
-  Long getJobId();
+    void setJobId(Long jobId);
+    Long getJobId();
 
-  void setPrintDate(Date printDate);
-  Date getPrintDate();
+    void setPrintDate(Date printDate);
+    Date getPrintDate();
 
-  void setPrintUser(User printUser);
-  User getPrintUser();
+    void setPrintUser(User printUser);
+    User getPrintUser();
 
-  void setPrintService(MisoPrintService printService);
-  MisoPrintService getPrintService();
+    void setPrintService(MisoPrintService printService);
+    MisoPrintService getPrintService();
 
-  void setQueuedElements(Queue<?> elements);
-  Queue<?> getQueuedElements();
+    void setQueuedElements(Queue<?> elements);
+    Queue<?> getQueuedElements();
 
-  void setStatus(String status);
-  String getStatus();
+    void setStatus(String status);
+    String getStatus();
 }

@@ -50,105 +50,102 @@ import java.util.regex.Pattern;
  */
 @ServiceProvider
 public class TGACIlluminaFilepathGenerator implements FilePathGenerator {
-  protected static final Logger log = LoggerFactory.getLogger(TGACIlluminaFilepathGenerator.class);
+    protected static final Logger log = LoggerFactory.getLogger(TGACIlluminaFilepathGenerator.class);
 
-  String basePath = "";
+    String basePath = "";
 
-  public TGACIlluminaFilepathGenerator() {}
-
-  public TGACIlluminaFilepathGenerator(String basePath) {
-    this.basePath = basePath;
-  }
-
-  public void setBaseReadPath(String basePath) {
-    this.basePath = basePath;
-  }
-
-  @Override
-  public Set<File> generateFilePath(SequencerPoolPartition partition, Dilution l) throws SubmissionException {
-    Pool<? extends Poolable> pool = partition.getPool();
-    if (pool != null) {
-      if (pool.getExperiments() != null) {
-        Collection<Experiment> experiments = pool.getExperiments();
-        Experiment experiment = experiments.iterator().next();
-        StringBuilder filePath = new StringBuilder();
-        if (!"".equals(basePath)) {
-          filePath.append(partition.getSequencerPartitionContainer().getRun().getFilePath() + "/Data/Intensities/BaseCalls/PAP/Project_" +
-                            experiment.getStudy().getProject().getAlias() + "/Sample_" + l.getLibrary().getName() + "/" +
-                            l.getLibrary().getName());
-        }
-        else {
-          filePath.append(basePath + "/" + experiment.getStudy().getProject().getAlias() + "/Sample_" + l.getLibrary().getName() + "/" +
-                            l.getLibrary().getName());
-        }
-        if (l.getLibrary().getTagBarcodes() != null && !l.getLibrary().getTagBarcodes().isEmpty()) {
-          filePath.append("_");
-          for (TagBarcode tb : l.getLibrary().getTagBarcodes().values()) {
-            filePath.append(tb.getSequence());
-          }
-        }
-        filePath.append("_L00" + partition.getPartitionNumber() + "*.fastq.gz");
-        Set<File> files = new HashSet<File>();
-        files.add(new File(filePath.toString()));
-        return files;
-      }
-      else {
-        throw new SubmissionException("partition.getPool=null!");
-      }
-    }
-    else {
-      throw new SubmissionException("Collection of experiments is empty");
-    }
-  }
-
-  @Override
-  public Set<File> generateFilePaths(SequencerPoolPartition partition) throws SubmissionException {
-    Set<File> filePaths = new HashSet<File>();
-    if((partition.getSequencerPartitionContainer().getRun().getFilePath()) == null){
-      throw new SubmissionException("No valid run filepath!");
+    public TGACIlluminaFilepathGenerator() {
     }
 
-    Pool<? extends Poolable> pool = partition.getPool();
-    if (pool == null) {
-      throw new SubmissionException("partition.getPool=null!");
+    public TGACIlluminaFilepathGenerator(String basePath) {
+        this.basePath = basePath;
     }
-    else {
-      Collection<Experiment> experiments = pool.getExperiments();
-      if (experiments.isEmpty()) {
-        throw new SubmissionException("Collection or experiments is empty");
-      }
-      else {
-        Collection<? extends Dilution> libraryDilutions = pool.getDilutions();
-        if (libraryDilutions.isEmpty()) {
-          throw new SubmissionException("Collection of libraryDilutions is empty");
-        }
-        else {
-          for (Dilution l : libraryDilutions) {
-            Set<File> files = generateFilePath(partition,l);
-            filePaths.addAll(files);
-          }
-        }
-      }
+
+    public void setBaseReadPath(String basePath) {
+        this.basePath = basePath;
     }
-    return filePaths;
-  }
 
-  @Override
-  public String getName() {
-    return "TGAC Illumina File Path Generator";
-  }
-
-  @Override
-  public PlatformType generatesFilePathsFor() {
-    return PlatformType.ILLUMINA;
-  }
-
-  private class IlluminaFilenameFilter implements FilenameFilter {
     @Override
-    public boolean accept(File dir, String name) {
-      Pattern pattern = Pattern.compile("LIB|SAM[\\d]+_[ACTG]+_L00[\\d]{1}_.*\\.fastq.gz");
-      Matcher m = pattern.matcher(name);
-      return m.matches();
+    public Set<File> generateFilePath(SequencerPoolPartition partition, Dilution l) throws SubmissionException {
+        Pool<? extends Poolable> pool = partition.getPool();
+        if (pool != null) {
+            if (pool.getExperiments() != null) {
+                Collection<Experiment> experiments = pool.getExperiments();
+                Experiment experiment = experiments.iterator().next();
+                StringBuilder filePath = new StringBuilder();
+                if (!"".equals(basePath)) {
+                    filePath.append(
+                        partition.getSequencerPartitionContainer().getRun().getFilePath() + "/Data/Intensities/BaseCalls/PAP/Project_" +
+                        experiment.getStudy().getProject().getAlias() + "/Sample_" + l.getLibrary().getName() + "/" +
+                        l.getLibrary().getName());
+                } else {
+                    filePath.append(
+                        basePath + "/" + experiment.getStudy().getProject().getAlias() + "/Sample_" + l.getLibrary().getName() + "/" +
+                        l.getLibrary().getName());
+                }
+                if (l.getLibrary().getTagBarcodes() != null && !l.getLibrary().getTagBarcodes().isEmpty()) {
+                    filePath.append("_");
+                    for (TagBarcode tb : l.getLibrary().getTagBarcodes().values()) {
+                        filePath.append(tb.getSequence());
+                    }
+                }
+                filePath.append("_L00" + partition.getPartitionNumber() + "*.fastq.gz");
+                Set<File> files = new HashSet<File>();
+                files.add(new File(filePath.toString()));
+                return files;
+            } else {
+                throw new SubmissionException("partition.getPool=null!");
+            }
+        } else {
+            throw new SubmissionException("Collection of experiments is empty");
+        }
     }
-  }
+
+    @Override
+    public Set<File> generateFilePaths(SequencerPoolPartition partition) throws SubmissionException {
+        Set<File> filePaths = new HashSet<File>();
+        if ((partition.getSequencerPartitionContainer().getRun().getFilePath()) == null) {
+            throw new SubmissionException("No valid run filepath!");
+        }
+
+        Pool<? extends Poolable> pool = partition.getPool();
+        if (pool == null) {
+            throw new SubmissionException("partition.getPool=null!");
+        } else {
+            Collection<Experiment> experiments = pool.getExperiments();
+            if (experiments.isEmpty()) {
+                throw new SubmissionException("Collection or experiments is empty");
+            } else {
+                Collection<? extends Dilution> libraryDilutions = pool.getDilutions();
+                if (libraryDilutions.isEmpty()) {
+                    throw new SubmissionException("Collection of libraryDilutions is empty");
+                } else {
+                    for (Dilution l : libraryDilutions) {
+                        Set<File> files = generateFilePath(partition, l);
+                        filePaths.addAll(files);
+                    }
+                }
+            }
+        }
+        return filePaths;
+    }
+
+    @Override
+    public String getName() {
+        return "TGAC Illumina File Path Generator";
+    }
+
+    @Override
+    public PlatformType generatesFilePathsFor() {
+        return PlatformType.ILLUMINA;
+    }
+
+    private class IlluminaFilenameFilter implements FilenameFilter {
+        @Override
+        public boolean accept(File dir, String name) {
+            Pattern pattern = Pattern.compile("LIB|SAM[\\d]+_[ACTG]+_L00[\\d]{1}_.*\\.fastq.gz");
+            Matcher m = pattern.matcher(name);
+            return m.matches();
+        }
+    }
 }

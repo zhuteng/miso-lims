@@ -27,12 +27,11 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlType;
 
-
 /**
  * <p>Java class for queueStatistics complex type.
- * 
+ * <p/>
  * <p>The following schema fragment specifies the expected content contained within this class.
- * 
+ * <p/>
  * <pre>
  * &lt;complexType name="queueStatistics">
  *   &lt;complexContent>
@@ -49,18 +48,9 @@ import javax.xml.bind.annotation.XmlType;
  *   &lt;/complexContent>
  * &lt;/complexType>
  * </pre>
- * 
- * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "queueStatistics", propOrder = {
-    "activeJobs",
-    "activeNodeString",
-    "blockedJobs",
-    "idleJobs",
-    "totalJobs",
-    "xml"
-})
+@XmlType(name = "queueStatistics", propOrder = { "activeJobs", "activeNodeString", "blockedJobs", "idleJobs", "totalJobs", "xml" })
 public class QueueStatistics {
 
     protected int activeJobs;
@@ -72,7 +62,6 @@ public class QueueStatistics {
 
     /**
      * Gets the value of the activeJobs property.
-     * 
      */
     public int getActiveJobs() {
         return activeJobs;
@@ -80,7 +69,6 @@ public class QueueStatistics {
 
     /**
      * Sets the value of the activeJobs property.
-     * 
      */
     public void setActiveJobs(int value) {
         this.activeJobs = value;
@@ -88,11 +76,9 @@ public class QueueStatistics {
 
     /**
      * Gets the value of the activeNodeString property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     * {@link String }
      */
     public String getActiveNodeString() {
         return activeNodeString;
@@ -100,11 +86,9 @@ public class QueueStatistics {
 
     /**
      * Sets the value of the activeNodeString property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setActiveNodeString(String value) {
         this.activeNodeString = value;
@@ -112,7 +96,6 @@ public class QueueStatistics {
 
     /**
      * Gets the value of the blockedJobs property.
-     * 
      */
     public int getBlockedJobs() {
         return blockedJobs;
@@ -120,7 +103,6 @@ public class QueueStatistics {
 
     /**
      * Sets the value of the blockedJobs property.
-     * 
      */
     public void setBlockedJobs(int value) {
         this.blockedJobs = value;
@@ -128,7 +110,6 @@ public class QueueStatistics {
 
     /**
      * Gets the value of the idleJobs property.
-     * 
      */
     public int getIdleJobs() {
         return idleJobs;
@@ -136,7 +117,6 @@ public class QueueStatistics {
 
     /**
      * Sets the value of the idleJobs property.
-     * 
      */
     public void setIdleJobs(int value) {
         this.idleJobs = value;
@@ -144,7 +124,6 @@ public class QueueStatistics {
 
     /**
      * Gets the value of the totalJobs property.
-     * 
      */
     public int getTotalJobs() {
         return totalJobs;
@@ -152,7 +131,6 @@ public class QueueStatistics {
 
     /**
      * Sets the value of the totalJobs property.
-     * 
      */
     public void setTotalJobs(int value) {
         this.totalJobs = value;
@@ -160,11 +138,9 @@ public class QueueStatistics {
 
     /**
      * Gets the value of the xml property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     * {@link String }
      */
     public String getXml() {
         return xml;
@@ -172,11 +148,9 @@ public class QueueStatistics {
 
     /**
      * Sets the value of the xml property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setXml(String value) {
         this.xml = value;

@@ -51,70 +51,67 @@ import java.util.regex.Pattern;
 @DiscriminatorValue("Illumina")
 public class IlluminaRun extends RunImpl {
 
-  public IlluminaRun() {
-    setPlatformType(PlatformType.ILLUMINA);
-    setStatus(new StatusImpl());
-    setSecurityProfile(new SecurityProfile());
-  }
-
-  public IlluminaRun(String statusXml) {
-    this(statusXml, null);
-  }
-
-  public IlluminaRun(String statusXml, User user) {
-    try {
-      Document statusDoc = SubmissionUtils.emptyDocument();
-      if (statusXml != null && !"".equals(statusXml)) {
-        SubmissionUtils.transform(new UnicodeReader(statusXml), statusDoc);
-
-        String runName = (statusDoc.getElementsByTagName("RunName").item(0).getTextContent());
-        setPairedEnd(false);
-
-        if (!statusDoc.getDocumentElement().getTagName().equals("error")) {
-          if (statusDoc.getElementsByTagName("IsPairedEndRun").getLength() > 0) {
-            boolean paired = Boolean.parseBoolean(statusDoc.getElementsByTagName("IsPairedEndRun").item(0).getTextContent().toLowerCase());
-            setPairedEnd(paired);
-          }
-        }
-
-        String runDirRegex = "[\\d]+_([A-z0-9\\-])+_([\\d])+_([A-z0-9_\\+\\-]*)";
-        Matcher m = Pattern.compile(runDirRegex).matcher(runName);
-        if (m.matches()) {
-          setPlatformRunId(Integer.parseInt(m.group(2)));
-        }
-
-        setAlias(runName);
-        setFilePath(runName);
-        setDescription(m.group(3));
+    public IlluminaRun() {
         setPlatformType(PlatformType.ILLUMINA);
-        setStatus(new IlluminaStatus(statusXml));
-        if (user != null) {
-          setSecurityProfile(new SecurityProfile(user));
-        }
-        else {
-          setSecurityProfile(new SecurityProfile());
-        }
-      }
-      else {
-        log.error("No status XML for this run");
-      }
+        setStatus(new StatusImpl());
+        setSecurityProfile(new SecurityProfile());
     }
-    catch (ParserConfigurationException e) {
-      e.printStackTrace();
-    }
-    catch (TransformerException e) {
-      log.error("Cannot parse status: " + statusXml);
-      e.printStackTrace();
-    }
-  }
 
-  public IlluminaRun(User user) {
-    setPlatformType(PlatformType.ILLUMINA);
-    setStatus(new StatusImpl());
-    setSecurityProfile(new SecurityProfile(user));
-  }
+    public IlluminaRun(String statusXml) {
+        this(statusXml, null);
+    }
 
-  public void buildSubmission() {
+    public IlluminaRun(String statusXml, User user) {
+        try {
+            Document statusDoc = SubmissionUtils.emptyDocument();
+            if (statusXml != null && !"".equals(statusXml)) {
+                SubmissionUtils.transform(new UnicodeReader(statusXml), statusDoc);
+
+                String runName = (statusDoc.getElementsByTagName("RunName").item(0).getTextContent());
+                setPairedEnd(false);
+
+                if (!statusDoc.getDocumentElement().getTagName().equals("error")) {
+                    if (statusDoc.getElementsByTagName("IsPairedEndRun").getLength() > 0) {
+                        boolean paired = Boolean
+                            .parseBoolean(statusDoc.getElementsByTagName("IsPairedEndRun").item(0).getTextContent().toLowerCase());
+                        setPairedEnd(paired);
+                    }
+                }
+
+                String runDirRegex = "[\\d]+_([A-z0-9\\-])+_([\\d])+_([A-z0-9_\\+\\-]*)";
+                Matcher m = Pattern.compile(runDirRegex).matcher(runName);
+                if (m.matches()) {
+                    setPlatformRunId(Integer.parseInt(m.group(2)));
+                }
+
+                setAlias(runName);
+                setFilePath(runName);
+                setDescription(m.group(3));
+                setPlatformType(PlatformType.ILLUMINA);
+                setStatus(new IlluminaStatus(statusXml));
+                if (user != null) {
+                    setSecurityProfile(new SecurityProfile(user));
+                } else {
+                    setSecurityProfile(new SecurityProfile());
+                }
+            } else {
+                log.error("No status XML for this run");
+            }
+        } catch (ParserConfigurationException e) {
+            e.printStackTrace();
+        } catch (TransformerException e) {
+            log.error("Cannot parse status: " + statusXml);
+            e.printStackTrace();
+        }
+    }
+
+    public IlluminaRun(User user) {
+        setPlatformType(PlatformType.ILLUMINA);
+        setStatus(new StatusImpl());
+        setSecurityProfile(new SecurityProfile(user));
+    }
+
+    public void buildSubmission() {
     /*
     try {
       DocumentBuilder docBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
@@ -125,12 +122,12 @@ public class IlluminaRun extends RunImpl {
     }
     ERASubmissionFactory.generateFullRunSubmissionXML(submissionDocument, this);
     */
-  }
+    }
 
-  @Override
-  public String toString() {
-    StringBuffer sb = new StringBuffer();
-    sb.append(super.toString());
+    @Override
+    public String toString() {
+        StringBuffer sb = new StringBuffer();
+        sb.append(super.toString());
     /*
     if (getFlowcells() != null) {
       sb.append(" : ");
@@ -139,19 +136,19 @@ public class IlluminaRun extends RunImpl {
       }
     }
     */
-    if (getSequencerPartitionContainers() != null) {
-      sb.append(" : ");
-      for(SequencerPartitionContainer f: getSequencerPartitionContainers()) {
-        sb.append(f.toString());
-      }
+        if (getSequencerPartitionContainers() != null) {
+            sb.append(" : ");
+            for (SequencerPartitionContainer f : getSequencerPartitionContainers()) {
+                sb.append(f.toString());
+            }
+        }
+        return sb.toString();
     }
-    return sb.toString();
-  }
 
-  /**
-   * Method buildReport ...
-   */
-  public void buildReport() {
+    /**
+     * Method buildReport ...
+     */
+    public void buildReport() {
 
-  }
+    }
 }

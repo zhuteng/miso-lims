@@ -40,17 +40,17 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
  */
 @Deprecated
 public class SolidPool extends PoolImpl<emPCRDilution> {
-  public static final String PREFIX = "SPO";
+    public static final String PREFIX = "SPO";
 
-  private final String units = "beads/&#181;l";
+    private final String units = "beads/&#181;l";
 
-  public SolidPool() {
-    setSecurityProfile(new SecurityProfile());
-    setPlatformType(PlatformType.SOLID);
-  }
+    public SolidPool() {
+        setSecurityProfile(new SecurityProfile());
+        setPlatformType(PlatformType.SOLID);
+    }
 
-  public SolidPool(User user) {
-    setSecurityProfile(new SecurityProfile(user));
-    setPlatformType(PlatformType.SOLID);
-  }
+    public SolidPool(User user) {
+        setSecurityProfile(new SecurityProfile(user));
+        setPlatformType(PlatformType.SOLID);
+    }
 }

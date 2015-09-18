@@ -40,56 +40,53 @@ import java.util.*;
  * @since 0.1.5
  */
 public class MisoPrintContextResolverService implements PrintContextResolverService {
-  protected static final Logger log = LoggerFactory.getLogger(MisoPrintContextResolverService.class);
-  private Map<String, PrintContext> contextMap;
+    protected static final Logger log = LoggerFactory.getLogger(MisoPrintContextResolverService.class);
+    private Map<String, PrintContext> contextMap;
 
-  @Override
-  public PrintContext getPrintContext(String contextName) {
-    for (PrintContext context : getPrintContexts()) {
-      if (context.getName().equals(contextName)) {
-        try {
-          return context.getClass().newInstance();
+    @Override
+    public PrintContext getPrintContext(String contextName) {
+        for (PrintContext context : getPrintContexts()) {
+            if (context.getName().equals(contextName)) {
+                try {
+                    return context.getClass().newInstance();
+                } catch (InstantiationException e) {
+                    log.error("Cannot create a new instance of '" + contextName + "'", e);
+                    e.printStackTrace();
+                } catch (IllegalAccessException e) {
+                    log.error("Cannot create a new instance of '" + contextName + "'", e);
+                    e.printStackTrace();
+                }
+            }
         }
-        catch (InstantiationException e) {
-          log.error("Cannot create a new instance of '" + contextName + "'", e);
-          e.printStackTrace();
-        }
-        catch (IllegalAccessException e) {
-          log.error("Cannot create a new instance of '" + contextName + "'", e);
-          e.printStackTrace();
-        }
-      }
-    }
-    log.warn("No context called '" + contextName + "' was available on the classpath");
-    return null;
-  }
-
-  @Override
-  public Collection<PrintContext> getPrintContexts() {
-    //lazily load available contexts
-    if (contextMap == null) {
-      ServiceLoader<PrintContext> consumerLoader = ServiceLoader.load(PrintContext.class);
-      Iterator<PrintContext> consumerIterator = consumerLoader.iterator();
-
-      contextMap = new HashMap<String, PrintContext>();
-      while (consumerIterator.hasNext()) {
-        PrintContext p = consumerIterator.next();
-
-        if (!contextMap.containsKey(p.getName())) {
-          contextMap.put(p.getName(), p);
-        }
-        else {
-          if (contextMap.get(p.getName()) != p) {
-            String msg = "Multiple different PrintContexts with the same context name " +
-                         "('" + p.getName() + "') are present on the classpath. Context names must be unique.";
-            log.error(msg);
-            throw new ServiceConfigurationError(msg);
-          }
-        }
-      }
-      log.info("Loaded " + contextMap.values().size() + " known contexts");
+        log.warn("No context called '" + contextName + "' was available on the classpath");
+        return null;
     }
 
-    return contextMap.values();
-  }
+    @Override
+    public Collection<PrintContext> getPrintContexts() {
+        //lazily load available contexts
+        if (contextMap == null) {
+            ServiceLoader<PrintContext> consumerLoader = ServiceLoader.load(PrintContext.class);
+            Iterator<PrintContext> consumerIterator = consumerLoader.iterator();
+
+            contextMap = new HashMap<String, PrintContext>();
+            while (consumerIterator.hasNext()) {
+                PrintContext p = consumerIterator.next();
+
+                if (!contextMap.containsKey(p.getName())) {
+                    contextMap.put(p.getName(), p);
+                } else {
+                    if (contextMap.get(p.getName()) != p) {
+                        String msg = "Multiple different PrintContexts with the same context name " +
+                                     "('" + p.getName() + "') are present on the classpath. Context names must be unique.";
+                        log.error(msg);
+                        throw new ServiceConfigurationError(msg);
+                    }
+                }
+            }
+            log.info("Loaded " + contextMap.values().size() + " known contexts");
+        }
+
+        return contextMap.values();
+    }
 }

@@ -25,6 +25,7 @@ package uk.ac.bbsrc.tgac.miso.core.data;
 
 //import com.fasterxml.jackson.annotation.*;
 //import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 import org.codehaus.jackson.annotate.JsonTypeInfo;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
@@ -33,7 +34,7 @@ import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 /**
  * A Partition represents a compartment on a {@link SequencerPartitionContainer} on a sequencing platform,
  * e.g. a lane on Illumina, a chamber on 454, or a SMRT cell on a PacBio.
- *
+ * <p/>
  * A Partition has a unique ID as well as a number describing its relative position in a SequencerPartitionContainer.
  *
  * @author Rob Davey
@@ -41,48 +42,48 @@ import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
  */
 @JsonSerialize(typing = JsonSerialize.Typing.STATIC, include = JsonSerialize.Inclusion.NON_NULL)
 //@JsonIdentityInfo(generator = ObjectIdGenerators.IntSequenceGenerator.class, property = "@id")
-@JsonTypeInfo(use=JsonTypeInfo.Id.CLASS, include= JsonTypeInfo.As.PROPERTY, property="@class")
-@JsonIgnoreProperties({"securityProfile","submissionDocument"})
+@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
+@JsonIgnoreProperties({ "securityProfile", "submissionDocument" })
 public interface Partition extends SecurableByProfile, Comparable {
-  /**
-   * Returns the sequencerPartitionContainer of this Partition object.
-   *
-   * @return SequencerPartitionContainer sequencerPartitionContainer.
-   */
-  SequencerPartitionContainer getSequencerPartitionContainer();
+    /**
+     * Returns the sequencerPartitionContainer of this Partition object.
+     *
+     * @return SequencerPartitionContainer sequencerPartitionContainer.
+     */
+    SequencerPartitionContainer getSequencerPartitionContainer();
 
-  /**
-   * Sets the sequencerPartitionContainer of this Partition object.
-   *
-   * @param sequencerPartitionContainer sequencerPartitionContainer.
-   */
-  void setSequencerPartitionContainer(SequencerPartitionContainer sequencerPartitionContainer);
+    /**
+     * Sets the sequencerPartitionContainer of this Partition object.
+     *
+     * @param sequencerPartitionContainer sequencerPartitionContainer.
+     */
+    void setSequencerPartitionContainer(SequencerPartitionContainer sequencerPartitionContainer);
 
-  /**
-   * Returns the id of this Partition object.
-   *
-   * @return Long id.
-   */
-  long getId();
+    /**
+     * Returns the id of this Partition object.
+     *
+     * @return Long id.
+     */
+    long getId();
 
-  /**
-   * Sets the id of this Partition object.
-   *
-   * @param id id.
-   */
-  void setId(long id);
+    /**
+     * Sets the id of this Partition object.
+     *
+     * @param id id.
+     */
+    void setId(long id);
 
-  /**
-   * Returns the partitionNumber, relative to the parent SequencerPartitionContainer, of this Partition object.
-   *
-   * @return Integer partitionNumber.
-   */
-  Integer getPartitionNumber();
+    /**
+     * Returns the partitionNumber, relative to the parent SequencerPartitionContainer, of this Partition object.
+     *
+     * @return Integer partitionNumber.
+     */
+    Integer getPartitionNumber();
 
-  /**
-   * Sets the partitionNumber, relative to the parent SequencerPartitionContainer, of this Partition object.
-   *
-   * @param partitionNumber partitionNumber.
-   */
-  void setPartitionNumber(Integer partitionNumber);
+    /**
+     * Sets the partitionNumber, relative to the parent SequencerPartitionContainer, of this Partition object.
+     *
+     * @param partitionNumber partitionNumber.
+     */
+    void setPartitionNumber(Integer partitionNumber);
 }

@@ -58,138 +58,140 @@ import java.util.*;
  */
 @Ajaxified
 public class CacheHelperService {
-  protected static final Logger log = LoggerFactory.getLogger(CacheHelperService.class);
+    protected static final Logger log = LoggerFactory.getLogger(CacheHelperService.class);
 
-  @Autowired
-  private CacheManager cacheManager;
+    @Autowired
+    private CacheManager cacheManager;
 
-  public void setCacheManager(CacheManager cacheManager) {
-    this.cacheManager = cacheManager;
-  }
-
-  @Autowired
-  private RequestManager requestManager;
-
-  public void setRequestManager(RequestManager requestManager) {
-    this.requestManager = requestManager;
-  }
-
-  @Autowired
-  private ProjectAlertManager projectAlertManager;
-
-  public void setProjectAlertManager(ProjectAlertManager projectAlertManager) {
-    this.projectAlertManager = projectAlertManager;
-  }
-
-  @Autowired
-  private RunAlertManager runAlertManager;
-
-  public void setRunAlertManager(RunAlertManager runAlertManager) {
-    this.runAlertManager = runAlertManager;
-  }
-
-  @Autowired
-  private PoolAlertManager poolAlertManager;
-
-  public void setPoolAlertManager(PoolAlertManager poolAlertManager) {
-    this.poolAlertManager = poolAlertManager;
-  }
-
-  public JSONObject flushAllCaches(HttpSession session, JSONObject json) {
-    DbUtils.flushAllCaches(cacheManager);
-    log.info("Caches flushed!");
-    return JSONUtils.JSONObjectResponse("html", jQueryDialogFactory.okDialog("Cache Administration", "Caches flushed successfully!"));
-  }
-
-  public JSONObject flushCache(HttpSession session, JSONObject json) {
-    if (json.has("cache") && !"".equals(json.getString("cache"))) {
-      String cacheName = json.getString("cache");
-      Cache cache = cacheManager.getCache(cacheName);
-      if (cache != null) {
-        cache.removeAll();
-        log.info("Cache '"+cacheName+"' flushed!");
-      }
-      else {
-        return JSONUtils.SimpleJSONError("No such cache: " + cacheName);
-      }
-      return JSONUtils.JSONObjectResponse("html", jQueryDialogFactory.okDialog("Cache Administration", "Cache '"+cacheName+"' flushed successfully!"));
+    public void setCacheManager(CacheManager cacheManager) {
+        this.cacheManager = cacheManager;
     }
-    return JSONUtils.SimpleJSONError("No cache specified to flush");
-  }
 
-  public <T extends Nameable> void evictObjectFromCache(T n, Class<T> entityType) {
-    Cache lazyCache = DbUtils.lookupCache(cacheManager, entityType, true);
-    Cache cache = DbUtils.lookupCache(cacheManager, entityType, false);
-    if (lazyCache != null) {
-      DbUtils.updateCaches(lazyCache, n.getId());
-    }
-    if (cache != null) {
-      DbUtils.updateCaches(cache, n.getId());
-    }
-  }
+    @Autowired
+    private RequestManager requestManager;
 
-  public JSONObject viewCacheStats(HttpSession session, JSONObject json) {
-    Map<String, Object> response = new HashMap<String, Object>();
-    List<String> cacheNames = Arrays.asList(cacheManager.getCacheNames());
-    Collections.sort(cacheNames);
-    JSONArray caches = new JSONArray();
-    for (String s : cacheNames) {
-      Cache c = cacheManager.getCache(s);
-      JSONObject j = new JSONObject();
-      j.put("name",s);
-      j.put("size",c.getSize());
-      j.put("hits", c.getLiveCacheStatistics().getCacheHitCount());
-      j.put("searchtimes", c.getLiveCacheStatistics().getAverageGetTimeMillis() + " ("+c.getLiveCacheStatistics().getMaxGetTimeMillis()+")");
-      caches.add(j);
+    public void setRequestManager(RequestManager requestManager) {
+        this.requestManager = requestManager;
     }
-    response.put("caches", caches);
-    return JSONUtils.JSONObjectResponse(response);
-  }
 
-  public JSONObject regenerateAllBarcodes(HttpSession session, JSONObject json) {
-    try {
-      for (Sample s : requestManager.listAllSamples()) {
-        if (s.getIdentificationBarcode() == null || "".equals(s.getIdentificationBarcode())) {
-          requestManager.saveSample(s);
+    @Autowired
+    private ProjectAlertManager projectAlertManager;
+
+    public void setProjectAlertManager(ProjectAlertManager projectAlertManager) {
+        this.projectAlertManager = projectAlertManager;
+    }
+
+    @Autowired
+    private RunAlertManager runAlertManager;
+
+    public void setRunAlertManager(RunAlertManager runAlertManager) {
+        this.runAlertManager = runAlertManager;
+    }
+
+    @Autowired
+    private PoolAlertManager poolAlertManager;
+
+    public void setPoolAlertManager(PoolAlertManager poolAlertManager) {
+        this.poolAlertManager = poolAlertManager;
+    }
+
+    public JSONObject flushAllCaches(HttpSession session, JSONObject json) {
+        DbUtils.flushAllCaches(cacheManager);
+        log.info("Caches flushed!");
+        return JSONUtils.JSONObjectResponse("html", jQueryDialogFactory.okDialog("Cache Administration", "Caches flushed successfully!"));
+    }
+
+    public JSONObject flushCache(HttpSession session, JSONObject json) {
+        if (json.has("cache") && !"".equals(json.getString("cache"))) {
+            String cacheName = json.getString("cache");
+            Cache cache = cacheManager.getCache(cacheName);
+            if (cache != null) {
+                cache.removeAll();
+                log.info("Cache '" + cacheName + "' flushed!");
+            } else {
+                return JSONUtils.SimpleJSONError("No such cache: " + cacheName);
+            }
+            return JSONUtils.JSONObjectResponse("html", jQueryDialogFactory
+                .okDialog("Cache Administration", "Cache '" + cacheName + "' flushed successfully!"));
         }
-      }
-
-      for (LibraryDilution ld : requestManager.listAllLibraryDilutions()) {
-        if (ld.getIdentificationBarcode() == null || "".equals(ld.getIdentificationBarcode())) {
-          requestManager.saveLibraryDilution(ld);
-        }
-      }
-
-      for (emPCRDilution ed : requestManager.listAllEmPcrDilutions()) {
-        if (ed.getIdentificationBarcode() == null || "".equals(ed.getIdentificationBarcode())) {
-          requestManager.saveEmPCRDilution(ed);
-        }
-      }
-
-      for (Library l : requestManager.listAllLibraries()) {
-        if (l.getIdentificationBarcode() == null || "".equals(l.getIdentificationBarcode())) {
-          requestManager.saveLibrary(l);
-        }
-      }
-
-      for (Pool p : requestManager.listAllPools()) {
-        if (p.getIdentificationBarcode() == null || "".equals(p.getIdentificationBarcode())) {
-          requestManager.savePool(p);
-        }
-      }
-    }
-    catch (IOException e) {
-      e.printStackTrace();
-      return JSONUtils.JSONObjectResponse("html", jQueryDialogFactory.errorDialog("Cache Administration", "Barcode regeneration failed!:\n\n" + e.getMessage()));
+        return JSONUtils.SimpleJSONError("No cache specified to flush");
     }
 
-    DbUtils.flushAllCaches(cacheManager);
-    log.info("Barcodes regenerated!");
-    return JSONUtils.JSONObjectResponse("html", jQueryDialogFactory.okDialog("Cache Administration", "Barcodes regenerated successfully!"));
-  }
+    public <T extends Nameable> void evictObjectFromCache(T n, Class<T> entityType) {
+        Cache lazyCache = DbUtils.lookupCache(cacheManager, entityType, true);
+        Cache cache = DbUtils.lookupCache(cacheManager, entityType, false);
+        if (lazyCache != null) {
+            DbUtils.updateCaches(lazyCache, n.getId());
+        }
+        if (cache != null) {
+            DbUtils.updateCaches(cache, n.getId());
+        }
+    }
 
-  @Deprecated
-  public JSONObject reindexAlertManagers(HttpSession session, JSONObject json) {
+    public JSONObject viewCacheStats(HttpSession session, JSONObject json) {
+        Map<String, Object> response = new HashMap<String, Object>();
+        List<String> cacheNames = Arrays.asList(cacheManager.getCacheNames());
+        Collections.sort(cacheNames);
+        JSONArray caches = new JSONArray();
+        for (String s : cacheNames) {
+            Cache c = cacheManager.getCache(s);
+            JSONObject j = new JSONObject();
+            j.put("name", s);
+            j.put("size", c.getSize());
+            j.put("hits", c.getLiveCacheStatistics().getCacheHitCount());
+            j.put("searchtimes",
+                  c.getLiveCacheStatistics().getAverageGetTimeMillis() + " (" + c.getLiveCacheStatistics().getMaxGetTimeMillis() + ")");
+            caches.add(j);
+        }
+        response.put("caches", caches);
+        return JSONUtils.JSONObjectResponse(response);
+    }
+
+    public JSONObject regenerateAllBarcodes(HttpSession session, JSONObject json) {
+        try {
+            for (Sample s : requestManager.listAllSamples()) {
+                if (s.getIdentificationBarcode() == null || "".equals(s.getIdentificationBarcode())) {
+                    requestManager.saveSample(s);
+                }
+            }
+
+            for (LibraryDilution ld : requestManager.listAllLibraryDilutions()) {
+                if (ld.getIdentificationBarcode() == null || "".equals(ld.getIdentificationBarcode())) {
+                    requestManager.saveLibraryDilution(ld);
+                }
+            }
+
+            for (emPCRDilution ed : requestManager.listAllEmPcrDilutions()) {
+                if (ed.getIdentificationBarcode() == null || "".equals(ed.getIdentificationBarcode())) {
+                    requestManager.saveEmPCRDilution(ed);
+                }
+            }
+
+            for (Library l : requestManager.listAllLibraries()) {
+                if (l.getIdentificationBarcode() == null || "".equals(l.getIdentificationBarcode())) {
+                    requestManager.saveLibrary(l);
+                }
+            }
+
+            for (Pool p : requestManager.listAllPools()) {
+                if (p.getIdentificationBarcode() == null || "".equals(p.getIdentificationBarcode())) {
+                    requestManager.savePool(p);
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            return JSONUtils.JSONObjectResponse("html", jQueryDialogFactory
+                .errorDialog("Cache Administration", "Barcode regeneration failed!:\n\n" + e.getMessage()));
+        }
+
+        DbUtils.flushAllCaches(cacheManager);
+        log.info("Barcodes regenerated!");
+        return JSONUtils
+            .JSONObjectResponse("html", jQueryDialogFactory.okDialog("Cache Administration", "Barcodes regenerated successfully!"));
+    }
+
+    @Deprecated
+    public JSONObject reindexAlertManagers(HttpSession session, JSONObject json) {
     /*
     try {
       log.info("Alert managers reindexing...");
@@ -204,6 +206,7 @@ public class CacheHelperService {
 
     return JSONUtils.JSONObjectResponse("html", jQueryDialogFactory.okDialog("Cache Administration", "Alert Managers reindexing!"));
     */
-    return JSONUtils.JSONObjectResponse("html", jQueryDialogFactory.okDialog("Cache Administration", "Deprecated function. Not reindexing."));
-  }
+        return JSONUtils
+            .JSONObjectResponse("html", jQueryDialogFactory.okDialog("Cache Administration", "Deprecated function. Not reindexing."));
+    }
 }

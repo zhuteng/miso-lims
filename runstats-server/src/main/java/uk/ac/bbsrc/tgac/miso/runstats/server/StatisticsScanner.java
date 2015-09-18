@@ -44,46 +44,45 @@ import java.util.regex.Pattern;
  * @since 0.0.2
  */
 public class StatisticsScanner extends DefaultDirectoryScanner {
-  protected static final Logger log = LoggerFactory.getLogger(StatisticsScanner.class);
+    protected static final Logger log = LoggerFactory.getLogger(StatisticsScanner.class);
 
-  private Pattern runDirPattern;
-  private Pattern statsFilePattern;
-  private String statsDir;
+    private Pattern runDirPattern;
+    private Pattern statsFilePattern;
+    private String statsDir;
 
-  public StatisticsScanner(String runDirRegex, String statsDir, String statsFileRegex) {
-    this.statsDir = statsDir;
-    runDirPattern = Pattern.compile(runDirRegex);
-    statsFilePattern = Pattern.compile(runDirRegex + statsDir + statsFileRegex);
-  }
-
-  protected File[] listEligibleFiles(File directory) throws IllegalArgumentException {
-    File[] rootFiles = directory.listFiles();
-    List<File> files = new ArrayList<File>(rootFiles.length);
-    for (File rootFile : rootFiles) {
-      if (rootFile.isDirectory()) {
-        Matcher rm = runDirPattern.matcher(rootFile.getAbsolutePath());
-        if (rm.matches()) {
-          File f = new File(rootFile.getAbsolutePath(), statsDir);
-          if (f.exists()) {
-            File[] statsFiles = f.listFiles();
-            if (statsFiles != null) {
-              for (File sf : statsFiles) {
-                Matcher sm = statsFilePattern.matcher(sf.getAbsolutePath());
-                if (sm.matches()) {
-                  log.debug("Added " + sf.getAbsolutePath());
-                  files.add(sf);
-                }
-              }
-            }
-          }
-        }
-        else {
-          if (rm.find()) {
-            files.addAll(Arrays.asList(listEligibleFiles(rootFile)));
-          }
-        }
-      }
+    public StatisticsScanner(String runDirRegex, String statsDir, String statsFileRegex) {
+        this.statsDir = statsDir;
+        runDirPattern = Pattern.compile(runDirRegex);
+        statsFilePattern = Pattern.compile(runDirRegex + statsDir + statsFileRegex);
     }
-    return files.toArray(new File[files.size()]);
-  }
+
+    protected File[] listEligibleFiles(File directory) throws IllegalArgumentException {
+        File[] rootFiles = directory.listFiles();
+        List<File> files = new ArrayList<File>(rootFiles.length);
+        for (File rootFile : rootFiles) {
+            if (rootFile.isDirectory()) {
+                Matcher rm = runDirPattern.matcher(rootFile.getAbsolutePath());
+                if (rm.matches()) {
+                    File f = new File(rootFile.getAbsolutePath(), statsDir);
+                    if (f.exists()) {
+                        File[] statsFiles = f.listFiles();
+                        if (statsFiles != null) {
+                            for (File sf : statsFiles) {
+                                Matcher sm = statsFilePattern.matcher(sf.getAbsolutePath());
+                                if (sm.matches()) {
+                                    log.debug("Added " + sf.getAbsolutePath());
+                                    files.add(sf);
+                                }
+                            }
+                        }
+                    }
+                } else {
+                    if (rm.find()) {
+                        files.addAll(Arrays.asList(listEligibleFiles(rootFile)));
+                    }
+                }
+            }
+        }
+        return files.toArray(new File[files.size()]);
+    }
 }

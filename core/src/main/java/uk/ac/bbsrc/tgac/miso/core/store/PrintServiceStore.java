@@ -36,22 +36,22 @@ import java.util.List;
  * @since 0.0.3
  */
 public interface PrintServiceStore extends Store<MisoPrintService> {
-  /**
-   * Get the MisoPrintService with the specified name
-   *
-   * @param serviceName of type String
-   * @return the MisoPrintService with the given name, or null if none exists
-   * @throws IOException
-   */
-  MisoPrintService getByName(String serviceName) throws IOException;
+    /**
+     * Get the MisoPrintService with the specified name
+     *
+     * @param serviceName of type String
+     * @return the MisoPrintService with the given name, or null if none exists
+     * @throws IOException
+     */
+    MisoPrintService getByName(String serviceName) throws IOException;
 
-  /**
-   * List all {@link MisoPrintService} objects that are able to handle a given
-   * {@link uk.ac.bbsrc.tgac.miso.core.service.printing.context.PrintContext}
-   *
-   * @param contextName of type String
-   * @return List<MisoPrintService>
-   * @throws IOException when
-   */
-  List<MisoPrintService> listByContext(String contextName) throws IOException;
+    /**
+     * List all {@link MisoPrintService} objects that are able to handle a given
+     * {@link uk.ac.bbsrc.tgac.miso.core.service.printing.context.PrintContext}
+     *
+     * @param contextName of type String
+     * @return List<MisoPrintService>
+     * @throws IOException when
+     */
+    List<MisoPrintService> listByContext(String contextName) throws IOException;
 }

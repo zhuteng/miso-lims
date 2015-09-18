@@ -40,57 +40,46 @@ import java.util.Map;
  * @since 0.1.3
  */
 public class MySqlConanUserDAO extends DatabaseConanUserDAO {
-  private long getAutoIncrement(String tableName) throws IOException {
-    final String q = "SHOW TABLE STATUS LIKE '" + tableName + "'";
-    Map<String, Object> rs = getJdbcTemplate().queryForMap(q);
-    Object ai = rs.get("Auto_increment");
-    if (ai != null) {
-      return new Long(ai.toString());
-    }
-    else {
-      throw new IOException("Cannot resolve Auto_increment value from DBMS metadata tables");
-    }
-  }
-
-  @Override
-  public ConanUser saveUser(ConanUser user) {
-    int userCheck = 0;
-
-    if (user.getId() != null) {
-      userCheck = getJdbcTemplate().queryForInt(USER_COUNT, user.getId());
-    }
-
-    //There is no such user in database
-    if (userCheck == 0) {
-      try {
-        int userID = (int) getAutoIncrement("CONAN_USERS");
-        getJdbcTemplate().update(USER_INSERT,
-                                 userID,
-                                 user.getUserName(),
-                                 user.getFirstName(),
-                                 user.getSurname(),
-                                 user.getEmail(),
-                                 user.getRestApiKey(),
-                                 user.getPermissions().toString());
-        if (user instanceof ConanUserWithPermissions) {
-          ((ConanUserWithPermissions) user).setId(Integer.toString(userID));
+    private long getAutoIncrement(String tableName) throws IOException {
+        final String q = "SHOW TABLE STATUS LIKE '" + tableName + "'";
+        Map<String, Object> rs = getJdbcTemplate().queryForMap(q);
+        Object ai = rs.get("Auto_increment");
+        if (ai != null) {
+            return new Long(ai.toString());
+        } else {
+            throw new IOException("Cannot resolve Auto_increment value from DBMS metadata tables");
         }
-        else {
-          getLog().warn("User acquired from database was of unexpected type " +
-                        user.getClass().getSimpleName() + ", cannot set user ID");
-        }
-      }
-      catch (IOException e) {
-        e.printStackTrace();
-      }
-    }
-    else {
-      getJdbcTemplate().update(USER_UPDATE,
-                               user.getUserName(), user.getFirstName(), user.getSurname(),
-                               user.getEmail(),
-                               user.getRestApiKey(), user.getPermissions().toString(), user.getId());
     }
 
-    return user;
-  }
+    @Override
+    public ConanUser saveUser(ConanUser user) {
+        int userCheck = 0;
+
+        if (user.getId() != null) {
+            userCheck = getJdbcTemplate().queryForInt(USER_COUNT, user.getId());
+        }
+
+        //There is no such user in database
+        if (userCheck == 0) {
+            try {
+                int userID = (int) getAutoIncrement("CONAN_USERS");
+                getJdbcTemplate().update(USER_INSERT, userID, user.getUserName(), user.getFirstName(), user.getSurname(), user.getEmail(),
+                                         user.getRestApiKey(), user.getPermissions().toString());
+                if (user instanceof ConanUserWithPermissions) {
+                    ((ConanUserWithPermissions) user).setId(Integer.toString(userID));
+                } else {
+                    getLog().warn("User acquired from database was of unexpected type " +
+                                  user.getClass().getSimpleName() + ", cannot set user ID");
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } else {
+            getJdbcTemplate()
+                .update(USER_UPDATE, user.getUserName(), user.getFirstName(), user.getSurname(), user.getEmail(), user.getRestApiKey(),
+                        user.getPermissions().toString(), user.getId());
+        }
+
+        return user;
+    }
 }

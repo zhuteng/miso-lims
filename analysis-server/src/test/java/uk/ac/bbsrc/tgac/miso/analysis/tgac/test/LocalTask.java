@@ -51,69 +51,64 @@ import java.util.Map;
  * @since 0.1.2
  */
 public class LocalTask extends TestCase {
-  protected final Logger log = LoggerFactory.getLogger(getClass());
+    protected final Logger log = LoggerFactory.getLogger(getClass());
 
-  private static File testFile = null;
-  static {
-    try {
-      testFile = File.createTempFile("sequence", ".txt");
-    }
-    catch (IOException e) {
-      e.printStackTrace();
-    }
-  }
+    private static File testFile = null;
 
-  @Test
-  public void testGzip() {
-    try {
-      InputStream in = LocalTask.class.getResourceAsStream("/sequence.txt");
-      LimsUtils.writeFile(in, testFile);
-    }
-    catch (IOException e) {
-      e.printStackTrace();
-      fail();
+    static {
+        try {
+            testFile = File.createTempFile("sequence", ".txt");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
-    ConanProcess process = new LocalGzipProcess();
-    Map<ConanParameter, String> processParams = new HashMap<ConanParameter, String>();
-    Map<String, String> inputParams = new HashMap<String, String>();
-    inputParams.put("compression", "9");
-    inputParams.put("file", testFile.getAbsolutePath());
-    ProcessUtils.extractConanParameters(processParams, inputParams, process);
+    @Test
+    public void testGzip() {
+        try {
+            InputStream in = LocalTask.class.getResourceAsStream("/sequence.txt");
+            LimsUtils.writeFile(in, testFile);
+        } catch (IOException e) {
+            e.printStackTrace();
+            fail();
+        }
 
-    try {
-      process.execute(processParams);
-    }
-    catch (ProcessExecutionException e) {
-      e.printStackTrace();
-      fail();
-    }
-    catch (InterruptedException e) {
-      e.printStackTrace();
-      fail();
-    }
-  }
+        ConanProcess process = new LocalGzipProcess();
+        Map<ConanParameter, String> processParams = new HashMap<ConanParameter, String>();
+        Map<String, String> inputParams = new HashMap<String, String>();
+        inputParams.put("compression", "9");
+        inputParams.put("file", testFile.getAbsolutePath());
+        ProcessUtils.extractConanParameters(processParams, inputParams, process);
 
-  @Test
-  public void testGunzip() {
-    File file = new File(testFile.getAbsolutePath()+".gz");
+        try {
+            process.execute(processParams);
+        } catch (ProcessExecutionException e) {
+            e.printStackTrace();
+            fail();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+            fail();
+        }
+    }
 
-    ConanProcess process = new LocalGunzipProcess();
-    Map<ConanParameter, String> processParams = new HashMap<ConanParameter, String>();
-    Map<String, String> inputParams = new HashMap<String, String>();
-    inputParams.put("file", file.getAbsolutePath());
-    ProcessUtils.extractConanParameters(processParams, inputParams, process);
+    @Test
+    public void testGunzip() {
+        File file = new File(testFile.getAbsolutePath() + ".gz");
 
-    try {
-      process.execute(processParams);
+        ConanProcess process = new LocalGunzipProcess();
+        Map<ConanParameter, String> processParams = new HashMap<ConanParameter, String>();
+        Map<String, String> inputParams = new HashMap<String, String>();
+        inputParams.put("file", file.getAbsolutePath());
+        ProcessUtils.extractConanParameters(processParams, inputParams, process);
+
+        try {
+            process.execute(processParams);
+        } catch (ProcessExecutionException e) {
+            e.printStackTrace();
+            fail();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+            fail();
+        }
     }
-    catch (ProcessExecutionException e) {
-      e.printStackTrace();
-      fail();
-    }
-    catch (InterruptedException e) {
-      e.printStackTrace();
-      fail();
-    }
-  }
 }

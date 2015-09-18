@@ -43,12 +43,13 @@ import javax.servlet.http.HttpSession;
 @Ajaxified
 public class LoggedActionService {
 
-  protected static final Logger log = LoggerFactory.getLogger("limsFileLogger");
+    protected static final Logger log = LoggerFactory.getLogger("limsFileLogger");
 
-  @LoggedAction
-  public JSONObject logAction(HttpSession session, JSONObject json) {
-    //TODO - find a way to aspect this - can't get it to work, so resorting to bog standard logging :(
-    log.info("AJAX ["+ SecurityContextHolder.getContext().getAuthentication().getName()+"] "+json.getString("action")+" [" + json.getString("objectType") +","+json.getString("objectId")+"]");
-    return json;
-  }
+    @LoggedAction
+    public JSONObject logAction(HttpSession session, JSONObject json) {
+        //TODO - find a way to aspect this - can't get it to work, so resorting to bog standard logging :(
+        log.info("AJAX [" + SecurityContextHolder.getContext().getAuthentication().getName() + "] " + json.getString("action") + " [" +
+                 json.getString("objectType") + "," + json.getString("objectId") + "]");
+        return json;
+    }
 }

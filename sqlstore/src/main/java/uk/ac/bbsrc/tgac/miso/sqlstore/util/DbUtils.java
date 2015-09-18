@@ -54,228 +54,219 @@ import java.util.Map;
  * @since 0.0.2
  */
 public class DbUtils {
-  protected static final Logger log = LoggerFactory.getLogger(DbUtils.class);
-  private static final HashCodeCacheKeyGenerator hashCodeCacheKeyGenerator = new HashCodeCacheKeyGenerator();
+    protected static final Logger log = LoggerFactory.getLogger(DbUtils.class);
+    private static final HashCodeCacheKeyGenerator hashCodeCacheKeyGenerator = new HashCodeCacheKeyGenerator();
 
-  public static long getAutoIncrement(JdbcTemplate template, String tableName) throws IOException {
-    final String q = "SHOW TABLE STATUS LIKE '" + tableName + "'";
-    Map<String, Object> rs = template.queryForMap(q);
-    Object ai = rs.get("Auto_increment");
-    if (ai != null) {
-      return new Long(ai.toString());
+    public static long getAutoIncrement(JdbcTemplate template, String tableName) throws IOException {
+        final String q = "SHOW TABLE STATUS LIKE '" + tableName + "'";
+        Map<String, Object> rs = template.queryForMap(q);
+        Object ai = rs.get("Auto_increment");
+        if (ai != null) {
+            return new Long(ai.toString());
+        } else {
+            throw new IOException("Cannot resolve Auto_increment value from DBMS metadata tables");
+        }
     }
-    else {
-      throw new IOException("Cannot resolve Auto_increment value from DBMS metadata tables");
-    }
-  }
 
-  public static ArrayList<String> getTables(JdbcTemplate template) throws MetaDataAccessException, SQLException {
-    Object o = JdbcUtils.extractDatabaseMetaData(template.getDataSource(), new GetTableNames(template.getDataSource().getConnection().getCatalog()));
-    return (ArrayList<String>)o;
-  }
+    public static ArrayList<String> getTables(JdbcTemplate template) throws MetaDataAccessException, SQLException {
+        Object o = JdbcUtils
+            .extractDatabaseMetaData(template.getDataSource(), new GetTableNames(template.getDataSource().getConnection().getCatalog()));
+        return (ArrayList<String>) o;
+    }
 
-  public static ArrayList<String> getColumns(JdbcTemplate template, String table) throws MetaDataAccessException, SQLException {
-    Object o = JdbcUtils.extractDatabaseMetaData(template.getDataSource(), new GetColumnNames(template.getDataSource().getConnection().getCatalog(), table));
-    return (ArrayList<String>)o;
-  }
+    public static ArrayList<String> getColumns(JdbcTemplate template, String table) throws MetaDataAccessException, SQLException {
+        Object o = JdbcUtils.extractDatabaseMetaData(template.getDataSource(),
+                                                     new GetColumnNames(template.getDataSource().getConnection().getCatalog(), table));
+        return (ArrayList<String>) o;
+    }
 
-  public static Map<String, Integer> getColumnSizes(JdbcTemplate template, String table) {
-    Connection connection = null;
-    try {
-      connection = template.getDataSource().getConnection();
-      Object o = JdbcUtils.extractDatabaseMetaData(template.getDataSource(), new GetColumnSizes(connection.getCatalog(), table));
-      return (HashMap<String, Integer>)o;
-    }
-    catch (MetaDataAccessException e) {
-      e.printStackTrace();
-      log.warn("Could not retrieve table "+table+" field lengths: " + e.getMessage());
-    }
-    catch (SQLException e) {
-      e.printStackTrace();
-      log.warn("Could not retrieve table "+table+" field lengths: " + e.getMessage());
-    }
-    finally {
-      if (connection != null) {
+    public static Map<String, Integer> getColumnSizes(JdbcTemplate template, String table) {
+        Connection connection = null;
         try {
-          connection.close();
+            connection = template.getDataSource().getConnection();
+            Object o = JdbcUtils.extractDatabaseMetaData(template.getDataSource(), new GetColumnSizes(connection.getCatalog(), table));
+            return (HashMap<String, Integer>) o;
+        } catch (MetaDataAccessException e) {
+            e.printStackTrace();
+            log.warn("Could not retrieve table " + table + " field lengths: " + e.getMessage());
+        } catch (SQLException e) {
+            e.printStackTrace();
+            log.warn("Could not retrieve table " + table + " field lengths: " + e.getMessage());
+        } finally {
+            if (connection != null) {
+                try {
+                    connection.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                    log.error("Badness! Could not close connection!");
+                }
+            }
         }
-        catch (SQLException e) {
-          e.printStackTrace();
-          log.error("Badness! Could not close connection!");
-        }
-      }
+        return null;
     }
-    return null;
-  }
 
-  public static Integer getColumnSize(JdbcTemplate template, String table, String column) {
-    Connection connection = null;
-    try {
-      connection = template.getDataSource().getConnection();
-      Object o = JdbcUtils.extractDatabaseMetaData(template.getDataSource(), new GetColumnSizes(connection.getCatalog(), table));
-      return ((HashMap<String, Integer>)o).get(column);
-    }
-    catch (MetaDataAccessException e) {
-      e.printStackTrace();
-      log.warn("Could not retrieve field "+column+" max length: " + e.getMessage());
-    }
-    catch (SQLException e) {
-      e.printStackTrace();
-      log.warn("Could not retrieve field "+column+" max length: " + e.getMessage());
-    }
-    finally {
-      if (connection != null) {
+    public static Integer getColumnSize(JdbcTemplate template, String table, String column) {
+        Connection connection = null;
         try {
-          connection.close();
+            connection = template.getDataSource().getConnection();
+            Object o = JdbcUtils.extractDatabaseMetaData(template.getDataSource(), new GetColumnSizes(connection.getCatalog(), table));
+            return ((HashMap<String, Integer>) o).get(column);
+        } catch (MetaDataAccessException e) {
+            e.printStackTrace();
+            log.warn("Could not retrieve field " + column + " max length: " + e.getMessage());
+        } catch (SQLException e) {
+            e.printStackTrace();
+            log.warn("Could not retrieve field " + column + " max length: " + e.getMessage());
+        } finally {
+            if (connection != null) {
+                try {
+                    connection.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                    log.error("Badness! Could not close connection!");
+                }
+            }
         }
-        catch (SQLException e) {
-          e.printStackTrace();
-          log.error("Badness! Could not close connection!");
+        return null;
+    }
+
+    public static void flushAllCaches(CacheManager cacheManager) {
+        if (cacheManager != null) {
+            for (String s : cacheManager.getCacheNames()) {
+                flushCache(cacheManager, s);
+            }
+        } else {
+            throw new CacheException("No cacheManager declared. Please check your Spring config, or supply a non-null manager");
         }
-      }
-    }
-    return null;
-  }
-
-  public static void flushAllCaches(CacheManager cacheManager) {
-    if (cacheManager != null) {
-      for (String s : cacheManager.getCacheNames()) {
-        flushCache(cacheManager, s);
-      }
-    }
-    else {
-      throw new CacheException("No cacheManager declared. Please check your Spring config, or supply a non-null manager");
-    }
-  }
-
-  public static void flushCache(CacheManager cacheManager, String cacheName) {
-    if (cacheManager != null) {
-      Ehcache c = cacheManager.getEhcache(cacheName);
-      if (c != null) {
-        log.info("Removing " + c.getSize() + " elements from " + cacheName);
-        c.removeAll();
-      }
-      else {
-        log.warn("No such cache: " + cacheName);
-      }
-    }
-    else {
-      throw new CacheException("No cacheManager declared. Please check your Spring config, or supply a non-null manager");
-    }
-  }
-
-  public static <T> Cache lookupCache(CacheManager cacheManager, Class<T> cacheClass, boolean lazy) {
-    if (lazy) {
-      return cacheManager.getCache("lazy"+ LimsUtils.capitalise(cacheClass.getSimpleName())+"Cache");
-    }
-    else {
-      return cacheManager.getCache(LimsUtils.noddyCamelCaseify(cacheClass.getSimpleName())+"Cache");
-    }
-  }
-
-  public static void updateCaches(Cache cache, long id) {
-    if (cache != null && cache.getKeys().size() > 0) {
-      log.debug("Removing " + id + " from " + cache.getName());
-      BlockingCache c = new BlockingCache(cache);
-      c.remove(DbUtils.hashCodeCacheKeyFor(id));
-    }
-  }
-
-  public static <T extends Nameable> void updateCaches(CacheManager cacheManager, T obj, Class<T> cacheClass) {
-    Cache cache = DbUtils.lookupCache(cacheManager, cacheClass, true);
-    if (cache != null && cache.getKeys().size() > 0) {
-      log.debug("Removing " + cacheClass.getSimpleName() + " " + obj.getId() + " from " + cache.getName());
-      BlockingCache c = new BlockingCache(cache);
-      c.remove(DbUtils.hashCodeCacheKeyFor(obj.getId()));
     }
 
-    cache = DbUtils.lookupCache(cacheManager, cacheClass, false);
-    if (cache != null && cache.getKeys().size() > 0) {
-      log.debug("Removing " + cacheClass.getSimpleName() + " " + obj.getId() + " from " + cache.getName());
-      BlockingCache c = new BlockingCache(cache);
-      c.remove(DbUtils.hashCodeCacheKeyFor(obj.getId()));
-    }
-  }
-
-  public static <T> void updateListCache(Cache cache, boolean replace, T obj, Class<T> cacheClass) {
-    if (cache != null && cache.getKeys().size() > 0) {
-      BlockingCache c = new BlockingCache(cache);
-      Object cachekey = c.getKeys().get(0);
-      List<T> e = (List<T>)c.get(cachekey).getObjectValue();
-      if (e.remove(obj)) {
-        if (replace) {
-          e.add(obj);
+    public static void flushCache(CacheManager cacheManager, String cacheName) {
+        if (cacheManager != null) {
+            Ehcache c = cacheManager.getEhcache(cacheName);
+            if (c != null) {
+                log.info("Removing " + c.getSize() + " elements from " + cacheName);
+                c.removeAll();
+            } else {
+                log.warn("No such cache: " + cacheName);
+            }
+        } else {
+            throw new CacheException("No cacheManager declared. Please check your Spring config, or supply a non-null manager");
         }
-      }
-      else {
-        e.add(obj);
-      }
-      c.put(new Element(cachekey, e));
-    }
-  }
-
-  public static Long hashCodeCacheKeyFor(Object ... datas) {
-    return hashCodeCacheKeyGenerator.generateKey(datas);
-  }
-
-  static class GetTableNames implements DatabaseMetaDataCallback {
-    String catalog = "";
-
-    public GetTableNames() { }    
-
-    public GetTableNames(String catalog) {
-      this.catalog = catalog;
     }
 
-    public Object processMetaData(DatabaseMetaData dbmd) throws SQLException {
-      ResultSet rs = dbmd.getTables(catalog, null, null, new String[]{"TABLE"});
-      ArrayList l = new ArrayList();
-      while (rs.next()) {
-        l.add(rs.getString(3));
-      }
-      return l;
-    }
-  }
-
-  static class GetColumnNames implements DatabaseMetaDataCallback {
-    String catalog = "";
-    String table = "";
-
-    public GetColumnNames() { }
-
-    public GetColumnNames(String catalog, String table) {
-      this.catalog = catalog;
-      this.table = table;
+    public static <T> Cache lookupCache(CacheManager cacheManager, Class<T> cacheClass, boolean lazy) {
+        if (lazy) {
+            return cacheManager.getCache("lazy" + LimsUtils.capitalise(cacheClass.getSimpleName()) + "Cache");
+        } else {
+            return cacheManager.getCache(LimsUtils.noddyCamelCaseify(cacheClass.getSimpleName()) + "Cache");
+        }
     }
 
-    public Object processMetaData(DatabaseMetaData dbmd) throws SQLException {
-      ResultSet rs = dbmd.getColumns(catalog, null, table, null);
-      ArrayList l = new ArrayList();
-      while (rs.next()) {
-        l.add(rs.getString("COLUMN_NAME"));
-      }
-      return l;
-    }
-  }
-
-  static class GetColumnSizes implements DatabaseMetaDataCallback {
-    String catalog = "";
-    String table = "";
-
-    public GetColumnSizes() { }
-
-    public GetColumnSizes(String catalog, String table) {
-      this.catalog = catalog;
-      this.table = table;
+    public static void updateCaches(Cache cache, long id) {
+        if (cache != null && cache.getKeys().size() > 0) {
+            log.debug("Removing " + id + " from " + cache.getName());
+            BlockingCache c = new BlockingCache(cache);
+            c.remove(DbUtils.hashCodeCacheKeyFor(id));
+        }
     }
 
-    public Object processMetaData(DatabaseMetaData dbmd) throws SQLException {
-      ResultSet rs = dbmd.getColumns(catalog, null, table, null);
-      Map<String, Integer> l = new HashMap<String, Integer>();
-      while (rs.next()) {
-        l.put(rs.getString("COLUMN_NAME"), rs.getInt("COLUMN_SIZE"));
-      }
-      return l;
+    public static <T extends Nameable> void updateCaches(CacheManager cacheManager, T obj, Class<T> cacheClass) {
+        Cache cache = DbUtils.lookupCache(cacheManager, cacheClass, true);
+        if (cache != null && cache.getKeys().size() > 0) {
+            log.debug("Removing " + cacheClass.getSimpleName() + " " + obj.getId() + " from " + cache.getName());
+            BlockingCache c = new BlockingCache(cache);
+            c.remove(DbUtils.hashCodeCacheKeyFor(obj.getId()));
+        }
+
+        cache = DbUtils.lookupCache(cacheManager, cacheClass, false);
+        if (cache != null && cache.getKeys().size() > 0) {
+            log.debug("Removing " + cacheClass.getSimpleName() + " " + obj.getId() + " from " + cache.getName());
+            BlockingCache c = new BlockingCache(cache);
+            c.remove(DbUtils.hashCodeCacheKeyFor(obj.getId()));
+        }
     }
-  }
+
+    public static <T> void updateListCache(Cache cache, boolean replace, T obj, Class<T> cacheClass) {
+        if (cache != null && cache.getKeys().size() > 0) {
+            BlockingCache c = new BlockingCache(cache);
+            Object cachekey = c.getKeys().get(0);
+            List<T> e = (List<T>) c.get(cachekey).getObjectValue();
+            if (e.remove(obj)) {
+                if (replace) {
+                    e.add(obj);
+                }
+            } else {
+                e.add(obj);
+            }
+            c.put(new Element(cachekey, e));
+        }
+    }
+
+    public static Long hashCodeCacheKeyFor(Object... datas) {
+        return hashCodeCacheKeyGenerator.generateKey(datas);
+    }
+
+    static class GetTableNames implements DatabaseMetaDataCallback {
+        String catalog = "";
+
+        public GetTableNames() {
+        }
+
+        public GetTableNames(String catalog) {
+            this.catalog = catalog;
+        }
+
+        public Object processMetaData(DatabaseMetaData dbmd) throws SQLException {
+            ResultSet rs = dbmd.getTables(catalog, null, null, new String[] { "TABLE" });
+            ArrayList l = new ArrayList();
+            while (rs.next()) {
+                l.add(rs.getString(3));
+            }
+            return l;
+        }
+    }
+
+    static class GetColumnNames implements DatabaseMetaDataCallback {
+        String catalog = "";
+        String table = "";
+
+        public GetColumnNames() {
+        }
+
+        public GetColumnNames(String catalog, String table) {
+            this.catalog = catalog;
+            this.table = table;
+        }
+
+        public Object processMetaData(DatabaseMetaData dbmd) throws SQLException {
+            ResultSet rs = dbmd.getColumns(catalog, null, table, null);
+            ArrayList l = new ArrayList();
+            while (rs.next()) {
+                l.add(rs.getString("COLUMN_NAME"));
+            }
+            return l;
+        }
+    }
+
+    static class GetColumnSizes implements DatabaseMetaDataCallback {
+        String catalog = "";
+        String table = "";
+
+        public GetColumnSizes() {
+        }
+
+        public GetColumnSizes(String catalog, String table) {
+            this.catalog = catalog;
+            this.table = table;
+        }
+
+        public Object processMetaData(DatabaseMetaData dbmd) throws SQLException {
+            ResultSet rs = dbmd.getColumns(catalog, null, table, null);
+            Map<String, Integer> l = new HashMap<String, Integer>();
+            while (rs.next()) {
+                l.put(rs.getString("COLUMN_NAME"), rs.getInt("COLUMN_SIZE"));
+            }
+            return l;
+        }
+    }
 }

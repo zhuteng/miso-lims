@@ -41,49 +41,45 @@ import java.util.Properties;
  */
 public class EraSampleDecorator extends AbstractSubmittableDecorator<Document> {
 
-  public EraSampleDecorator(Submittable submittable, Properties submissionProperties, Document submission) {
-    super(submittable, submissionProperties);
-    this.submission = submission;
-  }
-
-  public void buildSubmission() {
-    //submittable.buildSubmission();
-
-    Sample sample = (Sample)submittable;
-    Element s = submission.createElementNS(null, "SAMPLE");
-
-    s.setAttribute("alias", sample.getAlias());
-
-    s.setAttribute("center_name", submissionProperties.getProperty("submission.centreName"));
-
-    Element sampleTitle = submission.createElementNS(null, "TITLE");
-    sampleTitle.setTextContent(sample.getAlias());
-    s.appendChild(sampleTitle);
-
-    Element sampleName = submission.createElementNS(null, "SAMPLE_NAME");
-    Element sampleScientificName = submission.createElementNS(null, "SCIENTIFIC_NAME");
-    sampleScientificName.setTextContent(sample.getScientificName());
-    sampleName.appendChild(sampleScientificName);
-
-
-    //2/11/2011 Antony Colles moved IF !=null statement, to help produce valid submission XML.
-    Element sampleTaxonIdentifier = submission.createElementNS(null, "TAXON_ID");
-    if (sample.getTaxonIdentifier() != null && !sample.getTaxonIdentifier().equals(""))
-    {
-      sampleTaxonIdentifier.setTextContent(sample.getTaxonIdentifier());
+    public EraSampleDecorator(Submittable submittable, Properties submissionProperties, Document submission) {
+        super(submittable, submissionProperties);
+        this.submission = submission;
     }
-    else
-    {
-      sampleTaxonIdentifier.setTextContent("000001");
+
+    public void buildSubmission() {
+        //submittable.buildSubmission();
+
+        Sample sample = (Sample) submittable;
+        Element s = submission.createElementNS(null, "SAMPLE");
+
+        s.setAttribute("alias", sample.getAlias());
+
+        s.setAttribute("center_name", submissionProperties.getProperty("submission.centreName"));
+
+        Element sampleTitle = submission.createElementNS(null, "TITLE");
+        sampleTitle.setTextContent(sample.getAlias());
+        s.appendChild(sampleTitle);
+
+        Element sampleName = submission.createElementNS(null, "SAMPLE_NAME");
+        Element sampleScientificName = submission.createElementNS(null, "SCIENTIFIC_NAME");
+        sampleScientificName.setTextContent(sample.getScientificName());
+        sampleName.appendChild(sampleScientificName);
+
+        //2/11/2011 Antony Colles moved IF !=null statement, to help produce valid submission XML.
+        Element sampleTaxonIdentifier = submission.createElementNS(null, "TAXON_ID");
+        if (sample.getTaxonIdentifier() != null && !sample.getTaxonIdentifier().equals("")) {
+            sampleTaxonIdentifier.setTextContent(sample.getTaxonIdentifier());
+        } else {
+            sampleTaxonIdentifier.setTextContent("000001");
+        }
+        sampleName.appendChild(sampleTaxonIdentifier);
+
+        s.appendChild(sampleName);
+
+        Element sampleDescription = submission.createElementNS(null, "DESCRIPTION");
+        sampleDescription.setTextContent(sample.getDescription());
+        s.appendChild(sampleDescription);
+
+        submission.getElementsByTagName("SAMPLE_SET").item(0).appendChild(s);
     }
-    sampleName.appendChild(sampleTaxonIdentifier);
-
-    s.appendChild(sampleName);
-
-    Element sampleDescription = submission.createElementNS(null, "DESCRIPTION");
-    sampleDescription.setTextContent(sample.getDescription());
-    s.appendChild(sampleDescription);
-
-    submission.getElementsByTagName("SAMPLE_SET").item(0).appendChild(s);
-  }
 }

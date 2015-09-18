@@ -48,62 +48,62 @@ import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 @RequestMapping("/experimentwizard")
 @SessionAttributes("experimentwizard")
 public class ExperimentWizardController {
-  protected static final Logger log = LoggerFactory.getLogger(ExperimentWizardController.class);
+    protected static final Logger log = LoggerFactory.getLogger(ExperimentWizardController.class);
 
-  @Autowired
-  private SecurityManager securityManager;
+    @Autowired
+    private SecurityManager securityManager;
 
-  @Autowired
-  private RequestManager requestManager;
+    @Autowired
+    private RequestManager requestManager;
 
-  @Autowired
-  private DataObjectFactory dataObjectFactory;
+    @Autowired
+    private DataObjectFactory dataObjectFactory;
 
-  @Autowired
-  private JdbcTemplate interfaceTemplate;
+    @Autowired
+    private JdbcTemplate interfaceTemplate;
 
-  public void setInterfaceTemplate(JdbcTemplate interfaceTemplate) {
-    this.interfaceTemplate = interfaceTemplate;
-  }
+    public void setInterfaceTemplate(JdbcTemplate interfaceTemplate) {
+        this.interfaceTemplate = interfaceTemplate;
+    }
 
-  public void setDataObjectFactory(DataObjectFactory dataObjectFactory) {
-    this.dataObjectFactory = dataObjectFactory;
-  }
+    public void setDataObjectFactory(DataObjectFactory dataObjectFactory) {
+        this.dataObjectFactory = dataObjectFactory;
+    }
 
-  public void setRequestManager(RequestManager requestManager) {
-    this.requestManager = requestManager;
-  }
+    public void setRequestManager(RequestManager requestManager) {
+        this.requestManager = requestManager;
+    }
 
-  public void setSecurityManager(SecurityManager securityManager) {
-    this.securityManager = securityManager;
-  }
+    public void setSecurityManager(SecurityManager securityManager) {
+        this.securityManager = securityManager;
+    }
 
-  @ModelAttribute("studyTypes")
-  public Collection<String> populateStudyTypes() throws IOException {
-    return requestManager.listAllStudyTypes();
-  }
+    @ModelAttribute("studyTypes")
+    public Collection<String> populateStudyTypes() throws IOException {
+        return requestManager.listAllStudyTypes();
+    }
 
-  @ModelAttribute("maxLengths")
-  public Map<String, Integer> maxLengths() throws IOException {
-    return DbUtils.getColumnSizes(interfaceTemplate, "Experiment");
-  }
+    @ModelAttribute("maxLengths")
+    public Map<String, Integer> maxLengths() throws IOException {
+        return DbUtils.getColumnSizes(interfaceTemplate, "Experiment");
+    }
 
-  @ModelAttribute("platforms")
-  public Collection<Platform> populatePlatforms() throws IOException {
-    return requestManager.listAllPlatforms();
-  }
+    @ModelAttribute("platforms")
+    public Collection<Platform> populatePlatforms() throws IOException {
+        return requestManager.listAllPlatforms();
+    }
 
-  public Collection<? extends Pool> populateAvailablePools(Experiment experiment) throws IOException {
-    if (experiment.getPlatform() != null) {
-      PlatformType platformType = experiment.getPlatform().getPlatformType();
-      ArrayList<Pool> pools = new ArrayList<Pool>();
-      for (Pool p : requestManager.listAllPoolsByPlatform(platformType)) {
-        if (experiment.getPool() == null || !experiment.getPool().equals(p)) {
-          pools.add(p);
-        }
-        Collections.sort(pools);
-      }
-      return pools;
+    public Collection<? extends Pool> populateAvailablePools(Experiment experiment) throws IOException {
+        if (experiment.getPlatform() != null) {
+            PlatformType platformType = experiment.getPlatform().getPlatformType();
+            ArrayList<Pool> pools = new ArrayList<Pool>();
+            for (Pool p : requestManager.listAllPoolsByPlatform(platformType)) {
+                if (experiment.getPool() == null || !experiment.getPool().equals(p)) {
+                    pools.add(p);
+                }
+                Collections.sort(pools);
+            }
+            return pools;
       /*
       if (experiment.getPlatform().getPlatformType().equals(PlatformType.ILLUMINA)) {
         ArrayList<IlluminaPool> pools = new ArrayList<IlluminaPool>();
@@ -139,38 +139,35 @@ public class ExperimentWizardController {
         return Collections.emptyList();
       }
       */
+        }
+        return requestManager.listAllPools();
     }
-    return requestManager.listAllPools();
-  }
 
-  @RequestMapping(value = "/new/{projectId}", method = RequestMethod.GET)
-  public ModelAndView newAssignedProject(@PathVariable Long projectId,
-                                         ModelMap model) throws IOException {
-    try {
-      User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
+    @RequestMapping(value = "/new/{projectId}", method = RequestMethod.GET)
+    public ModelAndView newAssignedProject(@PathVariable Long projectId, ModelMap model) throws IOException {
+        try {
+            User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
 
-      StringBuilder a = new StringBuilder();
-      StringBuilder b = new StringBuilder();
+            StringBuilder a = new StringBuilder();
+            StringBuilder b = new StringBuilder();
 
-      for (Platform platform : requestManager.listAllPlatforms()) {
-        a.append("<option value=\"" + platform.getPlatformId() + "\">" + platform.getNameAndModel() + "</option>");
-      }
+            for (Platform platform : requestManager.listAllPlatforms()) {
+                a.append("<option value=\"" + platform.getPlatformId() + "\">" + platform.getNameAndModel() + "</option>");
+            }
 
+            for (String st : requestManager.listAllStudyTypes()) {
+                b.append("<option value=\"" + st + "\">" + st + "</option>");
+            }
 
-      for (String st : requestManager.listAllStudyTypes()) {
-        b.append("<option value=\"" + st + "\">" + st + "</option>");
-      }
-
-      model.put("projectId", projectId);
-      model.put("platforms", a.toString());
-      model.put("studyTypes", b.toString());
-      return new ModelAndView("/pages/experimentWizard.jsp", model);
+            model.put("projectId", projectId);
+            model.put("platforms", a.toString());
+            model.put("studyTypes", b.toString());
+            return new ModelAndView("/pages/experimentWizard.jsp", model);
+        } catch (IOException ex) {
+            if (log.isDebugEnabled()) {
+                log.debug("Failed to show experiment wizard", ex);
+            }
+            throw ex;
+        }
     }
-    catch (IOException ex) {
-      if (log.isDebugEnabled()) {
-        log.debug("Failed to show experiment wizard", ex);
-      }
-      throw ex;
-    }
-  }
 }

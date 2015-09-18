@@ -55,84 +55,78 @@ import java.util.regex.Pattern;
 @DiscriminatorValue("Solid")
 public class SolidRun extends RunImpl {
 
-  public SolidRun() {
-    setPlatformType(PlatformType.SOLID);
-    setStatus(new StatusImpl());
-    setSecurityProfile(new SecurityProfile());
-  }
-
-  public SolidRun(User user) {
-    setPlatformType(PlatformType.SOLID);
-    setStatus(new StatusImpl());
-    setSecurityProfile(new SecurityProfile(user));
-  }
-
-  public SolidRun(String statusXml) {
-    this(statusXml, null);
-  }
-
-  public SolidRun(String statusXml, User user) {
-    try {
-      if (statusXml != null && !"".equals(statusXml)) {
-        String runDirRegex = "([A-z0-9\\-]+)_([0-9]{8})_(.*)";
-        Pattern runRegex = Pattern.compile(runDirRegex);
-        Document statusDoc = SubmissionUtils.emptyDocument();
-        SubmissionUtils.transform(new UnicodeReader(statusXml), statusDoc);
-
-        String runName;
-        if (statusDoc.getDocumentElement().getTagName().equals("error")) {
-          runName = (statusDoc.getElementsByTagName("RunName").item(0).getTextContent());
-        }
-        else {
-          runName = (statusDoc.getElementsByTagName("name").item(0).getTextContent());
-          if (statusDoc.getElementsByTagName("name").getLength() != 0) {
-            for (int i = 0; i < statusDoc.getElementsByTagName("name").getLength(); i++) {
-              Element e = (Element)statusDoc.getElementsByTagName("name").item(i);
-              Matcher m = runRegex.matcher(e.getTextContent());
-              if (m.matches()) {
-                runName = e.getTextContent();
-              }
-            }
-          }
-          setPlatformRunId(Integer.parseInt(statusDoc.getElementsByTagName("id").item(0).getTextContent()));
-        }
-        setAlias(runName);
-        setFilePath(runName);
-        setPairedEnd(false);
-
-        Matcher m = runRegex.matcher(runName);
-        if (m.matches()) {
-          setDescription(m.group(3));
-          if (m.group(3).startsWith("MP") || m.group(3).startsWith("PE")) {
-            setPairedEnd(true);
-          }
-        }
-        else {
-          setDescription(runName);
-        }
-
+    public SolidRun() {
         setPlatformType(PlatformType.SOLID);
-        setStatus(new SolidStatus(statusXml));
-        if (user != null) {
-          setSecurityProfile(new SecurityProfile(user));
-        }
-        else {
-          setSecurityProfile(new SecurityProfile());
-        }
-      }
-      else {
-        log.error("No status XML for this run");
-      }
+        setStatus(new StatusImpl());
+        setSecurityProfile(new SecurityProfile());
     }
-    catch (ParserConfigurationException e) {
-      e.printStackTrace();
-    }
-    catch (TransformerException e) {
-      e.printStackTrace();
-    }
-  }
 
-  public void buildSubmission() {
+    public SolidRun(User user) {
+        setPlatformType(PlatformType.SOLID);
+        setStatus(new StatusImpl());
+        setSecurityProfile(new SecurityProfile(user));
+    }
+
+    public SolidRun(String statusXml) {
+        this(statusXml, null);
+    }
+
+    public SolidRun(String statusXml, User user) {
+        try {
+            if (statusXml != null && !"".equals(statusXml)) {
+                String runDirRegex = "([A-z0-9\\-]+)_([0-9]{8})_(.*)";
+                Pattern runRegex = Pattern.compile(runDirRegex);
+                Document statusDoc = SubmissionUtils.emptyDocument();
+                SubmissionUtils.transform(new UnicodeReader(statusXml), statusDoc);
+
+                String runName;
+                if (statusDoc.getDocumentElement().getTagName().equals("error")) {
+                    runName = (statusDoc.getElementsByTagName("RunName").item(0).getTextContent());
+                } else {
+                    runName = (statusDoc.getElementsByTagName("name").item(0).getTextContent());
+                    if (statusDoc.getElementsByTagName("name").getLength() != 0) {
+                        for (int i = 0; i < statusDoc.getElementsByTagName("name").getLength(); i++) {
+                            Element e = (Element) statusDoc.getElementsByTagName("name").item(i);
+                            Matcher m = runRegex.matcher(e.getTextContent());
+                            if (m.matches()) {
+                                runName = e.getTextContent();
+                            }
+                        }
+                    }
+                    setPlatformRunId(Integer.parseInt(statusDoc.getElementsByTagName("id").item(0).getTextContent()));
+                }
+                setAlias(runName);
+                setFilePath(runName);
+                setPairedEnd(false);
+
+                Matcher m = runRegex.matcher(runName);
+                if (m.matches()) {
+                    setDescription(m.group(3));
+                    if (m.group(3).startsWith("MP") || m.group(3).startsWith("PE")) {
+                        setPairedEnd(true);
+                    }
+                } else {
+                    setDescription(runName);
+                }
+
+                setPlatformType(PlatformType.SOLID);
+                setStatus(new SolidStatus(statusXml));
+                if (user != null) {
+                    setSecurityProfile(new SecurityProfile(user));
+                } else {
+                    setSecurityProfile(new SecurityProfile());
+                }
+            } else {
+                log.error("No status XML for this run");
+            }
+        } catch (ParserConfigurationException e) {
+            e.printStackTrace();
+        } catch (TransformerException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void buildSubmission() {
     /*
     try {
       DocumentBuilder docBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
@@ -143,12 +137,12 @@ public class SolidRun extends RunImpl {
     }
     ERASubmissionFactory.generateFullRunSubmissionXML(submissionDocument, this);
     */
-  }
+    }
 
-  /**
-   * Method buildReport ...
-   */
-  public void buildReport() {
+    /**
+     * Method buildReport ...
+     */
+    public void buildReport() {
 
-  }
+    }
 }

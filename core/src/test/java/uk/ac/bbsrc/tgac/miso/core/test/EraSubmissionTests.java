@@ -53,49 +53,48 @@ import java.util.Properties;
  * @since 0.1.1
  */
 public class EraSubmissionTests {
-  protected static final Logger log = LoggerFactory.getLogger(EraSubmissionTests.class);
-  private DataObjectFactory dataObjectFactory;
+    protected static final Logger log = LoggerFactory.getLogger(EraSubmissionTests.class);
+    private DataObjectFactory dataObjectFactory;
 
-  @Before
-  public void setUp() {
-    dataObjectFactory = new TgacDataObjectFactory();
-  }
+    @Before
+    public void setUp() {
+        dataObjectFactory = new TgacDataObjectFactory();
+    }
 
-  @Test
-  public void testStudyXmlGeneration() {
-      Project p = dataObjectFactory.getProject();
-      p.setAlias("Submission Test Project");
-      //creates a Study object and sets parameters
-      Study s = dataObjectFactory.getStudy();
-      s.setProject(p);
-      s.setAlias("Submission Test Study");
-      s.setDescription("A test of the Submission XML generation process");
-      s.setSecurityProfile(new SecurityProfile());
+    @Test
+    public void testStudyXmlGeneration() {
+        Project p = dataObjectFactory.getProject();
+        p.setAlias("Submission Test Project");
+        //creates a Study object and sets parameters
+        Study s = dataObjectFactory.getStudy();
+        s.setProject(p);
+        s.setAlias("Submission Test Study");
+        s.setDescription("A test of the Submission XML generation process");
+        s.setSecurityProfile(new SecurityProfile());
 
-      Document submissionDocument = null;
-      try {
-          DocumentBuilder docBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-          submissionDocument = docBuilder.newDocument();
-          Element set = submissionDocument.createElementNS(null, "STUDY_SET");
-          submissionDocument.appendChild(set);
-      } catch (Exception e) {
-          log.debug("Error while attempting to build document");
-      }
+        Document submissionDocument = null;
+        try {
+            DocumentBuilder docBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+            submissionDocument = docBuilder.newDocument();
+            Element set = submissionDocument.createElementNS(null, "STUDY_SET");
+            submissionDocument.appendChild(set);
+        } catch (Exception e) {
+            log.debug("Error while attempting to build document");
+        }
 
-      new EraStudyDecorator(s, new Properties(), submissionDocument).buildSubmission();
-      try{
-      SubmissionUtils.transform(submissionDocument,
-              new File("/tmp/testSubmission.xml"));
-         //sb.append(SubmissionUtils.transform(submissionDocument, true));
-      } catch(Exception e){
-          log.debug("Error while attempting to write document to file");
-      }
+        new EraStudyDecorator(s, new Properties(), submissionDocument).buildSubmission();
+        try {
+            SubmissionUtils.transform(submissionDocument, new File("/tmp/testSubmission.xml"));
+            //sb.append(SubmissionUtils.transform(submissionDocument, true));
+        } catch (Exception e) {
+            log.debug("Error while attempting to write document to file");
+        }
 
-      log.info("Done testing Study XML generation");
-  }
+        log.info("Done testing Study XML generation");
+    }
 
-  @After
-  public void tearDown() {
-    dataObjectFactory = null;  
-  }
+    @After
+    public void tearDown() {
+        dataObjectFactory = null;
+    }
 }

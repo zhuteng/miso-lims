@@ -41,26 +41,25 @@ import java.net.URL;
  * @since 0.1.3
  */
 public class SolidServiceWrapper {
-  private String machineName;
-  private URL wsdlLocation;
-  private SolidService solidService;
+    private String machineName;
+    private URL wsdlLocation;
+    private SolidService solidService;
 
-  public SolidServiceWrapper(String machineName, URL wsdlLocation) {
-    QName qname = new QName("http://solid.aga.appliedbiosystems.com", "SolidService");
-    this.machineName = machineName;
-    this.wsdlLocation = wsdlLocation;
+    public SolidServiceWrapper(String machineName, URL wsdlLocation) {
+        QName qname = new QName("http://solid.aga.appliedbiosystems.com", "SolidService");
+        this.machineName = machineName;
+        this.wsdlLocation = wsdlLocation;
 
-    if (LimsUtils.isUrlValid(wsdlLocation)) {
-      this.solidService = new SolidService(wsdlLocation, qname);
+        if (LimsUtils.isUrlValid(wsdlLocation)) {
+            this.solidService = new SolidService(wsdlLocation, qname);
+        }
     }
-  }
 
-  public SolidService getSolidService() throws InterrogationException {
-    if (solidService != null) {
-      return solidService;
+    public SolidService getSolidService() throws InterrogationException {
+        if (solidService != null) {
+            return solidService;
+        } else {
+            throw new InterrogationException("Couldn't contact SOLiD machine " + machineName + " at " + wsdlLocation.toString());
+        }
     }
-    else {
-      throw new InterrogationException("Couldn't contact SOLiD machine " + machineName + " at " + wsdlLocation.toString());
-    }
-  }
 }

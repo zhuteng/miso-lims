@@ -41,40 +41,37 @@ import java.io.IOException;
  */
 @Aspect
 public class RunAlertAspect {
-  private RunAlertManager runAlertManager;
+    private RunAlertManager runAlertManager;
 
-  public RunAlertAspect(RunAlertManager runAlertManager) {
-    this.runAlertManager = runAlertManager;
-  }
+    public RunAlertAspect(RunAlertManager runAlertManager) {
+        this.runAlertManager = runAlertManager;
+    }
 
-  public void removeWatcher(Run run, User user) {
-    try {
-      if (user != null) {
-        runAlertManager.removeWatcher(run, user.getUserId());
-      }
+    public void removeWatcher(Run run, User user) {
+        try {
+            if (user != null) {
+                runAlertManager.removeWatcher(run, user.getUserId());
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
-    catch (IOException e) {
-      e.printStackTrace();
-    }
-  }
 
-  public void addWatcher(Run run, User user) {
-    try {
-      if (user != null) {
-        runAlertManager.addWatcher(run, user.getUserId());
-      }
+    public void addWatcher(Run run, User user) {
+        try {
+            if (user != null) {
+                runAlertManager.addWatcher(run, user.getUserId());
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
-    catch (IOException e) {
-      e.printStackTrace();
-    }
-  }
 
-  public void update(Long runId) {
-    try {
-      runAlertManager.update(runId);
+    public void update(Long runId) {
+        try {
+            runAlertManager.update(runId);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
-    catch (IOException e) {
-      e.printStackTrace();
-    }
-  }
 }

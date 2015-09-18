@@ -39,57 +39,54 @@ import java.util.*;
  * @since 0.2.0
  */
 public class MisoBarcodableSchemaResolverService implements BarcodableSchemaResolverService {
-  protected static final Logger log = LoggerFactory.getLogger(MisoBarcodableSchemaResolverService.class);
-  private Map<String, BarcodableSchema> contextMap;
+    protected static final Logger log = LoggerFactory.getLogger(MisoBarcodableSchemaResolverService.class);
+    private Map<String, BarcodableSchema> contextMap;
 
-  @Override
-  public BarcodableSchema getBarcodableSchema(String name) {
-    for (BarcodableSchema barcodableSchema : getBarcodableSchemas()) {
-      if (barcodableSchema.getName().equals(name)) {
-        try {
-          return barcodableSchema.getClass().newInstance();
+    @Override
+    public BarcodableSchema getBarcodableSchema(String name) {
+        for (BarcodableSchema barcodableSchema : getBarcodableSchemas()) {
+            if (barcodableSchema.getName().equals(name)) {
+                try {
+                    return barcodableSchema.getClass().newInstance();
+                } catch (InstantiationException e) {
+                    log.error("Cannot create a new instance of '" + name + "'", e);
+                    e.printStackTrace();
+                } catch (IllegalAccessException e) {
+                    log.error("Cannot create a new instance of '" + name + "'", e);
+                    e.printStackTrace();
+                }
+            }
         }
-        catch (InstantiationException e) {
-          log.error("Cannot create a new instance of '" + name + "'", e);
-          e.printStackTrace();
-        }
-        catch (IllegalAccessException e) {
-          log.error("Cannot create a new instance of '" + name + "'", e);
-          e.printStackTrace();
-        }
-      }
-    }
-    log.warn("No schema called '" + name + "' was available on the classpath");
-    return null;
-  }
-
-  @Override
-  public Collection<BarcodableSchema> getBarcodableSchemas() {
-    //lazily load available schemas
-    if (contextMap == null) {
-      ServiceLoader<BarcodableSchema> consumerLoader = ServiceLoader.load(BarcodableSchema.class);
-      Iterator<BarcodableSchema> consumerIterator = consumerLoader.iterator();
-
-      contextMap = new HashMap<String, BarcodableSchema>();
-      while (consumerIterator.hasNext()) {
-        BarcodableSchema p = consumerIterator.next();
-
-        if (!contextMap.containsKey(p.getName())) {
-          contextMap.put(p.getName(), p);
-        }
-        else {
-          if (contextMap.get(p.getName()) != p) {
-            String msg = "Multiple different BarcodableSchemas with the same schema name " +
-                         "('" + p.getName() + "') are present on the classpath. Schema names must be unique.";
-            log.error(msg);
-            throw new ServiceConfigurationError(msg);
-          }
-        }
-      }
-      log.info("Loaded " + contextMap.values().size() + " known schemas");
+        log.warn("No schema called '" + name + "' was available on the classpath");
+        return null;
     }
 
-    return contextMap.values();
-  }
+    @Override
+    public Collection<BarcodableSchema> getBarcodableSchemas() {
+        //lazily load available schemas
+        if (contextMap == null) {
+            ServiceLoader<BarcodableSchema> consumerLoader = ServiceLoader.load(BarcodableSchema.class);
+            Iterator<BarcodableSchema> consumerIterator = consumerLoader.iterator();
+
+            contextMap = new HashMap<String, BarcodableSchema>();
+            while (consumerIterator.hasNext()) {
+                BarcodableSchema p = consumerIterator.next();
+
+                if (!contextMap.containsKey(p.getName())) {
+                    contextMap.put(p.getName(), p);
+                } else {
+                    if (contextMap.get(p.getName()) != p) {
+                        String msg = "Multiple different BarcodableSchemas with the same schema name " +
+                                     "('" + p.getName() + "') are present on the classpath. Schema names must be unique.";
+                        log.error(msg);
+                        throw new ServiceConfigurationError(msg);
+                    }
+                }
+            }
+            log.info("Loaded " + contextMap.values().size() + " known schemas");
+        }
+
+        return contextMap.values();
+    }
 
 }

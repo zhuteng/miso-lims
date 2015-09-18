@@ -36,47 +36,50 @@ import java.util.Collection;
  * @since 0.0.2
  */
 public interface PoolQcStore extends Store<PoolQC>, Remover<PoolQC> {
-  /**
-   * Retrieve a PoolQC from an underlying data store given a PoolQC ID
-   * <p/>
-   * This method intends to retrieve objects in an 'ignorant' fashion, i.e.  will not populate
-   * parent or child objects that could lead to a circular dependency
-   *
-   * @param qcId of type long
-   * @return PoolQC
-   * @throws java.io.IOException when
-   */
-  //PoolQC lazyGet(long qcId) throws IOException;
+    /**
+     * Retrieve a PoolQC from an underlying data store given a PoolQC ID
+     * <p/>
+     * This method intends to retrieve objects in an 'ignorant' fashion, i.e.  will not populate
+     * parent or child objects that could lead to a circular dependency
+     *
+     * @param qcId of type long
+     * @return PoolQC
+     * @throws java.io.IOException when
+     */
+    //PoolQC lazyGet(long qcId) throws IOException;
 
-  /**
-   * List all PoolQCs performed on a Pool given a parent Pool ID
-   *
-   * @param poolId of type long
-   * @return Collection<PoolQC>
-   * @throws java.io.IOException when
-   */
-  Collection<PoolQC> listByPoolId(long poolId) throws IOException;
+    /**
+     * List all PoolQCs performed on a Pool given a parent Pool ID
+     *
+     * @param poolId of type long
+     * @return Collection<PoolQC>
+     * @throws java.io.IOException when
+     */
+    Collection<PoolQC> listByPoolId(long poolId) throws IOException;
 
-  /**
-   * Get the QcType descriptor for a given type ID
-   * @param qcTypeId
-   * @return the QcType with the given ID, or null if none exists
-   * @throws java.io.IOException
-   */
-  QcType getPoolQcTypeById(long qcTypeId) throws IOException;
+    /**
+     * Get the QcType descriptor for a given type ID
+     *
+     * @param qcTypeId
+     * @return the QcType with the given ID, or null if none exists
+     * @throws java.io.IOException
+     */
+    QcType getPoolQcTypeById(long qcTypeId) throws IOException;
 
-  /**
-   * Get the QcType descriptor for a given type name
-   * @param qcName
-   * @return the QcType with the given name, or null if none exists
-   * @throws java.io.IOException
-   */
-  QcType getPoolQcTypeByName(String qcName) throws IOException;
+    /**
+     * Get the QcType descriptor for a given type name
+     *
+     * @param qcName
+     * @return the QcType with the given name, or null if none exists
+     * @throws java.io.IOException
+     */
+    QcType getPoolQcTypeByName(String qcName) throws IOException;
 
-  /**
-   * Get all QcType descriptors for {@link uk.ac.bbsrc.tgac.miso.core.data.Pool} objects
-   * @return Collection<QcType>
-   * @throws java.io.IOException
-   */
-  Collection<QcType> listAllPoolQcTypes() throws IOException;
+    /**
+     * Get all QcType descriptors for {@link uk.ac.bbsrc.tgac.miso.core.data.Pool} objects
+     *
+     * @return Collection<QcType>
+     * @throws java.io.IOException
+     */
+    Collection<QcType> listAllPoolQcTypes() throws IOException;
 }

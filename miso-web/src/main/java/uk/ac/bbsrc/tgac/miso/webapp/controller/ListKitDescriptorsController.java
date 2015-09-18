@@ -41,38 +41,37 @@ import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
 @Controller
 public class ListKitDescriptorsController {
-  protected static final Logger log = LoggerFactory.getLogger(ListKitDescriptorsController.class);
+    protected static final Logger log = LoggerFactory.getLogger(ListKitDescriptorsController.class);
 
-  @Autowired
-  private SecurityManager securityManager;
+    @Autowired
+    private SecurityManager securityManager;
 
-  public void setSecurityManager(SecurityManager securityManager) {
-    this.securityManager = securityManager;
-  }
-
-  @Autowired
-  private RequestManager requestManager;
-
-  public void setRequestManager(RequestManager requestManager) {
-    this.requestManager = requestManager;
-  }
-
-  @RequestMapping("/kitdescriptors")
-  public ModelAndView listKitDescriptors(ModelMap model) throws IOException {
-    try {
-      model.addAttribute("sequencing", requestManager.listKitDescriptorsByType(KitType.SEQUENCING));
-      model.addAttribute("empcr", requestManager.listKitDescriptorsByType(KitType.EMPCR));
-      model.addAttribute("library",requestManager.listKitDescriptorsByType(KitType.LIBRARY));
-      model.addAttribute("clustering",requestManager.listKitDescriptorsByType(KitType.CLUSTERING));
-      model.addAttribute("multiplexing",requestManager.listKitDescriptorsByType(KitType.MULTIPLEXING));
-
-      return new ModelAndView("/pages/listKitDescriptors.jsp", model);
+    public void setSecurityManager(SecurityManager securityManager) {
+        this.securityManager = securityManager;
     }
-    catch (IOException ex) {
-      if (log.isDebugEnabled()) {
-        log.debug("Failed to list Kit Descriptors", ex);
-      }
-      throw ex;
+
+    @Autowired
+    private RequestManager requestManager;
+
+    public void setRequestManager(RequestManager requestManager) {
+        this.requestManager = requestManager;
     }
-  }
+
+    @RequestMapping("/kitdescriptors")
+    public ModelAndView listKitDescriptors(ModelMap model) throws IOException {
+        try {
+            model.addAttribute("sequencing", requestManager.listKitDescriptorsByType(KitType.SEQUENCING));
+            model.addAttribute("empcr", requestManager.listKitDescriptorsByType(KitType.EMPCR));
+            model.addAttribute("library", requestManager.listKitDescriptorsByType(KitType.LIBRARY));
+            model.addAttribute("clustering", requestManager.listKitDescriptorsByType(KitType.CLUSTERING));
+            model.addAttribute("multiplexing", requestManager.listKitDescriptorsByType(KitType.MULTIPLEXING));
+
+            return new ModelAndView("/pages/listKitDescriptors.jsp", model);
+        } catch (IOException ex) {
+            if (log.isDebugEnabled()) {
+                log.debug("Failed to list Kit Descriptors", ex);
+            }
+            throw ex;
+        }
+    }
 }

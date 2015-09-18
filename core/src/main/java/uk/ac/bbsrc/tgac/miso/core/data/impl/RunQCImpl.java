@@ -39,39 +39,37 @@ import java.io.Serializable;
  * @since 0.0.3
  */
 public class RunQCImpl extends AbstractRunQC implements Serializable {
-  /**
-   * Construct a new RunQCImpl
-   */
-  public RunQCImpl() {
+    /**
+     * Construct a new RunQCImpl
+     */
+    public RunQCImpl() {
 
-  }
-
-  /**
-   * Construct a new RunQC from a parent Run, checking that the given User can read that Run
-   *
-   * @param run of type Run
-   * @param user of type User
-   */
-  public RunQCImpl(Run run, User user) {
-    if (run.userCanRead(user)) {
-      try {
-        setRun(run);
-      }
-      catch (MalformedRunException e) {
-        e.printStackTrace();
-      }
-      //setSecurityProfile(experiment.getSecurityProfile());
     }
-    else {
-      //setSecurityProfile(new SecurityProfile(user));
+
+    /**
+     * Construct a new RunQC from a parent Run, checking that the given User can read that Run
+     *
+     * @param run  of type Run
+     * @param user of type User
+     */
+    public RunQCImpl(Run run, User user) {
+        if (run.userCanRead(user)) {
+            try {
+                setRun(run);
+            } catch (MalformedRunException e) {
+                e.printStackTrace();
+            }
+            //setSecurityProfile(experiment.getSecurityProfile());
+        } else {
+            //setSecurityProfile(new SecurityProfile(user));
+        }
     }
-  }
 
-  public boolean userCanRead(User user) {
-    return true;
-  }
+    public boolean userCanRead(User user) {
+        return true;
+    }
 
-  public boolean userCanWrite(User user) {
-    return true;
-  }
+    public boolean userCanWrite(User user) {
+        return true;
+    }
 }

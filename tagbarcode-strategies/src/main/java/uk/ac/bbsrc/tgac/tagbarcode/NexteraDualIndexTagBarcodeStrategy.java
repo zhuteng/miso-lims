@@ -46,82 +46,79 @@ import java.util.*;
  */
 @ServiceProvider
 public class NexteraDualIndexTagBarcodeStrategy implements TagBarcodeStrategy, RequestManagerAware {
-  protected static final Logger log = LoggerFactory.getLogger(NexteraDualIndexTagBarcodeStrategy.class);
+    protected static final Logger log = LoggerFactory.getLogger(NexteraDualIndexTagBarcodeStrategy.class);
 
-  private Map<Integer, Set<TagBarcode>> tagBarcodeMap = new HashMap<Integer, Set<TagBarcode>>();
-  private RequestManager requestManager;
+    private Map<Integer, Set<TagBarcode>> tagBarcodeMap = new HashMap<Integer, Set<TagBarcode>>();
+    private RequestManager requestManager;
 
-  @Override
-  public RequestManager getRequestManager() {
-    return requestManager;
-  }
+    @Override
+    public RequestManager getRequestManager() {
+        return requestManager;
+    }
 
-  @Override
-  public void setRequestManager(RequestManager requestManager) {
-    this.requestManager = requestManager;
-  }
+    @Override
+    public void setRequestManager(RequestManager requestManager) {
+        this.requestManager = requestManager;
+    }
 
-  @Override
-  public final String getName() {
-    return "Nextera Dual Index";
-  }
+    @Override
+    public final String getName() {
+        return "Nextera Dual Index";
+    }
 
-  @Override
-  public PlatformType getPlatformType() {
-    return PlatformType.ILLUMINA;
-  }
+    @Override
+    public PlatformType getPlatformType() {
+        return PlatformType.ILLUMINA;
+    }
 
-  @Override
-  public final int getNumApplicableBarcodes() {
-    return 2;
-  }
+    @Override
+    public final int getNumApplicableBarcodes() {
+        return 2;
+    }
 
-  @Override
-  public Map<Integer, Set<TagBarcode>> getApplicableBarcodes() {
-    if (tagBarcodeMap.isEmpty()) {
-      if (requestManager != null) {
-        tagBarcodeMap.put(1, new TreeSet<TagBarcode>());
-        tagBarcodeMap.put(2, new TreeSet<TagBarcode>());
+    @Override
+    public Map<Integer, Set<TagBarcode>> getApplicableBarcodes() {
+        if (tagBarcodeMap.isEmpty()) {
+            if (requestManager != null) {
+                tagBarcodeMap.put(1, new TreeSet<TagBarcode>());
+                tagBarcodeMap.put(2, new TreeSet<TagBarcode>());
 
-        try {
-          List<TagBarcode> barcodes = new ArrayList<TagBarcode>(requestManager.listAllTagBarcodesByPlatform(PlatformType.ILLUMINA.getKey()));
-          for (TagBarcode t : barcodes) {
-            if (getName().equals(t.getStrategyName()) && t.getName() != null) {
-              log.debug("Registering tag barcode: " + t.getName());
-              if (t.getName().startsWith("N7")) {
-                tagBarcodeMap.get(1).add(t);
-              }
-              else if (t.getName().startsWith("N5")) {
-                tagBarcodeMap.get(2).add(t);
-              }
-              else if (t.getName().startsWith("S5")) {
-                tagBarcodeMap.get(2).add(t);
-              }
+                try {
+                    List<TagBarcode> barcodes = new ArrayList<TagBarcode>(
+                        requestManager.listAllTagBarcodesByPlatform(PlatformType.ILLUMINA.getKey()));
+                    for (TagBarcode t : barcodes) {
+                        if (getName().equals(t.getStrategyName()) && t.getName() != null) {
+                            log.debug("Registering tag barcode: " + t.getName());
+                            if (t.getName().startsWith("N7")) {
+                                tagBarcodeMap.get(1).add(t);
+                            } else if (t.getName().startsWith("N5")) {
+                                tagBarcodeMap.get(2).add(t);
+                            } else if (t.getName().startsWith("S5")) {
+                                tagBarcodeMap.get(2).add(t);
+                            }
+                        }
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            } else {
+                log.error("Null requestManager");
             }
-          }
         }
-        catch (IOException e) {
-          e.printStackTrace();
+        return tagBarcodeMap;
+    }
+
+    @Override
+    public Set<TagBarcode> getApplicableBarcodesForPosition(int position) {
+        if (position < 1 || position > getNumApplicableBarcodes()) {
+            throw new IndexOutOfBoundsException("This TagBarcodeStrategy only has " + getNumApplicableBarcodes() + " valid positions");
         }
-      }
-      else {
-        log.error("Null requestManager");
-      }
+        return tagBarcodeMap.get(position);
     }
-    return tagBarcodeMap;
-  }
 
-  @Override
-  public Set<TagBarcode> getApplicableBarcodesForPosition(int position) {
-    if (position < 1 || position > getNumApplicableBarcodes()) {
-      throw new IndexOutOfBoundsException("This TagBarcodeStrategy only has " + getNumApplicableBarcodes() + " valid positions");
+    @Override
+    public void reload() {
+        tagBarcodeMap.clear();
+        getApplicableBarcodes();
     }
-    return tagBarcodeMap.get(position);
-  }
-
-  @Override
-  public void reload() {
-    tagBarcodeMap.clear();
-    getApplicableBarcodes();
-  }
 }

@@ -36,76 +36,76 @@ import java.util.Collection;
  * @since version
  */
 public interface StudyStore extends Store<Study>, Cascadable, Remover<Study>, NamingSchemeAware<Study> {
-  /**
-   * Retrieve a Study from an underlying data store given a Study ID
-   * <p/>
-   * This method intends to retrieve objects in an 'ignorant' fashion, i.e. will not populate
-   * parent or child objects that could lead to a circular dependency
-   *
-   * @param studyId of type long
-   * @return Study
-   * @throws IOException when
-   */
-  //Study lazyGet(long studyId) throws IOException;
+    /**
+     * Retrieve a Study from an underlying data store given a Study ID
+     * <p/>
+     * This method intends to retrieve objects in an 'ignorant' fashion, i.e. will not populate
+     * parent or child objects that could lead to a circular dependency
+     *
+     * @param studyId of type long
+     * @return Study
+     * @throws IOException when
+     */
+    //Study lazyGet(long studyId) throws IOException;
 
-  /**
-   * List all Studies that match a search criteria
-   *
-   * @param query of type String
-   * @return Collection<Study>
-   * @throws IOException when
-   */
-  Collection<Study> listBySearch(String query) throws IOException;
+    /**
+     * List all Studies that match a search criteria
+     *
+     * @param query of type String
+     * @return Collection<Study>
+     * @throws IOException when
+     */
+    Collection<Study> listBySearch(String query) throws IOException;
 
-  /**
-   * Get a Study related to an Experiment given an Experiment ID
-   *
-   * @param experimentId of type long
-   * @return Study
-   * @throws IOException when
-   */
-  Study getByExperimentId(long experimentId) throws IOException;
+    /**
+     * Get a Study related to an Experiment given an Experiment ID
+     *
+     * @param experimentId of type long
+     * @return Study
+     * @throws IOException when
+     */
+    Study getByExperimentId(long experimentId) throws IOException;
 
-  /**
-   * List all Studies that are carried out as part of a parent Project given a Project ID
-   *
-   * @param projectId of type long
-   * @return Collection<Study>
-   * @throws IOException when
-   */
-  Collection<Study> listByProjectId(long projectId) throws IOException;
+    /**
+     * List all Studies that are carried out as part of a parent Project given a Project ID
+     *
+     * @param projectId of type long
+     * @return Collection<Study>
+     * @throws IOException when
+     */
+    Collection<Study> listByProjectId(long projectId) throws IOException;
 
-  /**
-   * List all Studys that are part of a Submission given a Submission ID
-   *
-   * @param submissionId of type long
-   * @return Collection<Study>
-   * @throws IOException when
-   */
-  Collection<Study> listBySubmissionId(long submissionId) throws IOException;
+    /**
+     * List all Studys that are part of a Submission given a Submission ID
+     *
+     * @param submissionId of type long
+     * @return Collection<Study>
+     * @throws IOException when
+     */
+    Collection<Study> listBySubmissionId(long submissionId) throws IOException;
 
-  /**
-   * List all Studies that are carried out as part of a related Library given a Library ID
-   *
-   * @param libraryId of type long
-   * @return Collection<Study>
-   * @throws IOException when
-   */
-  Collection<Study> listByLibraryId(long libraryId) throws IOException;
+    /**
+     * List all Studies that are carried out as part of a related Library given a Library ID
+     *
+     * @param libraryId of type long
+     * @return Collection<Study>
+     * @throws IOException when
+     */
+    Collection<Study> listByLibraryId(long libraryId) throws IOException;
 
-  /**
-   * List all StudyTypes
-   *
-   * @return Collection<String>
-   * @throws IOException when
-   */
-  Collection<String> listAllStudyTypes() throws IOException;
+    /**
+     * List all StudyTypes
+     *
+     * @return Collection<String>
+     * @throws IOException when
+     */
+    Collection<String> listAllStudyTypes() throws IOException;
 
-  /**
-   * List all persisted objects
-   *
-   * @return Collection<Study>
-   * @throws IOException when the objects cannot be retrieved
-   */
-  Collection<Study> listAllWithLimit(long limit) throws IOException;
+    /**
+     * List all persisted objects
+     *
+     * @return Collection<Study>
+     * @throws IOException when the objects cannot be retrieved
+     */
+    Collection<Study> listAllWithLimit(long limit) throws IOException;
 }

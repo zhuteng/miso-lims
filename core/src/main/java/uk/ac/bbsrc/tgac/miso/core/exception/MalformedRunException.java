@@ -32,14 +32,14 @@ package uk.ac.bbsrc.tgac.miso.core.exception;
  * @since 0.0.2
  */
 public class MalformedRunException extends Exception {
-  public MalformedRunException(String s) {
-    super(s);
-  }  
-
-  public MalformedRunException(String s, Throwable cause) {
-    super(s);
-    if (cause != null) {
-        initCause(cause);
+    public MalformedRunException(String s) {
+        super(s);
     }
-  }
+
+    public MalformedRunException(String s, Throwable cause) {
+        super(s);
+        if (cause != null) {
+            initCause(cause);
+        }
+    }
 }

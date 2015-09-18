@@ -55,32 +55,32 @@ import java.util.List;
  */
 @Controller
 public class ListExperimentsController {
-  protected static final Logger log = LoggerFactory.getLogger(ListExperimentsController.class);
+    protected static final Logger log = LoggerFactory.getLogger(ListExperimentsController.class);
 
-  @Autowired
-  private SecurityManager securityManager;
+    @Autowired
+    private SecurityManager securityManager;
 
-  public void setSecurityManager(SecurityManager securityManager) {
-    this.securityManager = securityManager;
-  }
+    public void setSecurityManager(SecurityManager securityManager) {
+        this.securityManager = securityManager;
+    }
 
-  @Autowired
-  private RequestManager requestManager;
+    @Autowired
+    private RequestManager requestManager;
 
-  public void setRequestManager(RequestManager requestManager) {
-    this.requestManager = requestManager;
-  }
+    public void setRequestManager(RequestManager requestManager) {
+        this.requestManager = requestManager;
+    }
 
-  @RequestMapping(value = "/experiments/rest/", method = RequestMethod.GET)
-  public
-  @ResponseBody
-  Collection<Experiment> jsonRest() throws IOException {
-    //User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-    return requestManager.listAllExperiments();
-  }
+    @RequestMapping(value = "/experiments/rest/", method = RequestMethod.GET)
+    public
+    @ResponseBody
+    Collection<Experiment> jsonRest() throws IOException {
+        //User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
+        return requestManager.listAllExperiments();
+    }
 
-  @RequestMapping("/experiments")
-  public ModelAndView listExperiments() throws Exception {
-    return new ModelAndView("/pages/listExperiments.jsp");
-  }
+    @RequestMapping("/experiments")
+    public ModelAndView listExperiments() throws Exception {
+        return new ModelAndView("/pages/listExperiments.jsp");
+    }
 }

@@ -38,8 +38,8 @@ import java.io.IOException;
  */
 @Spi
 public interface PrintContext<T> {
-  boolean print(T content) throws IOException;
-  public String getName();
-  public String getDescription();
-  public String getHost();
+    boolean print(T content) throws IOException;
+    public String getName();
+    public String getDescription();
+    public String getHost();
 }

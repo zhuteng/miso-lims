@@ -32,10 +32,10 @@ import javax.persistence.CascadeType;
  * @since 0.0.2
  */
 public interface Cascadable {
-  /**
-   * Sets the cascadeType of this Cascadable object.
-   *
-   * @param cascadeType cascadeType.
-   */
-  public void setCascadeType(CascadeType cascadeType);
+    /**
+     * Sets the cascadeType of this Cascadable object.
+     *
+     * @param cascadeType cascadeType.
+     */
+    public void setCascadeType(CascadeType cascadeType);
 }

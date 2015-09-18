@@ -40,56 +40,53 @@ import java.util.Map;
  * @since 0.0.2
  */
 public class MisoWebUtils {
-  public static String generateErrorDivMessage(String errorMessage) {
-    return "<div id='errordiv' class='flasherror'>"+errorMessage+"</div>";
-  }
+    public static String generateErrorDivMessage(String errorMessage) {
+        return "<div id='errordiv' class='flasherror'>" + errorMessage + "</div>";
+    }
 
-  public static String generateErrorDivMessage(String errorMessage, String exceptionMessage) {
-    return "<div id='errordiv' class='flasherror'>"+errorMessage+"<br/><pre>"+exceptionMessage+"</pre></div>";
-  }
+    public static String generateErrorDivMessage(String errorMessage, String exceptionMessage) {
+        return "<div id='errordiv' class='flasherror'>" + errorMessage + "<br/><pre>" + exceptionMessage + "</pre></div>";
+    }
 
-  public static Map<String, String> checkStorageDirectories(String baseStoragePath) {
-    Map<String, String> checks = new HashMap<String, String>();
-    if (baseStoragePath.endsWith("/")) {
-      try {
-        File misoDir = new File(baseStoragePath);
-        if (LimsUtils.checkDirectory(misoDir, true)) {
-          LimsUtils.checkDirectory(new File(baseStoragePath, "files"), true);
-          LimsUtils.checkDirectory(new File(baseStoragePath, "files/submission"), true);
-          LimsUtils.checkDirectory(new File(baseStoragePath, "log"), true);
-          LimsUtils.checkDirectory(new File(baseStoragePath, "temp"), true);
-          checks.put("ok", "All storage directories OK");
+    public static Map<String, String> checkStorageDirectories(String baseStoragePath) {
+        Map<String, String> checks = new HashMap<String, String>();
+        if (baseStoragePath.endsWith("/")) {
+            try {
+                File misoDir = new File(baseStoragePath);
+                if (LimsUtils.checkDirectory(misoDir, true)) {
+                    LimsUtils.checkDirectory(new File(baseStoragePath, "files"), true);
+                    LimsUtils.checkDirectory(new File(baseStoragePath, "files/submission"), true);
+                    LimsUtils.checkDirectory(new File(baseStoragePath, "log"), true);
+                    LimsUtils.checkDirectory(new File(baseStoragePath, "temp"), true);
+                    checks.put("ok", "All storage directories OK");
+                } else {
+                    checks.put("error",
+                               "MISO storage directory seems to exist, but some other IO error occurred. Please check that this directory is writable.");
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+                checks.put("error", "Cannot access one of the MISO storage directories: " + e.getMessage());
+            }
+        } else {
+            checks.put("error", "MISO storage directory is defined, but must end with a trailing slash!");
         }
-        else {
-          checks.put("error", "MISO storage directory seems to exist, but some other IO error occurred. Please check that this directory is writable.");
-        }
-      }
-      catch (IOException e) {
-        e.printStackTrace();
-        checks.put("error", "Cannot access one of the MISO storage directories: " + e.getMessage());
-      }
+        return checks;
     }
-    else {
-      checks.put("error", "MISO storage directory is defined, but must end with a trailing slash!");
-    }
-    return checks;
-  }
 
-  public static Map<String, String> checkCorePropertiesFiles(String baseStoragePath) {
-    Map<String, String> checks = new HashMap<String, String>();
-    if (baseStoragePath.endsWith("/")) {
-      try {
-        LimsUtils.checkFile(new File(baseStoragePath, "issuetracker.properties"));
-        LimsUtils.checkFile(new File(baseStoragePath, "mail.properties"));
-        LimsUtils.checkFile(new File(baseStoragePath, "security.properties"));
-        LimsUtils.checkFile(new File(baseStoragePath, "submission.properties"));
-        checks.put("ok", "All core properties files OK");
-      }
-      catch (IOException e) {
-        e.printStackTrace();
-        checks.put("error", "Cannot access one of the MISO core properties files: " + e.getMessage());
-      }
+    public static Map<String, String> checkCorePropertiesFiles(String baseStoragePath) {
+        Map<String, String> checks = new HashMap<String, String>();
+        if (baseStoragePath.endsWith("/")) {
+            try {
+                LimsUtils.checkFile(new File(baseStoragePath, "issuetracker.properties"));
+                LimsUtils.checkFile(new File(baseStoragePath, "mail.properties"));
+                LimsUtils.checkFile(new File(baseStoragePath, "security.properties"));
+                LimsUtils.checkFile(new File(baseStoragePath, "submission.properties"));
+                checks.put("ok", "All core properties files OK");
+            } catch (IOException e) {
+                e.printStackTrace();
+                checks.put("error", "Cannot access one of the MISO core properties files: " + e.getMessage());
+            }
+        }
+        return checks;
     }
-    return checks;
-  }
 }

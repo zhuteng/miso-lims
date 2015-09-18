@@ -43,52 +43,52 @@ import java.io.IOException;
  */
 @ServiceProvider
 public class BradyFtpPrintContext implements PrintContext<File> {
-  protected static final Logger log = LoggerFactory.getLogger(BradyFtpPrintContext.class);
-  private BradyFtpPrintStrategy ps = new BradyFtpPrintStrategy();
-  public String host;
-  public String username;
-  public String password;
+    protected static final Logger log = LoggerFactory.getLogger(BradyFtpPrintContext.class);
+    private BradyFtpPrintStrategy ps = new BradyFtpPrintStrategy();
+    public String host;
+    public String username;
+    public String password;
 
-  public String getHost() {
-    return host;
-  }
+    public String getHost() {
+        return host;
+    }
 
-  public void setHost(String host) {
-    this.host = host;
-  }
+    public void setHost(String host) {
+        this.host = host;
+    }
 
-  public String getUsername() {
-    return username;
-  }
+    public String getUsername() {
+        return username;
+    }
 
-  public void setUsername(String username) {
-    this.username = username;
-  }
+    public void setUsername(String username) {
+        this.username = username;
+    }
 
-  public String getPassword() {
-    return password;
-  }
+    public String getPassword() {
+        return password;
+    }
 
-  public void setPassword(String password) {
-    this.password = password;
-  }
+    public void setPassword(String password) {
+        this.password = password;
+    }
 
-  public void setPrintStrategy(BradyFtpPrintStrategy ps) {
-    this.ps = ps;
-  }
+    public void setPrintStrategy(BradyFtpPrintStrategy ps) {
+        this.ps = ps;
+    }
 
-  @Override
-  public String getName() {
-    return "mach4-type-ftp-printer";
-  }
+    @Override
+    public String getName() {
+        return "mach4-type-ftp-printer";
+    }
 
-  @Override
-  public String getDescription() {
-    return "Prints to a Mach4-type printer via the FTP protocol";
-  }
+    @Override
+    public String getDescription() {
+        return "Prints to a Mach4-type printer via the FTP protocol";
+    }
 
-  @Override
-  public boolean print(File content) throws IOException {
-    return ps.print(content, this);    
-  }
+    @Override
+    public boolean print(File content) throws IOException {
+        return ps.print(content, this);
+    }
 }

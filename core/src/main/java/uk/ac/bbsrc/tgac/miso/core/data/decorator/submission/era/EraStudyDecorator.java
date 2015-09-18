@@ -40,48 +40,48 @@ import java.util.Properties;
  */
 public class EraStudyDecorator extends AbstractSubmittableDecorator<Document> {
 
-  public EraStudyDecorator(Submittable submittable, Properties submissionProperties, Document submission) {
-    super(submittable, submissionProperties);
-    this.submission = submission;
-  }
-
-  public void buildSubmission() {
-    Study s = (Study)submittable;
-    if (submission != null) {
-      Element study = submission.createElement("STUDY");
-      //study.setAttribute("accession", s.getAccession());
-      study.setAttribute("alias", s.getAlias());
-
-      Element studyDescriptor = submission.createElementNS(null, "DESCRIPTOR");
-      Element studyTitle = submission.createElementNS(null, "STUDY_TITLE");
-      studyTitle.setTextContent(s.getAlias());
-      studyDescriptor.appendChild(studyTitle);
-
-      Element studyType = submission.createElementNS(null, "STUDY_TYPE");
-      studyType.setAttribute("existing_study_type", s.getStudyType());
-      studyDescriptor.appendChild(studyType);
-
-      // DEPRECATED SRA 1.2
-      //Element centerName = doc.createElementNS(null, "CENTER_NAME");
-      //centerName.setTextContent(TgacSubmissionConstants.CENTRE_NAME.getKey());
-      //studyDescriptor.appendChild(centerName);
-
-      Element centerProjectName = submission.createElementNS(null, "CENTER_PROJECT_NAME");
-      centerProjectName.setTextContent(s.getProject().getAlias());
-      studyDescriptor.appendChild(centerProjectName);
-
-      Element studyAbstract = submission.createElementNS(null, "STUDY_ABSTRACT");
-      //TODO - add Study.getAbstract()
-      studyAbstract.setTextContent(s.getAbstract());
-      studyDescriptor.appendChild(studyAbstract);
-
-      Element studyDescription = submission.createElementNS(null, "STUDY_DESCRIPTION");
-      studyDescription.setTextContent(s.getDescription());
-      studyDescriptor.appendChild(studyDescription);
-
-      study.appendChild(studyDescriptor);
-
-      submission.getElementsByTagName("STUDY_SET").item(0).appendChild(study);
+    public EraStudyDecorator(Submittable submittable, Properties submissionProperties, Document submission) {
+        super(submittable, submissionProperties);
+        this.submission = submission;
     }
-  }
+
+    public void buildSubmission() {
+        Study s = (Study) submittable;
+        if (submission != null) {
+            Element study = submission.createElement("STUDY");
+            //study.setAttribute("accession", s.getAccession());
+            study.setAttribute("alias", s.getAlias());
+
+            Element studyDescriptor = submission.createElementNS(null, "DESCRIPTOR");
+            Element studyTitle = submission.createElementNS(null, "STUDY_TITLE");
+            studyTitle.setTextContent(s.getAlias());
+            studyDescriptor.appendChild(studyTitle);
+
+            Element studyType = submission.createElementNS(null, "STUDY_TYPE");
+            studyType.setAttribute("existing_study_type", s.getStudyType());
+            studyDescriptor.appendChild(studyType);
+
+            // DEPRECATED SRA 1.2
+            //Element centerName = doc.createElementNS(null, "CENTER_NAME");
+            //centerName.setTextContent(TgacSubmissionConstants.CENTRE_NAME.getKey());
+            //studyDescriptor.appendChild(centerName);
+
+            Element centerProjectName = submission.createElementNS(null, "CENTER_PROJECT_NAME");
+            centerProjectName.setTextContent(s.getProject().getAlias());
+            studyDescriptor.appendChild(centerProjectName);
+
+            Element studyAbstract = submission.createElementNS(null, "STUDY_ABSTRACT");
+            //TODO - add Study.getAbstract()
+            studyAbstract.setTextContent(s.getAbstract());
+            studyDescriptor.appendChild(studyAbstract);
+
+            Element studyDescription = submission.createElementNS(null, "STUDY_DESCRIPTION");
+            studyDescription.setTextContent(s.getDescription());
+            studyDescriptor.appendChild(studyDescription);
+
+            study.appendChild(studyDescriptor);
+
+            submission.getElementsByTagName("STUDY_SET").item(0).appendChild(study);
+        }
+    }
 }

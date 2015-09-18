@@ -42,234 +42,232 @@ import java.util.Iterator;
  * @since 0.1.3
  */
 public class AnalysisQueryService {
-  protected static final Logger log = LoggerFactory.getLogger(AnalysisQueryService.class);
+    protected static final Logger log = LoggerFactory.getLogger(AnalysisQueryService.class);
 
-  private String analysisServerHost;
-  private int analysisServerPort;
+    private String analysisServerHost;
+    private int analysisServerPort;
 
-  public void setAnalysisServerHost(String analysisServerHost) {
-    this.analysisServerHost = analysisServerHost;
-  }
-
-  public void setAnalysisServerPort(int analysisServerPort) {
-    this.analysisServerPort = analysisServerPort;
-  }
-
-  public JSONArray getTask(String taskId) throws IntegrationException {
-    JSONObject q1 = new JSONObject();
-    q1.put("query", "getTask");
-    JSONObject params = new JSONObject();
-    params.put("name", taskId);
-    q1.put("params", params);
-    String query = q1.toString();
-
-    String response = IntegrationUtils.sendMessage(IntegrationUtils.prepareSocket(analysisServerHost, analysisServerPort), query);
-    if (!"".equals(response)) {
-      JSONArray r = JSONArray.fromObject(response);
-      if (!r.isEmpty()) {
-        if (r.size() == 1 && r.getJSONObject(0).has("error")) {
-          String error = r.getJSONObject(0).getString("error");
-          log.error(error);
-          throw new IntegrationException("Analysis query returned an error: " + error);
-        }
-
-        return JSONArray.fromObject(response);
-      }
+    public void setAnalysisServerHost(String analysisServerHost) {
+        this.analysisServerHost = analysisServerHost;
     }
-    throw new IntegrationException("No such task.");
-  }
 
-  public JSONArray getTasks() throws IntegrationException {
-    JSONObject q1 = new JSONObject();
-    q1.put("query", "getTasks");
-    String query = q1.toString();
-
-    String response = IntegrationUtils.sendMessage(IntegrationUtils.prepareSocket(analysisServerHost, analysisServerPort), query);
-    if (!"".equals(response)) {
-      JSONArray r = JSONArray.fromObject(response);
-      if (!r.isEmpty()) {
-        if (r.size() == 1 && r.getJSONObject(0).has("error")) {
-          String error = r.getJSONObject(0).getString("error");
-          log.error(error);
-          throw new IntegrationException("Analysis query returned an error: " + error);
-        }
-
-        return JSONArray.fromObject(response);
-      }
+    public void setAnalysisServerPort(int analysisServerPort) {
+        this.analysisServerPort = analysisServerPort;
     }
-    return JSONArray.fromObject("[]");
-  }
 
-  public JSONArray getPendingTasks() throws IntegrationException {
-    JSONObject q1 = new JSONObject();
-    q1.put("query", "getPendingTasks");
-    String query = q1.toString();
+    public JSONArray getTask(String taskId) throws IntegrationException {
+        JSONObject q1 = new JSONObject();
+        q1.put("query", "getTask");
+        JSONObject params = new JSONObject();
+        params.put("name", taskId);
+        q1.put("params", params);
+        String query = q1.toString();
 
-    String response = IntegrationUtils.sendMessage(IntegrationUtils.prepareSocket(analysisServerHost, analysisServerPort), query);
-    if (!"".equals(response)) {
-      JSONArray r = JSONArray.fromObject(response);
-      if (!r.isEmpty()) {
-        if (r.size() == 1 && r.getJSONObject(0).has("error")) {
-          String error = r.getJSONObject(0).getString("error");
-          log.error(error);
-          throw new IntegrationException("Analysis query returned an error: " + error);
-        }
-        else {
-          JSONArray n = new JSONArray();
-          for (JSONObject task : (Iterable<JSONObject>)r) {
-            if (!task.getString("statusMessage").contains("Failed")) {
-              n.add(task);
+        String response = IntegrationUtils.sendMessage(IntegrationUtils.prepareSocket(analysisServerHost, analysisServerPort), query);
+        if (!"".equals(response)) {
+            JSONArray r = JSONArray.fromObject(response);
+            if (!r.isEmpty()) {
+                if (r.size() == 1 && r.getJSONObject(0).has("error")) {
+                    String error = r.getJSONObject(0).getString("error");
+                    log.error(error);
+                    throw new IntegrationException("Analysis query returned an error: " + error);
+                }
+
+                return JSONArray.fromObject(response);
             }
-          }
-          return n;
         }
-      }
+        throw new IntegrationException("No such task.");
     }
-    return JSONArray.fromObject("[]");
-  }
 
-  public JSONArray getFailedTasks() throws IntegrationException {
-    JSONObject q1 = new JSONObject();
-    q1.put("query", "getPendingTasks");
-    String query = q1.toString();
+    public JSONArray getTasks() throws IntegrationException {
+        JSONObject q1 = new JSONObject();
+        q1.put("query", "getTasks");
+        String query = q1.toString();
 
-    String response = IntegrationUtils.sendMessage(IntegrationUtils.prepareSocket(analysisServerHost, analysisServerPort), query);
-    if (!"".equals(response)) {
-      JSONArray r = JSONArray.fromObject(response);
-      if (!r.isEmpty()) {
-        if (r.size() == 1 && r.getJSONObject(0).has("error")) {
-          String error = r.getJSONObject(0).getString("error");
-          log.error(error);
-          throw new IntegrationException("Analysis query returned an error: " + error);
-        }
-        else {
-          JSONArray n = new JSONArray();
-          for (JSONObject task : (Iterable<JSONObject>)r) {
-            if (task.getString("statusMessage").contains("Failed")) {
-              n.add(task);
+        String response = IntegrationUtils.sendMessage(IntegrationUtils.prepareSocket(analysisServerHost, analysisServerPort), query);
+        if (!"".equals(response)) {
+            JSONArray r = JSONArray.fromObject(response);
+            if (!r.isEmpty()) {
+                if (r.size() == 1 && r.getJSONObject(0).has("error")) {
+                    String error = r.getJSONObject(0).getString("error");
+                    log.error(error);
+                    throw new IntegrationException("Analysis query returned an error: " + error);
+                }
+
+                return JSONArray.fromObject(response);
             }
-          }
-          return n;
         }
-      }
+        return JSONArray.fromObject("[]");
     }
-    return JSONArray.fromObject("[]");
-  }
 
-  public JSONArray getRunningTasks() throws IntegrationException {
-    JSONObject q1 = new JSONObject();
-    q1.put("query", "getRunningTasks");
-    String query = q1.toString();
+    public JSONArray getPendingTasks() throws IntegrationException {
+        JSONObject q1 = new JSONObject();
+        q1.put("query", "getPendingTasks");
+        String query = q1.toString();
 
-    String response = IntegrationUtils.sendMessage(IntegrationUtils.prepareSocket(analysisServerHost, analysisServerPort), query);
-    if (!"".equals(response)) {
-      JSONArray r = JSONArray.fromObject(response);
-      if (!r.isEmpty()) {
-        if (r.size() == 1 && r.getJSONObject(0).has("error")) {
-          String error = r.getJSONObject(0).getString("error");
-          log.error(error);
-          throw new IntegrationException("Analysis query returned an error: " + error);
+        String response = IntegrationUtils.sendMessage(IntegrationUtils.prepareSocket(analysisServerHost, analysisServerPort), query);
+        if (!"".equals(response)) {
+            JSONArray r = JSONArray.fromObject(response);
+            if (!r.isEmpty()) {
+                if (r.size() == 1 && r.getJSONObject(0).has("error")) {
+                    String error = r.getJSONObject(0).getString("error");
+                    log.error(error);
+                    throw new IntegrationException("Analysis query returned an error: " + error);
+                } else {
+                    JSONArray n = new JSONArray();
+                    for (JSONObject task : (Iterable<JSONObject>) r) {
+                        if (!task.getString("statusMessage").contains("Failed")) {
+                            n.add(task);
+                        }
+                    }
+                    return n;
+                }
+            }
+        }
+        return JSONArray.fromObject("[]");
+    }
+
+    public JSONArray getFailedTasks() throws IntegrationException {
+        JSONObject q1 = new JSONObject();
+        q1.put("query", "getPendingTasks");
+        String query = q1.toString();
+
+        String response = IntegrationUtils.sendMessage(IntegrationUtils.prepareSocket(analysisServerHost, analysisServerPort), query);
+        if (!"".equals(response)) {
+            JSONArray r = JSONArray.fromObject(response);
+            if (!r.isEmpty()) {
+                if (r.size() == 1 && r.getJSONObject(0).has("error")) {
+                    String error = r.getJSONObject(0).getString("error");
+                    log.error(error);
+                    throw new IntegrationException("Analysis query returned an error: " + error);
+                } else {
+                    JSONArray n = new JSONArray();
+                    for (JSONObject task : (Iterable<JSONObject>) r) {
+                        if (task.getString("statusMessage").contains("Failed")) {
+                            n.add(task);
+                        }
+                    }
+                    return n;
+                }
+            }
+        }
+        return JSONArray.fromObject("[]");
+    }
+
+    public JSONArray getRunningTasks() throws IntegrationException {
+        JSONObject q1 = new JSONObject();
+        q1.put("query", "getRunningTasks");
+        String query = q1.toString();
+
+        String response = IntegrationUtils.sendMessage(IntegrationUtils.prepareSocket(analysisServerHost, analysisServerPort), query);
+        if (!"".equals(response)) {
+            JSONArray r = JSONArray.fromObject(response);
+            if (!r.isEmpty()) {
+                if (r.size() == 1 && r.getJSONObject(0).has("error")) {
+                    String error = r.getJSONObject(0).getString("error");
+                    log.error(error);
+                    throw new IntegrationException("Analysis query returned an error: " + error);
+                }
+
+                return JSONArray.fromObject(response);
+            }
+        }
+        return JSONArray.fromObject("[]");
+    }
+
+    public JSONArray getCompletedTasks() throws IntegrationException {
+        JSONObject q1 = new JSONObject();
+        q1.put("query", "getCompletedTasks");
+        String query = q1.toString();
+
+        String response = IntegrationUtils.sendMessage(IntegrationUtils.prepareSocket(analysisServerHost, analysisServerPort), query);
+        if (!"".equals(response)) {
+            JSONArray r = JSONArray.fromObject(response);
+            if (!r.isEmpty()) {
+                if (r.size() == 1 && r.getJSONObject(0).has("error")) {
+                    String error = r.getJSONObject(0).getString("error");
+                    log.error(error);
+                    throw new IntegrationException("Analysis query returned an error: " + error);
+                }
+
+                return JSONArray.fromObject(response);
+            }
+        }
+        return JSONArray.fromObject("[]");
+    }
+
+    public JSONObject getPipeline(String pipelineName) throws IntegrationException {
+        JSONObject q1 = new JSONObject();
+        q1.put("query", "getPipeline");
+        JSONObject params = new JSONObject();
+        params.put("name", pipelineName);
+        q1.put("params", params);
+        String query = q1.toString();
+
+        String response = IntegrationUtils.sendMessage(IntegrationUtils.prepareSocket(analysisServerHost, analysisServerPort), query);
+        if (!"".equals(response)) {
+            JSONObject r = JSONObject.fromObject(response);
+            if (!r.isEmpty()) {
+                if (r.has("error")) {
+                    String error = r.getString("error");
+                    log.error(error);
+                    throw new IntegrationException("Analysis query returned an error: " + error);
+                }
+
+                return r;
+            }
+        }
+        throw new IntegrationException("No such pipeline.");
+    }
+
+    public JSONArray getPipelines() throws IntegrationException {
+        JSONObject q1 = new JSONObject();
+        q1.put("query", "getPipelines");
+        String query = q1.toString();
+
+        String response = IntegrationUtils.sendMessage(IntegrationUtils.prepareSocket(analysisServerHost, analysisServerPort), query);
+        if (!"".equals(response)) {
+            JSONArray r = JSONArray.fromObject(response);
+            if (!r.isEmpty()) {
+                if (r.size() == 1 && r.getJSONObject(0).has("error")) {
+                    String error = r.getJSONObject(0).getString("error");
+                    log.error(error);
+                    throw new IntegrationException("Analysis query returned an error: " + error);
+                }
+
+                return JSONArray.fromObject(response);
+            }
+        }
+        return JSONArray.fromObject("[]");
+    }
+
+    public JSONObject submitTask(JSONObject json) throws IntegrationException {
+        JSONObject task = new JSONObject();
+
+        JSONObject j = new JSONObject();
+
+        if (json.has("priority")) {
+            j.put("priority", json.get("priority"));
+        } else {
+            j.put("priority", "MEDIUM");
         }
 
-        return JSONArray.fromObject(response);
-      }
-    }
-    return JSONArray.fromObject("[]");
-  }
+        j.put("pipeline", json.get("pipeline"));
+        j.put("params", json);
 
-  public JSONArray getCompletedTasks() throws IntegrationException {
-    JSONObject q1 = new JSONObject();
-    q1.put("query", "getCompletedTasks");
-    String query = q1.toString();
+        task.put("submit", j);
 
-    String response = IntegrationUtils.sendMessage(IntegrationUtils.prepareSocket(analysisServerHost, analysisServerPort), query);
-    if (!"".equals(response)) {
-      JSONArray r = JSONArray.fromObject(response);
-      if (!r.isEmpty()) {
-        if (r.size() == 1 && r.getJSONObject(0).has("error")) {
-          String error = r.getJSONObject(0).getString("error");
-          log.error(error);
-          throw new IntegrationException("Analysis query returned an error: " + error);
+        String response = IntegrationUtils
+            .sendMessage(IntegrationUtils.prepareSocket(analysisServerHost, analysisServerPort), task.toString());
+        if (!"".equals(response)) {
+            JSONObject r = JSONObject.fromObject(response);
+            if (r.has("error")) {
+                String error = r.getString("error");
+                log.error(error);
+                throw new IntegrationException("Analysis query returned an error: " + error);
+            }
+            return r;
         }
-
-        return JSONArray.fromObject(response);
-      }
+        throw new IntegrationException("Cannot submit task.");
     }
-    return JSONArray.fromObject("[]");
-  }
-
-  public JSONObject getPipeline(String pipelineName) throws IntegrationException {
-    JSONObject q1 = new JSONObject();
-    q1.put("query", "getPipeline");
-    JSONObject params = new JSONObject();
-    params.put("name", pipelineName);
-    q1.put("params", params);
-    String query = q1.toString();
-
-    String response = IntegrationUtils.sendMessage(IntegrationUtils.prepareSocket(analysisServerHost, analysisServerPort), query);
-    if (!"".equals(response)) {
-      JSONObject r = JSONObject.fromObject(response);
-      if (!r.isEmpty()) {
-        if (r.has("error")) {
-          String error = r.getString("error");
-          log.error(error);
-          throw new IntegrationException("Analysis query returned an error: " + error);
-        }
-
-        return r;
-      }
-    }
-    throw new IntegrationException("No such pipeline.");
-  }
-
-  public JSONArray getPipelines() throws IntegrationException {
-    JSONObject q1 = new JSONObject();
-    q1.put("query", "getPipelines");
-    String query = q1.toString();
-
-    String response = IntegrationUtils.sendMessage(IntegrationUtils.prepareSocket(analysisServerHost, analysisServerPort), query);
-    if (!"".equals(response)) {
-      JSONArray r = JSONArray.fromObject(response);
-      if (!r.isEmpty()) {
-        if (r.size() == 1 && r.getJSONObject(0).has("error")) {
-          String error = r.getJSONObject(0).getString("error");
-          log.error(error);
-          throw new IntegrationException("Analysis query returned an error: " + error);
-        }
-
-        return JSONArray.fromObject(response);
-      }
-    }
-    return JSONArray.fromObject("[]");
-  }
-
-  public JSONObject submitTask(JSONObject json) throws IntegrationException {
-    JSONObject task = new JSONObject();
-
-    JSONObject j = new JSONObject();
-
-    if (json.has("priority")) {
-      j.put("priority", json.get("priority"));
-    }
-    else {
-      j.put("priority", "MEDIUM");
-    }
-
-    j.put("pipeline", json.get("pipeline"));
-    j.put("params", json);
-
-    task.put("submit", j);
-
-    String response = IntegrationUtils.sendMessage(IntegrationUtils.prepareSocket(analysisServerHost, analysisServerPort), task.toString());
-    if (!"".equals(response)) {
-      JSONObject r = JSONObject.fromObject(response);
-      if (r.has("error")) {
-        String error = r.getString("error");
-        log.error(error);
-        throw new IntegrationException("Analysis query returned an error: " + error);
-      }
-      return r;
-    }
-    throw new IntegrationException("Cannot submit task.");
-  }
 }

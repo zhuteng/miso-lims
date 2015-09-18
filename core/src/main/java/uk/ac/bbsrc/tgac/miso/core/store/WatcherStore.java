@@ -39,50 +39,50 @@ import java.util.Collection;
  * @since 0.1.3
  */
 public interface WatcherStore {
-  /**
-   * Get the list of Users that are watching an entity given an entity name (defined by that entity's {@link Watchable}
-   * getWatchableIdentifier method)
-   *
-   * @param entityName of type String
-   * @return Collection<User>
-   * @throws IOException
-   */
-  Collection<User> getWatchersByEntityName(String entityName) throws IOException;
+    /**
+     * Get the list of Users that are watching an entity given an entity name (defined by that entity's {@link Watchable}
+     * getWatchableIdentifier method)
+     *
+     * @param entityName of type String
+     * @return Collection<User>
+     * @throws IOException
+     */
+    Collection<User> getWatchersByEntityName(String entityName) throws IOException;
 
-  /**
-   * Get the list of Users that are in a given watcher group
-   *
-   * @param groupName of type String
-   * @return Collection<User>
-   * @throws IOException
-   */
-  Collection<User> getWatchersByWatcherGroup(String groupName) throws IOException;
+    /**
+     * Get the list of Users that are in a given watcher group
+     *
+     * @param groupName of type String
+     * @return Collection<User>
+     * @throws IOException
+     */
+    Collection<User> getWatchersByWatcherGroup(String groupName) throws IOException;
 
-  /**
-   * Unregister a watched entity / user coupling
-   *
-   * @param watchable of type Watchable
-   * @param user of type User
-   * @throws IOException
-   * @return true if removal was successful
-   */
-  boolean removeWatchedEntityByUser(Watchable watchable, User user) throws IOException;
+    /**
+     * Unregister a watched entity / user coupling
+     *
+     * @param watchable of type Watchable
+     * @param user      of type User
+     * @return true if removal was successful
+     * @throws IOException
+     */
+    boolean removeWatchedEntityByUser(Watchable watchable, User user) throws IOException;
 
-  /**
-   * Unregister this watched entity
-   *
-   * @param watchable of type Watchable
-   * @return true if removal was successful
-   * @throws IOException
-   */
-  boolean removeWatchedEntity(Watchable watchable) throws IOException;
+    /**
+     * Unregister this watched entity
+     *
+     * @param watchable of type Watchable
+     * @return true if removal was successful
+     * @throws IOException
+     */
+    boolean removeWatchedEntity(Watchable watchable) throws IOException;
 
-  /**
-   * Register a watched entity / user coupling
-   *
-   * @param watchable of type Watchable
-   * @param user of type User
-   * @throws IOException
-   */
-  void saveWatchedEntityUser(Watchable watchable, User user) throws IOException;
+    /**
+     * Register a watched entity / user coupling
+     *
+     * @param watchable of type Watchable
+     * @param user      of type User
+     * @throws IOException
+     */
+    void saveWatchedEntityUser(Watchable watchable, User user) throws IOException;
 }

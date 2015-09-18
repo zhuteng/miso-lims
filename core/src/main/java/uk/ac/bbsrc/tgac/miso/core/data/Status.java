@@ -25,6 +25,7 @@ package uk.ac.bbsrc.tgac.miso.core.data;
 
 //import com.fasterxml.jackson.annotation.*;
 //import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 import org.codehaus.jackson.annotate.JsonTypeInfo;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
@@ -42,88 +43,88 @@ import java.util.Date;
  */
 @JsonSerialize(typing = JsonSerialize.Typing.STATIC, include = JsonSerialize.Inclusion.NON_NULL)
 //@JsonIdentityInfo(generator = ObjectIdGenerators.IntSequenceGenerator.class, property = "@id")
-@JsonTypeInfo(use=JsonTypeInfo.Id.CLASS, include= JsonTypeInfo.As.PROPERTY, property="@class")
+@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
 public interface Status extends Securable {
-  /**
-   * Returns the statusId of this Status object.
-   *
-   * @return Long statusId.
-   */
-  public Long getStatusId();
+    /**
+     * Returns the statusId of this Status object.
+     *
+     * @return Long statusId.
+     */
+    public Long getStatusId();
 
-  /**
-   * Sets the statusId of this Status object.
-   *
-   * @param statusId statusId.
-   */
-  public void setStatusId(Long statusId);
+    /**
+     * Sets the statusId of this Status object.
+     *
+     * @param statusId statusId.
+     */
+    public void setStatusId(Long statusId);
 
-  /**
-   * Returns the XML status string of this Status object.  Illumina for example produces Status.xml files.
-   * If the platform doesn't supply xml files, this field is null.
-   *
-   * @return String xml.
-   */
-  public String getXml();
+    /**
+     * Returns the XML status string of this Status object.  Illumina for example produces Status.xml files.
+     * If the platform doesn't supply xml files, this field is null.
+     *
+     * @return String xml.
+     */
+    public String getXml();
 
-  /**
-   * Sets the underlying XML status string of this Status object. Illumina for example produces Status.xml files.
-   *
-   * @param xml String.
-   */
-  public void setXml(String xml);
+    /**
+     * Sets the underlying XML status string of this Status object. Illumina for example produces Status.xml files.
+     *
+     * @param xml String.
+     */
+    public void setXml(String xml);
 
-  /**
-   * Returns the health of this Status object.
-   *
-   * @return HealthType health.
-   */
-  public HealthType getHealth();
+    /**
+     * Returns the health of this Status object.
+     *
+     * @return HealthType health.
+     */
+    public HealthType getHealth();
 
-  /**
-   * Sets the health of this Status object.
-   *
-   * @param health health.
-   */
-  public void setHealth(HealthType health);
+    /**
+     * Sets the health of this Status object.
+     *
+     * @param health health.
+     */
+    public void setHealth(HealthType health);
 
-  /**
-   * Returns the startDate of this Status object.
-   *
-   * @return Date startDate.
-   */
-  public Date getStartDate();
+    /**
+     * Returns the startDate of this Status object.
+     *
+     * @return Date startDate.
+     */
+    public Date getStartDate();
 
-  /**
-   * Sets the startDate of this Status object.
-   *
-   * @param startDate startDate.
-   */
-  public void setStartDate(Date startDate);
+    /**
+     * Sets the startDate of this Status object.
+     *
+     * @param startDate startDate.
+     */
+    public void setStartDate(Date startDate);
 
-  /**
-   * Returns the completionDate of this Status object.
-   *
-   * @return Date completionDate.
-   */
-  public Date getCompletionDate();
+    /**
+     * Returns the completionDate of this Status object.
+     *
+     * @return Date completionDate.
+     */
+    public Date getCompletionDate();
 
-  /**
-   * Sets the completionDate of this Status object.
-   *
-   * @param completionDate completionDate.
-   */
-  public void setCompletionDate(Date completionDate);
+    /**
+     * Sets the completionDate of this Status object.
+     *
+     * @param completionDate completionDate.
+     */
+    public void setCompletionDate(Date completionDate);
 
-  public String getInstrumentName();
+    public String getInstrumentName();
 
-  public void setInstrumentName(String instrumentName);
+    public void setInstrumentName(String instrumentName);
 
-  public String getRunName();
+    public String getRunName();
 
-  public void setRunName(String runName);
+    public void setRunName(String runName);
 
-  public Date getLastUpdated();
+    public Date getLastUpdated();
 
-  public void setLastUpdated(Date lastUpdated);
+    public void setLastUpdated(Date lastUpdated);
 }

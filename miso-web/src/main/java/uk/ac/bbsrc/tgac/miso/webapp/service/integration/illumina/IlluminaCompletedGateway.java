@@ -39,5 +39,5 @@ import java.util.Set;
  */
 public interface IlluminaCompletedGateway {
     @Gateway(requestChannel = "illuminaCompletedChannel")
-    void consume(Message<Set<String>> message);  
+    void consume(Message<Set<String>> message);
 }

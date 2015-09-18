@@ -67,242 +67,219 @@ import java.util.*;
 @RequestMapping("/reports")
 @Controller
 public class ReportsController {
-  protected static final Logger log = LoggerFactory.getLogger(ReportsController.class);
+    protected static final Logger log = LoggerFactory.getLogger(ReportsController.class);
 
-  private static final String HTML = "html";
-  private static final String PDF = "pdf";
-  private static final String XLS = "xls";
+    private static final String HTML = "html";
+    private static final String PDF = "pdf";
+    private static final String XLS = "xls";
 
-  @Autowired
-  private RequestManager requestManager;
+    @Autowired
+    private RequestManager requestManager;
 
-  public void setRequestManager(RequestManager requestManager) {
-    this.requestManager = requestManager;
-  }
+    public void setRequestManager(RequestManager requestManager) {
+        this.requestManager = requestManager;
+    }
 
-  @Autowired
-  private SecurityManager securityManager;
+    @Autowired
+    private SecurityManager securityManager;
 
-  public void setSecurityManager(SecurityManager securityManager) {
-    this.securityManager = securityManager;
-  }
+    public void setSecurityManager(SecurityManager securityManager) {
+        this.securityManager = securityManager;
+    }
 
-  @Autowired
-  private JdbcTemplate interfaceTemplate;
+    @Autowired
+    private JdbcTemplate interfaceTemplate;
 
-  public void setInterfaceTemplate(JdbcTemplate interfaceTemplate) {
-    this.interfaceTemplate = interfaceTemplate;
-  }
+    public void setInterfaceTemplate(JdbcTemplate interfaceTemplate) {
+        this.interfaceTemplate = interfaceTemplate;
+    }
 
-  @RequestMapping(value = "/project/{projectId}")
-  public void fireGetProjectReport(@PathVariable("projectId") Long projectId, ModelMap modelMap, HttpServletResponse response) {
+    @RequestMapping(value = "/project/{projectId}")
+    public void fireGetProjectReport(@PathVariable("projectId") Long projectId, ModelMap modelMap, HttpServletResponse response) {
 
-    User user = null;
-    String format = PDF;
-    try {
-      user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-      Project project = projectId == AbstractProject.UNSAVED_ID ? null : requestManager.getProjectById(projectId);
-      if (project != null) {
-        if (!project.userCanRead(user)) {
-          throw new SecurityException("Permission denied.");
-        }
-
+        User user = null;
+        String format = PDF;
         try {
-          if (format.equals(PDF)) {
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            List<Project> projects = new ArrayList<Project>(Arrays.asList(project));
-            new ITextProjectDecorator(projects, new Document(), baos).buildReport();
+            user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
+            Project project = projectId == AbstractProject.UNSAVED_ID ? null : requestManager.getProjectById(projectId);
+            if (project != null) {
+                if (!project.userCanRead(user)) {
+                    throw new SecurityException("Permission denied.");
+                }
 
-            response.setHeader("Expires", "0");
-            response.setHeader("Cache-Control",
-                               "must-revalidate, post-check=0, pre-check=0");
-            response.setHeader("Pragma", "public");
-            response.setContentType("application/pdf");
-            response.setContentLength(baos.size());
-            OutputStream os = response.getOutputStream();
-            baos.writeTo(os);
-            os.flush();
-            os.close();
-          }
-          else {
-            throw new ReportingException("Unsupported report format");
-          }
+                try {
+                    if (format.equals(PDF)) {
+                        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                        List<Project> projects = new ArrayList<Project>(Arrays.asList(project));
+                        new ITextProjectDecorator(projects, new Document(), baos).buildReport();
+
+                        response.setHeader("Expires", "0");
+                        response.setHeader("Cache-Control", "must-revalidate, post-check=0, pre-check=0");
+                        response.setHeader("Pragma", "public");
+                        response.setContentType("application/pdf");
+                        response.setContentLength(baos.size());
+                        OutputStream os = response.getOutputStream();
+                        baos.writeTo(os);
+                        os.flush();
+                        os.close();
+                    } else {
+                        throw new ReportingException("Unsupported report format");
+                    }
+                } catch (ReportingException e) {
+                    e.printStackTrace();
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-        catch (ReportingException e) {
-          e.printStackTrace();
-        }
-      }
     }
-    catch (IOException e) {
-      e.printStackTrace();
-    }
-  }
 
-  @RequestMapping(value = "/projects", method = RequestMethod.GET)
-  public void fireGetProjectsReport(ModelMap modelMap, HttpServletResponse response) {
-    //User user = null;
-    String format = PDF;
-    try {
-      //user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-      try {
-        if (format.equals(PDF)) {
-          ByteArrayOutputStream baos = new ByteArrayOutputStream();
-          List<Project> projects = new ArrayList<Project>(requestManager.listAllProjects());
-          Document document = new Document();
-//          for (Project project : projects) {
-//            new ITextProjectDecorator(project, document, baos).buildReport();
-//          }
-          new ITextProjectDecorator(projects, document, baos).buildReport();
-          response.setHeader("Expires", "0");
-          response.setHeader("Cache-Control",
-                             "must-revalidate, post-check=0, pre-check=0");
-          response.setHeader("Pragma", "public");
-          response.setContentType("application/pdf");
-          response.setContentLength(baos.size());
-          OutputStream os = response.getOutputStream();
-          baos.writeTo(os);
-          os.flush();
-          os.close();
-        }
-        else {
-          throw new ReportingException("Unsupported report format");
-        }
-      }
-      catch (ReportingException e) {
-        e.printStackTrace();
-      }
-    }
-    catch (IOException e) {
-      e.printStackTrace();
-    }
-  }
-
-
-  @RequestMapping(value = "/sample/{sampleId}")
-  public void fireGetSampleReport(@PathVariable("sampleId") Long sampleId, ModelMap modelMap, HttpServletResponse response) {
-
-    User user = null;
-    String format = PDF;
-    try {
-      user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-      Sample sample = sampleId == AbstractSample.UNSAVED_ID ? null : requestManager.getSampleById(sampleId);
-      if (sample != null) {
-        if (!sample.userCanRead(user)) {
-          throw new SecurityException("Permission denied.");
-        }
-
+    @RequestMapping(value = "/projects", method = RequestMethod.GET)
+    public void fireGetProjectsReport(ModelMap modelMap, HttpServletResponse response) {
+        //User user = null;
+        String format = PDF;
         try {
-          if (format.equals(PDF)) {
-            System.out.println("not implemented");
-          }
-          else {
-            throw new ReportingException("Unsupported report format");
-          }
+            //user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
+            try {
+                if (format.equals(PDF)) {
+                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                    List<Project> projects = new ArrayList<Project>(requestManager.listAllProjects());
+                    Document document = new Document();
+                    //          for (Project project : projects) {
+                    //            new ITextProjectDecorator(project, document, baos).buildReport();
+                    //          }
+                    new ITextProjectDecorator(projects, document, baos).buildReport();
+                    response.setHeader("Expires", "0");
+                    response.setHeader("Cache-Control", "must-revalidate, post-check=0, pre-check=0");
+                    response.setHeader("Pragma", "public");
+                    response.setContentType("application/pdf");
+                    response.setContentLength(baos.size());
+                    OutputStream os = response.getOutputStream();
+                    baos.writeTo(os);
+                    os.flush();
+                    os.close();
+                } else {
+                    throw new ReportingException("Unsupported report format");
+                }
+            } catch (ReportingException e) {
+                e.printStackTrace();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-        catch (ReportingException e) {
-          e.printStackTrace();
-        }
-      }
     }
-    catch (IOException e) {
-      e.printStackTrace();
-    }
-  }
 
-  @RequestMapping(value = "/samples", method = RequestMethod.GET)
-  public void fireGetSamplesReport(ModelMap modelMap, HttpServletResponse response) {
-    User user = null;
-    String format = PDF;
-    try {
-      user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-      try {
-        if (format.equals(PDF)) {
-          System.out.println("not implemented");
-        }
-        else {
-          throw new ReportingException("Unsupported report format");
-        }
-      }
-      catch (ReportingException e) {
-        e.printStackTrace();
-      }
-    }
-    catch (IOException e) {
-      e.printStackTrace();
-    }
-  }
+    @RequestMapping(value = "/sample/{sampleId}")
+    public void fireGetSampleReport(@PathVariable("sampleId") Long sampleId, ModelMap modelMap, HttpServletResponse response) {
 
-  @RequestMapping(value = "/run/{runId}")
-  public void fireGetRunReport(@PathVariable("runId") Long runId, ModelMap modelMap, HttpServletResponse response) {
-
-    User user = null;
-    String format = PDF;
-    try {
-      user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-      Run run = runId == AbstractRun.UNSAVED_ID ? null : requestManager.getRunById(runId);
-      if (run != null) {
-        if (!run.userCanRead(user)) {
-          throw new SecurityException("Permission denied.");
-        }
-
+        User user = null;
+        String format = PDF;
         try {
-          if (format.equals(PDF)) {
-            System.out.println("not implemented");
-          }
-          else {
-            throw new ReportingException("Unsupported report format");
-          }
+            user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
+            Sample sample = sampleId == AbstractSample.UNSAVED_ID ? null : requestManager.getSampleById(sampleId);
+            if (sample != null) {
+                if (!sample.userCanRead(user)) {
+                    throw new SecurityException("Permission denied.");
+                }
+
+                try {
+                    if (format.equals(PDF)) {
+                        System.out.println("not implemented");
+                    } else {
+                        throw new ReportingException("Unsupported report format");
+                    }
+                } catch (ReportingException e) {
+                    e.printStackTrace();
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-        catch (ReportingException e) {
-          e.printStackTrace();
+    }
+
+    @RequestMapping(value = "/samples", method = RequestMethod.GET)
+    public void fireGetSamplesReport(ModelMap modelMap, HttpServletResponse response) {
+        User user = null;
+        String format = PDF;
+        try {
+            user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
+            try {
+                if (format.equals(PDF)) {
+                    System.out.println("not implemented");
+                } else {
+                    throw new ReportingException("Unsupported report format");
+                }
+            } catch (ReportingException e) {
+                e.printStackTrace();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-      }
     }
-    catch (IOException e) {
-      e.printStackTrace();
-    }
-  }
 
-  @RequestMapping(value = "/runs", method = RequestMethod.GET)
-  public void fireGetRunsReport(ModelMap modelMap, HttpServletResponse response) {
-    String format = PDF;
-    try {
-      if (format.equals(PDF)) {
-        System.out.println("not implemented");
-      }
-      else {
-        throw new ReportingException("Unsupported report format");
-      }
-    }
-    catch (ReportingException e) {
-      e.printStackTrace();
-    }
-  }
+    @RequestMapping(value = "/run/{runId}")
+    public void fireGetRunReport(@PathVariable("runId") Long runId, ModelMap modelMap, HttpServletResponse response) {
 
-  @RequestMapping(method = RequestMethod.GET)
-  public ModelAndView setupForm(ModelMap modelMap) {
-    try {
-      modelMap.put("tables", DbUtils.getTables(interfaceTemplate));
-    }
-    catch (MetaDataAccessException e) {
-      e.printStackTrace();
-    }
-    catch (SQLException e) {
-      e.printStackTrace();
-    }
-    return new ModelAndView("/pages/reporting.jsp", modelMap);
-  }
+        User user = null;
+        String format = PDF;
+        try {
+            user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
+            Run run = runId == AbstractRun.UNSAVED_ID ? null : requestManager.getRunById(runId);
+            if (run != null) {
+                if (!run.userCanRead(user)) {
+                    throw new SecurityException("Permission denied.");
+                }
 
-  @RequestMapping(method = RequestMethod.POST)
-  public void postReport(ModelMap modelMap, HttpServletRequest request, HttpServletResponse response) {
-    String format = "html";
-    try {
-      String j = ServletRequestUtils.getRequiredStringParameter(request, "json");
-      JSONObject json = JSONObject.fromObject(j);
-      log.info(json.toString());
+                try {
+                    if (format.equals(PDF)) {
+                        System.out.println("not implemented");
+                    } else {
+                        throw new ReportingException("Unsupported report format");
+                    }
+                } catch (ReportingException e) {
+                    e.printStackTrace();
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
-    catch (ServletRequestBindingException e) {
-      e.printStackTrace();
+
+    @RequestMapping(value = "/runs", method = RequestMethod.GET)
+    public void fireGetRunsReport(ModelMap modelMap, HttpServletResponse response) {
+        String format = PDF;
+        try {
+            if (format.equals(PDF)) {
+                System.out.println("not implemented");
+            } else {
+                throw new ReportingException("Unsupported report format");
+            }
+        } catch (ReportingException e) {
+            e.printStackTrace();
+        }
     }
-  }
+
+    @RequestMapping(method = RequestMethod.GET)
+    public ModelAndView setupForm(ModelMap modelMap) {
+        try {
+            modelMap.put("tables", DbUtils.getTables(interfaceTemplate));
+        } catch (MetaDataAccessException e) {
+            e.printStackTrace();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return new ModelAndView("/pages/reporting.jsp", modelMap);
+    }
+
+    @RequestMapping(method = RequestMethod.POST)
+    public void postReport(ModelMap modelMap, HttpServletRequest request, HttpServletResponse response) {
+        String format = "html";
+        try {
+            String j = ServletRequestUtils.getRequiredStringParameter(request, "json");
+            JSONObject json = JSONObject.fromObject(j);
+            log.info(json.toString());
+        } catch (ServletRequestBindingException e) {
+            e.printStackTrace();
+        }
+    }
 }

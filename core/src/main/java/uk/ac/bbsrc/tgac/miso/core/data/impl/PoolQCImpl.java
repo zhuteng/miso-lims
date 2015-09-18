@@ -37,38 +37,36 @@ import java.io.Serializable;
  * @since 0.1.9
  */
 public class PoolQCImpl extends AbstractPoolQC implements Serializable {
-  /**
-   * Construct a new PoolQC
-   */
-  public PoolQCImpl() {
-  }
-
-  /**
-   * Construct a new PoolQC from a parent Pool, checking that the given User can read that Pool
-   *
-   * @param pool of type Pool
-   * @param user of type User
-   */
-  public PoolQCImpl(Pool pool, User user) {
-    if (pool.userCanRead(user)) {
-      try {
-        setPool(pool);
-      }
-      catch (MalformedPoolException e) {
-        e.printStackTrace();
-      }
-      //setSecurityProfile(experiment.getSecurityProfile());
+    /**
+     * Construct a new PoolQC
+     */
+    public PoolQCImpl() {
     }
-    else {
-      //setSecurityProfile(new SecurityProfile(user));
+
+    /**
+     * Construct a new PoolQC from a parent Pool, checking that the given User can read that Pool
+     *
+     * @param pool of type Pool
+     * @param user of type User
+     */
+    public PoolQCImpl(Pool pool, User user) {
+        if (pool.userCanRead(user)) {
+            try {
+                setPool(pool);
+            } catch (MalformedPoolException e) {
+                e.printStackTrace();
+            }
+            //setSecurityProfile(experiment.getSecurityProfile());
+        } else {
+            //setSecurityProfile(new SecurityProfile(user));
+        }
     }
-  }
 
-  public boolean userCanRead(User user) {
-    return true;
-  }
+    public boolean userCanRead(User user) {
+        return true;
+    }
 
-  public boolean userCanWrite(User user) {
-    return true;
-  }
+    public boolean userCanWrite(User user) {
+        return true;
+    }
 }

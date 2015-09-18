@@ -43,166 +43,161 @@ import java.util.Properties;
  */
 public class EraExperimentDecorator extends AbstractSubmittableDecorator<Document> {
 
-  public EraExperimentDecorator(Submittable submittable, Properties submissionProperties, Document submission) {
-    super(submittable, submissionProperties);
-    this.submission = submission;
-  }
+    public EraExperimentDecorator(Submittable submittable, Properties submissionProperties, Document submission) {
+        super(submittable, submissionProperties);
+        this.submission = submission;
+    }
 
-  public void buildSubmission() {
-    //submittable.buildSubmission();
-    Experiment e = (Experiment)submittable;
-    
-    if (submission != null) {
-      Element experiment = submission.createElementNS(null, "EXPERIMENT");
-      experiment.setAttribute("alias", e.getAlias());
-      //experiment.setAttribute("accession", e.getAccession());
-      experiment.setAttribute("center_name", submissionProperties.getProperty("submission.centreName"));
-      //submission.appendChild(experiment);
+    public void buildSubmission() {
+        //submittable.buildSubmission();
+        Experiment e = (Experiment) submittable;
 
-      Element experimentTitle = submission.createElementNS(null, "TITLE");
-      experimentTitle.setTextContent(e.getTitle());
-      experiment.appendChild(experimentTitle);
+        if (submission != null) {
+            Element experiment = submission.createElementNS(null, "EXPERIMENT");
+            experiment.setAttribute("alias", e.getAlias());
+            //experiment.setAttribute("accession", e.getAccession());
+            experiment.setAttribute("center_name", submissionProperties.getProperty("submission.centreName"));
+            //submission.appendChild(experiment);
 
-      Element studyRef = submission.createElementNS(null, "STUDY_REF");
-      studyRef.setAttribute("refname", e.getStudy().getAlias());
-      studyRef.setAttribute("refcenter", submissionProperties.getProperty("submission.centreName"));
-      if (e.getStudy().getAccession() != null && !"".equals(e.getStudy().getAccession())) {
-        studyRef.setAttribute("accession", e.getStudy().getAccession());
-      }
-      experiment.appendChild(studyRef);
+            Element experimentTitle = submission.createElementNS(null, "TITLE");
+            experimentTitle.setTextContent(e.getTitle());
+            experiment.appendChild(experimentTitle);
 
-      Element design = submission.createElementNS(null, "DESIGN");
-      experiment.appendChild(design);
-
-      Element designDescription = submission.createElementNS(null, "DESIGN_DESCRIPTION");
-      designDescription.setTextContent(e.getDescription());
-      design.appendChild(designDescription);
-
-      Element sampleDescriptor = submission.createElementNS(null, "SAMPLE_DESCRIPTOR");
-      sampleDescriptor.setAttribute("refcenter", submissionProperties.getProperty("submission.centreName"));
-
-      Library relevantLibrary = null;
-
-      if (e.getPool() != null) {
-        if (e.getPool().getDilutions().size() > 1) {
-          //multiplexed pool
-          Element pool = submission.createElementNS(null, "POOL");
-          sampleDescriptor.appendChild(pool);
-
-          for (Dilution dil : e.getPool().getDilutions()) {
-            relevantLibrary = dil.getLibrary();
-            Element member = submission.createElementNS(null, "MEMBER");
-            member.setAttribute("member_name", dil.getName());
-            member.setAttribute("refcenter", submissionProperties.getProperty("submission.centreName"));
-            member.setAttribute("refname", relevantLibrary.getSample().getAlias());
-            if (relevantLibrary.getSample().getAccession() != null && !"".equals(relevantLibrary.getSample().getAccession())) {
-              sampleDescriptor.setAttribute("accession", relevantLibrary.getSample().getAccession());
+            Element studyRef = submission.createElementNS(null, "STUDY_REF");
+            studyRef.setAttribute("refname", e.getStudy().getAlias());
+            studyRef.setAttribute("refcenter", submissionProperties.getProperty("submission.centreName"));
+            if (e.getStudy().getAccession() != null && !"".equals(e.getStudy().getAccession())) {
+                studyRef.setAttribute("accession", e.getStudy().getAccession());
             }
-            pool.appendChild(member);
+            experiment.appendChild(studyRef);
 
-            Element readLabel = submission.createElementNS(null, "READ_LABEL");
-            if (!relevantLibrary.getTagBarcodes().isEmpty()) {
-              StringBuilder tsb = new StringBuilder();
-              StringBuilder vsb = new StringBuilder();
-              for (TagBarcode tb : relevantLibrary.getTagBarcodes().values()) {
-                tsb.append(tb.getSequence());
-                vsb.append(tb.getName());
-              }
-              readLabel.setAttribute("read_group_tag", tsb.toString());
-              readLabel.setTextContent(vsb.toString());
-            }
-            member.appendChild(readLabel);
-          }
-        }
-        else {
-          for (Dilution dil : e.getPool().getDilutions()) {
-            relevantLibrary = dil.getLibrary();
-            sampleDescriptor.setAttribute("refname", relevantLibrary.getSample().getAlias());
+            Element design = submission.createElementNS(null, "DESIGN");
+            experiment.appendChild(design);
+
+            Element designDescription = submission.createElementNS(null, "DESIGN_DESCRIPTION");
+            designDescription.setTextContent(e.getDescription());
+            design.appendChild(designDescription);
+
+            Element sampleDescriptor = submission.createElementNS(null, "SAMPLE_DESCRIPTOR");
             sampleDescriptor.setAttribute("refcenter", submissionProperties.getProperty("submission.centreName"));
-            if (relevantLibrary.getSample().getAccession() != null && !"".equals(relevantLibrary.getSample().getAccession())) {
-              sampleDescriptor.setAttribute("accession", relevantLibrary.getSample().getAccession());
+
+            Library relevantLibrary = null;
+
+            if (e.getPool() != null) {
+                if (e.getPool().getDilutions().size() > 1) {
+                    //multiplexed pool
+                    Element pool = submission.createElementNS(null, "POOL");
+                    sampleDescriptor.appendChild(pool);
+
+                    for (Dilution dil : e.getPool().getDilutions()) {
+                        relevantLibrary = dil.getLibrary();
+                        Element member = submission.createElementNS(null, "MEMBER");
+                        member.setAttribute("member_name", dil.getName());
+                        member.setAttribute("refcenter", submissionProperties.getProperty("submission.centreName"));
+                        member.setAttribute("refname", relevantLibrary.getSample().getAlias());
+                        if (relevantLibrary.getSample().getAccession() != null && !"".equals(relevantLibrary.getSample().getAccession())) {
+                            sampleDescriptor.setAttribute("accession", relevantLibrary.getSample().getAccession());
+                        }
+                        pool.appendChild(member);
+
+                        Element readLabel = submission.createElementNS(null, "READ_LABEL");
+                        if (!relevantLibrary.getTagBarcodes().isEmpty()) {
+                            StringBuilder tsb = new StringBuilder();
+                            StringBuilder vsb = new StringBuilder();
+                            for (TagBarcode tb : relevantLibrary.getTagBarcodes().values()) {
+                                tsb.append(tb.getSequence());
+                                vsb.append(tb.getName());
+                            }
+                            readLabel.setAttribute("read_group_tag", tsb.toString());
+                            readLabel.setTextContent(vsb.toString());
+                        }
+                        member.appendChild(readLabel);
+                    }
+                } else {
+                    for (Dilution dil : e.getPool().getDilutions()) {
+                        relevantLibrary = dil.getLibrary();
+                        sampleDescriptor.setAttribute("refname", relevantLibrary.getSample().getAlias());
+                        sampleDescriptor.setAttribute("refcenter", submissionProperties.getProperty("submission.centreName"));
+                        if (relevantLibrary.getSample().getAccession() != null && !"".equals(relevantLibrary.getSample().getAccession())) {
+                            sampleDescriptor.setAttribute("accession", relevantLibrary.getSample().getAccession());
+                        }
+                    }
+                }
             }
-          }
-        }
-      }
 
-      design.appendChild(sampleDescriptor);
+            design.appendChild(sampleDescriptor);
 
-      Element libraryDescriptor = submission.createElementNS(null, "LIBRARY_DESCRIPTOR");
-      Element libraryName = submission.createElementNS(null, "LIBRARY_NAME");
-      if (relevantLibrary != null) {
-        if (e.getPool().getAlias() != null && !"".equals(e.getPool().getAlias())) {
-          libraryName.setTextContent(e.getPool().getAlias());
-        }
-        else {
-          libraryName.setTextContent(e.getPool().getName());
-        }
-      }
-      libraryDescriptor.appendChild(libraryName);
-
-      Element libraryStrategy = submission.createElementNS(null, "LIBRARY_STRATEGY");
-      if (relevantLibrary != null) {
-        libraryStrategy.setTextContent(relevantLibrary.getLibraryStrategyType().getName());
-      }
-      libraryDescriptor.appendChild(libraryStrategy);
-
-      Element librarySource = submission.createElementNS(null, "LIBRARY_SOURCE");
-      if (relevantLibrary != null) {
-        librarySource.setTextContent(relevantLibrary.getSample().getSampleType());
-      }
-      libraryDescriptor.appendChild(librarySource);
-
-      Element librarySelection = submission.createElementNS(null, "LIBRARY_SELECTION");
-      if (relevantLibrary != null) {
-        librarySelection.setTextContent(relevantLibrary.getLibrarySelectionType().getName());
-      }
-      libraryDescriptor.appendChild(librarySelection);
-
-      Element libraryLayout = submission.createElementNS(null, "LIBRARY_LAYOUT");
-      Element layout;
-      if (relevantLibrary != null) {
-        if (relevantLibrary.getPaired()) {
-          layout = submission.createElementNS(null, "PAIRED");
-          if (!relevantLibrary.getLibraryQCs().isEmpty()) {
-            List<LibraryQC> qcs = new ArrayList<LibraryQC>(relevantLibrary.getLibraryQCs());
-            int insert = 0;
-            for (LibraryQC qc : qcs) {
-              insert += qc.getInsertSize();
+            Element libraryDescriptor = submission.createElementNS(null, "LIBRARY_DESCRIPTOR");
+            Element libraryName = submission.createElementNS(null, "LIBRARY_NAME");
+            if (relevantLibrary != null) {
+                if (e.getPool().getAlias() != null && !"".equals(e.getPool().getAlias())) {
+                    libraryName.setTextContent(e.getPool().getAlias());
+                } else {
+                    libraryName.setTextContent(e.getPool().getName());
+                }
             }
-            layout.setAttribute("NOMINAL_LENGTH", String.valueOf(insert/qcs.size()));
-          }
-          else {
-            layout.setAttribute("NOMINAL_LENGTH", "0");
-          }
-        }
-        else {
-          layout = submission.createElementNS(null, "SINGLE");
-        }
-        libraryLayout.appendChild(layout);
-      }
-      libraryDescriptor.appendChild(libraryLayout);
+            libraryDescriptor.appendChild(libraryName);
 
-      Element poolingStrategy = submission.createElementNS(null, "POOLING_STRATEGY");
-      if (e.getPool() != null) {
-        if (e.getPool().getDilutions().size() > 1) {
-          //if (e.getPool().getSpiked()) {
-          //  poolingStrategy.setTextContent("spiked library");
-          //}          
-          poolingStrategy.setTextContent("multiplexed libraries");
-        }
-        else {
-          //if (e.getPool().getSpiked()) {
-          //  poolingStrategy.setTextContent("spiked library");
-          //}
-          poolingStrategy.setTextContent("none");
-        }
-      }
-      libraryDescriptor.appendChild(poolingStrategy);
+            Element libraryStrategy = submission.createElementNS(null, "LIBRARY_STRATEGY");
+            if (relevantLibrary != null) {
+                libraryStrategy.setTextContent(relevantLibrary.getLibraryStrategyType().getName());
+            }
+            libraryDescriptor.appendChild(libraryStrategy);
 
-      design.appendChild(libraryDescriptor);
+            Element librarySource = submission.createElementNS(null, "LIBRARY_SOURCE");
+            if (relevantLibrary != null) {
+                librarySource.setTextContent(relevantLibrary.getSample().getSampleType());
+            }
+            libraryDescriptor.appendChild(librarySource);
 
-       // commenting out spot_descriptor to see what happens...
-      // SPOT DESCRIPTOR WAS MADE OPTIONAL IN 1.3
+            Element librarySelection = submission.createElementNS(null, "LIBRARY_SELECTION");
+            if (relevantLibrary != null) {
+                librarySelection.setTextContent(relevantLibrary.getLibrarySelectionType().getName());
+            }
+            libraryDescriptor.appendChild(librarySelection);
+
+            Element libraryLayout = submission.createElementNS(null, "LIBRARY_LAYOUT");
+            Element layout;
+            if (relevantLibrary != null) {
+                if (relevantLibrary.getPaired()) {
+                    layout = submission.createElementNS(null, "PAIRED");
+                    if (!relevantLibrary.getLibraryQCs().isEmpty()) {
+                        List<LibraryQC> qcs = new ArrayList<LibraryQC>(relevantLibrary.getLibraryQCs());
+                        int insert = 0;
+                        for (LibraryQC qc : qcs) {
+                            insert += qc.getInsertSize();
+                        }
+                        layout.setAttribute("NOMINAL_LENGTH", String.valueOf(insert / qcs.size()));
+                    } else {
+                        layout.setAttribute("NOMINAL_LENGTH", "0");
+                    }
+                } else {
+                    layout = submission.createElementNS(null, "SINGLE");
+                }
+                libraryLayout.appendChild(layout);
+            }
+            libraryDescriptor.appendChild(libraryLayout);
+
+            Element poolingStrategy = submission.createElementNS(null, "POOLING_STRATEGY");
+            if (e.getPool() != null) {
+                if (e.getPool().getDilutions().size() > 1) {
+                    //if (e.getPool().getSpiked()) {
+                    //  poolingStrategy.setTextContent("spiked library");
+                    //}
+                    poolingStrategy.setTextContent("multiplexed libraries");
+                } else {
+                    //if (e.getPool().getSpiked()) {
+                    //  poolingStrategy.setTextContent("spiked library");
+                    //}
+                    poolingStrategy.setTextContent("none");
+                }
+            }
+            libraryDescriptor.appendChild(poolingStrategy);
+
+            design.appendChild(libraryDescriptor);
+
+            // commenting out spot_descriptor to see what happens...
+            // SPOT DESCRIPTOR WAS MADE OPTIONAL IN 1.3
       /*
       Element spotDescriptor = submission.createElementNS(null, "SPOT_DESCRIPTOR");
       Element spotDecodeSpec = submission.createElementNS(null, "SPOT_DECODE_SPEC");
@@ -421,37 +416,36 @@ public class EraExperimentDecorator extends AbstractSubmittableDecorator<Documen
 
       design.appendChild(spotDescriptor);
       */
-      if (e.getPlatform() != null) {
-        Element platform = submission.createElementNS(null, "PLATFORM");
+            if (e.getPlatform() != null) {
+                Element platform = submission.createElementNS(null, "PLATFORM");
 
-        if (e.getPlatform().getPlatformType().equals(PlatformType.ILLUMINA)) {
-          Element type = submission.createElementNS(null, "ILLUMINA");
-          platform.appendChild(type);
+                if (e.getPlatform().getPlatformType().equals(PlatformType.ILLUMINA)) {
+                    Element type = submission.createElementNS(null, "ILLUMINA");
+                    platform.appendChild(type);
 
-          Element model = submission.createElementNS(null, "INSTRUMENT_MODEL");
-          model.setTextContent(e.getPlatform().getInstrumentModel());
-          type.appendChild(model);
+                    Element model = submission.createElementNS(null, "INSTRUMENT_MODEL");
+                    model.setTextContent(e.getPlatform().getInstrumentModel());
+                    type.appendChild(model);
 
-//DEPRECATED SRA 1.2          
-//          Element cycleCount = submission.createElementNS(null, "CYCLE_COUNT");
-//          //illumina 120bp (max 150/160?)
-//          cycleCount.setTextContent("120");
-//          type.appendChild(cycleCount);
+                    //DEPRECATED SRA 1.2
+                    //          Element cycleCount = submission.createElementNS(null, "CYCLE_COUNT");
+                    //          //illumina 120bp (max 150/160?)
+                    //          cycleCount.setTextContent("120");
+                    //          type.appendChild(cycleCount);
 
-//DEPRECATED SRA 1.5
-//          Element sequenceLength = submission.createElementNS(null, "SEQUENCE_LENGTH");
-//          sequenceLength.setTextContent("120");
-//          type.appendChild(sequenceLength);
-        }
-        else if (e.getPlatform().getPlatformType().equals(PlatformType.LS454)) {
-          Element type = submission.createElementNS(null, "LS454");
-          platform.appendChild(type);
+                    //DEPRECATED SRA 1.5
+                    //          Element sequenceLength = submission.createElementNS(null, "SEQUENCE_LENGTH");
+                    //          sequenceLength.setTextContent("120");
+                    //          type.appendChild(sequenceLength);
+                } else if (e.getPlatform().getPlatformType().equals(PlatformType.LS454)) {
+                    Element type = submission.createElementNS(null, "LS454");
+                    platform.appendChild(type);
 
-          Element model = submission.createElementNS(null, "INSTRUMENT_MODEL");
-          model.setTextContent(e.getPlatform().getInstrumentModel());
-          type.appendChild(model);
+                    Element model = submission.createElementNS(null, "INSTRUMENT_MODEL");
+                    model.setTextContent(e.getPlatform().getInstrumentModel());
+                    type.appendChild(model);
 
-//DEPRECATED SRA 1.5
+                    //DEPRECATED SRA 1.5
           /*
           Element keySequence = submission.createElementNS(null, "KEY_SEQUENCE");
           if (relevantLibrary != null &&
@@ -475,15 +469,14 @@ public class EraExperimentDecorator extends AbstractSubmittableDecorator<Documen
           flowCount.setTextContent("400");
           type.appendChild(flowCount);
           */
-        }
-        else if (e.getPlatform().getPlatformType().equals(PlatformType.SOLID)) {
-          Element type = submission.createElementNS(null, "ABI_SOLID");
-          platform.appendChild(type);
+                } else if (e.getPlatform().getPlatformType().equals(PlatformType.SOLID)) {
+                    Element type = submission.createElementNS(null, "ABI_SOLID");
+                    platform.appendChild(type);
 
-          Element model = submission.createElementNS(null, "INSTRUMENT_MODEL");
-          model.setTextContent(e.getPlatform().getInstrumentModel());
-          type.appendChild(model);
-//DEPRECATED SRA 1.5
+                    Element model = submission.createElementNS(null, "INSTRUMENT_MODEL");
+                    model.setTextContent(e.getPlatform().getInstrumentModel());
+                    type.appendChild(model);
+                    //DEPRECATED SRA 1.5
           /*
           Element colourMatrix = submission.createElementNS(null, "COLOR_MATRIX");
           Element colour = submission.createElementNS(null, "COLOR");
@@ -500,21 +493,20 @@ public class EraExperimentDecorator extends AbstractSubmittableDecorator<Documen
           type.appendChild(sequenceLength);
           */
 
-//DEPRECATED SRA 1.2
-//          Element cycleCount = submission.createElementNS(null, "CYCLE_COUNT");
-//          cycleCount.setTextContent("40");
-//          type.appendChild(cycleCount);
-        }
-        else {
+                    //DEPRECATED SRA 1.2
+                    //          Element cycleCount = submission.createElementNS(null, "CYCLE_COUNT");
+                    //          cycleCount.setTextContent("40");
+                    //          type.appendChild(cycleCount);
+                } else {
 
-        }
+                }
 
-        experiment.appendChild(platform);
-      }
-      
-      Element processing = submission.createElementNS(null, "PROCESSING");
-      
-      //DEPRECATED SRA 1.2
+                experiment.appendChild(platform);
+            }
+
+            Element processing = submission.createElementNS(null, "PROCESSING");
+
+            //DEPRECATED SRA 1.2
 /*
       Element baseCalls = submission.createElementNS(null, "BASE_CALLS");
       processing.appendChild(baseCalls);
@@ -537,8 +529,8 @@ public class EraExperimentDecorator extends AbstractSubmittableDecorator<Documen
       }
       baseCalls.appendChild(baseCaller);
 */
-      
-//DEPRECATED SRA 1.2
+
+            //DEPRECATED SRA 1.2
 /*
       Element qualityScores = submission.createElementNS(null, "QUALITY_SCORES");
       qualityScores.setAttribute("qtype", "phred"); // other
@@ -567,9 +559,9 @@ public class EraExperimentDecorator extends AbstractSubmittableDecorator<Documen
       }
       qualityScores.appendChild(qualityScorer);
 */
-      experiment.appendChild(processing);
+            experiment.appendChild(processing);
 
-      submission.getElementsByTagName("EXPERIMENT_SET").item(0).appendChild(experiment);
+            submission.getElementsByTagName("EXPERIMENT_SET").item(0).appendChild(experiment);
+        }
     }
-  }
 }

@@ -42,81 +42,74 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class PacBioService {
-  protected static final Logger log = LoggerFactory.getLogger(PacBioService.class);
-  private final HttpClient httpclient = new DefaultHttpClient();
-  private final URI baseRestUri;
-  private final DateFormat startDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+    protected static final Logger log = LoggerFactory.getLogger(PacBioService.class);
+    private final HttpClient httpclient = new DefaultHttpClient();
+    private final URI baseRestUri;
+    private final DateFormat startDateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
-  public PacBioService(URI restLocation) {
-    baseRestUri = restLocation;
-  }
+    public PacBioService(URI restLocation) {
+        baseRestUri = restLocation;
+    }
 
-  public String getPrimaryAnalysisJob(String plateId, String sampleWellId, Date fromDate) {
-    try {
-      String d = startDateFormat.format(fromDate);
-      HttpGet httpget = new HttpGet(baseRestUri.toString() + "Jobs/PrimaryAnalysis/Query?after="+d);
-      HttpResponse response = httpclient.execute(httpget);
-      String out = parseEntity(response.getEntity());
-      JSONArray a = JSONArray.fromObject(out);
-      for (JSONObject j : (Iterable<JSONObject>)a) {
-        if (j.getString("Plate").equals(plateId) && j.getString("Well").equals(sampleWellId)) {
-          return j.toString();
+    public String getPrimaryAnalysisJob(String plateId, String sampleWellId, Date fromDate) {
+        try {
+            String d = startDateFormat.format(fromDate);
+            HttpGet httpget = new HttpGet(baseRestUri.toString() + "Jobs/PrimaryAnalysis/Query?after=" + d);
+            HttpResponse response = httpclient.execute(httpget);
+            String out = parseEntity(response.getEntity());
+            JSONArray a = JSONArray.fromObject(out);
+            for (JSONObject j : (Iterable<JSONObject>) a) {
+                if (j.getString("Plate").equals(plateId) && j.getString("Well").equals(sampleWellId)) {
+                    return j.toString();
+                }
+            }
+        } catch (ClientProtocolException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-      }
+        return null;
     }
-    catch (ClientProtocolException e) {
-      e.printStackTrace();
-    }
-    catch (IOException e) {
-      e.printStackTrace();
-    }
-    return null;
-  }
 
-  public String getPrimaryAnalysisStatus(String plateId, String sampleWellId) {
-    HttpGet httpget = new HttpGet(baseRestUri.toString() + "/Jobs/PrimaryAnalysis/"+plateId+"/"+sampleWellId+"/Status");
-    try {
-      HttpResponse response = httpclient.execute(httpget);
-      String out = parseEntity(response.getEntity());
-      JSONObject j = JSONObject.fromObject(out);
-      if (j.has("Status")) {
-        return j.getString("Status");
-      }
+    public String getPrimaryAnalysisStatus(String plateId, String sampleWellId) {
+        HttpGet httpget = new HttpGet(baseRestUri.toString() + "/Jobs/PrimaryAnalysis/" + plateId + "/" + sampleWellId + "/Status");
+        try {
+            HttpResponse response = httpclient.execute(httpget);
+            String out = parseEntity(response.getEntity());
+            JSONObject j = JSONObject.fromObject(out);
+            if (j.has("Status")) {
+                return j.getString("Status");
+            }
+        } catch (ClientProtocolException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
-    catch (ClientProtocolException e) {
-      e.printStackTrace();
-    }
-    catch (IOException e) {
-      e.printStackTrace();
-    }
-    return null;
-  }
 
-  public String getPlateStatus(String plateId) {
-    HttpGet httpget = new HttpGet(baseRestUri.toString() + "/Jobs/Plate/"+plateId+"/Status");
-    try {
-      HttpResponse response = httpclient.execute(httpget);
-      String out = parseEntity(response.getEntity());
-      JSONObject j = JSONObject.fromObject(out);
-      if (j.has("Status")) {
-        return j.getString("Status");
-      }
+    public String getPlateStatus(String plateId) {
+        HttpGet httpget = new HttpGet(baseRestUri.toString() + "/Jobs/Plate/" + plateId + "/Status");
+        try {
+            HttpResponse response = httpclient.execute(httpget);
+            String out = parseEntity(response.getEntity());
+            JSONObject j = JSONObject.fromObject(out);
+            if (j.has("Status")) {
+                return j.getString("Status");
+            }
+        } catch (ClientProtocolException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
-    catch (ClientProtocolException e) {
-      e.printStackTrace();
-    }
-    catch (IOException e) {
-      e.printStackTrace();
-    }
-    return null;
-  }
 
-  private String parseEntity(HttpEntity entity) throws IOException {
-    if (entity != null) {
-      return EntityUtils.toString(entity, "UTF-8");
+    private String parseEntity(HttpEntity entity) throws IOException {
+        if (entity != null) {
+            return EntityUtils.toString(entity, "UTF-8");
+        } else {
+            throw new IOException("Null entity in REST response");
+        }
     }
-    else {
-      throw new IOException("Null entity in REST response");
-    }
-  }
 }

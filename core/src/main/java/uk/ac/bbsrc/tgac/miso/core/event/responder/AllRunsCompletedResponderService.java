@@ -50,64 +50,66 @@ import java.util.Set;
  * @since 0.1.2
  */
 public class AllRunsCompletedResponderService extends AbstractResponderService {
-  protected static final Logger log = LoggerFactory.getLogger(AllRunsCompletedResponderService.class);
+    protected static final Logger log = LoggerFactory.getLogger(AllRunsCompletedResponderService.class);
 
-  private Set<AlerterService> alerterServices = new HashSet<AlerterService>();
+    private Set<AlerterService> alerterServices = new HashSet<AlerterService>();
 
-  public AllRunsCompletedResponderService() {}
-
-  public Set<AlerterService> getAlerterServices() {
-    return alerterServices;
-  }
-
-  public void setAlerterServices(Set<AlerterService> alerterServices) {
-    this.alerterServices = alerterServices;
-  }
-
-  @Override
-  public boolean respondsTo(Event event) {
-    if (event instanceof ProjectOverviewEvent) {
-      ProjectOverviewEvent poe = (ProjectOverviewEvent)event;
-      ProjectOverview po = poe.getEventObject();
-      if (poe.getEventType().equals(MisoEventType.ALL_RUNS_COMPLETED) && po.getAllRunsCompleted()) {
-        log.info("Project "+poe.getEventObject().getProject().getAlias() +": " + poe.getEventMessage());
-        return true;
-      }
+    public AllRunsCompletedResponderService() {
     }
-    return false;
-  }
 
-  @Override
-  public void generateResponse(Event event) {
-    if (event instanceof ProjectOverviewEvent) {
-      ProjectOverviewEvent re = (ProjectOverviewEvent)event;
-      ProjectOverview po = re.getEventObject();
-
-      for (User user : po.getWatchers()) {
-        Alert a = new DefaultAlert(user);
-        a.setAlertTitle("All runs have now completed for project " + po.getProject().getAlias() + "(" + po.getProject().getName() + ")");
-
-        StringBuilder at = new StringBuilder();
-        at.append("The following runs associated with this Project have been completed: "+po.getProject().getAlias()+" ("+event.getEventMessage()+"). Please view Project " +po.getProject().getId() + " in MISO for more information");
-        if (event.getEventContext().has("baseURL")) {
-          at.append(":\n\n" + event.getEventContext().getString("baseURL")+"/project/"+po.getProject().getId());
-        }
-        a.setAlertText(at.toString());
-
-        for (AlerterService as : alerterServices) {
-          try {
-            as.raiseAlert(a);
-          }
-          catch (AlertingException e) {
-            log.error("Cannot raise user-level alert:" + e.getMessage());
-            e.printStackTrace();
-          }
-        }
-      }
-
-      if (getSaveSystemAlert()) {
-        raiseSystemAlert(event);
-      }
+    public Set<AlerterService> getAlerterServices() {
+        return alerterServices;
     }
-  }
+
+    public void setAlerterServices(Set<AlerterService> alerterServices) {
+        this.alerterServices = alerterServices;
+    }
+
+    @Override
+    public boolean respondsTo(Event event) {
+        if (event instanceof ProjectOverviewEvent) {
+            ProjectOverviewEvent poe = (ProjectOverviewEvent) event;
+            ProjectOverview po = poe.getEventObject();
+            if (poe.getEventType().equals(MisoEventType.ALL_RUNS_COMPLETED) && po.getAllRunsCompleted()) {
+                log.info("Project " + poe.getEventObject().getProject().getAlias() + ": " + poe.getEventMessage());
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public void generateResponse(Event event) {
+        if (event instanceof ProjectOverviewEvent) {
+            ProjectOverviewEvent re = (ProjectOverviewEvent) event;
+            ProjectOverview po = re.getEventObject();
+
+            for (User user : po.getWatchers()) {
+                Alert a = new DefaultAlert(user);
+                a.setAlertTitle(
+                    "All runs have now completed for project " + po.getProject().getAlias() + "(" + po.getProject().getName() + ")");
+
+                StringBuilder at = new StringBuilder();
+                at.append("The following runs associated with this Project have been completed: " + po.getProject().getAlias() + " (" +
+                          event.getEventMessage() + "). Please view Project " + po.getProject().getId() + " in MISO for more information");
+                if (event.getEventContext().has("baseURL")) {
+                    at.append(":\n\n" + event.getEventContext().getString("baseURL") + "/project/" + po.getProject().getId());
+                }
+                a.setAlertText(at.toString());
+
+                for (AlerterService as : alerterServices) {
+                    try {
+                        as.raiseAlert(a);
+                    } catch (AlertingException e) {
+                        log.error("Cannot raise user-level alert:" + e.getMessage());
+                        e.printStackTrace();
+                    }
+                }
+            }
+
+            if (getSaveSystemAlert()) {
+                raiseSystemAlert(event);
+            }
+        }
+    }
 }

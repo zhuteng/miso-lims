@@ -35,63 +35,65 @@ import java.util.Map;
  * @since 0.0.2
  */
 public enum HealthType {
-  Unknown("Unknown"),
-  Completed("Completed"),
-  Failed("Failed"),
-  Started("Started"),
-  Stopped("Stopped"),
-  Running("Running");
+    Unknown("Unknown"),
+    Completed("Completed"),
+    Failed("Failed"),
+    Started("Started"),
+    Stopped("Stopped"),
+    Running("Running");
 
-  /** Field key  */
-  private String key;
-  /**
-   * Field lookup
-   */
-  private static final Map<String, HealthType> lookup = new HashMap<String, HealthType>();
+    /**
+     * Field key
+     */
+    private String key;
+    /**
+     * Field lookup
+     */
+    private static final Map<String, HealthType> lookup = new HashMap<String, HealthType>();
 
-  static {
-    for (HealthType s : EnumSet.allOf(HealthType.class))
-      lookup.put(s.getKey(), s);
-  }
-
-  /**
-   * Constructs a HealthType based on a given key
-   *
-   * @param key of type String
-   */
-  HealthType(String key) {
-    this.key = key;
-  }
-
-  /**
-   * Returns a HealthType given an enum key
-   *
-   * @param key of type String
-   * @return HealthType
-   */
-  public static HealthType get(String key) {
-    return lookup.get(key);
-  }
-
-  /**
-   * Returns the key of this HealthType enum.
-   *
-   * @return String key.
-   */
-  public String getKey() {
-    return key;
-  }
-
-  /**
-   * Returns the keys of this HealthType enum.
-   *
-   * @return ArrayList<String> keys.
-   */
-  public static ArrayList<String> getKeys() {
-    ArrayList<String> keys = new ArrayList<String>();
-    for (HealthType h : HealthType.values()) {
-      keys.add(h.getKey());
+    static {
+        for (HealthType s : EnumSet.allOf(HealthType.class))
+            lookup.put(s.getKey(), s);
     }
-    return keys;
-  }
+
+    /**
+     * Constructs a HealthType based on a given key
+     *
+     * @param key of type String
+     */
+    HealthType(String key) {
+        this.key = key;
+    }
+
+    /**
+     * Returns a HealthType given an enum key
+     *
+     * @param key of type String
+     * @return HealthType
+     */
+    public static HealthType get(String key) {
+        return lookup.get(key);
+    }
+
+    /**
+     * Returns the key of this HealthType enum.
+     *
+     * @return String key.
+     */
+    public String getKey() {
+        return key;
+    }
+
+    /**
+     * Returns the keys of this HealthType enum.
+     *
+     * @return ArrayList<String> keys.
+     */
+    public static ArrayList<String> getKeys() {
+        ArrayList<String> keys = new ArrayList<String>();
+        for (HealthType h : HealthType.values()) {
+            keys.add(h.getKey());
+        }
+        return keys;
+    }
 }

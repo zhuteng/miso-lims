@@ -36,10 +36,11 @@ import java.util.Set;
  * @since 0.1.5
  */
 public interface NotificationGatewayService {
-  /**
-   * For a given {@link PlatformType}, return a Set of {@link NotificationGateway} objects that are available
-   * @param pt
-   * @return the Set of {@link NotificationGateway} objects that have been exposed by a given service loading mechanism
-   */
-  Set<? extends NotificationGateway> getGatewaysFor(PlatformType pt);
+    /**
+     * For a given {@link PlatformType}, return a Set of {@link NotificationGateway} objects that are available
+     *
+     * @param pt
+     * @return the Set of {@link NotificationGateway} objects that have been exposed by a given service loading mechanism
+     */
+    Set<? extends NotificationGateway> getGatewaysFor(PlatformType pt);
 }

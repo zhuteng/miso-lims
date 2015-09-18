@@ -42,210 +42,212 @@ import java.util.List;
  * Concrete implementation of a User object, inheriting from the simlims core User
  *
  * @author Rob Davey
- * @since 0.0.2  
+ * @since 0.0.2
  */
 @Entity
 public class UserImpl implements User, Serializable, Comparable {
-  protected static final Logger log = LoggerFactory.getLogger(UserImpl.class);
+    protected static final Logger log = LoggerFactory.getLogger(UserImpl.class);
 
-  private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-  /**
-   * Use this ID to indicate that a user has not yet been saved, and therefore
-   * does not yet have a unique ID.
-   */
-  public static final Long UNSAVED_ID = 0L;
+    /**
+     * Use this ID to indicate that a user has not yet been saved, and therefore
+     * does not yet have a unique ID.
+     */
+    public static final Long UNSAVED_ID = 0L;
 
-  @Id
-  @GeneratedValue(strategy = GenerationType.AUTO)
-  private long userId = UserImpl.UNSAVED_ID;
-  private String fullName = "";
-  private String loginName = "";
-  private String email = "";
-  private String password = "";
-  private boolean internal = false;
-  private boolean external = false;
-  private boolean admin = false;
-  private boolean active = true;
-  @ManyToMany
-  private Collection<Group> groups = new HashSet<Group>();
-  private String[] roles = new String[0];
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private long userId = UserImpl.UNSAVED_ID;
+    private String fullName = "";
+    private String loginName = "";
+    private String email = "";
+    private String password = "";
+    private boolean internal = false;
+    private boolean external = false;
+    private boolean admin = false;
+    private boolean active = true;
+    @ManyToMany
+    private Collection<Group> groups = new HashSet<Group>();
+    private String[] roles = new String[0];
 
-  public boolean isActive() {
-    return active;
-  }
-
-  public void setActive(boolean active) {
-    this.active = active;
-  }
-
-  public Long getUserId() {
-    return userId;
-  }
-
-  public void setUserId(Long userId) {
-    this.userId = userId;
-  }
-
-  public long getId() {
-    return userId;
-  }
-
-  public void setId(long userId) {
-    this.userId = userId;
-  }
-
-  public String getEmail() {
-    return email;
-  }
-
-  public void setEmail(String email) {
-    this.email = email;
-  }
-
-  public String getFullName() {
-    return fullName;
-  }
-
-  public String getPassword() {
-    return password;
-  }
-
-  public Collection<Group> getGroups() {
-    return groups;
-  }
-
-  public String getLoginName() {
-    return loginName;
-  }
-
-  public String[] getRoles() {
-    return roles;
-  }
-
-  public Collection<GrantedAuthority> getRolesAsAuthorities() {
-    List<GrantedAuthority> auths = new ArrayList<GrantedAuthority>();
-    for (String s : roles) {
-      auths.add(new GrantedAuthorityImpl(s));
-    }
-    return auths;
-  }
-
-  public Collection<GrantedAuthority> getPermissionsAsAuthorities() {
-    List<GrantedAuthority> auths = new ArrayList<GrantedAuthority>();
-    if (isAdmin()) {
-      auths.add(new GrantedAuthorityImpl("ROLE_ADMIN"));
+    public boolean isActive() {
+        return active;
     }
 
-    if (isInternal()) {
-      auths.add(new GrantedAuthorityImpl("ROLE_INTERNAL"));
+    public void setActive(boolean active) {
+        this.active = active;
     }
 
-    if (isExternal()) {
-      auths.add(new GrantedAuthorityImpl("ROLE_EXTERNAL"));
+    public Long getUserId() {
+        return userId;
     }
 
-    return auths;
-  }
-
-  public boolean isAdmin() {
-    return admin;
-  }
-
-  public boolean isExternal() {
-    return external;
-  }
-
-  public boolean isInternal() {
-    return internal;
-  }
-
-  public void setAdmin(boolean admin) {
-    this.admin = admin;
-  }
-
-  public void setExternal(boolean external) {
-    this.external = external;
-  }
-
-  public void setFullName(String fullName) {
-    this.fullName = fullName;
-  }
-
-  public void setPassword(String password) {
-    this.password = password;
-  }
-
-  public void setGroups(Collection<Group> groups) {
-    this.groups = groups;
-  }
-
-  public void setInternal(boolean internal) {
-    this.internal = internal;
-  }
-
-  public void setLoginName(String loginName) {
-    this.loginName = loginName;
-  }
-
-  public void setRoles(String[] roles) {
-    this.roles = roles;
-  }
-
-  /**
-   * Users are equated by login name.
-   */
-  @Override
-  public boolean equals(Object obj) {
-    if (obj == null)
-      return false;
-    if (obj == this)
-      return true;
-    if (!(obj instanceof UserImpl))
-      return false;
-    UserImpl them = (UserImpl) obj;
-    if (getId() == UserImpl.UNSAVED_ID || them.getId() == UserImpl.UNSAVED_ID) {
-      return this.getLoginName().equals(them.getLoginName());
+    public void setUserId(Long userId) {
+        this.userId = userId;
     }
-    else {
-      return this.getId() == them.getId();
-    }
-  }
 
-  @Override
-  public int hashCode() {
-    if (getId() != UserImpl.UNSAVED_ID) {
-      return (int)getId();
+    public long getId() {
+        return userId;
     }
-    else {
-      int hashcode = 1;
-      if (getLoginName() != null) hashcode = 37* hashcode + getLoginName().hashCode();
-      if (getEmail() != null) hashcode = 37 * hashcode + getEmail().hashCode();
-      return hashcode;
+
+    public void setId(long userId) {
+        this.userId = userId;
     }
-  }
 
-  /**
-   * Equivalent to getLoginName().
-   */
-  @Override
-  public String toString() {
-    StringBuilder sb = new StringBuilder();
-    sb.append(getLoginName());
-    sb.append(":").append(getFullName());
-    sb.append(":").append(getEmail());
-    sb.append(":").append(isActive());
-    sb.append(":").append(isAdmin());
-    sb.append(":").append(isInternal());
-    sb.append(":").append(isExternal());
-    sb.append("[").append(LimsUtils.join(getRoles(), ",")).append("]");
-    return sb.toString();
-  }
+    public String getEmail() {
+        return email;
+    }
 
-  public int compareTo(Object o) {
-    User t = (User)o;
-    if (getId() < t.getUserId()) return -1;
-    if (getId() > t.getUserId()) return 1;
-    return 0;
-  }
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getFullName() {
+        return fullName;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public Collection<Group> getGroups() {
+        return groups;
+    }
+
+    public String getLoginName() {
+        return loginName;
+    }
+
+    public String[] getRoles() {
+        return roles;
+    }
+
+    public Collection<GrantedAuthority> getRolesAsAuthorities() {
+        List<GrantedAuthority> auths = new ArrayList<GrantedAuthority>();
+        for (String s : roles) {
+            auths.add(new GrantedAuthorityImpl(s));
+        }
+        return auths;
+    }
+
+    public Collection<GrantedAuthority> getPermissionsAsAuthorities() {
+        List<GrantedAuthority> auths = new ArrayList<GrantedAuthority>();
+        if (isAdmin()) {
+            auths.add(new GrantedAuthorityImpl("ROLE_ADMIN"));
+        }
+
+        if (isInternal()) {
+            auths.add(new GrantedAuthorityImpl("ROLE_INTERNAL"));
+        }
+
+        if (isExternal()) {
+            auths.add(new GrantedAuthorityImpl("ROLE_EXTERNAL"));
+        }
+
+        return auths;
+    }
+
+    public boolean isAdmin() {
+        return admin;
+    }
+
+    public boolean isExternal() {
+        return external;
+    }
+
+    public boolean isInternal() {
+        return internal;
+    }
+
+    public void setAdmin(boolean admin) {
+        this.admin = admin;
+    }
+
+    public void setExternal(boolean external) {
+        this.external = external;
+    }
+
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public void setGroups(Collection<Group> groups) {
+        this.groups = groups;
+    }
+
+    public void setInternal(boolean internal) {
+        this.internal = internal;
+    }
+
+    public void setLoginName(String loginName) {
+        this.loginName = loginName;
+    }
+
+    public void setRoles(String[] roles) {
+        this.roles = roles;
+    }
+
+    /**
+     * Users are equated by login name.
+     */
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null)
+            return false;
+        if (obj == this)
+            return true;
+        if (!(obj instanceof UserImpl))
+            return false;
+        UserImpl them = (UserImpl) obj;
+        if (getId() == UserImpl.UNSAVED_ID || them.getId() == UserImpl.UNSAVED_ID) {
+            return this.getLoginName().equals(them.getLoginName());
+        } else {
+            return this.getId() == them.getId();
+        }
+    }
+
+    @Override
+    public int hashCode() {
+        if (getId() != UserImpl.UNSAVED_ID) {
+            return (int) getId();
+        } else {
+            int hashcode = 1;
+            if (getLoginName() != null)
+                hashcode = 37 * hashcode + getLoginName().hashCode();
+            if (getEmail() != null)
+                hashcode = 37 * hashcode + getEmail().hashCode();
+            return hashcode;
+        }
+    }
+
+    /**
+     * Equivalent to getLoginName().
+     */
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(getLoginName());
+        sb.append(":").append(getFullName());
+        sb.append(":").append(getEmail());
+        sb.append(":").append(isActive());
+        sb.append(":").append(isAdmin());
+        sb.append(":").append(isInternal());
+        sb.append(":").append(isExternal());
+        sb.append("[").append(LimsUtils.join(getRoles(), ",")).append("]");
+        return sb.toString();
+    }
+
+    public int compareTo(Object o) {
+        User t = (User) o;
+        if (getId() < t.getUserId())
+            return -1;
+        if (getId() > t.getUserId())
+            return 1;
+        return 0;
+    }
 }

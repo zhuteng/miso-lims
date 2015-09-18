@@ -37,8 +37,8 @@ import uk.ac.bbsrc.tgac.miso.core.service.printing.schema.BarcodableSchema;
  * @since 0.1.6
  */
 @Spi
-public interface BarcodeLabelFactory<T,S, B extends BarcodableSchema<T, S>> {
-  T getLabel(B s,S b);
-  void setSecurityManager(com.eaglegenomics.simlims.core.manager.SecurityManager securityManager);
-  void setFilesManager(MisoFilesManager misoFileManager);
+public interface BarcodeLabelFactory<T, S, B extends BarcodableSchema<T, S>> {
+    T getLabel(B s, S b);
+    void setSecurityManager(com.eaglegenomics.simlims.core.manager.SecurityManager securityManager);
+    void setFilesManager(MisoFilesManager misoFileManager);
 }

@@ -54,111 +54,104 @@ import java.net.*;
  */
 @ServiceProvider
 public class JiraIssueManager implements IssueTrackerManager {
-  private String oAuthConsumerKey;
-  private String oAuthConsumerSecret;
-  private String oAuthSignatureMethod;
-  
-  private String httpBasicAuthUsername;
-  private String httpBasicAuthPassword;
+    private String oAuthConsumerKey;
+    private String oAuthConsumerSecret;
+    private String oAuthSignatureMethod;
 
-  public String baseTrackerUrl;
-  private final String restApiUrl = "/rest/api/";
-  public String jiraRestApiVersion = "2";
+    private String httpBasicAuthUsername;
+    private String httpBasicAuthPassword;
 
-  public final String jiraIssueSuffix = restApiUrl+jiraRestApiVersion+"/issue/";
+    public String baseTrackerUrl;
+    private final String restApiUrl = "/rest/api/";
+    public String jiraRestApiVersion = "2";
 
-  public Client client;
+    public final String jiraIssueSuffix = restApiUrl + jiraRestApiVersion + "/issue/";
 
-  public void setOAuthConsumerKey(String oAuthConsumerKey) {
-    this.oAuthConsumerKey = oAuthConsumerKey;
-  }
+    public Client client;
 
-  public void setOAuthConsumerSecret(String oAuthConsumerSecret) {
-    this.oAuthConsumerSecret = oAuthConsumerSecret;
-  }
+    public void setOAuthConsumerKey(String oAuthConsumerKey) {
+        this.oAuthConsumerKey = oAuthConsumerKey;
+    }
 
-  public void setOAuthSignatureMethod(String oAuthSignatureMethod) {
-    this.oAuthSignatureMethod = oAuthSignatureMethod;
-  }
+    public void setOAuthConsumerSecret(String oAuthConsumerSecret) {
+        this.oAuthConsumerSecret = oAuthConsumerSecret;
+    }
 
-  public void setHttpBasicAuthUsername(String httpBasicAuthUsername) {
-    this.httpBasicAuthUsername = httpBasicAuthUsername;
-  }
+    public void setOAuthSignatureMethod(String oAuthSignatureMethod) {
+        this.oAuthSignatureMethod = oAuthSignatureMethod;
+    }
 
-  public void setHttpBasicAuthPassword(String httpBasicAuthPassword) {
-    this.httpBasicAuthPassword = httpBasicAuthPassword;
-  }
+    public void setHttpBasicAuthUsername(String httpBasicAuthUsername) {
+        this.httpBasicAuthUsername = httpBasicAuthUsername;
+    }
 
-  public String getBaseTrackerUrl() {
-    return baseTrackerUrl;
-  }
+    public void setHttpBasicAuthPassword(String httpBasicAuthPassword) {
+        this.httpBasicAuthPassword = httpBasicAuthPassword;
+    }
 
-  public void setBaseTrackerUrl(String baseTrackerUrl) {
-    this.baseTrackerUrl = baseTrackerUrl;
-  }
+    public String getBaseTrackerUrl() {
+        return baseTrackerUrl;
+    }
 
-  public void setClient(Client client) {
-    this.client = client;
-  }
+    public void setBaseTrackerUrl(String baseTrackerUrl) {
+        this.baseTrackerUrl = baseTrackerUrl;
+    }
 
-  public String getType() {
-    return IssueTrackerManager.TrackerType.JIRA.getKey();
-  }
+    public void setClient(Client client) {
+        this.client = client;
+    }
 
-  public JSONObject getIssue(String issueKey) throws IOException {
-    WebResource webResource = prepareWebResource(URI.create(baseTrackerUrl+jiraIssueSuffix+issueKey));
-    if (webResource != null) {
-      try {
-        String json = webResource.get(String.class);
-        if (json != null) {
-          return IssueJsonConverter.jiraToMiso(JSONObject.fromObject(json));
+    public String getType() {
+        return IssueTrackerManager.TrackerType.JIRA.getKey();
+    }
+
+    public JSONObject getIssue(String issueKey) throws IOException {
+        WebResource webResource = prepareWebResource(URI.create(baseTrackerUrl + jiraIssueSuffix + issueKey));
+        if (webResource != null) {
+            try {
+                String json = webResource.get(String.class);
+                if (json != null) {
+                    return IssueJsonConverter.jiraToMiso(JSONObject.fromObject(json));
+                }
+            } catch (Exception e) {
+                throw new IOException("Unable to get resource: " + issueKey, e);
+            }
+            return null;
+        } else {
+            throw new IOException("No viable resource to query for issue. Please check your IssueTrackerManager configuration.");
         }
-      }
-      catch(Exception e) {
-        throw new IOException("Unable to get resource: " + issueKey , e);
-      }
-      return null;
     }
-    else {
-      throw new IOException("No viable resource to query for issue. Please check your IssueTrackerManager configuration.");
-    }
-  }
 
-  private WebResource prepareWebResource(URI uri) {
-    WebResource wr = null;
-    if (httpBasicAuthUsername != null && httpBasicAuthPassword != null) {
-      if (this.client == null) {
-        DefaultApacheHttpClientConfig config = new DefaultApacheHttpClientConfig();
-        config.getState().setCredentials(null, null, -1, httpBasicAuthUsername, httpBasicAuthPassword);
-        config.getProperties().put(ApacheHttpClientConfig.PROPERTY_PREEMPTIVE_AUTHENTICATION, true);
-        ApacheHttpClientHandler ahcHandler = new ApacheHttpClientHandler(new HttpClient(new MultiThreadedHttpConnectionManager()), config);
-        ApacheHttpClient ahc = new ApacheHttpClient(ahcHandler);
-        setClient(ahc);
-        wr = ahc.resource(uri);
-      }
-      else {
-        wr = this.client.resource(uri);
-      }
-    }
-    else if (oAuthConsumerKey != null && oAuthConsumerSecret != null && oAuthSignatureMethod != null) {
-      if (this.client == null) {
-        Client c = new Client();
-        OAuthParameters params = new OAuthParameters()
-          .signatureMethod(oAuthSignatureMethod)
-          .consumerKey(oAuthConsumerKey)
-          .version("1.1");
+    private WebResource prepareWebResource(URI uri) {
+        WebResource wr = null;
+        if (httpBasicAuthUsername != null && httpBasicAuthPassword != null) {
+            if (this.client == null) {
+                DefaultApacheHttpClientConfig config = new DefaultApacheHttpClientConfig();
+                config.getState().setCredentials(null, null, -1, httpBasicAuthUsername, httpBasicAuthPassword);
+                config.getProperties().put(ApacheHttpClientConfig.PROPERTY_PREEMPTIVE_AUTHENTICATION, true);
+                ApacheHttpClientHandler ahcHandler = new ApacheHttpClientHandler(new HttpClient(new MultiThreadedHttpConnectionManager()),
+                                                                                 config);
+                ApacheHttpClient ahc = new ApacheHttpClient(ahcHandler);
+                setClient(ahc);
+                wr = ahc.resource(uri);
+            } else {
+                wr = this.client.resource(uri);
+            }
+        } else if (oAuthConsumerKey != null && oAuthConsumerSecret != null && oAuthSignatureMethod != null) {
+            if (this.client == null) {
+                Client c = new Client();
+                OAuthParameters params = new OAuthParameters().signatureMethod(oAuthSignatureMethod).consumerKey(oAuthConsumerKey)
+                                                              .version("1.1");
 
-        OAuthSecrets secrets = new OAuthSecrets()
-          .consumerSecret(oAuthConsumerSecret);
-        OAuthClientFilter filter = new OAuthClientFilter(c.getProviders(), params, secrets);
-        setClient(c);
-        wr = c.resource(uri);
-        wr.addFilter(filter);
-      }
-      else {
-        wr = this.client.resource(uri);
-      }
+                OAuthSecrets secrets = new OAuthSecrets().consumerSecret(oAuthConsumerSecret);
+                OAuthClientFilter filter = new OAuthClientFilter(c.getProviders(), params, secrets);
+                setClient(c);
+                wr = c.resource(uri);
+                wr.addFilter(filter);
+            } else {
+                wr = this.client.resource(uri);
+            }
+        }
+        return wr;
     }
-    return wr;
-  }
 }

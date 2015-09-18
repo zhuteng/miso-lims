@@ -41,10 +41,10 @@ import java.util.Set;
  */
 @Spi
 public interface TagBarcodeStrategy {
-  String getName();
-  PlatformType getPlatformType();
-  int getNumApplicableBarcodes();
-  Map<Integer, Set<TagBarcode>> getApplicableBarcodes();
-  Set<TagBarcode> getApplicableBarcodesForPosition(int position);
-  void reload();
+    String getName();
+    PlatformType getPlatformType();
+    int getNumApplicableBarcodes();
+    Map<Integer, Set<TagBarcode>> getApplicableBarcodes();
+    Set<TagBarcode> getApplicableBarcodesForPosition(int position);
+    void reload();
 }

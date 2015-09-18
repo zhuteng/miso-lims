@@ -33,6 +33,6 @@ package uk.ac.bbsrc.tgac.miso.analysis.parameter;
  * @since 0.1.6
  */
 public interface Optionable {
-  boolean isOptional();
-  void setOptional(boolean optional);
+    boolean isOptional();
+    void setOptional(boolean optional);
 }

@@ -36,5 +36,5 @@ import java.io.Serializable;
  * @since 0.0.2
  */
 public class EmPcrKit extends AbstractKit implements Serializable {
-  public static final String PREFIX = "EKT";
+    public static final String PREFIX = "EKT";
 }

@@ -14,18 +14,18 @@ import java.io.IOException;
  * @since 0.1.6
  */
 public class DummyIssueTrackerManager implements IssueTrackerManager {
-  @Override
-  public String getType() {
-    return "DUMMY";
-  }
+    @Override
+    public String getType() {
+        return "DUMMY";
+    }
 
-  @Override
-  public JSONObject getIssue(String issueKey) throws IOException {
-    return null;
-  }
+    @Override
+    public JSONObject getIssue(String issueKey) throws IOException {
+        return null;
+    }
 
-  @Override
-  public String getBaseTrackerUrl() {
-    return null;
-  }
+    @Override
+    public String getBaseTrackerUrl() {
+        return null;
+    }
 }

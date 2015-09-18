@@ -11,11 +11,11 @@ import uk.ac.bbsrc.tgac.miso.core.data.Sample;
  * @since 0.2.0-SNAPSHOT
  */
 public abstract class LibraryRecursionAvoidanceMixin {
-  /**
-   * Ignore Library.getSample() method when applying this mixin to a Jackson ObjectMapper
-   *
-   * @return Sample
-   */
-  @JsonIgnore()
-  abstract Sample getSample();
+    /**
+     * Ignore Library.getSample() method when applying this mixin to a Jackson ObjectMapper
+     *
+     * @return Sample
+     */
+    @JsonIgnore()
+    abstract Sample getSample();
 }

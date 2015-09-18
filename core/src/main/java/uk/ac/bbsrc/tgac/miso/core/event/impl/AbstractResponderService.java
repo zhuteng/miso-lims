@@ -49,76 +49,75 @@ import java.util.Set;
  * @since 0.1.6
  */
 public abstract class AbstractResponderService implements ResponderService {
-  protected static final Logger log = LoggerFactory.getLogger(AbstractResponderService.class);
+    protected static final Logger log = LoggerFactory.getLogger(AbstractResponderService.class);
 
-  private boolean saveSystemAlert = true;
-  private Set<AlerterService> alerterServices = new HashSet<AlerterService>();
+    private boolean saveSystemAlert = true;
+    private Set<AlerterService> alerterServices = new HashSet<AlerterService>();
 
-  public void setSaveSystemAlert(boolean saveSystemAlert) {
-    this.saveSystemAlert = saveSystemAlert;
-  }
-
-  public boolean getSaveSystemAlert() {
-    return saveSystemAlert;
-  }  
-
-  public Set<AlerterService> getAlerterServices() {
-    return alerterServices;
-  }
-
-  public void setAlerterServices(Set<AlerterService> alerterServices) {
-    this.alerterServices = alerterServices;
-  }
-
-  public abstract boolean respondsTo(Event event);
-
-  public void raiseSystemAlert(Event event) {
-    raiseSystemAlert(event, DaoAlerterService.class);
-  }
-
-  protected void raiseSystemAlert(Event event, Class<? extends AlerterService> ... servicesToAlert) {
-    Watchable o = (Watchable)event.getEventObject();
-
-    Alert a = new SystemAlert();
-    a.setAlertTitle("[" + o.getWatchableIdentifier() + "] " + event.getEventType().name());
-    a.setAlertText(event.getEventMessage());
-
-    List<Class<? extends AlerterService>> serviceList = Arrays.asList(servicesToAlert);
-    for (AlerterService as : alerterServices) {
-      if (serviceList.contains(as.getClass())) {
-        log.debug("Raising system alert via " + as.getClass());
-        try {
-          as.raiseAlert(a);
-        } catch (AlertingException e) {
-          log.error("Cannot raise system alert:" + e.getMessage());
-          e.printStackTrace();
-        }
-      }
-    }
-  }
-
-  @Override
-  public void generateResponse(Event event) {
-    Watchable o = (Watchable) event.getEventObject();
-
-    for (User user : o.getWatchers()) {
-      Alert a = new DefaultAlert(user);
-      a.setAlertTitle("Raising alert on object");
-      a.setAlertText("The object " + o.toString() + " produced an event " + event.getEventType() + ":: " + event.getEventMessage());
-
-      for (AlerterService as : alerterServices) {
-        try {
-          as.raiseAlert(a);
-        }
-        catch (AlertingException e) {
-          log.error("Cannot raise user-level alert:" + e.getMessage());
-          e.printStackTrace();
-        }
-      }
+    public void setSaveSystemAlert(boolean saveSystemAlert) {
+        this.saveSystemAlert = saveSystemAlert;
     }
 
-    if (saveSystemAlert) {
-      raiseSystemAlert(event, AlerterService.class);
+    public boolean getSaveSystemAlert() {
+        return saveSystemAlert;
     }
-  }
+
+    public Set<AlerterService> getAlerterServices() {
+        return alerterServices;
+    }
+
+    public void setAlerterServices(Set<AlerterService> alerterServices) {
+        this.alerterServices = alerterServices;
+    }
+
+    public abstract boolean respondsTo(Event event);
+
+    public void raiseSystemAlert(Event event) {
+        raiseSystemAlert(event, DaoAlerterService.class);
+    }
+
+    protected void raiseSystemAlert(Event event, Class<? extends AlerterService>... servicesToAlert) {
+        Watchable o = (Watchable) event.getEventObject();
+
+        Alert a = new SystemAlert();
+        a.setAlertTitle("[" + o.getWatchableIdentifier() + "] " + event.getEventType().name());
+        a.setAlertText(event.getEventMessage());
+
+        List<Class<? extends AlerterService>> serviceList = Arrays.asList(servicesToAlert);
+        for (AlerterService as : alerterServices) {
+            if (serviceList.contains(as.getClass())) {
+                log.debug("Raising system alert via " + as.getClass());
+                try {
+                    as.raiseAlert(a);
+                } catch (AlertingException e) {
+                    log.error("Cannot raise system alert:" + e.getMessage());
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
+    @Override
+    public void generateResponse(Event event) {
+        Watchable o = (Watchable) event.getEventObject();
+
+        for (User user : o.getWatchers()) {
+            Alert a = new DefaultAlert(user);
+            a.setAlertTitle("Raising alert on object");
+            a.setAlertText("The object " + o.toString() + " produced an event " + event.getEventType() + ":: " + event.getEventMessage());
+
+            for (AlerterService as : alerterServices) {
+                try {
+                    as.raiseAlert(a);
+                } catch (AlertingException e) {
+                    log.error("Cannot raise user-level alert:" + e.getMessage());
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        if (saveSystemAlert) {
+            raiseSystemAlert(event, AlerterService.class);
+        }
+    }
 }

@@ -43,23 +43,22 @@ import java.util.Properties;
  * @since 0.1.2
  */
 public class MockEmailAlerterService implements AlerterService {
-  protected static final Logger log = LoggerFactory.getLogger(MockEmailAlerterService.class);
+    protected static final Logger log = LoggerFactory.getLogger(MockEmailAlerterService.class);
 
-  @Override
-  public void raiseAlert(Alert a) throws AlertingException {
-    log.info("Emailing alert -> " + a.toString());
+    @Override
+    public void raiseAlert(Alert a) throws AlertingException {
+        log.info("Emailing alert -> " + a.toString());
 
-    String to = "someone@somewhere";
-    String from = "runstats@miso";
-    String subject = "Test runstats delivery";
-    String text = "Hello,\n\nMISO would like to tell you about something:\n\n"+a.toString();
+        String to = "someone@somewhere";
+        String from = "runstats@miso";
+        String subject = "Test runstats delivery";
+        String text = "Hello,\n\nMISO would like to tell you about something:\n\n" + a.toString();
 
-
-    try {
-      EmailUtils.send(to, from, subject, text, new Properties());
-    } catch (MessagingException e) {
-      log.error("Cannot send email to alert recipients:" + e.getMessage());
-      throw new AlertingException("Cannot send email to alert recipients", e);
+        try {
+            EmailUtils.send(to, from, subject, text, new Properties());
+        } catch (MessagingException e) {
+            log.error("Cannot send email to alert recipients:" + e.getMessage());
+            throw new AlertingException("Cannot send email to alert recipients", e);
+        }
     }
-  }
 }

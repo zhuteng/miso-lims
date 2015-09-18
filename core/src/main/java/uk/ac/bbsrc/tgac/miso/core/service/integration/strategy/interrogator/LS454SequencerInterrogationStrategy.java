@@ -69,208 +69,202 @@ import java.util.regex.Pattern;
  */
 @ServiceProvider
 public class LS454SequencerInterrogationStrategy implements SequencerInterrogationStrategy {
-  protected static final Logger log = LoggerFactory.getLogger(LS454SequencerInterrogationStrategy.class);
+    protected static final Logger log = LoggerFactory.getLogger(LS454SequencerInterrogationStrategy.class);
 
-  private static final MisoPerlDaemonQuery statusQuery = new MisoPerlDaemonQuery("454", "status");
-  private static final MisoPerlDaemonQuery completeRunsQuery = new MisoPerlDaemonQuery("454", "complete");
-  private static final MisoPerlDaemonQuery incompleteRunsQuery = new MisoPerlDaemonQuery("454", "running");
+    private static final MisoPerlDaemonQuery statusQuery = new MisoPerlDaemonQuery("454", "status");
+    private static final MisoPerlDaemonQuery completeRunsQuery = new MisoPerlDaemonQuery("454", "complete");
+    private static final MisoPerlDaemonQuery incompleteRunsQuery = new MisoPerlDaemonQuery("454", "running");
 
-  public boolean isStrategyFor(SequencerReference sr) {
-    return (sr.getPlatform().getPlatformType().equals(PlatformType.LS454));
-  }
+    public boolean isStrategyFor(SequencerReference sr) {
+        return (sr.getPlatform().getPlatformType().equals(PlatformType.LS454));
+    }
 
-  public List<Status> listAllStatus(SequencerReference sr) throws InterrogationException {
-    List<Status> s = new ArrayList<Status>();
-    JSONObject response = JSONObject.fromObject(doQuery(sr, new MisoPerlDaemonInterrogationMechanism(), statusQuery).parseResult());
-    if (response != null && response.has("response")) {
-      JSONArray a = response.getJSONArray("response");
-      for (JSONObject j : (Iterable<JSONObject>) a) {
-        if (j.has("file") && j.has("xml")) {
-          try {
-            StatusImpl status = new StatusImpl();
-            if (j.has("complete") && j.getString("complete").equals("true")) {
-              status.setHealth(HealthType.Completed);
+    public List<Status> listAllStatus(SequencerReference sr) throws InterrogationException {
+        List<Status> s = new ArrayList<Status>();
+        JSONObject response = JSONObject.fromObject(doQuery(sr, new MisoPerlDaemonInterrogationMechanism(), statusQuery).parseResult());
+        if (response != null && response.has("response")) {
+            JSONArray a = response.getJSONArray("response");
+            for (JSONObject j : (Iterable<JSONObject>) a) {
+                if (j.has("file") && j.has("xml")) {
+                    try {
+                        StatusImpl status = new StatusImpl();
+                        if (j.has("complete") && j.getString("complete").equals("true")) {
+                            status.setHealth(HealthType.Completed);
+                        } else {
+                            status.setHealth(HealthType.Running);
+                        }
+
+                        Document statusDoc = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
+                        SubmissionUtils.transform(new UnicodeReader(j.getString("xml")), statusDoc);
+                        String runStarted = statusDoc.getElementsByTagName("date").item(0).getTextContent();
+                        status.setStartDate(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'").parse(runStarted));
+                        status.setInstrumentName(statusDoc.getElementsByTagName("serialNumber").item(0).getTextContent());
+                        Node n = statusDoc.getElementsByTagName("run").item(0);
+                        for (int i = 0; i < n.getChildNodes().getLength(); i++) {
+                            Node child = n.getChildNodes().item(i);
+                            if (child instanceof Element && ((Element) child).getTagName().equals("id")) {
+                                status.setRunName(child.getTextContent());
+                            }
+                        }
+                        s.add(status);
+                    } catch (ParserConfigurationException e) {
+                        e.printStackTrace();
+                        throw new InterrogationException(e.getMessage());
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                        throw new InterrogationException(e.getMessage());
+                    } catch (TransformerException e) {
+                        e.printStackTrace();
+                        throw new InterrogationException(e.getMessage());
+                    }
+                }
             }
-            else {
-              status.setHealth(HealthType.Running);
-            }
+        }
+        return s;
+    }
 
-            Document statusDoc = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
-            SubmissionUtils.transform(new UnicodeReader(j.getString("xml")), statusDoc);
-            String runStarted = statusDoc.getElementsByTagName("date").item(0).getTextContent();
-            status.setStartDate(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'").parse(runStarted));
-            status.setInstrumentName(statusDoc.getElementsByTagName("serialNumber").item(0).getTextContent());
-            Node n = statusDoc.getElementsByTagName("run").item(0);
-            for (int i = 0; i < n.getChildNodes().getLength(); i++) {
-              Node child = n.getChildNodes().item(i);
-              if(child instanceof Element && ((Element) child).getTagName().equals("id")) {
-                status.setRunName(child.getTextContent());
-              }
+    public List<Status> listAllStatusBySequencerName(SequencerReference sr, String name) throws InterrogationException {
+        return null;
+    }
+
+    @Override
+    public List<String> listRunsByHealthType(SequencerReference sr, HealthType healthType) throws InterrogationException {
+        String response = doQuery(sr, new MisoPerlDaemonInterrogationMechanism(),
+                                  new MisoPerlDaemonQuery("454", healthType.getKey().toLowerCase())).parseResult();
+        List<String> s = new ArrayList<String>();
+        if (response != null) {
+            String[] ss = response.split(",");
+            for (String sss : ss) {
+                String regex = ".*/([\\d]+_[A-z0-9]+_[\\d]+_[A-z0-9_]*)/.*";
+                Pattern p = Pattern.compile(regex);
+                Matcher m = p.matcher(sss);
+                if (m.matches()) {
+                    s.add(m.group(1));
+                }
             }
-            s.add(status);
-          }
-          catch (ParserConfigurationException e) {
+        }
+        Collections.sort(s);
+        return s;
+    }
+
+    public List<String> listAllCompleteRuns(SequencerReference sr) throws InterrogationException {
+        String response = doQuery(sr, new MisoPerlDaemonInterrogationMechanism(), completeRunsQuery).parseResult();
+        List<String> s = new ArrayList<String>();
+        if (response != null) {
+            String[] ss = response.split(",");
+            for (String sss : ss) {
+                String regex = ".*\\/(R_\\d{4}_\\d{2}_\\d{2}_\\d{2}_\\d{2}_\\d{2}_[A-z0-9]+_[A-z0-9]+_[A-z0-9_\\-]+)\\/.*";
+                Pattern p = Pattern.compile(regex);
+                Matcher m = p.matcher(sss);
+                if (m.matches()) {
+                    s.add(m.group(1));
+                }
+            }
+        }
+        Collections.sort(s);
+        return s;
+    }
+
+    public List<String> listAllIncompleteRuns(SequencerReference sr) throws InterrogationException {
+        String response = doQuery(sr, new MisoPerlDaemonInterrogationMechanism(), incompleteRunsQuery).parseResult();
+        List<String> s = new ArrayList<String>();
+        if (response != null) {
+            String[] ss = response.split(",");
+            for (String sss : ss) {
+                String regex = ".*\\/(R_\\d{4}_\\d{2}_\\d{2}_\\d{2}_\\d{2}_\\d{2}_[A-z0-9]+_[A-z0-9]+_[A-z0-9_\\-]+)\\/.*";
+                Pattern p = Pattern.compile(regex);
+                Matcher m = p.matcher(sss);
+                if (m.matches()) {
+                    s.add(m.group(1));
+                }
+            }
+        }
+        Collections.sort(s);
+        return s;
+    }
+
+    public Status getRunStatus(SequencerReference sr, String runName) throws InterrogationException {
+        MisoPerlDaemonQuery runStatusQuery = new MisoPerlDaemonQuery("454", runName, "status");
+
+        try {
+            JSONObject response = JSONObject
+                .fromObject(doQuery(sr, new MisoPerlDaemonInterrogationMechanism(), runStatusQuery).parseResult());
+            if (response != null && response.has("response")) {
+                JSONArray a = response.getJSONArray("response");
+                if (a.iterator().hasNext()) {
+                    JSONObject j = (JSONObject) a.iterator().next();
+                    if (j.has("file") && j.has("xml")) {
+                        StatusImpl status = new StatusImpl();
+                        if (j.has("complete") && j.getString("complete").equals("true")) {
+                            status.setHealth(HealthType.Completed);
+                        } else {
+                            status.setHealth(HealthType.Running);
+                        }
+                        Document statusDoc = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
+                        SubmissionUtils.transform(new UnicodeReader(j.getString("xml")), statusDoc);
+                        String runStarted = statusDoc.getElementsByTagName("date").item(0).getTextContent();
+                        status.setStartDate(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'").parse(runStarted));
+                        status.setInstrumentName(statusDoc.getElementsByTagName("serialNumber").item(0).getTextContent());
+                        Node n = statusDoc.getElementsByTagName("run").item(0);
+                        for (int i = 0; i < n.getChildNodes().getLength(); i++) {
+                            Node child = n.getChildNodes().item(i);
+                            if (child instanceof Element && ((Element) child).getTagName().equals("id")) {
+                                status.setRunName(child.getTextContent());
+                            }
+                        }
+                        return status;
+                    }
+                }
+            }
+        } catch (ParserConfigurationException e) {
             e.printStackTrace();
             throw new InterrogationException(e.getMessage());
-          }
-          catch (ParseException e) {
+        } catch (ParseException e) {
             e.printStackTrace();
             throw new InterrogationException(e.getMessage());
-          }
-          catch (TransformerException e) {
+        } catch (TransformerException e) {
             e.printStackTrace();
             throw new InterrogationException(e.getMessage());
-          }
         }
-      }
+        return null;
     }
-    return s;
-  }
 
-  public List<Status> listAllStatusBySequencerName(SequencerReference sr, String name) throws InterrogationException {
-    return null;
-  }
+    public JSONObject getRunInformation(SequencerReference sr, String runName) throws InterrogationException {
+        MisoPerlDaemonQuery runInfoQuery = new MisoPerlDaemonQuery("454", runName, "status");
 
-  @Override
-  public List<String> listRunsByHealthType(SequencerReference sr, HealthType healthType) throws InterrogationException {
-    String response = doQuery(sr, new MisoPerlDaemonInterrogationMechanism(), new MisoPerlDaemonQuery("454", healthType.getKey().toLowerCase())).parseResult();
-    List<String> s = new ArrayList<String>();
-    if (response != null) {
-      String[] ss = response.split(",");
-      for (String sss : ss) {
-        String regex = ".*/([\\d]+_[A-z0-9]+_[\\d]+_[A-z0-9_]*)/.*";
-        Pattern p = Pattern.compile(regex);
-        Matcher m = p.matcher(sss);
-        if (m.matches()) {
-          s.add(m.group(1));
-        }
-      }
-    }
-    Collections.sort(s);
-    return s;
-  }
-
-  public List<String> listAllCompleteRuns(SequencerReference sr) throws InterrogationException {
-    String response = doQuery(sr, new MisoPerlDaemonInterrogationMechanism(), completeRunsQuery).parseResult();
-    List<String> s = new ArrayList<String>();
-    if (response != null) {
-      String[] ss = response.split(",");
-      for (String sss : ss) {
-        String regex = ".*\\/(R_\\d{4}_\\d{2}_\\d{2}_\\d{2}_\\d{2}_\\d{2}_[A-z0-9]+_[A-z0-9]+_[A-z0-9_\\-]+)\\/.*";
-        Pattern p = Pattern.compile(regex);
-        Matcher m = p.matcher(sss);
-        if (m.matches()) {
-          s.add(m.group(1));
-        }
-      }
-    }
-    Collections.sort(s);
-    return s;
-  }
-
-  public List<String> listAllIncompleteRuns(SequencerReference sr) throws InterrogationException {
-    String response = doQuery(sr, new MisoPerlDaemonInterrogationMechanism(), incompleteRunsQuery).parseResult();
-    List<String> s = new ArrayList<String>();
-    if (response != null) {
-      String[] ss = response.split(",");
-      for (String sss : ss) {
-        String regex = ".*\\/(R_\\d{4}_\\d{2}_\\d{2}_\\d{2}_\\d{2}_\\d{2}_[A-z0-9]+_[A-z0-9]+_[A-z0-9_\\-]+)\\/.*";
-        Pattern p = Pattern.compile(regex);
-        Matcher m = p.matcher(sss);
-        if (m.matches()) {
-          s.add(m.group(1));
-        }
-      }
-    }
-    Collections.sort(s);
-    return s;
-  }
-
-  public Status getRunStatus(SequencerReference sr, String runName) throws InterrogationException {
-    MisoPerlDaemonQuery runStatusQuery = new MisoPerlDaemonQuery("454", runName, "status");
-
-    try {
-      JSONObject response = JSONObject.fromObject(doQuery(sr, new MisoPerlDaemonInterrogationMechanism(), runStatusQuery).parseResult());
-      if (response != null && response.has("response")) {
-        JSONArray a = response.getJSONArray("response");
-        if (a.iterator().hasNext()) {
-          JSONObject j = (JSONObject) a.iterator().next();
-          if (j.has("file") && j.has("xml")) {
-            StatusImpl status = new StatusImpl();
-            if (j.has("complete") && j.getString("complete").equals("true")) {
-              status.setHealth(HealthType.Completed);
+        JSONObject json = new JSONObject();
+        try {
+            JSONObject response = JSONObject
+                .fromObject(doQuery(sr, new MisoPerlDaemonInterrogationMechanism(), runInfoQuery).parseResult());
+            if (response != null && response.has("response")) {
+                JSONArray a = response.getJSONArray("response");
+                if (a.iterator().hasNext()) {
+                    JSONObject j = (JSONObject) a.iterator().next();
+                    if (j.has("file") && j.has("xml")) {
+                        XMLSerializer xmls = new XMLSerializer();
+                        JSON info = xmls.read(j.getString("xml"));
+                        if (!info.isEmpty()) {
+                            if (info.isArray()) {
+                                json.put("response", info);
+                            } else {
+                                return (JSONObject) info;
+                            }
+                        }
+                    }
+                }
             }
-            else {
-              status.setHealth(HealthType.Running);
-            }
-            Document statusDoc = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
-            SubmissionUtils.transform(new UnicodeReader(j.getString("xml")), statusDoc);
-            String runStarted = statusDoc.getElementsByTagName("date").item(0).getTextContent();
-            status.setStartDate(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'").parse(runStarted));
-            status.setInstrumentName(statusDoc.getElementsByTagName("serialNumber").item(0).getTextContent());
-            Node n = statusDoc.getElementsByTagName("run").item(0);
-            for (int i = 0; i < n.getChildNodes().getLength(); i++) {
-              Node child = n.getChildNodes().item(i);
-              if(child instanceof Element && ((Element) child).getTagName().equals("id")) {
-                status.setRunName(child.getTextContent());
-              }
-            }
-            return status;
-          }
+        } catch (InterrogationException ie) {
+            ie.printStackTrace();
         }
-      }
+        return json;
     }
-    catch (ParserConfigurationException e) {
-      e.printStackTrace();
-      throw new InterrogationException(e.getMessage());
-    }
-    catch (ParseException e) {
-      e.printStackTrace();
-      throw new InterrogationException(e.getMessage());
-    }
-    catch (TransformerException e) {
-      e.printStackTrace();
-      throw new InterrogationException(e.getMessage());
-    }
-    return null;
-  }
 
-  public JSONObject getRunInformation(SequencerReference sr, String runName) throws InterrogationException {
-    MisoPerlDaemonQuery runInfoQuery = new MisoPerlDaemonQuery("454", runName, "status");
-
-    JSONObject json = new JSONObject();
-    try {
-      JSONObject response = JSONObject.fromObject(doQuery(sr, new MisoPerlDaemonInterrogationMechanism(), runInfoQuery).parseResult());
-      if (response != null && response.has("response")) {
-        JSONArray a = response.getJSONArray("response");
-        if (a.iterator().hasNext()) {
-          JSONObject j = (JSONObject) a.iterator().next();
-          if (j.has("file") && j.has("xml")) {
-            XMLSerializer xmls = new XMLSerializer();
-            JSON info = xmls.read(j.getString("xml"));
-            if (!info.isEmpty()) {
-              if (info.isArray()) {
-                json.put("response", info);
-              }
-              else {
-                return (JSONObject)info;
-              }
-            }
-          }
-        }
-      }
+    private InterrogationResult<String> doQuery(SequencerReference sr, InterrogationMechanism mechanism, MisoPerlDaemonQuery query)
+        throws InterrogationException {
+        log.info("Pushing query: " + query.generateQuery());
+        InterrogationResult<String> result = mechanism.doQuery(sr, query);
+        log.info("Consuming result: " + result.parseResult());
+        return result;
     }
-    catch (InterrogationException ie) {
-      ie.printStackTrace();
-    }
-    return json;
-  }
-
-  private InterrogationResult<String> doQuery(SequencerReference sr, InterrogationMechanism mechanism, MisoPerlDaemonQuery query) throws InterrogationException {
-    log.info("Pushing query: " + query.generateQuery());
-    InterrogationResult<String> result = mechanism.doQuery(sr, query);
-    log.info("Consuming result: " + result.parseResult());
-    return result;
-  }
 }
 

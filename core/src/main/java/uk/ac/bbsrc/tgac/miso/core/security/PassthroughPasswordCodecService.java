@@ -35,41 +35,45 @@ import org.springframework.security.authentication.encoding.PasswordEncoder;
  * @since 0.0.2
  */
 public final class PassthroughPasswordCodecService implements PasswordCodecService {
-  /** Field log  */
-  protected static final Logger log = LoggerFactory.getLogger(PassthroughPasswordCodecService.class);
+    /**
+     * Field log
+     */
+    protected static final Logger log = LoggerFactory.getLogger(PassthroughPasswordCodecService.class);
 
-  /** Field instance  */
-  private static PassthroughPasswordCodecService instance;
-  private PasswordEncoder encoder;
+    /**
+     * Field instance
+     */
+    private static PassthroughPasswordCodecService instance;
+    private PasswordEncoder encoder;
 
-  public PasswordEncoder getEncoder() {
-    return encoder;
-  }
+    public PasswordEncoder getEncoder() {
+        return encoder;
+    }
 
-  /**
-   * Set the encoder. This will NOT actually encrypt, but is used for validation of existing passwords
-   */
-  public void setEncoder(PasswordEncoder encoder) {
-    this.encoder = encoder;
-  }
+    /**
+     * Set the encoder. This will NOT actually encrypt, but is used for validation of existing passwords
+     */
+    public void setEncoder(PasswordEncoder encoder) {
+        this.encoder = encoder;
+    }
 
-  /**
-   * This method does nothing, i.e. simply passes the password through and does no encryption
-   *
-   * @param plaintext of type String
-   * @return String the plaintext String
-   */
-  public synchronized String encrypt(String plaintext) {
-    return plaintext;
-  }
+    /**
+     * This method does nothing, i.e. simply passes the password through and does no encryption
+     *
+     * @param plaintext of type String
+     * @return String the plaintext String
+     */
+    public synchronized String encrypt(String plaintext) {
+        return plaintext;
+    }
 
-  /**
-   * This method does nothing, i.e. simply passes the password through and does no encryption
-   *
-   * @param plaintext of type String
-   * @return String the plaintext String
-   */
-  public synchronized String encrypt(String plaintext, byte[] salt) {
-    return plaintext;
-  }
+    /**
+     * This method does nothing, i.e. simply passes the password through and does no encryption
+     *
+     * @param plaintext of type String
+     * @return String the plaintext String
+     */
+    public synchronized String encrypt(String plaintext, byte[] salt) {
+        return plaintext;
+    }
 }

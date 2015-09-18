@@ -17,21 +17,24 @@ import java.util.Collection;
  * @date 04/11/13
  * @since version
  */
-public interface EntityGroupStore extends Store<EntityGroup<? extends Nameable, ? extends Nameable>>, Remover<EntityGroup<? extends Nameable, ? extends Nameable>> {
+public interface EntityGroupStore
+    extends Store<EntityGroup<? extends Nameable, ? extends Nameable>>, Remover<EntityGroup<? extends Nameable, ? extends Nameable>> {
 
-  EntityGroup<? extends Nameable, ? extends Nameable> lazyGet(long sampleId) throws IOException;
+    EntityGroup<? extends Nameable, ? extends Nameable> lazyGet(long sampleId) throws IOException;
 
-  /**
-   * List all persisted objects
-   *
-   * @return Collection<EntityGroup<? extends Nameable, ? extends Nameable>>
-   * @throws IOException when the objects cannot be retrieved
-   */
-  Collection<EntityGroup<? extends Nameable, ? extends Nameable>> listAllWithLimit(long limit) throws IOException;
+    /**
+     * List all persisted objects
+     *
+     * @return Collection<EntityGroup<? extends Nameable, ? extends Nameable>>
+     * @throws IOException when the objects cannot be retrieved
+     */
+    Collection<EntityGroup<? extends Nameable, ? extends Nameable>> listAllWithLimit(long limit) throws IOException;
 
-  //<T extends Nameable, S extends Nameable> EntityGroup<? extends Nameable, ? extends Nameable> getEntityGroupByParentTypeAndId(Class<? extends Nameable> parentType, long parentId) throws IOException, SQLException;
+    //<T extends Nameable, S extends Nameable> EntityGroup<? extends Nameable, ? extends Nameable> getEntityGroupByParentTypeAndId(Class<? extends Nameable> parentType, long parentId) throws IOException, SQLException;
 
-  <T extends Nameable, S extends Nameable> EntityGroup<T, S> getEntityGroupByParentTypeAndId(Class<? extends T> parentType, long parentId) throws IOException, SQLException;
+    <T extends Nameable, S extends Nameable> EntityGroup<T, S> getEntityGroupByParentTypeAndId(Class<? extends T> parentType, long parentId)
+        throws IOException, SQLException;
 
-  <T extends Nameable, S extends Nameable> EntityGroup<T, S> getEntityGroupByParent(T parent, Class<? extends T> parentClz) throws IOException, SQLException;
+    <T extends Nameable, S extends Nameable> EntityGroup<T, S> getEntityGroupByParent(T parent, Class<? extends T> parentClz)
+        throws IOException, SQLException;
 }

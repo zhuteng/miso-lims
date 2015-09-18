@@ -40,30 +40,29 @@ import java.lang.reflect.Field;
  * @since 0.1.6
  */
 public class PrintServiceUtils {
-  protected static final Logger log = LoggerFactory.getLogger(PrintServiceUtils.class);
+    protected static final Logger log = LoggerFactory.getLogger(PrintServiceUtils.class);
 
-  public static JSONObject mapContextFieldsToJSON(PrintContext context) throws IllegalAccessException {
-    JSONObject contextFields = new JSONObject();
-    //only get public fields
-    for (Field f : context.getClass().getFields()) {
-      if (!f.getName().equals("name") && !f.getName().equals("description")) {
-        if (f.get(context) == null) {
-          contextFields.put(f.getName(), "");
+    public static JSONObject mapContextFieldsToJSON(PrintContext context) throws IllegalAccessException {
+        JSONObject contextFields = new JSONObject();
+        //only get public fields
+        for (Field f : context.getClass().getFields()) {
+            if (!f.getName().equals("name") && !f.getName().equals("description")) {
+                if (f.get(context) == null) {
+                    contextFields.put(f.getName(), "");
+                } else {
+                    contextFields.put(f.getName(), f.get(context));
+                }
+            }
         }
-        else {
-          contextFields.put(f.getName(), f.get(context));
-        }
-      }
+        log.info(contextFields.toString());
+        return contextFields;
     }
-    log.info(contextFields.toString());
-    return contextFields;
-  }
 
-  public static void mapJSONToContextFields(JSONObject contextFields, PrintContext context) throws IllegalAccessException {
-    for (Field f : context.getClass().getFields()) {
-      if (contextFields.has(f.getName())) {
-        f.set(context,contextFields.get(f.getName()));
-      }
+    public static void mapJSONToContextFields(JSONObject contextFields, PrintContext context) throws IllegalAccessException {
+        for (Field f : context.getClass().getFields()) {
+            if (contextFields.has(f.getName())) {
+                f.set(context, contextFields.get(f.getName()));
+            }
+        }
     }
-  }
 }

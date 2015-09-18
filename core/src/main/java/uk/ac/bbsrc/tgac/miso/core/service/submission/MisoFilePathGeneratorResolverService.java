@@ -41,77 +41,72 @@ import java.util.*;
  * @since 0.1.5
  */
 public class MisoFilePathGeneratorResolverService implements FilePathGeneratorResolverService {
-  protected static final Logger log = LoggerFactory.getLogger(MisoFilePathGeneratorResolverService.class);
-  private Map<String, FilePathGenerator> contextMap;
+    protected static final Logger log = LoggerFactory.getLogger(MisoFilePathGeneratorResolverService.class);
+    private Map<String, FilePathGenerator> contextMap;
 
-  @Override
-  public FilePathGenerator getFilePathGenerator(PlatformType platformType) {
-    for (FilePathGenerator generator : getFilePathGenerators()) {
-      if (generator.generatesFilePathsFor() != null && generator.generatesFilePathsFor().equals(platformType)) {
-        try {
-          return generator.getClass().newInstance();
+    @Override
+    public FilePathGenerator getFilePathGenerator(PlatformType platformType) {
+        for (FilePathGenerator generator : getFilePathGenerators()) {
+            if (generator.generatesFilePathsFor() != null && generator.generatesFilePathsFor().equals(platformType)) {
+                try {
+                    return generator.getClass().newInstance();
+                } catch (InstantiationException e) {
+                    log.error("Cannot create a new instance of '" + generator.getName() + "'", e);
+                    e.printStackTrace();
+                } catch (IllegalAccessException e) {
+                    log.error("Cannot create a new instance of '" + generator.getName() + "'", e);
+                    e.printStackTrace();
+                }
+            }
         }
-        catch (InstantiationException e) {
-          log.error("Cannot create a new instance of '" + generator.getName() + "'", e);
-          e.printStackTrace();
-        }
-        catch (IllegalAccessException e) {
-          log.error("Cannot create a new instance of '" + generator.getName() + "'", e);
-          e.printStackTrace();
-        }
-      }
-    }
-    log.warn("No generator available for '" + platformType.getKey() + "' was available on the classpath");
-    return null;
-  }
-
-  @Override
-  public FilePathGenerator getFilePathGenerator(String generatorName) {
-    for (FilePathGenerator generator : getFilePathGenerators()) {
-      if (generator.getName().equals(generatorName)) {
-        try {
-          return generator.getClass().newInstance();
-        }
-        catch (InstantiationException e) {
-          log.error("Cannot create a new instance of '" + generatorName + "'", e);
-          e.printStackTrace();
-        }
-        catch (IllegalAccessException e) {
-          log.error("Cannot create a new instance of '" + generatorName + "'", e);
-          e.printStackTrace();
-        }
-      }
-    }
-    log.warn("No generator called '" + generatorName + "' was available on the classpath");
-    return null;
-  }
-
-  @Override
-  public Collection<FilePathGenerator> getFilePathGenerators() {
-    //lazily load available contexts
-    if (contextMap == null) {
-      ServiceLoader<FilePathGenerator> consumerLoader = ServiceLoader.load(FilePathGenerator.class);
-      Iterator<FilePathGenerator> consumerIterator = consumerLoader.iterator();
-
-      contextMap = new HashMap<String, FilePathGenerator>();
-      while (consumerIterator.hasNext()) {
-        FilePathGenerator p = consumerIterator.next();
-
-        if (!contextMap.containsKey(p.getName())) {
-          contextMap.put(p.getName(), p);
-        }
-        else {
-          if (contextMap.get(p.getName()) != p) {
-            String msg = "Multiple different FilePathGenerators with the same context name " +
-                         "('" + p.getName() + "') are present on the classpath. Generator names must be unique.";
-            log.error(msg);
-            throw new ServiceConfigurationError(msg);
-          }
-        }
-      }
-      log.info("Loaded " + contextMap.values().size() + " known generators");
+        log.warn("No generator available for '" + platformType.getKey() + "' was available on the classpath");
+        return null;
     }
 
-    return contextMap.values();
-  }
+    @Override
+    public FilePathGenerator getFilePathGenerator(String generatorName) {
+        for (FilePathGenerator generator : getFilePathGenerators()) {
+            if (generator.getName().equals(generatorName)) {
+                try {
+                    return generator.getClass().newInstance();
+                } catch (InstantiationException e) {
+                    log.error("Cannot create a new instance of '" + generatorName + "'", e);
+                    e.printStackTrace();
+                } catch (IllegalAccessException e) {
+                    log.error("Cannot create a new instance of '" + generatorName + "'", e);
+                    e.printStackTrace();
+                }
+            }
+        }
+        log.warn("No generator called '" + generatorName + "' was available on the classpath");
+        return null;
+    }
+
+    @Override
+    public Collection<FilePathGenerator> getFilePathGenerators() {
+        //lazily load available contexts
+        if (contextMap == null) {
+            ServiceLoader<FilePathGenerator> consumerLoader = ServiceLoader.load(FilePathGenerator.class);
+            Iterator<FilePathGenerator> consumerIterator = consumerLoader.iterator();
+
+            contextMap = new HashMap<String, FilePathGenerator>();
+            while (consumerIterator.hasNext()) {
+                FilePathGenerator p = consumerIterator.next();
+
+                if (!contextMap.containsKey(p.getName())) {
+                    contextMap.put(p.getName(), p);
+                } else {
+                    if (contextMap.get(p.getName()) != p) {
+                        String msg = "Multiple different FilePathGenerators with the same context name " +
+                                     "('" + p.getName() + "') are present on the classpath. Generator names must be unique.";
+                        log.error(msg);
+                        throw new ServiceConfigurationError(msg);
+                    }
+                }
+            }
+            log.info("Loaded " + contextMap.values().size() + " known generators");
+        }
+
+        return contextMap.values();
+    }
 }

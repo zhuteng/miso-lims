@@ -32,15 +32,15 @@ package uk.ac.bbsrc.tgac.miso.core.exception;
  * @since 0.0.2
  */
 public class MalformedLibraryQcException extends Exception {
-  public MalformedLibraryQcException(String s) {
-    super(s);
-  }
-
-  public MalformedLibraryQcException(String s, Throwable cause) {
-    super(s);
-    if (cause != null) {
-      initCause(cause);
+    public MalformedLibraryQcException(String s) {
+        super(s);
     }
-  }
+
+    public MalformedLibraryQcException(String s, Throwable cause) {
+        super(s);
+        if (cause != null) {
+            initCause(cause);
+        }
+    }
 }
 

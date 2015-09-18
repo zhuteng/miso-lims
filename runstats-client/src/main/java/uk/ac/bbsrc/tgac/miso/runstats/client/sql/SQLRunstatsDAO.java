@@ -41,38 +41,38 @@ import java.util.Collection;
  */
 @Deprecated
 public class SQLRunstatsDAO implements RunstatsStore {
-  private JdbcTemplate template;
+    private JdbcTemplate template;
 
-  public JdbcTemplate getJdbcTemplate() {
-    return template;
-  }
+    public JdbcTemplate getJdbcTemplate() {
+        return template;
+    }
 
-  public void setJdbcTemplate(JdbcTemplate template) {
-    this.template = template;
-  }
+    public void setJdbcTemplate(JdbcTemplate template) {
+        this.template = template;
+    }
 
-  @Override
-  public long save(Object o) throws IOException {
-    return 0;
-  }
+    @Override
+    public long save(Object o) throws IOException {
+        return 0;
+    }
 
-  @Override
-  public Object get(long id) throws IOException {
-    return null;
-  }
+    @Override
+    public Object get(long id) throws IOException {
+        return null;
+    }
 
-  @Override
-  public Object lazyGet(long id) throws IOException {
-    return null;
-  }
+    @Override
+    public Object lazyGet(long id) throws IOException {
+        return null;
+    }
 
-  @Override
-  public Collection listAll() throws IOException {
-    return null;
-  }
+    @Override
+    public Collection listAll() throws IOException {
+        return null;
+    }
 
-  @Override
-  public int count() throws IOException {
-    return 0;
-  }
+    @Override
+    public int count() throws IOException {
+        return 0;
+    }
 }

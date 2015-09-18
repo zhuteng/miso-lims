@@ -35,60 +35,64 @@ import java.util.Map;
  * @since 0.0.2
  */
 public enum KitType {
-  LIBRARY("Library"),
-  SEQUENCING("Sequencing"),
-  EMPCR("EmPCR"),
-  CLUSTERING("Clustering"),
-  MULTIPLEXING("Multiplexing");
+    LIBRARY("Library"),
+    SEQUENCING("Sequencing"),
+    EMPCR("EmPCR"),
+    CLUSTERING("Clustering"),
+    MULTIPLEXING("Multiplexing");
 
-  /** Field key  */
-  private String key;
-  /** Field lookup  */
-  private static final Map<String, KitType> lookup = new HashMap<String, KitType>();
+    /**
+     * Field key
+     */
+    private String key;
+    /**
+     * Field lookup
+     */
+    private static final Map<String, KitType> lookup = new HashMap<String, KitType>();
 
-  static {
-    for (KitType s : EnumSet.allOf(KitType.class))
-      lookup.put(s.getKey(), s);
-  }
-
-  /**
-   * Constructs a KitType based on a given key
-   *
-   * @param key of type String
-   */
-  KitType(String key) {
-    this.key = key;
-  }
-
-  /**
-   * Returns a KitType given an enum key
-   *
-   * @param key of type String
-   * @return KitType
-   */
-  public static KitType get(String key) {
-    return lookup.get(key);
-  }
-
-  /**
-   * Returns the key of this KitType enum.
-   *
-   * @return String key.
-   */
-  public String getKey() {
-    return key;
-  }
-
-  /**
-   * Returns the keys of this KitType enum.
-   *
-   * @return ArrayList<String> keys.
-   */
-  public static ArrayList<String> getKeys() {
-    ArrayList<String> keys = new ArrayList<String>();
-    for (KitType k : KitType.values()) {
-      keys.add(k.getKey());
+    static {
+        for (KitType s : EnumSet.allOf(KitType.class))
+            lookup.put(s.getKey(), s);
     }
-    return keys;
-  }
+
+    /**
+     * Constructs a KitType based on a given key
+     *
+     * @param key of type String
+     */
+    KitType(String key) {
+        this.key = key;
+    }
+
+    /**
+     * Returns a KitType given an enum key
+     *
+     * @param key of type String
+     * @return KitType
+     */
+    public static KitType get(String key) {
+        return lookup.get(key);
+    }
+
+    /**
+     * Returns the key of this KitType enum.
+     *
+     * @return String key.
+     */
+    public String getKey() {
+        return key;
+    }
+
+    /**
+     * Returns the keys of this KitType enum.
+     *
+     * @return ArrayList<String> keys.
+     */
+    public static ArrayList<String> getKeys() {
+        ArrayList<String> keys = new ArrayList<String>();
+        for (KitType k : KitType.values()) {
+            keys.add(k.getKey());
+        }
+        return keys;
+    }
 }

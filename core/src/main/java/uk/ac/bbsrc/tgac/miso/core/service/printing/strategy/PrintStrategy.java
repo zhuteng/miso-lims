@@ -39,5 +39,5 @@ import java.io.IOException;
  */
 
 public interface PrintStrategy<T, C extends PrintContext> {
-  public boolean print(T content, C pc) throws IOException;
+    public boolean print(T content, C pc) throws IOException;
 }

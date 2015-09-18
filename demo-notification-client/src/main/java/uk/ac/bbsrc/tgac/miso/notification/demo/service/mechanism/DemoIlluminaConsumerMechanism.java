@@ -48,49 +48,49 @@ import java.util.*;
  * @since 0.1.5
  */
 public class DemoIlluminaConsumerMechanism implements NotificationMessageConsumerMechanism<Message<Map<String, List<String>>>, Set<Run>> {
-  protected static final Logger log = LoggerFactory.getLogger(DemoIlluminaConsumerMechanism.class);
+    protected static final Logger log = LoggerFactory.getLogger(DemoIlluminaConsumerMechanism.class);
 
-  @Override
-  public Set<Run> consume(Message<Map<String, List<String>>> message) throws InterrogationException {
-    Map<String, List<String>> statuses = message.getPayload();
-    Set<Run> output = new HashSet<Run>();
-    for (String key : statuses.keySet()) {
-      HealthType ht = HealthType.valueOf(key);
-      JSONArray runs = (JSONArray) JSONArray.fromObject(statuses.get(key)).get(0);
-      Map<String, Run> map = processRunJSON(ht, runs);
-      for (Run r : map.values()) {
-        output.add(r);
-      }
-    }
-    return output;
-  }
-
-  private Map<String, Run> processRunJSON(HealthType ht, JSONArray runs) {
-    Map<String, Run> updatedRuns = new HashMap<String, Run>();
-
-    StringBuilder sb = new StringBuilder();
-
-    for (JSONObject run : (Iterable<JSONObject>) runs) {
-      String runName = run.getString("runName");
-      sb.append("Processing " + runName);
-      log.debug("Processing " + runName);
-      Status is = new IlluminaStatus();
-      is.setRunName(runName);
-
-      Run r = new IlluminaRun();
-      r.setPlatformRunId(0);
-      r.setAlias(runName);
-      r.setFilePath(runName);
-      r.setDescription("Test Run Import");
-      r.setPairedEnd(false);
-      is.setHealth(ht);
-      r.setStatus(is);
-
-      updatedRuns.put(r.getAlias(), r);
-      sb.append("...done\n");
+    @Override
+    public Set<Run> consume(Message<Map<String, List<String>>> message) throws InterrogationException {
+        Map<String, List<String>> statuses = message.getPayload();
+        Set<Run> output = new HashSet<Run>();
+        for (String key : statuses.keySet()) {
+            HealthType ht = HealthType.valueOf(key);
+            JSONArray runs = (JSONArray) JSONArray.fromObject(statuses.get(key)).get(0);
+            Map<String, Run> map = processRunJSON(ht, runs);
+            for (Run r : map.values()) {
+                output.add(r);
+            }
+        }
+        return output;
     }
 
-    log.info(sb.toString());
-    return updatedRuns;
-  }
+    private Map<String, Run> processRunJSON(HealthType ht, JSONArray runs) {
+        Map<String, Run> updatedRuns = new HashMap<String, Run>();
+
+        StringBuilder sb = new StringBuilder();
+
+        for (JSONObject run : (Iterable<JSONObject>) runs) {
+            String runName = run.getString("runName");
+            sb.append("Processing " + runName);
+            log.debug("Processing " + runName);
+            Status is = new IlluminaStatus();
+            is.setRunName(runName);
+
+            Run r = new IlluminaRun();
+            r.setPlatformRunId(0);
+            r.setAlias(runName);
+            r.setFilePath(runName);
+            r.setDescription("Test Run Import");
+            r.setPairedEnd(false);
+            is.setHealth(ht);
+            r.setStatus(is);
+
+            updatedRuns.put(r.getAlias(), r);
+            sb.append("...done\n");
+        }
+
+        log.info(sb.toString());
+        return updatedRuns;
+    }
 }

@@ -50,75 +50,70 @@ import java.io.IOException;
  */
 @Ajaxified
 public class StudyControllerHelperService {
-  protected static final Logger log = LoggerFactory.getLogger(StudyControllerHelperService.class);
-  @Autowired
-  private SecurityManager securityManager;
-  @Autowired
-  private RequestManager requestManager;
-  @Autowired
-  private SubmissionManager submissionManager;
+    protected static final Logger log = LoggerFactory.getLogger(StudyControllerHelperService.class);
+    @Autowired
+    private SecurityManager securityManager;
+    @Autowired
+    private RequestManager requestManager;
+    @Autowired
+    private SubmissionManager submissionManager;
 
-  public void setSecurityManager(SecurityManager securityManager) {
-    this.securityManager = securityManager;
-  }
-
-  public void setRequestManager(RequestManager requestManager) {
-    this.requestManager = requestManager;
-  }
-
-  public void setSubmissionManager(SubmissionManager submissionManager) {
-    this.submissionManager = submissionManager;
-  }
-
-  public JSONObject deleteStudy(HttpSession session, JSONObject json) {
-    User user;
-    try {
-      user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-    }
-    catch (IOException e) {
-      e.printStackTrace();
-      return JSONUtils.SimpleJSONError("Error getting currently logged in user.");
+    public void setSecurityManager(SecurityManager securityManager) {
+        this.securityManager = securityManager;
     }
 
-    if (user != null && user.isAdmin()) {
-      if (json.has("studyId")) {
-        Long studyId = json.getLong("studyId");
+    public void setRequestManager(RequestManager requestManager) {
+        this.requestManager = requestManager;
+    }
+
+    public void setSubmissionManager(SubmissionManager submissionManager) {
+        this.submissionManager = submissionManager;
+    }
+
+    public JSONObject deleteStudy(HttpSession session, JSONObject json) {
+        User user;
         try {
-          requestManager.deleteStudy(requestManager.getStudyById(studyId));
-          return JSONUtils.SimpleJSONResponse("Study deleted");
+            user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
+        } catch (IOException e) {
+            e.printStackTrace();
+            return JSONUtils.SimpleJSONError("Error getting currently logged in user.");
         }
-        catch (IOException e) {
-          e.printStackTrace();
-          return JSONUtils.SimpleJSONError("Cannot delete study: " + e.getMessage());
+
+        if (user != null && user.isAdmin()) {
+            if (json.has("studyId")) {
+                Long studyId = json.getLong("studyId");
+                try {
+                    requestManager.deleteStudy(requestManager.getStudyById(studyId));
+                    return JSONUtils.SimpleJSONResponse("Study deleted");
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    return JSONUtils.SimpleJSONError("Cannot delete study: " + e.getMessage());
+                }
+            } else {
+                return JSONUtils.SimpleJSONError("No study specified to delete.");
+            }
+        } else {
+            return JSONUtils.SimpleJSONError("Only admins can delete objects.");
         }
-      }
-      else {
-        return JSONUtils.SimpleJSONError("No study specified to delete.");
-      }
     }
-    else {
-      return JSONUtils.SimpleJSONError("Only admins can delete objects.");
-    }
-  }
 
-  public JSONObject listStudiesDataTable(HttpSession session, JSONObject json) {
-    try {
-      JSONObject j = new JSONObject();
-      JSONArray jsonArray = new JSONArray();
-      for (Study study : requestManager.listAllStudies()) {
-        jsonArray.add("['" + study.getName() + "','" +
-                      study.getAlias() + "','" +
-                      study.getDescription() + "','" +
-                      study.getStudyType() + "','" +
-                      "<a href=\"/miso/study/" + study.getId() + "\"><span class=\"ui-icon ui-icon-pencil\"></span></a>" + "']");
+    public JSONObject listStudiesDataTable(HttpSession session, JSONObject json) {
+        try {
+            JSONObject j = new JSONObject();
+            JSONArray jsonArray = new JSONArray();
+            for (Study study : requestManager.listAllStudies()) {
+                jsonArray.add("['" + study.getName() + "','" +
+                              study.getAlias() + "','" +
+                              study.getDescription() + "','" +
+                              study.getStudyType() + "','" +
+                              "<a href=\"/miso/study/" + study.getId() + "\"><span class=\"ui-icon ui-icon-pencil\"></span></a>" + "']");
 
-      }
-      j.put("array", jsonArray);
-      return j;
+            }
+            j.put("array", jsonArray);
+            return j;
+        } catch (IOException e) {
+            log.debug("Failed", e);
+            return JSONUtils.SimpleJSONError("Failed: " + e.getMessage());
+        }
     }
-    catch (IOException e) {
-      log.debug("Failed", e);
-      return JSONUtils.SimpleJSONError("Failed: " + e.getMessage());
-    }
-  }
 }

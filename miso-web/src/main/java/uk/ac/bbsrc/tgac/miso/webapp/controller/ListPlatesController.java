@@ -42,34 +42,33 @@ import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
 @Controller
 public class ListPlatesController {
-  protected static final Logger log = LoggerFactory.getLogger(ListPlatesController.class);
+    protected static final Logger log = LoggerFactory.getLogger(ListPlatesController.class);
 
-  @Autowired
-  private SecurityManager securityManager;
+    @Autowired
+    private SecurityManager securityManager;
 
-  public void setSecurityManager(SecurityManager securityManager) {
-    this.securityManager = securityManager;
-  }
-
-  @Autowired
-  private RequestManager requestManager;
-
-  public void setRequestManager(RequestManager requestManager) {
-    this.requestManager = requestManager;
-  }
-
-  @RequestMapping("/plates")
-  public ModelAndView listPlates(ModelMap model) throws IOException {
-    try {
-      Collection<Plate<? extends List<? extends Plateable>, ? extends Plateable>> lp = requestManager.listAllPlates();
-      model.addAttribute("plates", lp);
-      return new ModelAndView("/pages/listPlates.jsp", model);
+    public void setSecurityManager(SecurityManager securityManager) {
+        this.securityManager = securityManager;
     }
-    catch (IOException ex) {
-      if (log.isDebugEnabled()) {
-        log.debug("Failed to list plates", ex);
-      }
-      throw ex;
+
+    @Autowired
+    private RequestManager requestManager;
+
+    public void setRequestManager(RequestManager requestManager) {
+        this.requestManager = requestManager;
     }
-  }
+
+    @RequestMapping("/plates")
+    public ModelAndView listPlates(ModelMap model) throws IOException {
+        try {
+            Collection<Plate<? extends List<? extends Plateable>, ? extends Plateable>> lp = requestManager.listAllPlates();
+            model.addAttribute("plates", lp);
+            return new ModelAndView("/pages/listPlates.jsp", model);
+        } catch (IOException ex) {
+            if (log.isDebugEnabled()) {
+                log.debug("Failed to list plates", ex);
+            }
+            throw ex;
+        }
+    }
 }

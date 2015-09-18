@@ -32,64 +32,59 @@ import uk.ac.bbsrc.tgac.miso.core.exception.MalformedSampleException;
  * @since 0.0.2
  */
 public abstract class AbstractSampleQC extends AbstractQC implements SampleQC {
-  public static final String UNITS = "ng/&#181;l";
+    public static final String UNITS = "ng/&#181;l";
 
-  private Double results;
-  private Sample sample;
+    private Double results;
+    private Sample sample;
 
-  public Sample getSample() {
-    return sample;
-  }
-
-  public void setSample(Sample sample) throws MalformedSampleException {
-    this.sample = sample;
-  }
-
-  public Double getResults() {
-    return results;
-  }
-
-  public void setResults(Double results) {
-    this.results = results;
-  }
-
-  /**
-   * Equivalency is based on getRunId() if set, otherwise on name
-   */
-  @Override
-  public boolean equals(Object obj) {
-    if (obj == null)
-      return false;
-    if (obj == this)
-      return true;
-    if (!(obj instanceof AbstractSampleQC))
-      return false;
-    SampleQC them = (SampleQC) obj;
-    // If not saved, then compare resolved actual objects. Otherwise
-    // just compare IDs.
-    if (this.getId() == AbstractSampleQC.UNSAVED_ID
-        || them.getId() == AbstractSampleQC.UNSAVED_ID) {
-      return this.getQcCreator().equals(them.getQcCreator())
-             && this.getQcDate().equals(them.getQcDate())
-             && this.getQcType().equals(them.getQcType())
-             && this.getResults().equals(them.getResults());
+    public Sample getSample() {
+        return sample;
     }
-    else {
-      return this.getId() == them.getId();
-    }
-  }
 
-  @Override
-  public int hashCode() {
-    if (getId() != AbstractSampleQC.UNSAVED_ID) {
-      return (int)getId();
+    public void setSample(Sample sample) throws MalformedSampleException {
+        this.sample = sample;
     }
-    else {
-      int hashcode = getQcCreator().hashCode();
-      hashcode = 37 * hashcode + getQcDate().hashCode();
-      hashcode = 37 * hashcode + getQcType().hashCode();
-      hashcode = 37 * hashcode + getResults().hashCode();
-      return hashcode;
+
+    public Double getResults() {
+        return results;
     }
-  }
+
+    public void setResults(Double results) {
+        this.results = results;
+    }
+
+    /**
+     * Equivalency is based on getRunId() if set, otherwise on name
+     */
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null)
+            return false;
+        if (obj == this)
+            return true;
+        if (!(obj instanceof AbstractSampleQC))
+            return false;
+        SampleQC them = (SampleQC) obj;
+        // If not saved, then compare resolved actual objects. Otherwise
+        // just compare IDs.
+        if (this.getId() == AbstractSampleQC.UNSAVED_ID || them.getId() == AbstractSampleQC.UNSAVED_ID) {
+            return this.getQcCreator().equals(them.getQcCreator()) && this.getQcDate().equals(them.getQcDate()) &&
+                   this.getQcType().equals(them.getQcType()) && this.getResults().equals(them.getResults());
+        } else {
+            return this.getId() == them.getId();
+        }
+    }
+
+    @Override
+    public int hashCode() {
+        if (getId() != AbstractSampleQC.UNSAVED_ID) {
+            return (int) getId();
+        } else {
+            int hashcode = getQcCreator().hashCode();
+            hashcode = 37 * hashcode + getQcDate().hashCode();
+            hashcode = 37 * hashcode + getQcType().hashCode();
+            hashcode = 37 * hashcode + getResults().hashCode();
+            return hashcode;
+        }
+    }
 }

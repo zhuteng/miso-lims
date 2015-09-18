@@ -35,13 +35,13 @@ import uk.ac.bbsrc.tgac.miso.core.service.integration.contract.InterrogationResu
  * @since 0.0.2
  */
 public interface InterrogationMechanism<Q extends InterrogationQuery, O, R extends InterrogationResult> {
-  /**
-   * Push a query to a queryable object and return a result
-   *
-   * @param queryable of type O
-   * @param query of type Q
-   * @return R
-   * @throws InterrogationException when
-   */
-  R doQuery(O queryable, Q query) throws InterrogationException;
+    /**
+     * Push a query to a queryable object and return a result
+     *
+     * @param queryable of type O
+     * @param query     of type Q
+     * @return R
+     * @throws InterrogationException when
+     */
+    R doQuery(O queryable, Q query) throws InterrogationException;
 }

@@ -41,30 +41,29 @@ import java.io.IOException;
  */
 @Aspect
 public class UserUpdateAspect {
-  private ProjectAlertManager projectAlertManager;
-  private RunAlertManager runAlertManager;
-  private PoolAlertManager poolAlertManager;
+    private ProjectAlertManager projectAlertManager;
+    private RunAlertManager runAlertManager;
+    private PoolAlertManager poolAlertManager;
 
-  public void setProjectAlertManager(ProjectAlertManager projectAlertManager) {
-    this.projectAlertManager = projectAlertManager;
-  }
-
-  public void setRunAlertManager(RunAlertManager runAlertManager) {
-    this.runAlertManager = runAlertManager;
-  }
-
-  public void setPoolAlertManager(PoolAlertManager poolAlertManager) {
-    this.poolAlertManager = poolAlertManager;
-  }
-
-  public void update(Long userId) {
-    try {
-      runAlertManager.updateGroupWatcher(userId);
-      projectAlertManager.updateGroupWatcher(userId);
-      poolAlertManager.updateGroupWatcher(userId);
+    public void setProjectAlertManager(ProjectAlertManager projectAlertManager) {
+        this.projectAlertManager = projectAlertManager;
     }
-    catch (IOException e) {
-      e.printStackTrace();
+
+    public void setRunAlertManager(RunAlertManager runAlertManager) {
+        this.runAlertManager = runAlertManager;
     }
-  }
+
+    public void setPoolAlertManager(PoolAlertManager poolAlertManager) {
+        this.poolAlertManager = poolAlertManager;
+    }
+
+    public void update(Long userId) {
+        try {
+            runAlertManager.updateGroupWatcher(userId);
+            projectAlertManager.updateGroupWatcher(userId);
+            poolAlertManager.updateGroupWatcher(userId);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 }

@@ -40,19 +40,19 @@ import java.util.Set;
  */
 @Spi
 public interface FilePathGenerator {
-  /**
-   * Generates file Paths for sequence datafiles
-   *
-   * @param partition
-   * @param dilution
-   * @return Object response
-   * @throws uk.ac.bbsrc.tgac.miso.core.exception.SubmissionException
-   */
-  public Set<File> generateFilePath(SequencerPoolPartition partition, Dilution dilution) throws SubmissionException;
+    /**
+     * Generates file Paths for sequence datafiles
+     *
+     * @param partition
+     * @param dilution
+     * @return Object response
+     * @throws uk.ac.bbsrc.tgac.miso.core.exception.SubmissionException
+     */
+    public Set<File> generateFilePath(SequencerPoolPartition partition, Dilution dilution) throws SubmissionException;
 
-  public Set<File> generateFilePaths(SequencerPoolPartition partition) throws SubmissionException;
+    public Set<File> generateFilePaths(SequencerPoolPartition partition) throws SubmissionException;
 
-  public String getName();
+    public String getName();
 
-  public PlatformType generatesFilePathsFor();
+    public PlatformType generatesFilePathsFor();
 }

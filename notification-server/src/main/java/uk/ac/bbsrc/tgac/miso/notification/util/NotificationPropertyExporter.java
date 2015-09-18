@@ -39,20 +39,19 @@ import java.util.*;
  * @since 0.1.4
  */
 public class NotificationPropertyExporter extends PropertyPlaceholderConfigurer {
-  private Map<String, String> resolvedProperties;
-  
-  @Override
-  protected void processProperties(ConfigurableListableBeanFactory beanFactoryToProcess,
-                                   Properties properties) throws BeansException {
-    super.processProperties(beanFactoryToProcess, properties);
-    resolvedProperties = new HashMap<String, String>();
-    for (Object key : properties.keySet()) {
-      String keyStr = key.toString();
-      resolvedProperties.put(keyStr, properties.getProperty(keyStr));
-    }
-  }
+    private Map<String, String> resolvedProperties;
 
-  public Map<String, String> getResolvedProperties() {
-    return Collections.unmodifiableMap(resolvedProperties);
-  }
+    @Override
+    protected void processProperties(ConfigurableListableBeanFactory beanFactoryToProcess, Properties properties) throws BeansException {
+        super.processProperties(beanFactoryToProcess, properties);
+        resolvedProperties = new HashMap<String, String>();
+        for (Object key : properties.keySet()) {
+            String keyStr = key.toString();
+            resolvedProperties.put(keyStr, properties.getProperty(keyStr));
+        }
+    }
+
+    public Map<String, String> getResolvedProperties() {
+        return Collections.unmodifiableMap(resolvedProperties);
+    }
 }

@@ -30,88 +30,88 @@ import java.io.IOException;
 import java.net.InetAddress;
 
 /**
- * Abstract class to provide basic methods to encapsulate a reference to a physical machine attached to a sequencer 
+ * Abstract class to provide basic methods to encapsulate a reference to a physical machine attached to a sequencer
  *
  * @author Rob Davey
  * @since 0.0.2
  */
 public abstract class AbstractSequencerReference implements SequencerReference {
-  protected static final Logger log = LoggerFactory.getLogger(AbstractSequencerReference.class);
+    protected static final Logger log = LoggerFactory.getLogger(AbstractSequencerReference.class);
 
-  public static final Long UNSAVED_ID = 0L;
+    public static final Long UNSAVED_ID = 0L;
 
-  private long id = AbstractSequencerReference.UNSAVED_ID;
-  private String name;
-  private Platform platform;
-  private Boolean available;
-  private InetAddress ip;
+    private long id = AbstractSequencerReference.UNSAVED_ID;
+    private String name;
+    private Platform platform;
+    private Boolean available;
+    private InetAddress ip;
 
-  @Override
-  public void setId(Long id) {
-    this.id = id;
-  }
+    @Override
+    public void setId(Long id) {
+        this.id = id;
+    }
 
-  @Override
-  public long getId() {
-    return this.id;
-  }
+    @Override
+    public long getId() {
+        return this.id;
+    }
 
-  @Override
-  public void setName(String name) {
-    this.name = name;
-  }
+    @Override
+    public void setName(String name) {
+        this.name = name;
+    }
 
-  @Override
-  public String getName() {
-    return this.name;
-  }
+    @Override
+    public String getName() {
+        return this.name;
+    }
 
-  public void setPlatform(Platform platform) {
-    this.platform = platform;
-  }
+    public void setPlatform(Platform platform) {
+        this.platform = platform;
+    }
 
-  public Platform getPlatform() {
-    return this.platform;
-  }
+    public Platform getPlatform() {
+        return this.platform;
+    }
 
-  public void setAvailable(Boolean available) {
-    this.available = available;
-  }
+    public void setAvailable(Boolean available) {
+        this.available = available;
+    }
 
-  public Boolean getAvailable() {
-    return this.available;
-  }
+    public Boolean getAvailable() {
+        return this.available;
+    }
 
-  public void checkAvailability(int timeout) throws IOException {
-    this.available = getIpAddress().isReachable(timeout);
-  }
+    public void checkAvailability(int timeout) throws IOException {
+        this.available = getIpAddress().isReachable(timeout);
+    }
 
-  public void setIpAddress(InetAddress ip) {
-    this.ip = ip;
-  }
+    public void setIpAddress(InetAddress ip) {
+        this.ip = ip;
+    }
 
-  public InetAddress getIpAddress() {
-    return this.ip;
-  }
+    public InetAddress getIpAddress() {
+        return this.ip;
+    }
 
-  public String getFQDN() {
-    return getIpAddress().getCanonicalHostName();
-  }
+    public String getFQDN() {
+        return getIpAddress().getCanonicalHostName();
+    }
 
-  public boolean isDeletable() {
-    return getId() != AbstractSequencerReference.UNSAVED_ID;
-  }
+    public boolean isDeletable() {
+        return getId() != AbstractSequencerReference.UNSAVED_ID;
+    }
 
-  @Override
-  public String toString() {
-    StringBuilder sb = new StringBuilder();
-    sb.append(getId());
-    sb.append(" : ");
-    sb.append(getName());
-    sb.append(" : ");
-    sb.append(getFQDN());
-    sb.append(" : ");
-    sb.append(getAvailable());
-    return sb.toString();
-  }
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(getId());
+        sb.append(" : ");
+        sb.append(getName());
+        sb.append(" : ");
+        sb.append(getFQDN());
+        sb.append(" : ");
+        sb.append(getAvailable());
+        return sb.toString();
+    }
 }

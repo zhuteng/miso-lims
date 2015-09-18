@@ -46,92 +46,89 @@ import java.util.*;
  */
 public class EraSubmissionDecorator extends AbstractSubmittableDecorator<Document> {
 
-  public EraSubmissionDecorator(Submission submittable, Properties submissionProperties, Document submission) {
-    super(submittable, submissionProperties);
-    this.submission = submission;
-  }
+    public EraSubmissionDecorator(Submission submittable, Properties submissionProperties, Document submission) {
+        super(submittable, submissionProperties);
+        this.submission = submission;
+    }
 
-  public void buildSubmission() {
-    Submission sub = (Submission)submittable;
+    public void buildSubmission() {
+        Submission sub = (Submission) submittable;
 
-    if (submission != null) {
-      Element s = submission.createElementNS(null, "SUBMISSION");
-      s.setAttribute("alias", sub.getAlias());
-      s.setAttribute("submission_date", submissionProperties.getProperty("submissionDate"));
-      s.setAttribute("submission_comment", sub.getDescription());
-      s.setAttribute("center_name", submissionProperties.getProperty("submission.centreName"));
+        if (submission != null) {
+            Element s = submission.createElementNS(null, "SUBMISSION");
+            s.setAttribute("alias", sub.getAlias());
+            s.setAttribute("submission_date", submissionProperties.getProperty("submissionDate"));
+            s.setAttribute("submission_comment", sub.getDescription());
+            s.setAttribute("center_name", submissionProperties.getProperty("submission.centreName"));
 
-      Element title = submission.createElementNS(null, "TITLE");
-      title.setTextContent(sub.getTitle());
-      s.appendChild(title);
+            Element title = submission.createElementNS(null, "TITLE");
+            title.setTextContent(sub.getTitle());
+            s.appendChild(title);
 
-      Element contacts = submission.createElementNS(null, "CONTACTS");
-      for (String contactName : submissionProperties.getProperty("submission.contacts").split(",")) {
-        Element contact = submission.createElementNS(null, "CONTACT");
-        contact.setAttribute("name", contactName);
-        contacts.appendChild(contact);
-      }
-      s.appendChild(contacts);
-
-      SubmissionActionType sat = sub.getSubmissionActionType();
-
-      Map<String, List<Submittable<Document>>> map = new HashMap<String, List<Submittable<Document>>>();
-      map.put("study", new ArrayList<Submittable<Document>>());
-      map.put("sample", new ArrayList<Submittable<Document>>());
-      map.put("experiment", new ArrayList<Submittable<Document>>());
-      map.put("run", new ArrayList<Submittable<Document>>());
-
-      Map<SequencerPoolPartition, Collection<? extends Poolable>> dataFilePoolables =
-              new HashMap<SequencerPoolPartition, Collection<? extends Poolable>>();
-
-      Set<Submittable<Document>> subs = sub.getSubmissionElements();
-      for (Submittable<Document> subtype : subs) {
-        if (subtype instanceof Study) {
-          map.get("study").add(subtype);
-        }
-        else if (subtype instanceof Sample) {
-          map.get("sample").add(subtype);
-        }
-        else if (subtype instanceof Experiment) {
-          map.get("experiment").add(subtype);
-        }
-        else if (subtype instanceof SequencerPoolPartition) {
-          map.get("run").add(subtype);
-
-          SequencerPoolPartition p = (SequencerPoolPartition)subtype;
-          if (p.getPool() != null) {
-            dataFilePoolables.put(p, p.getPool().getPoolableElements());
-          }
-        }
-      }
-
-      Element actions = submission.createElementNS(null, "ACTIONS");
-
-      for (String key : map.keySet()) {
-        List<Submittable<Document>> submittables = map.get(key);
-        if (submittables.size() > 0) {
-          Element action = submission.createElementNS(null, "ACTION");
-          if (sat != null) {
-            if (sat.equals(SubmissionActionType.VALIDATE)) {
-              Element validate = submission.createElementNS(null, "VALIDATE");
-              validate.setAttribute("schema", key);
-              validate.setAttribute("source", sub.getName()+"_"+key+"_"+submissionProperties.getProperty("submissionDate")+".xml");
-              action.appendChild(validate);
+            Element contacts = submission.createElementNS(null, "CONTACTS");
+            for (String contactName : submissionProperties.getProperty("submission.contacts").split(",")) {
+                Element contact = submission.createElementNS(null, "CONTACT");
+                contact.setAttribute("name", contactName);
+                contacts.appendChild(contact);
             }
-            else if (sat.equals(SubmissionActionType.ADD)) {
-              Element add = submission.createElementNS(null, "ADD");
-              add.setAttribute("schema", key);
-              add.setAttribute("source", sub.getName()+"_"+key+"_"+submissionProperties.getProperty("submissionDate")+".xml");
-              action.appendChild(add);
-            }
-          }
-          else {
+            s.appendChild(contacts);
 
-          }
-          actions.appendChild(action);
-        }
-      }
-      s.appendChild(actions);
+            SubmissionActionType sat = sub.getSubmissionActionType();
+
+            Map<String, List<Submittable<Document>>> map = new HashMap<String, List<Submittable<Document>>>();
+            map.put("study", new ArrayList<Submittable<Document>>());
+            map.put("sample", new ArrayList<Submittable<Document>>());
+            map.put("experiment", new ArrayList<Submittable<Document>>());
+            map.put("run", new ArrayList<Submittable<Document>>());
+
+            Map<SequencerPoolPartition, Collection<? extends Poolable>> dataFilePoolables = new HashMap<SequencerPoolPartition, Collection<? extends Poolable>>();
+
+            Set<Submittable<Document>> subs = sub.getSubmissionElements();
+            for (Submittable<Document> subtype : subs) {
+                if (subtype instanceof Study) {
+                    map.get("study").add(subtype);
+                } else if (subtype instanceof Sample) {
+                    map.get("sample").add(subtype);
+                } else if (subtype instanceof Experiment) {
+                    map.get("experiment").add(subtype);
+                } else if (subtype instanceof SequencerPoolPartition) {
+                    map.get("run").add(subtype);
+
+                    SequencerPoolPartition p = (SequencerPoolPartition) subtype;
+                    if (p.getPool() != null) {
+                        dataFilePoolables.put(p, p.getPool().getPoolableElements());
+                    }
+                }
+            }
+
+            Element actions = submission.createElementNS(null, "ACTIONS");
+
+            for (String key : map.keySet()) {
+                List<Submittable<Document>> submittables = map.get(key);
+                if (submittables.size() > 0) {
+                    Element action = submission.createElementNS(null, "ACTION");
+                    if (sat != null) {
+                        if (sat.equals(SubmissionActionType.VALIDATE)) {
+                            Element validate = submission.createElementNS(null, "VALIDATE");
+                            validate.setAttribute("schema", key);
+                            validate.setAttribute("source",
+                                                  sub.getName() + "_" + key + "_" + submissionProperties.getProperty("submissionDate") +
+                                                  ".xml");
+                            action.appendChild(validate);
+                        } else if (sat.equals(SubmissionActionType.ADD)) {
+                            Element add = submission.createElementNS(null, "ADD");
+                            add.setAttribute("schema", key);
+                            add.setAttribute("source",
+                                             sub.getName() + "_" + key + "_" + submissionProperties.getProperty("submissionDate") + ".xml");
+                            action.appendChild(add);
+                        }
+                    } else {
+
+                    }
+                    actions.appendChild(action);
+                }
+            }
+            s.appendChild(actions);
 
       /*
       * FILES element deprecated in SRA 1.5
@@ -164,15 +161,14 @@ public class EraSubmissionDecorator extends AbstractSubmittableDecorator<Documen
       s.appendChild(files);
       */
 
-      if (submission.getElementsByTagName("SUBMISSION_SET").item(0) != null) {
-        submission.getElementsByTagName("SUBMISSION_SET").item(0).appendChild(s);
-      }
-      else {
-        Element submissionSet=submission.createElementNS(null,"SUBMISSION_SET");
-        submission.appendChild(submissionSet);
-        submissionSet.appendChild(s);
-      }
+            if (submission.getElementsByTagName("SUBMISSION_SET").item(0) != null) {
+                submission.getElementsByTagName("SUBMISSION_SET").item(0).appendChild(s);
+            } else {
+                Element submissionSet = submission.createElementNS(null, "SUBMISSION_SET");
+                submission.appendChild(submissionSet);
+                submissionSet.appendChild(s);
+            }
 
+        }
     }
-  }
 }

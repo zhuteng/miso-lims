@@ -48,61 +48,57 @@ import java.util.regex.Pattern;
  * @since 0.0.2
  */
 public class IlluminaStatus extends StatusImpl {
-  String statusXml = null;
+    String statusXml = null;
 
-  public IlluminaStatus() {
-    setHealth(HealthType.Unknown);
-  }
+    public IlluminaStatus() {
+        setHealth(HealthType.Unknown);
+    }
 
-  public IlluminaStatus(String statusXml) {
-    this.statusXml = statusXml;
-    parseStatusXml(statusXml);
-  }
+    public IlluminaStatus(String statusXml) {
+        this.statusXml = statusXml;
+        parseStatusXml(statusXml);
+    }
 
-  public void parseStatusXml(String statusXml) {
-    try {
-      Document statusDoc = SubmissionUtils.emptyDocument();
-      SubmissionUtils.transform(new UnicodeReader(statusXml), statusDoc);
+    public void parseStatusXml(String statusXml) {
+        try {
+            Document statusDoc = SubmissionUtils.emptyDocument();
+            SubmissionUtils.transform(new UnicodeReader(statusXml), statusDoc);
 
-      if (statusDoc.getDocumentElement().getTagName().equals("error")) {
-        String runName = statusDoc.getElementsByTagName("RunName").item(0).getTextContent();
-        String runDirRegex = "(\\d{6})_([A-z0-9]+)_(\\d+)_[A-z0-9_]*";
-        Matcher m = Pattern.compile(runDirRegex).matcher(runName);
-        if (m.matches()) {
-          setStartDate(new SimpleDateFormat("yyMMdd").parse(m.group(1)));
-          setInstrumentName(m.group(2));
+            if (statusDoc.getDocumentElement().getTagName().equals("error")) {
+                String runName = statusDoc.getElementsByTagName("RunName").item(0).getTextContent();
+                String runDirRegex = "(\\d{6})_([A-z0-9]+)_(\\d+)_[A-z0-9_]*";
+                Matcher m = Pattern.compile(runDirRegex).matcher(runName);
+                if (m.matches()) {
+                    setStartDate(new SimpleDateFormat("yyMMdd").parse(m.group(1)));
+                    setInstrumentName(m.group(2));
+                }
+                setRunName(runName);
+                setHealth(HealthType.Unknown);
+            } else {
+                String runStarted = statusDoc.getElementsByTagName("RunStarted").item(0).getTextContent();
+                setStartDate(new SimpleDateFormat("EEEE, MMMMM dd, yyyy h:mm aaa").parse(runStarted));
+                setInstrumentName(statusDoc.getElementsByTagName("InstrumentName").item(0).getTextContent());
+                setRunName(statusDoc.getElementsByTagName("RunName").item(0).getTextContent());
+                setHealth(HealthType.Unknown);
+            }
+            setXml(statusXml);
+        } catch (ParserConfigurationException e) {
+            e.printStackTrace();
+        } catch (TransformerException e) {
+            e.printStackTrace();
+        } catch (ParseException e) {
+            e.printStackTrace();
         }
-        setRunName(runName);
-        setHealth(HealthType.Unknown);
-      }
-      else {
-        String runStarted = statusDoc.getElementsByTagName("RunStarted").item(0).getTextContent();
-        setStartDate(new SimpleDateFormat("EEEE, MMMMM dd, yyyy h:mm aaa").parse(runStarted));
-        setInstrumentName(statusDoc.getElementsByTagName("InstrumentName").item(0).getTextContent());
-        setRunName(statusDoc.getElementsByTagName("RunName").item(0).getTextContent());
-        setHealth(HealthType.Unknown);
-      }
-      setXml(statusXml);
     }
-    catch (ParserConfigurationException e) {
-      e.printStackTrace();
-    }
-    catch (TransformerException e) {
-      e.printStackTrace();
-    }
-    catch (ParseException e) {
-      e.printStackTrace();
-    }
-  }
 
-  @Override
-  public String toString() {
-    StringBuffer sb = new StringBuffer();
-    sb.append(super.toString());
-    if (statusXml != null) {
-      sb.append(" : ");
-      sb.append(statusXml);
+    @Override
+    public String toString() {
+        StringBuffer sb = new StringBuffer();
+        sb.append(super.toString());
+        if (statusXml != null) {
+            sb.append(" : ");
+            sb.append(statusXml);
+        }
+        return sb.toString();
     }
-    return sb.toString();
-  }
 }

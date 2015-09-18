@@ -24,6 +24,7 @@
 package uk.ac.bbsrc.tgac.miso.core.data;
 
 //import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import org.codehaus.jackson.annotate.JsonIgnore;
 
 /**
@@ -36,25 +37,25 @@ import org.codehaus.jackson.annotate.JsonIgnore;
  * @since 0.0.2
  */
 public interface Barcodable extends Nameable {
-   /**
-   * Returns the label text of this Barcodable object.
-   *
-   * @return String labelText.
-   */
-  @JsonIgnore
-  public String getLabelText();
+    /**
+     * Returns the label text of this Barcodable object.
+     *
+     * @return String labelText.
+     */
+    @JsonIgnore
+    public String getLabelText();
 
-  /**
-   * Returns the identificationBarcode of this Barcodable object.
-   *
-   * @return String identificationBarcode.
-   */
-  public String getIdentificationBarcode();
+    /**
+     * Returns the identificationBarcode of this Barcodable object.
+     *
+     * @return String identificationBarcode.
+     */
+    public String getIdentificationBarcode();
 
-  /**
-   * Sets the identificationBarcode of this Barcodable object.
-   *
-   * @param identificationBarcode identificationBarcode.
-   */
-  public void setIdentificationBarcode(String identificationBarcode);
+    /**
+     * Sets the identificationBarcode of this Barcodable object.
+     *
+     * @param identificationBarcode identificationBarcode.
+     */
+    public void setIdentificationBarcode(String identificationBarcode);
 }

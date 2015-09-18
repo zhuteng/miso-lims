@@ -53,54 +53,48 @@ import java.net.URLEncoder;
  * @since 0.1.4
  */
 public class TaxonomyUtils {
-  protected static final Logger log = LoggerFactory.getLogger(TaxonomyUtils.class);
+    protected static final Logger log = LoggerFactory.getLogger(TaxonomyUtils.class);
 
-  private static final String ncbiEntrezUtilsURL = "http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?";
+    private static final String ncbiEntrezUtilsURL = "http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?";
 
-  public static String checkScientificNameAtNCBI(String scientificName) {
-    try {
-      String query = ncbiEntrezUtilsURL+"db=taxonomy&term="+URLEncoder.encode(scientificName, "UTF-8");
-      final HttpClient httpclient = new DefaultHttpClient();
-      HttpGet httpget = new HttpGet(query);
-      try {
-        HttpResponse response = httpclient.execute(httpget);
-        String out = parseEntity(response.getEntity());
-        log.info(out);
+    public static String checkScientificNameAtNCBI(String scientificName) {
         try {
-          Document d = SubmissionUtils.emptyDocument();
-          SubmissionUtils.transform(new UnicodeReader(out), d);
-          NodeList nl = d.getElementsByTagName("Id");
-          for (int i = 0; i < nl.getLength(); i++) {
-            Element e = (Element)nl.item(i);
-            return e.getTextContent();
-          }
+            String query = ncbiEntrezUtilsURL + "db=taxonomy&term=" + URLEncoder.encode(scientificName, "UTF-8");
+            final HttpClient httpclient = new DefaultHttpClient();
+            HttpGet httpget = new HttpGet(query);
+            try {
+                HttpResponse response = httpclient.execute(httpget);
+                String out = parseEntity(response.getEntity());
+                log.info(out);
+                try {
+                    Document d = SubmissionUtils.emptyDocument();
+                    SubmissionUtils.transform(new UnicodeReader(out), d);
+                    NodeList nl = d.getElementsByTagName("Id");
+                    for (int i = 0; i < nl.getLength(); i++) {
+                        Element e = (Element) nl.item(i);
+                        return e.getTextContent();
+                    }
+                } catch (ParserConfigurationException e) {
+                    e.printStackTrace();
+                } catch (TransformerException e) {
+                    e.printStackTrace();
+                }
+            } catch (ClientProtocolException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
         }
-        catch (ParserConfigurationException e) {
-          e.printStackTrace();
-        }
-        catch (TransformerException e) {
-          e.printStackTrace();
-        }
-      }
-      catch (ClientProtocolException e) {
-        e.printStackTrace();
-      }
-      catch (IOException e) {
-        e.printStackTrace();
-      }
+        return null;
     }
-    catch (UnsupportedEncodingException e) {
-      e.printStackTrace();
-    }
-    return null;
-  }
 
-  private static String parseEntity(HttpEntity entity) throws IOException {
-    if (entity != null) {
-      return EntityUtils.toString(entity, "UTF-8");
+    private static String parseEntity(HttpEntity entity) throws IOException {
+        if (entity != null) {
+            return EntityUtils.toString(entity, "UTF-8");
+        } else {
+            throw new IOException("Null entity in REST response");
+        }
     }
-    else {
-      throw new IOException("Null entity in REST response");
-    }
-  }
 }

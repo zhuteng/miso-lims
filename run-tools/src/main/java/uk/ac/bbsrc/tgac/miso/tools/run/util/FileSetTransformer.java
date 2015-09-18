@@ -41,5 +41,5 @@ import java.util.Set;
  * @since 0.0.3
  */
 public interface FileSetTransformer<K, V, S> {
-  Map<K, V> transform(Set<S> files);
+    Map<K, V> transform(Set<S> files);
 }

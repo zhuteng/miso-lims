@@ -36,28 +36,28 @@ import java.util.List;
  * @since 0.0.2
  */
 public interface PlatformStore extends Store<Platform> {
-  /**
-   * Get a Platform given a model name
-   *
-   * @param model of type String
-   * @return Platform
-   * @throws IOException when
-   */
-  Platform getByModel(String model) throws IOException;
+    /**
+     * Get a Platform given a model name
+     *
+     * @param model of type String
+     * @return Platform
+     * @throws IOException when
+     */
+    Platform getByModel(String model) throws IOException;
 
-  /**
-   * List all Platforms
-   *
-   * @return List<Platform>
-   * @throws IOException when
-   */
-  List<Platform> listByName() throws IOException;
+    /**
+     * List all Platforms
+     *
+     * @return List<Platform>
+     * @throws IOException when
+     */
+    List<Platform> listByName() throws IOException;
 
-  /**
-   * List all distinct Platform names
-   * 
-   * @return List<String>
-   * @throws IOException when
-   */
-  List<String> listDistinctPlatformNames() throws IOException;
+    /**
+     * List all distinct Platform names
+     *
+     * @return List<String>
+     * @throws IOException when
+     */
+    List<String> listDistinctPlatformNames() throws IOException;
 }

@@ -30,12 +30,11 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
 
-
 /**
  * <p>Java class for qualityMetrics complex type.
- * 
+ * <p/>
  * <p>The following schema fragment specifies the expected content contained within this class.
- * 
+ * <p/>
  * <pre>
  * &lt;complexType name="qualityMetrics">
  *   &lt;complexContent>
@@ -56,22 +55,11 @@ import javax.xml.bind.annotation.XmlType;
  *   &lt;/complexContent>
  * &lt;/complexType>
  * </pre>
- * 
- * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "qualityMetrics", propOrder = {
-    "cycle",
-    "filePath",
-    "name",
-    "primer",
-    "primerSet",
-    "qualityMetricsDetails",
-    "sample",
-    "timeStamp",
-    "version",
-    "xml"
-})
+@XmlType(name = "qualityMetrics",
+         propOrder = { "cycle", "filePath", "name", "primer", "primerSet", "qualityMetricsDetails", "sample", "timeStamp", "version",
+                       "xml" })
 public class QualityMetrics {
 
     protected int cycle;
@@ -88,7 +76,6 @@ public class QualityMetrics {
 
     /**
      * Gets the value of the cycle property.
-     * 
      */
     public int getCycle() {
         return cycle;
@@ -96,7 +83,6 @@ public class QualityMetrics {
 
     /**
      * Sets the value of the cycle property.
-     * 
      */
     public void setCycle(int value) {
         this.cycle = value;
@@ -104,11 +90,9 @@ public class QualityMetrics {
 
     /**
      * Gets the value of the filePath property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     * {@link String }
      */
     public String getFilePath() {
         return filePath;
@@ -116,11 +100,9 @@ public class QualityMetrics {
 
     /**
      * Sets the value of the filePath property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setFilePath(String value) {
         this.filePath = value;
@@ -128,11 +110,9 @@ public class QualityMetrics {
 
     /**
      * Gets the value of the name property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     * {@link String }
      */
     public String getName() {
         return name;
@@ -140,11 +120,9 @@ public class QualityMetrics {
 
     /**
      * Sets the value of the name property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setName(String value) {
         this.name = value;
@@ -152,7 +130,6 @@ public class QualityMetrics {
 
     /**
      * Gets the value of the primer property.
-     * 
      */
     public int getPrimer() {
         return primer;
@@ -160,7 +137,6 @@ public class QualityMetrics {
 
     /**
      * Sets the value of the primer property.
-     * 
      */
     public void setPrimer(int value) {
         this.primer = value;
@@ -168,11 +144,9 @@ public class QualityMetrics {
 
     /**
      * Gets the value of the primerSet property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     * {@link String }
      */
     public String getPrimerSet() {
         return primerSet;
@@ -180,11 +154,9 @@ public class QualityMetrics {
 
     /**
      * Sets the value of the primerSet property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setPrimerSet(String value) {
         this.primerSet = value;
@@ -192,25 +164,23 @@ public class QualityMetrics {
 
     /**
      * Gets the value of the qualityMetricsDetails property.
-     * 
-     * <p>
+     * <p/>
+     * <p/>
      * This accessor method returns a reference to the live list,
      * not a snapshot. Therefore any modification you make to the
      * returned list will be present inside the JAXB object.
      * This is why there is not a <CODE>set</CODE> method for the qualityMetricsDetails property.
-     * 
-     * <p>
+     * <p/>
+     * <p/>
      * For example, to add a new item, do as follows:
      * <pre>
      *    getQualityMetricsDetails().add(newItem);
      * </pre>
-     * 
-     * 
-     * <p>
+     * <p/>
+     * <p/>
+     * <p/>
      * Objects of the following type(s) are allowed in the list
      * {@link QualityMetricsDetails }
-     * 
-     * 
      */
     public List<QualityMetricsDetails> getQualityMetricsDetails() {
         if (qualityMetricsDetails == null) {
@@ -221,11 +191,9 @@ public class QualityMetrics {
 
     /**
      * Gets the value of the sample property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     * {@link String }
      */
     public String getSample() {
         return sample;
@@ -233,11 +201,9 @@ public class QualityMetrics {
 
     /**
      * Sets the value of the sample property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setSample(String value) {
         this.sample = value;
@@ -245,11 +211,9 @@ public class QualityMetrics {
 
     /**
      * Gets the value of the timeStamp property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     * {@link String }
      */
     public String getTimeStamp() {
         return timeStamp;
@@ -257,11 +221,9 @@ public class QualityMetrics {
 
     /**
      * Sets the value of the timeStamp property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setTimeStamp(String value) {
         this.timeStamp = value;
@@ -269,7 +231,6 @@ public class QualityMetrics {
 
     /**
      * Gets the value of the version property.
-     * 
      */
     public int getVersion() {
         return version;
@@ -277,7 +238,6 @@ public class QualityMetrics {
 
     /**
      * Sets the value of the version property.
-     * 
      */
     public void setVersion(int value) {
         this.version = value;
@@ -285,11 +245,9 @@ public class QualityMetrics {
 
     /**
      * Gets the value of the xml property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     * {@link String }
      */
     public String getXml() {
         return xml;
@@ -297,11 +255,9 @@ public class QualityMetrics {
 
     /**
      * Sets the value of the xml property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setXml(String value) {
         this.xml = value;

@@ -49,114 +49,103 @@ import java.util.List;
  * @since 0.0.2
  */
 public class SQLPlatformDAO implements PlatformStore {
-  private static final String TABLE_NAME = "Platform";
+    private static final String TABLE_NAME = "Platform";
 
-  public static final String PLATFORMS_SELECT =
-          "SELECT platformId, name, instrumentModel, description, numContainers " +
-          "FROM "+TABLE_NAME;
+    public static final String PLATFORMS_SELECT = "SELECT platformId, name, instrumentModel, description, numContainers " +
+                                                  "FROM " + TABLE_NAME;
 
-  public static final String PLATFORM_NAMES_SELECT_DISTINCT =
-          "SELECT DISTINCT name FROM "+TABLE_NAME;
+    public static final String PLATFORM_NAMES_SELECT_DISTINCT = "SELECT DISTINCT name FROM " + TABLE_NAME;
 
-  public static final String PLATFORM_UPDATE =
-          "UPDATE "+TABLE_NAME+" " +
-          "SET name=:name, instrumentModel=:instrumentModel, description=:description, numContainers=:numContainers " +
-          "WHERE platformId=:platformId";
+    public static final String PLATFORM_UPDATE = "UPDATE " + TABLE_NAME + " " +
+                                                 "SET name=:name, instrumentModel=:instrumentModel, description=:description, numContainers=:numContainers " +
+                                                 "WHERE platformId=:platformId";
 
-  public static final String PLATFORM_SELECT_BY_ID =
-          PLATFORMS_SELECT + " " + "WHERE platformId = ?";
+    public static final String PLATFORM_SELECT_BY_ID = PLATFORMS_SELECT + " " + "WHERE platformId = ?";
 
-  public static final String PLATFORMS_SELECT_BY_NAME =
-          PLATFORMS_SELECT + " " + "WHERE name = ?";
+    public static final String PLATFORMS_SELECT_BY_NAME = PLATFORMS_SELECT + " " + "WHERE name = ?";
 
-  public static final String PLATFORM_SELECT_BY_MODEL =
-          PLATFORMS_SELECT + " " + "WHERE instrumentModel = ?";
+    public static final String PLATFORM_SELECT_BY_MODEL = PLATFORMS_SELECT + " " + "WHERE instrumentModel = ?";
 
-  private JdbcTemplate template;
+    private JdbcTemplate template;
 
-  @Autowired
-  private DataObjectFactory dataObjectFactory;
+    @Autowired
+    private DataObjectFactory dataObjectFactory;
 
-  public void setDataObjectFactory(DataObjectFactory dataObjectFactory) {
-    this.dataObjectFactory = dataObjectFactory;
-  }  
-
-  public JdbcTemplate getJdbcTemplate() {
-    return template;
-  }
-
-  public void setJdbcTemplate(JdbcTemplate template) {
-    this.template = template;
-  }
-
-  public long save(Platform platform) throws IOException {
-    // execute this procedure...
-    MapSqlParameterSource params = new MapSqlParameterSource();
-    params.addValue("name", platform.getPlatformType().getKey())
-            .addValue("instrumentModel", platform.getInstrumentModel())
-            .addValue("description", platform.getDescription())
-            .addValue("numContainers", platform.getNumContainers());
-
-    if (platform.getPlatformId() == null) {
-      SimpleJdbcInsert insert = new SimpleJdbcInsert(template)
-              .withTableName(TABLE_NAME)
-              .usingGeneratedKeyColumns("platformId");
-      Number newId = insert.executeAndReturnKey(params);
-      platform.setPlatformId(newId.longValue());
+    public void setDataObjectFactory(DataObjectFactory dataObjectFactory) {
+        this.dataObjectFactory = dataObjectFactory;
     }
-    else {
-      params.addValue("platformId", platform.getPlatformId());
-      NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
-      namedTemplate.update(PLATFORM_UPDATE, params);
+
+    public JdbcTemplate getJdbcTemplate() {
+        return template;
     }
-    
-    return platform.getPlatformId();
-  }
 
-  public List<Platform> listAll() {
-    return template.query(PLATFORMS_SELECT, new PlatformMapper());
-  }
-
-  @Override
-  public int count() throws IOException {
-    return template.queryForInt("SELECT count(*) FROM "+TABLE_NAME);
-  }
-
-  public List<String> listDistinctPlatformNames() {
-    return template.queryForList(PLATFORM_NAMES_SELECT_DISTINCT, String.class);
-  }
-
-  public List<Platform> listByName() {
-    List results = template.query(PLATFORMS_SELECT_BY_NAME, new PlatformMapper());
-    return results;
-  }
-
-  public Platform getByModel(String model) {
-    List eResults = template.query(PLATFORM_SELECT_BY_MODEL, new Object[]{model}, new PlatformMapper());
-    Platform e = eResults.size() > 0 ? (Platform) eResults.get(0) : null;
-    return e;
-  }  
-
-  public Platform get(long platformId) throws IOException {
-    List eResults = template.query(PLATFORM_SELECT_BY_ID, new Object[]{platformId}, new PlatformMapper());
-    Platform e = eResults.size() > 0 ? (Platform) eResults.get(0) : null;
-    return e;
-  }
-
-  @Override
-  public Platform lazyGet(long id) throws IOException {
-    return get(id);
-  }
-
-  public class PlatformMapper implements RowMapper<Platform> {
-    public Platform mapRow(ResultSet rs, int rowNum) throws SQLException {
-      Platform p = new PlatformImpl();
-      p.setPlatformId(rs.getLong("platformId"));
-      p.setPlatformType(PlatformType.get(rs.getString("name")));
-      p.setDescription(rs.getString("description"));
-      p.setInstrumentModel(rs.getString("instrumentModel"));
-      p.setNumContainers(rs.getInt("numContainers"));
-      return p;
+    public void setJdbcTemplate(JdbcTemplate template) {
+        this.template = template;
     }
-  }
+
+    public long save(Platform platform) throws IOException {
+        // execute this procedure...
+        MapSqlParameterSource params = new MapSqlParameterSource();
+        params.addValue("name", platform.getPlatformType().getKey()).addValue("instrumentModel", platform.getInstrumentModel())
+              .addValue("description", platform.getDescription()).addValue("numContainers", platform.getNumContainers());
+
+        if (platform.getPlatformId() == null) {
+            SimpleJdbcInsert insert = new SimpleJdbcInsert(template).withTableName(TABLE_NAME).usingGeneratedKeyColumns("platformId");
+            Number newId = insert.executeAndReturnKey(params);
+            platform.setPlatformId(newId.longValue());
+        } else {
+            params.addValue("platformId", platform.getPlatformId());
+            NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
+            namedTemplate.update(PLATFORM_UPDATE, params);
+        }
+
+        return platform.getPlatformId();
+    }
+
+    public List<Platform> listAll() {
+        return template.query(PLATFORMS_SELECT, new PlatformMapper());
+    }
+
+    @Override
+    public int count() throws IOException {
+        return template.queryForInt("SELECT count(*) FROM " + TABLE_NAME);
+    }
+
+    public List<String> listDistinctPlatformNames() {
+        return template.queryForList(PLATFORM_NAMES_SELECT_DISTINCT, String.class);
+    }
+
+    public List<Platform> listByName() {
+        List results = template.query(PLATFORMS_SELECT_BY_NAME, new PlatformMapper());
+        return results;
+    }
+
+    public Platform getByModel(String model) {
+        List eResults = template.query(PLATFORM_SELECT_BY_MODEL, new Object[] { model }, new PlatformMapper());
+        Platform e = eResults.size() > 0 ? (Platform) eResults.get(0) : null;
+        return e;
+    }
+
+    public Platform get(long platformId) throws IOException {
+        List eResults = template.query(PLATFORM_SELECT_BY_ID, new Object[] { platformId }, new PlatformMapper());
+        Platform e = eResults.size() > 0 ? (Platform) eResults.get(0) : null;
+        return e;
+    }
+
+    @Override
+    public Platform lazyGet(long id) throws IOException {
+        return get(id);
+    }
+
+    public class PlatformMapper implements RowMapper<Platform> {
+        public Platform mapRow(ResultSet rs, int rowNum) throws SQLException {
+            Platform p = new PlatformImpl();
+            p.setPlatformId(rs.getLong("platformId"));
+            p.setPlatformType(PlatformType.get(rs.getString("name")));
+            p.setDescription(rs.getString("description"));
+            p.setInstrumentModel(rs.getString("instrumentModel"));
+            p.setNumContainers(rs.getInt("numContainers"));
+            return p;
+        }
+    }
 }

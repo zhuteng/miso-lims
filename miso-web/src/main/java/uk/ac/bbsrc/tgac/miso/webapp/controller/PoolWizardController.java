@@ -44,79 +44,77 @@ import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
 @RequestMapping("/poolwizard")
 @SessionAttributes("poolwizard")
 public class PoolWizardController {
-  protected static final Logger log = LoggerFactory.getLogger(PoolWizardController.class);
+    protected static final Logger log = LoggerFactory.getLogger(PoolWizardController.class);
 
-  @Autowired
-  private SecurityManager securityManager;
+    @Autowired
+    private SecurityManager securityManager;
 
-  @Autowired
-  private RequestManager requestManager;
+    @Autowired
+    private RequestManager requestManager;
 
-  @Autowired
-  private DataObjectFactory dataObjectFactory;
+    @Autowired
+    private DataObjectFactory dataObjectFactory;
 
-  @Autowired
-  private JdbcTemplate interfaceTemplate;
+    @Autowired
+    private JdbcTemplate interfaceTemplate;
 
-  public void setInterfaceTemplate(JdbcTemplate interfaceTemplate) {
-    this.interfaceTemplate = interfaceTemplate;
-  }
-
-  public void setDataObjectFactory(DataObjectFactory dataObjectFactory) {
-    this.dataObjectFactory = dataObjectFactory;
-  }
-
-  public void setRequestManager(RequestManager requestManager) {
-    this.requestManager = requestManager;
-  }
-
-  public void setSecurityManager(SecurityManager securityManager) {
-    this.securityManager = securityManager;
-  }
-
-  @ModelAttribute("studyTypes")
-  public Collection<String> populateStudyTypes() throws IOException {
-    return requestManager.listAllStudyTypes();
-  }
-
-  @ModelAttribute("platforms")
-  public Collection<Platform> populatePlatforms() throws IOException {
-    return requestManager.listAllPlatforms();
-  }
-
-  @ModelAttribute("platformNames")
-  public Collection<String> populatePlatformNames() throws IOException {
-    List<String> types = new ArrayList<String>(requestManager.listDistinctPlatformNames());
-    Collections.sort(types);
-    return types;
-  }
-
-  @RequestMapping(value = "/new/{projectId}", method = RequestMethod.GET)
-  public ModelAndView newAssignedProject(@PathVariable Long projectId,
-                                         ModelMap model) throws IOException {
-    try {
-      Project p = requestManager.getProjectById(projectId);
-      StringBuilder a = new StringBuilder();
-      for (String name : populatePlatformNames()) {
-        a.append("<option value=\"" + name + "\">" + name + "</option>");
-      }
-
-      StringBuilder b = new StringBuilder();
-      for (String st : requestManager.listAllStudyTypes()) {
-        b.append("<option value=\"" + st + "\">" + st + "</option>");
-      }
-
-      model.put("project", p);
-      model.put("platforms", a.toString());
-      //model.put("existingStudies", requestManager.listAllStudiesByProjectId(projectId));
-      model.put("studyTypes", b.toString());
-      return new ModelAndView("/pages/poolWizard.jsp", model);
+    public void setInterfaceTemplate(JdbcTemplate interfaceTemplate) {
+        this.interfaceTemplate = interfaceTemplate;
     }
-    catch (IOException ex) {
-      if (log.isDebugEnabled()) {
-        log.debug("Failed to show pool wizard", ex);
-      }
-      throw ex;
+
+    public void setDataObjectFactory(DataObjectFactory dataObjectFactory) {
+        this.dataObjectFactory = dataObjectFactory;
     }
-  }
+
+    public void setRequestManager(RequestManager requestManager) {
+        this.requestManager = requestManager;
+    }
+
+    public void setSecurityManager(SecurityManager securityManager) {
+        this.securityManager = securityManager;
+    }
+
+    @ModelAttribute("studyTypes")
+    public Collection<String> populateStudyTypes() throws IOException {
+        return requestManager.listAllStudyTypes();
+    }
+
+    @ModelAttribute("platforms")
+    public Collection<Platform> populatePlatforms() throws IOException {
+        return requestManager.listAllPlatforms();
+    }
+
+    @ModelAttribute("platformNames")
+    public Collection<String> populatePlatformNames() throws IOException {
+        List<String> types = new ArrayList<String>(requestManager.listDistinctPlatformNames());
+        Collections.sort(types);
+        return types;
+    }
+
+    @RequestMapping(value = "/new/{projectId}", method = RequestMethod.GET)
+    public ModelAndView newAssignedProject(@PathVariable Long projectId, ModelMap model) throws IOException {
+        try {
+            Project p = requestManager.getProjectById(projectId);
+            StringBuilder a = new StringBuilder();
+            for (String name : populatePlatformNames()) {
+                a.append("<option value=\"" + name + "\">" + name + "</option>");
+            }
+
+            StringBuilder b = new StringBuilder();
+            for (String st : requestManager.listAllStudyTypes()) {
+                b.append("<option value=\"" + st + "\">" + st + "</option>");
+            }
+
+            model.put("project", p);
+            model.put("platforms", a.toString());
+            //model.put("existingStudies", requestManager.listAllStudiesByProjectId(projectId));
+            model.put("studyTypes", b.toString());
+            return new ModelAndView("/pages/poolWizard.jsp", model);
+        } catch (IOException ex) {
+            if (log.isDebugEnabled()) {
+                log.debug("Failed to show pool wizard", ex);
+            }
+            throw ex;
+        }
+    }
 }

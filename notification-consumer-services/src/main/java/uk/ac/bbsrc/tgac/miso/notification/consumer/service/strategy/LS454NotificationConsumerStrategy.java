@@ -46,19 +46,19 @@ import java.util.Map;
  */
 @ServiceProvider
 public class LS454NotificationConsumerStrategy implements NotificationConsumerStrategy {
-  protected static final Logger log = LoggerFactory.getLogger(LS454NotificationConsumerStrategy.class);
+    protected static final Logger log = LoggerFactory.getLogger(LS454NotificationConsumerStrategy.class);
 
-  public String getName() {
-    return "LS454NotificationConsumer";
-  }
+    public String getName() {
+        return "LS454NotificationConsumer";
+    }
 
-  @Override
-  public void consume(Message<Map<String, List<String>>> m) throws InterrogationException {
-    new LS454NotificationMessageConsumerMechanism().consume(m);
-  }
+    @Override
+    public void consume(Message<Map<String, List<String>>> m) throws InterrogationException {
+        new LS454NotificationMessageConsumerMechanism().consume(m);
+    }
 
-  @Override
-  public boolean isStrategyFor(PlatformType pt) {
-    return (pt.equals(PlatformType.LS454));
-  }
+    @Override
+    public boolean isStrategyFor(PlatformType pt) {
+        return (pt.equals(PlatformType.LS454));
+    }
 }

@@ -46,119 +46,112 @@ import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
 @Controller
 @SessionAttributes("user")
 public class EditGroupController {
-  protected static final Logger log = LoggerFactory.getLogger(EditGroupController.class);
+    protected static final Logger log = LoggerFactory.getLogger(EditGroupController.class);
 
-  @Autowired
-  private SecurityManager securityManager;
+    @Autowired
+    private SecurityManager securityManager;
 
-  @Autowired
-  private DataObjectFactory dataObjectFactory;
+    @Autowired
+    private DataObjectFactory dataObjectFactory;
 
-  public void setDataObjectFactory(DataObjectFactory dataObjectFactory) {
-    this.dataObjectFactory = dataObjectFactory;
-  }
-
-  public void setSecurityManager(SecurityManager securityManager) {
-    this.securityManager = securityManager;
-  }
-
-  @ModelAttribute("users")
-  public Collection<User> populateUsers() throws IOException {
-    try {
-      List<User> users = new ArrayList<User>(securityManager.listAllUsers());
-      Collections.sort(users);
-      return users;
+    public void setDataObjectFactory(DataObjectFactory dataObjectFactory) {
+        this.dataObjectFactory = dataObjectFactory;
     }
-    catch (IOException ex) {
-      if (log.isDebugEnabled()) {
-        log.debug("Failed to list users", ex);
-      }
-      throw ex;
+
+    public void setSecurityManager(SecurityManager securityManager) {
+        this.securityManager = securityManager;
     }
-  }
 
-  @RequestMapping(value = "/admin/group/new", method = RequestMethod.GET)
-  public ModelAndView adminSetupForm(ModelMap model) throws IOException {
-    return adminSetupForm(Group.UNSAVED_ID, model);
-  }
-
-  @RequestMapping(value = "/tech/group/new", method = RequestMethod.GET)
-  public ModelAndView techSetupForm(ModelMap model) throws IOException {
-    return techSetupForm(Group.UNSAVED_ID, model);
-  }
-
-  @RequestMapping(value = "/admin/group/{groupId}", method = RequestMethod.GET)
-  public ModelAndView adminSetupForm(@PathVariable Long groupId,
-                                ModelMap model) throws IOException {
-    try {
-      model.put("group", groupId == Group.UNSAVED_ID ? dataObjectFactory.getGroup()
-                                                     : securityManager.getGroupById(groupId));
-      return new ModelAndView("/pages/editGroup.jsp", model);
+    @ModelAttribute("users")
+    public Collection<User> populateUsers() throws IOException {
+        try {
+            List<User> users = new ArrayList<User>(securityManager.listAllUsers());
+            Collections.sort(users);
+            return users;
+        } catch (IOException ex) {
+            if (log.isDebugEnabled()) {
+                log.debug("Failed to list users", ex);
+            }
+            throw ex;
+        }
     }
-    catch (IOException ex) {
-      if (log.isDebugEnabled()) {
-        log.debug("Failed to show group", ex);
-      }
-      throw ex;
+
+    @RequestMapping(value = "/admin/group/new", method = RequestMethod.GET)
+    public ModelAndView adminSetupForm(ModelMap model) throws IOException {
+        return adminSetupForm(Group.UNSAVED_ID, model);
     }
-  }
 
-  @RequestMapping(value = "/tech/group/{groupId}", method = RequestMethod.GET)
-  public ModelAndView techSetupForm(@PathVariable Long groupId,
-                                ModelMap model) throws IOException {
-    return adminSetupForm(groupId, model);
-  }
-
-  @RequestMapping(value = "/admin/group/new", method = RequestMethod.POST)
-  public String adminProcessSubmitNew(@ModelAttribute("group") Group group, ModelMap model, SessionStatus session) throws IOException {
-    return adminProcessSubmit(group, model, session);
-  }
-
-  @RequestMapping(value = "/admin/group/{groupId}", method = RequestMethod.POST)
-  public String adminProcessSubmitExisting(@PathVariable Long groupId, @ModelAttribute("group") Group group, ModelMap model, SessionStatus session) throws IOException {
-    group.setGroupId(groupId);
-    return adminProcessSubmit(group, model, session);
-  }
-
-  public String adminProcessSubmit(@ModelAttribute("group") Group group,
-                              ModelMap model, SessionStatus session) throws IOException {
-    try {
-      securityManager.saveGroup(group);
-      session.setComplete();
-      model.clear();
-      return "redirect:/miso/admin/groups";
+    @RequestMapping(value = "/tech/group/new", method = RequestMethod.GET)
+    public ModelAndView techSetupForm(ModelMap model) throws IOException {
+        return techSetupForm(Group.UNSAVED_ID, model);
     }
-    catch (IOException ex) {
-      if (log.isDebugEnabled()) {
-        log.debug("Failed to save group", ex);
-      }
-      throw ex;
-    }
-  }
 
-  @RequestMapping(value = "/tech/group/new", method = RequestMethod.POST)
-  public String techProcessSubmitNew(@ModelAttribute("group") Group group, ModelMap model, SessionStatus session) throws IOException {
-    return techProcessSubmit(group, model, session);
-  }
-
-  @RequestMapping(value = "/tech/group/{groupId}", method = RequestMethod.POST)
-  public String techProcessSubmitExisting(@ModelAttribute("group") Group group, ModelMap model, SessionStatus session) throws IOException {
-    return techProcessSubmit(group, model, session);
-  }
-
-  public String techProcessSubmit(@ModelAttribute("group") Group group,
-                              ModelMap model, SessionStatus session) throws IOException {
-    try {
-      securityManager.saveGroup(group);
-      session.setComplete();
-      model.clear();
-      return "redirect:/miso/tech/groups";
+    @RequestMapping(value = "/admin/group/{groupId}", method = RequestMethod.GET)
+    public ModelAndView adminSetupForm(@PathVariable Long groupId, ModelMap model) throws IOException {
+        try {
+            model.put("group", groupId == Group.UNSAVED_ID ? dataObjectFactory.getGroup() : securityManager.getGroupById(groupId));
+            return new ModelAndView("/pages/editGroup.jsp", model);
+        } catch (IOException ex) {
+            if (log.isDebugEnabled()) {
+                log.debug("Failed to show group", ex);
+            }
+            throw ex;
+        }
     }
-    catch (IOException ex) {
-      if (log.isDebugEnabled()) {
-        log.debug("Failed to save group", ex);
-      }
-      throw ex;
+
+    @RequestMapping(value = "/tech/group/{groupId}", method = RequestMethod.GET)
+    public ModelAndView techSetupForm(@PathVariable Long groupId, ModelMap model) throws IOException {
+        return adminSetupForm(groupId, model);
     }
-  }
+
+    @RequestMapping(value = "/admin/group/new", method = RequestMethod.POST)
+    public String adminProcessSubmitNew(@ModelAttribute("group") Group group, ModelMap model, SessionStatus session) throws IOException {
+        return adminProcessSubmit(group, model, session);
+    }
+
+    @RequestMapping(value = "/admin/group/{groupId}", method = RequestMethod.POST)
+    public String adminProcessSubmitExisting(@PathVariable Long groupId, @ModelAttribute("group") Group group, ModelMap model,
+                                             SessionStatus session) throws IOException {
+        group.setGroupId(groupId);
+        return adminProcessSubmit(group, model, session);
+    }
+
+    public String adminProcessSubmit(@ModelAttribute("group") Group group, ModelMap model, SessionStatus session) throws IOException {
+        try {
+            securityManager.saveGroup(group);
+            session.setComplete();
+            model.clear();
+            return "redirect:/miso/admin/groups";
+        } catch (IOException ex) {
+            if (log.isDebugEnabled()) {
+                log.debug("Failed to save group", ex);
+            }
+            throw ex;
+        }
+    }
+
+    @RequestMapping(value = "/tech/group/new", method = RequestMethod.POST)
+    public String techProcessSubmitNew(@ModelAttribute("group") Group group, ModelMap model, SessionStatus session) throws IOException {
+        return techProcessSubmit(group, model, session);
+    }
+
+    @RequestMapping(value = "/tech/group/{groupId}", method = RequestMethod.POST)
+    public String techProcessSubmitExisting(@ModelAttribute("group") Group group, ModelMap model, SessionStatus session)
+        throws IOException {
+        return techProcessSubmit(group, model, session);
+    }
+
+    public String techProcessSubmit(@ModelAttribute("group") Group group, ModelMap model, SessionStatus session) throws IOException {
+        try {
+            securityManager.saveGroup(group);
+            session.setComplete();
+            model.clear();
+            return "redirect:/miso/tech/groups";
+        } catch (IOException ex) {
+            if (log.isDebugEnabled()) {
+                log.debug("Failed to save group", ex);
+            }
+            throw ex;
+        }
+    }
 }

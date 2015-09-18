@@ -33,14 +33,14 @@ package uk.ac.bbsrc.tgac.miso.core.exception;
  * @since version
  */
 public class StatusException extends Exception {
-  public StatusException(String s) {
-    super(s);
-  }
-
-  public StatusException(String s, Throwable cause) {
-    super(s);
-    if (cause != null) {
-        initCause(cause);
+    public StatusException(String s) {
+        super(s);
     }
-  }
+
+    public StatusException(String s, Throwable cause) {
+        super(s);
+        if (cause != null) {
+            initCause(cause);
+        }
+    }
 }

@@ -34,48 +34,45 @@ import com.eaglegenomics.simlims.core.manager.SecurityManager;
 //import com.eaglegenomics.simlims.spring.ActivityControllerHelper;
 import uk.ac.bbsrc.tgac.miso.webapp.util.ActivityControllerHelperLoader;
 
-
 @Controller
-@SessionAttributes({"activitySession", "dataModel"})
+@SessionAttributes({ "activitySession", "dataModel" })
 public class EditActivityController {
-  protected static final Logger log = LoggerFactory.getLogger(EditActivityController.class);
+    protected static final Logger log = LoggerFactory.getLogger(EditActivityController.class);
 
-  //@Autowired
-  private InputDataXmlView inputDataXmlView;
+    //@Autowired
+    private InputDataXmlView inputDataXmlView;
 
-  //@Autowired
-  private ActivityControllerHelperLoader activityControllerHelperLoader;
+    //@Autowired
+    private ActivityControllerHelperLoader activityControllerHelperLoader;
 
-  //@Autowired
-  private SecurityManager securityManager;
+    //@Autowired
+    private SecurityManager securityManager;
 
-  //@Autowired
-  private ProtocolManager protocolManager;
+    //@Autowired
+    private ProtocolManager protocolManager;
 
-  //@Autowired
-  private ActivitySessionFactory activitySessionFactory;
+    //@Autowired
+    private ActivitySessionFactory activitySessionFactory;
 
-  public void setInputDataXmlView(InputDataXmlView inputDataXmlView) {
-    this.inputDataXmlView = inputDataXmlView;
-  }
+    public void setInputDataXmlView(InputDataXmlView inputDataXmlView) {
+        this.inputDataXmlView = inputDataXmlView;
+    }
 
-  public void setActivitySessionFactory(
-          ActivitySessionFactory activitySessionFactory) {
-    this.activitySessionFactory = activitySessionFactory;
-  }
+    public void setActivitySessionFactory(ActivitySessionFactory activitySessionFactory) {
+        this.activitySessionFactory = activitySessionFactory;
+    }
 
-  public void setActivityHelperLoader(
-          ActivityControllerHelperLoader activityControllerHelperLoader) {
-    this.activityControllerHelperLoader = activityControllerHelperLoader;
-  }
+    public void setActivityHelperLoader(ActivityControllerHelperLoader activityControllerHelperLoader) {
+        this.activityControllerHelperLoader = activityControllerHelperLoader;
+    }
 
-  public void setProtocolManager(ProtocolManager protocolManager) {
-    this.protocolManager = protocolManager;
-  }
+    public void setProtocolManager(ProtocolManager protocolManager) {
+        this.protocolManager = protocolManager;
+    }
 
-  public void setSecurityManager(SecurityManager securityManager) {
-    this.securityManager = securityManager;
-  }
+    public void setSecurityManager(SecurityManager securityManager) {
+        this.securityManager = securityManager;
+    }
 /*
   @RequestMapping(value = "/activity/{activityId}", method = RequestMethod.GET)
   public ModelAndView setupForm(

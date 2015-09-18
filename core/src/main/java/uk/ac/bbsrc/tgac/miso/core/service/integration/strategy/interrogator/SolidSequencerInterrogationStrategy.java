@@ -43,43 +43,43 @@ import java.util.List;
  */
 public class SolidSequencerInterrogationStrategy implements SequencerInterrogationStrategy {
 
-  @Override
-  public boolean isStrategyFor(SequencerReference sr) {
-    return (sr.getPlatform().getPlatformType().equals(PlatformType.SOLID));
-  }
+    @Override
+    public boolean isStrategyFor(SequencerReference sr) {
+        return (sr.getPlatform().getPlatformType().equals(PlatformType.SOLID));
+    }
 
-  @Override
-  public List<Status> listAllStatus(SequencerReference sr) throws InterrogationException {
-    return null;
-  }
+    @Override
+    public List<Status> listAllStatus(SequencerReference sr) throws InterrogationException {
+        return null;
+    }
 
-  @Override
-  public List<Status> listAllStatusBySequencerName(SequencerReference sr, String name) throws InterrogationException {
-    return null;
-  }
+    @Override
+    public List<Status> listAllStatusBySequencerName(SequencerReference sr, String name) throws InterrogationException {
+        return null;
+    }
 
-  @Override
-  public List<String> listRunsByHealthType(SequencerReference sr, HealthType healthType) throws InterrogationException {
-    return null;
-  }
+    @Override
+    public List<String> listRunsByHealthType(SequencerReference sr, HealthType healthType) throws InterrogationException {
+        return null;
+    }
 
-  @Override
-  public List<String> listAllCompleteRuns(SequencerReference sr) throws InterrogationException {
-    return null;
-  }
+    @Override
+    public List<String> listAllCompleteRuns(SequencerReference sr) throws InterrogationException {
+        return null;
+    }
 
-  @Override
-  public List<String> listAllIncompleteRuns(SequencerReference sr) throws InterrogationException {
-    return null;
-  }
+    @Override
+    public List<String> listAllIncompleteRuns(SequencerReference sr) throws InterrogationException {
+        return null;
+    }
 
-  @Override
-  public Status getRunStatus(SequencerReference sr, String runName) throws InterrogationException {
-    return null;
-  }
+    @Override
+    public Status getRunStatus(SequencerReference sr, String runName) throws InterrogationException {
+        return null;
+    }
 
-  @Override
-  public JSONObject getRunInformation(SequencerReference sr, String runName) throws InterrogationException {
-    return null;
-  }
+    @Override
+    public JSONObject getRunInformation(SequencerReference sr, String runName) throws InterrogationException {
+        return null;
+    }
 }

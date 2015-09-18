@@ -49,93 +49,91 @@ import java.util.Set;
  * @since 0.1.5
  */
 public class MisoNotificationGatewayService extends AbstractEndpoint implements NotificationGatewayService {
-  protected static final Logger log = LoggerFactory.getLogger(MisoNotificationGatewayService.class);
+    protected static final Logger log = LoggerFactory.getLogger(MisoNotificationGatewayService.class);
 
-  private final Map<String, GatewayProxyFactoryBean> proxyMap = new HashMap<String, GatewayProxyFactoryBean>();
-  private NotificationConsumerService notificationConsumerService;
+    private final Map<String, GatewayProxyFactoryBean> proxyMap = new HashMap<String, GatewayProxyFactoryBean>();
+    private NotificationConsumerService notificationConsumerService;
 
-  public void setNotificationConsumerService(NotificationConsumerService notificationConsumerService) {
-    this.notificationConsumerService = notificationConsumerService;
-  }
-
-  public NotificationConsumerService getNotificationConsumerService() {
-    return notificationConsumerService;
-  }
-
-  public MisoNotificationGatewayService(NotificationConsumerService consumerService) {
-    setNotificationConsumerService(consumerService);
-  }
-
-  @Override
-  public void onInit() {
-    wireGatewaysToConsumers();
-  }
-
-  private void wireGatewaysToConsumers() {
-    log.info("Building gateway service...");
-    if (getNotificationConsumerService() != null) {
-      for (NotificationConsumerStrategy s : getNotificationConsumerService().getConsumerStrategies()) {
-        log.info("Wiring up gateway for consumer strategy " + s.getName() + "...");
-        DirectChannel reply = new DirectChannel();
-        reply.setBeanName("reply-"+s.getName());
-
-        DirectChannel mc = new DirectChannel();
-        mc.setBeanName("channel-"+s.getName());
-
-        GatewayProxyFactoryBean gatewayProxy = new GatewayProxyFactoryBean();
-        gatewayProxy.setDefaultRequestChannel(mc);
-        gatewayProxy.setServiceInterface(NotificationGateway.class);
-        gatewayProxy.setBeanFactory(getBeanFactory());
-        gatewayProxy.setBeanName("gateway-"+s.getName());
-        gatewayProxy.setComponentName("gateway-" + s.getName());
-        gatewayProxy.setDefaultReplyChannel(reply);
-
-        mc.subscribe(new ServiceActivatingHandler(s, "consume"));
-
-        gatewayProxy.afterPropertiesSet();
-
-        this.proxyMap.put(s.getName(), gatewayProxy);
-      }
+    public void setNotificationConsumerService(NotificationConsumerService notificationConsumerService) {
+        this.notificationConsumerService = notificationConsumerService;
     }
-    else {
-      log.info("Null consumer service");
+
+    public NotificationConsumerService getNotificationConsumerService() {
+        return notificationConsumerService;
     }
-  }
 
-  @Override
-  public Set<NotificationGateway> getGatewaysFor(PlatformType pt) {
-    Set<NotificationGateway> gateways = new HashSet<NotificationGateway>();
+    public MisoNotificationGatewayService(NotificationConsumerService consumerService) {
+        setNotificationConsumerService(consumerService);
+    }
 
-    for (String str : this.proxyMap.keySet()) {
-      NotificationConsumerStrategy ncs = getNotificationConsumerService().getConsumerStrategy(str);
-      if (ncs.isStrategyFor(pt)) {
-        GatewayProxyFactoryBean gateway = this.proxyMap.get(str);
-        if (gateway.isRunning()) {
-          try {
-            NotificationGateway s = (NotificationGateway)gateway.getObject();
-            gateways.add(s);
-          }
-          catch (Exception e) {
-            e.printStackTrace();
-          }
+    @Override
+    public void onInit() {
+        wireGatewaysToConsumers();
+    }
+
+    private void wireGatewaysToConsumers() {
+        log.info("Building gateway service...");
+        if (getNotificationConsumerService() != null) {
+            for (NotificationConsumerStrategy s : getNotificationConsumerService().getConsumerStrategies()) {
+                log.info("Wiring up gateway for consumer strategy " + s.getName() + "...");
+                DirectChannel reply = new DirectChannel();
+                reply.setBeanName("reply-" + s.getName());
+
+                DirectChannel mc = new DirectChannel();
+                mc.setBeanName("channel-" + s.getName());
+
+                GatewayProxyFactoryBean gatewayProxy = new GatewayProxyFactoryBean();
+                gatewayProxy.setDefaultRequestChannel(mc);
+                gatewayProxy.setServiceInterface(NotificationGateway.class);
+                gatewayProxy.setBeanFactory(getBeanFactory());
+                gatewayProxy.setBeanName("gateway-" + s.getName());
+                gatewayProxy.setComponentName("gateway-" + s.getName());
+                gatewayProxy.setDefaultReplyChannel(reply);
+
+                mc.subscribe(new ServiceActivatingHandler(s, "consume"));
+
+                gatewayProxy.afterPropertiesSet();
+
+                this.proxyMap.put(s.getName(), gatewayProxy);
+            }
+        } else {
+            log.info("Null consumer service");
         }
-      }
     }
 
-    return gateways;
-  }
+    @Override
+    public Set<NotificationGateway> getGatewaysFor(PlatformType pt) {
+        Set<NotificationGateway> gateways = new HashSet<NotificationGateway>();
 
-  @Override
-  protected void doStart() {
-    for (GatewayProxyFactoryBean gateway : this.proxyMap.values()) {
-      gateway.start();
-    }
-  }
+        for (String str : this.proxyMap.keySet()) {
+            NotificationConsumerStrategy ncs = getNotificationConsumerService().getConsumerStrategy(str);
+            if (ncs.isStrategyFor(pt)) {
+                GatewayProxyFactoryBean gateway = this.proxyMap.get(str);
+                if (gateway.isRunning()) {
+                    try {
+                        NotificationGateway s = (NotificationGateway) gateway.getObject();
+                        gateways.add(s);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }
 
-  @Override
-  protected void doStop() {
-    for (GatewayProxyFactoryBean gateway : this.proxyMap.values()) {
-      gateway.stop();
+        return gateways;
     }
-  }
+
+    @Override
+    protected void doStart() {
+        for (GatewayProxyFactoryBean gateway : this.proxyMap.values()) {
+            gateway.start();
+        }
+    }
+
+    @Override
+    protected void doStop() {
+        for (GatewayProxyFactoryBean gateway : this.proxyMap.values()) {
+            gateway.stop();
+        }
+    }
 }

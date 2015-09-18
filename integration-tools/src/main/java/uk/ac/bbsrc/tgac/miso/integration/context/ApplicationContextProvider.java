@@ -37,14 +37,14 @@ import org.springframework.context.ApplicationContextAware;
  * @since 0.0.3
  */
 
-public class ApplicationContextProvider implements ApplicationContextAware{
-  private static ApplicationContext ctx = null;
+public class ApplicationContextProvider implements ApplicationContextAware {
+    private static ApplicationContext ctx = null;
 
-  public static ApplicationContext getApplicationContext() {
-    return ctx;
-  }
+    public static ApplicationContext getApplicationContext() {
+        return ctx;
+    }
 
-  public void setApplicationContext(ApplicationContext ctx) throws BeansException {
-    this.ctx = ctx;
-  }
+    public void setApplicationContext(ApplicationContext ctx) throws BeansException {
+        this.ctx = ctx;
+    }
 }

@@ -43,35 +43,34 @@ import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
 @Controller
 public class ListAlertsController {
-  protected static final Logger log = LoggerFactory.getLogger(ListAlertsController.class);
+    protected static final Logger log = LoggerFactory.getLogger(ListAlertsController.class);
 
-  @Autowired
-  private SecurityManager securityManager;
+    @Autowired
+    private SecurityManager securityManager;
 
-  public void setSecurityManager(SecurityManager securityManager) {
-    this.securityManager = securityManager;
-  }
-
-  @Autowired
-  private RequestManager requestManager;
-
-  public void setRequestManager(RequestManager requestManager) {
-    this.requestManager = requestManager;
-  }
-
-  @RequestMapping("/alerts")
-  public ModelAndView listAlerts(ModelMap model) throws IOException {
-    try {
-      User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-      Collection<Alert> alerts = requestManager.listUnreadAlertsByUserId(user.getUserId());
-      model.addAttribute("alerts", alerts);
-      return new ModelAndView("/pages/listAlerts.jsp", model);
+    public void setSecurityManager(SecurityManager securityManager) {
+        this.securityManager = securityManager;
     }
-    catch (IOException ex) {
-      if (log.isDebugEnabled()) {
-        log.debug("Failed to list alerts", ex);
-      }
-      throw ex;
+
+    @Autowired
+    private RequestManager requestManager;
+
+    public void setRequestManager(RequestManager requestManager) {
+        this.requestManager = requestManager;
     }
-  }
+
+    @RequestMapping("/alerts")
+    public ModelAndView listAlerts(ModelMap model) throws IOException {
+        try {
+            User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
+            Collection<Alert> alerts = requestManager.listUnreadAlertsByUserId(user.getUserId());
+            model.addAttribute("alerts", alerts);
+            return new ModelAndView("/pages/listAlerts.jsp", model);
+        } catch (IOException ex) {
+            if (log.isDebugEnabled()) {
+                log.debug("Failed to list alerts", ex);
+            }
+            throw ex;
+        }
+    }
 }

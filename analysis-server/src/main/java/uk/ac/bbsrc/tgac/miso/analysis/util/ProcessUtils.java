@@ -43,33 +43,30 @@ import java.util.Map;
  * @since version
  */
 public class ProcessUtils {
-  public static void extractConanParameters(Map<ConanParameter, String> parameters,
-                                            Map<String, String> inputValues,
-                                            ConanProcess process) {
-    for (ConanParameter param : process.getParameters()) {
-      // validate our request by checking we have this param value supplied
-      if (inputValues.get(param.getName()) == null) {
-        throw new MissingRequiredParameterException(
-                "Required parameter '" + param.getName() + "' not supplied, " +
-                "required for process '" + process.getName() + "'");
-      }
-      else {
-        if (!parameters.containsKey(param)) {
-          parameters.put(param, inputValues.get(param.getName()));
+    public static void extractConanParameters(Map<ConanParameter, String> parameters, Map<String, String> inputValues,
+                                              ConanProcess process) {
+        for (ConanParameter param : process.getParameters()) {
+            // validate our request by checking we have this param value supplied
+            if (inputValues.get(param.getName()) == null) {
+                throw new MissingRequiredParameterException("Required parameter '" + param.getName() + "' not supplied, " +
+                                                            "required for process '" + process.getName() + "'");
+            } else {
+                if (!parameters.containsKey(param)) {
+                    parameters.put(param, inputValues.get(param.getName()));
+                }
+            }
         }
-      }
     }
-  }
 
-  public static boolean validateTaskRequestJSON(JSONObject json) {
-    if (json.has("submit")) {
-      JSONObject s = json.getJSONObject("submit");
-      return (s.has("params") && s.has("priority") && s.has("pipeline"));
+    public static boolean validateTaskRequestJSON(JSONObject json) {
+        if (json.has("submit")) {
+            JSONObject s = json.getJSONObject("submit");
+            return (s.has("params") && s.has("priority") && s.has("pipeline"));
+        }
+        return false;
     }
-    return false;
-  }
 
-  public static boolean validateQueryJSON(JSONObject json) {
-    return (json.has("query") && (json.getString("query") != null && !"".equals(json.getString("query"))));
-  }
+    public static boolean validateQueryJSON(JSONObject json) {
+        return (json.has("query") && (json.getString("query") != null && !"".equals(json.getString("query"))));
+    }
 }

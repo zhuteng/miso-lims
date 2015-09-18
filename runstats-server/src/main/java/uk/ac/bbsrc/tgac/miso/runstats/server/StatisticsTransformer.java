@@ -49,46 +49,44 @@ import java.util.regex.Pattern;
  * @since 0.1.2
  */
 public class StatisticsTransformer implements FileSetTransformer<String, Map<String, byte[]>, File> {
-  protected static final Logger log = LoggerFactory.getLogger(StatisticsTransformer.class);
+    protected static final Logger log = LoggerFactory.getLogger(StatisticsTransformer.class);
 
-  private Pattern runDirPattern;
+    private Pattern runDirPattern;
 
-  public StatisticsTransformer(String runDirRegex) {
-    runDirPattern = Pattern.compile(runDirRegex);
-  }
-
-  public Map<String, Map<String, byte[]>> transform(Message<Set<File>> message) {
-    return transform(message.getPayload());
-  }
-
-  public Map<String, Map<String, byte[]>> transform(Set<File> files) {
-    Map<String, Map<String, byte[]>> map = new HashMap<String, Map<String, byte[]>>();
-    map.put("stats", new HashMap<String, byte[]>());
-
-    for (File f : files) {
-      try {
-        if (f.exists()) {
-          Matcher rm = runDirPattern.matcher(f.getAbsolutePath());
-          if (rm.matches()) {
-            String fileName = f.getName();
-            String runName = rm.group(1);
-            byte[] b = LimsUtils.inputStreamToByteArray(new FileInputStream(f));
-
-            map.get("stats").put(runName+"-"+fileName, b);
-          }
-        }
-      }
-      catch (FileNotFoundException e) {
-        //e.printStackTrace();
-        log.error("Cannot process file: " + e.getMessage());
-      }
-      catch (IOException e) {
-        //e.printStackTrace();
-        log.error("Error with file IO: " + e.getMessage());
-      }
+    public StatisticsTransformer(String runDirRegex) {
+        runDirPattern = Pattern.compile(runDirRegex);
     }
 
-    log.debug("Transformed: " + map.toString());
-    return map;
-  }
+    public Map<String, Map<String, byte[]>> transform(Message<Set<File>> message) {
+        return transform(message.getPayload());
+    }
+
+    public Map<String, Map<String, byte[]>> transform(Set<File> files) {
+        Map<String, Map<String, byte[]>> map = new HashMap<String, Map<String, byte[]>>();
+        map.put("stats", new HashMap<String, byte[]>());
+
+        for (File f : files) {
+            try {
+                if (f.exists()) {
+                    Matcher rm = runDirPattern.matcher(f.getAbsolutePath());
+                    if (rm.matches()) {
+                        String fileName = f.getName();
+                        String runName = rm.group(1);
+                        byte[] b = LimsUtils.inputStreamToByteArray(new FileInputStream(f));
+
+                        map.get("stats").put(runName + "-" + fileName, b);
+                    }
+                }
+            } catch (FileNotFoundException e) {
+                //e.printStackTrace();
+                log.error("Cannot process file: " + e.getMessage());
+            } catch (IOException e) {
+                //e.printStackTrace();
+                log.error("Error with file IO: " + e.getMessage());
+            }
+        }
+
+        log.debug("Transformed: " + map.toString());
+        return map;
+    }
 }

@@ -35,35 +35,35 @@ import uk.ac.ebi.fgpt.conan.model.AbstractConanParameter;
  * @since 0.0.3
  */
 public class DefaultProcessParameter extends AbstractConanParameter implements Optionable, Transientable {
-  private boolean optional = false;
-  private boolean t = false;
+    private boolean optional = false;
+    private boolean t = false;
 
-  public DefaultProcessParameter(String name) {
-      super(name);
-  }
+    public DefaultProcessParameter(String name) {
+        super(name);
+    }
 
-  @Override
-  public boolean validateParameterValue(String value) {
-    return true;
-  }
+    @Override
+    public boolean validateParameterValue(String value) {
+        return true;
+    }
 
-  @Override
-  public boolean isOptional() {
-    return optional;
-  }
+    @Override
+    public boolean isOptional() {
+        return optional;
+    }
 
-  @Override
-  public void setOptional(boolean optional) {
-    this.optional = optional;
-  }
+    @Override
+    public void setOptional(boolean optional) {
+        this.optional = optional;
+    }
 
-  @Override
-  public boolean isTransient() {
-    return t;
-  }
+    @Override
+    public boolean isTransient() {
+        return t;
+    }
 
-  @Override
-  public void setTransient(boolean t) {
-    this.t = t;
-  }
+    @Override
+    public void setTransient(boolean t) {
+        this.t = t;
+    }
 }

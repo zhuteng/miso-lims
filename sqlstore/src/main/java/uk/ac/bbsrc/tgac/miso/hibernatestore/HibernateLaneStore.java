@@ -43,26 +43,26 @@ import java.util.Collection;
  * @since 0.0.2
  */
 @Deprecated
-public class HibernateLaneStore  extends HibernateDaoSupport implements Store<Lane> {
-  @Transactional(readOnly = false)
-  public long save(Lane lane) throws IOException {
-    getHibernateTemplate().saveOrUpdate(lane);
-    return lane.getId();
-  }
+public class HibernateLaneStore extends HibernateDaoSupport implements Store<Lane> {
+    @Transactional(readOnly = false)
+    public long save(Lane lane) throws IOException {
+        getHibernateTemplate().saveOrUpdate(lane);
+        return lane.getId();
+    }
 
-  @Transactional(readOnly = true)
-  public Lane get(long laneId) throws IOException {
-    return (Lane) getHibernateTemplate().get(Lane.class, laneId);
-  }
+    @Transactional(readOnly = true)
+    public Lane get(long laneId) throws IOException {
+        return (Lane) getHibernateTemplate().get(Lane.class, laneId);
+    }
 
-  @Override
-  public Lane lazyGet(long id) throws IOException {
-    return get(id);
-  }
+    @Override
+    public Lane lazyGet(long id) throws IOException {
+        return get(id);
+    }
 
-  @Transactional(readOnly = true)
-  @SuppressWarnings("unchecked")
-  public Collection<Lane> listAll() throws IOException {
+    @Transactional(readOnly = true)
+    @SuppressWarnings("unchecked")
+    public Collection<Lane> listAll() throws IOException {
 /*    return (Collection<Lane>) getHibernateTemplate().execute(
             new HibernateCallback() {
               public Object doInHibernate(Session session)
@@ -71,11 +71,11 @@ public class HibernateLaneStore  extends HibernateDaoSupport implements Store<La
               }
             });
             */
-    return null;
-  }
+        return null;
+    }
 
-  @Override
-  public int count() throws IOException {
-    return 0;
-  }
+    @Override
+    public int count() throws IOException {
+        return 0;
+    }
 }

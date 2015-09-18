@@ -40,89 +40,98 @@ import java.util.List;
  * @since 0.0.2
  */
 public class SequencerInterrogator {
-  /** Field strategy  */
-  private SequencerInterrogationStrategy strategy;
-  /** Field reference  */
-  private SequencerReference reference;
+    /**
+     * Field strategy
+     */
+    private SequencerInterrogationStrategy strategy;
+    /**
+     * Field reference
+     */
+    private SequencerReference reference;
 
-  /**
-   * Creates a new SequencerInterrogator instance from a given SequencerInterrogationStrategy and SequencerReference
-   *
-   * @param strategy of type SequencerInterrogationStrategy
-   * @param reference of type SequencerReference
-   */
-  public SequencerInterrogator(SequencerInterrogationStrategy strategy, SequencerReference reference) {
-    this.strategy = strategy;
-    this.reference = reference;
-  }
+    /**
+     * Creates a new SequencerInterrogator instance from a given SequencerInterrogationStrategy and SequencerReference
+     *
+     * @param strategy  of type SequencerInterrogationStrategy
+     * @param reference of type SequencerReference
+     */
+    public SequencerInterrogator(SequencerInterrogationStrategy strategy, SequencerReference reference) {
+        this.strategy = strategy;
+        this.reference = reference;
+    }
 
-  /**
-   * List the status of all runs exposed by the SequencerInterrogationStrategy supplied at construction
-   * @return List<Status>
-   * @throws InterrogationException when
-   */
-  public List<Status> listAllStatus() throws InterrogationException {
-    return strategy.listAllStatus(reference);
-  }
+    /**
+     * List the status of all runs exposed by the SequencerInterrogationStrategy supplied at construction
+     *
+     * @return List<Status>
+     * @throws InterrogationException when
+     */
+    public List<Status> listAllStatus() throws InterrogationException {
+        return strategy.listAllStatus(reference);
+    }
 
-  /**
-   * List the status of all runs on a given machine exposed by the SequencerInterrogationStrategy supplied at construction
-   * @param name of type String
-   * @return List<Status>
-   * @throws InterrogationException when
-   */
-  public List<Status> listAllStatusBySequencerName(String name) throws InterrogationException {
-    return strategy.listAllStatusBySequencerName(reference, name);
-  }
+    /**
+     * List the status of all runs on a given machine exposed by the SequencerInterrogationStrategy supplied at construction
+     *
+     * @param name of type String
+     * @return List<Status>
+     * @throws InterrogationException when
+     */
+    public List<Status> listAllStatusBySequencerName(String name) throws InterrogationException {
+        return strategy.listAllStatusBySequencerName(reference, name);
+    }
 
-  /**
-   * List all runs of a given HealthType on a given machine exposed by the SequencerInterrogationStrategy supplied at construction
-   * @param healthType of type HealthType
-   * @return List<String>
-   * @throws InterrogationException when
-   */
-  public List<String> listAllRunsByHealthType(HealthType healthType) throws InterrogationException {
-    return strategy.listRunsByHealthType(reference, healthType);
-  }
+    /**
+     * List all runs of a given HealthType on a given machine exposed by the SequencerInterrogationStrategy supplied at construction
+     *
+     * @param healthType of type HealthType
+     * @return List<String>
+     * @throws InterrogationException when
+     */
+    public List<String> listAllRunsByHealthType(HealthType healthType) throws InterrogationException {
+        return strategy.listRunsByHealthType(reference, healthType);
+    }
 
-  /**
-   * List all complete runs exposed by the SequencerInterrogationStrategy supplied at construction
-   * @return List<String>
-   * @throws InterrogationException when
-   */
-  public List<String> listAllCompleteRuns() throws InterrogationException {
-    return strategy.listAllCompleteRuns(reference);
-  }
+    /**
+     * List all complete runs exposed by the SequencerInterrogationStrategy supplied at construction
+     *
+     * @return List<String>
+     * @throws InterrogationException when
+     */
+    public List<String> listAllCompleteRuns() throws InterrogationException {
+        return strategy.listAllCompleteRuns(reference);
+    }
 
-  /**
-   * List all imcomplete runs exposed by the SequencerInterrogationStrategy supplied at construction
-   * @return List<String>
-   * @throws InterrogationException when
-   */
-  public List<String> listAllIncompleteRuns() throws InterrogationException {
-    return strategy.listAllIncompleteRuns(reference);
-  }
+    /**
+     * List all imcomplete runs exposed by the SequencerInterrogationStrategy supplied at construction
+     *
+     * @return List<String>
+     * @throws InterrogationException when
+     */
+    public List<String> listAllIncompleteRuns() throws InterrogationException {
+        return strategy.listAllIncompleteRuns(reference);
+    }
 
-  /**
-   * Get the status of a single run exposed by the SequencerInterrogationStrategy supplied at construction
-   *
-   * @param name of type String
-   * @return Status
-   * @throws InterrogationException when
-   */
-  public Status getRunStatus(String name) throws InterrogationException {
-    return strategy.getRunStatus(reference, name);
-  }
+    /**
+     * Get the status of a single run exposed by the SequencerInterrogationStrategy supplied at construction
+     *
+     * @param name of type String
+     * @return Status
+     * @throws InterrogationException when
+     */
+    public Status getRunStatus(String name) throws InterrogationException {
+        return strategy.getRunStatus(reference, name);
+    }
 
-  /**
-   * Get the information about a single run exposed by the SequencerInterrogationStrategy supplied at construction
-   *
-   * @param name of type String
-   * @return JSONObject
-   * @throws InterrogationException when
-   */
-  public JSONObject getRunInformation(String name) throws InterrogationException {
-    return strategy.getRunInformation(reference, name);
-  }
+    /**
+     * Get the information about a single run exposed by the SequencerInterrogationStrategy supplied at construction
+     *
+     * @param name of type String
+     * @return JSONObject
+     * @throws InterrogationException when
+     */
+    public JSONObject getRunInformation(String name) throws InterrogationException {
+        return strategy.getRunInformation(reference, name);
+    }
 }
 

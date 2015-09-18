@@ -40,17 +40,17 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
  */
 @Deprecated
 public class LS454Pool extends PoolImpl<emPCRDilution> {
-  public static final String PREFIX = "LPO";
+    public static final String PREFIX = "LPO";
 
-  private final String units = "beads/&#181;l";
+    private final String units = "beads/&#181;l";
 
-  public LS454Pool() {
-    setSecurityProfile(new SecurityProfile());
-    setPlatformType(PlatformType.LS454);
-  }
+    public LS454Pool() {
+        setSecurityProfile(new SecurityProfile());
+        setPlatformType(PlatformType.LS454);
+    }
 
-  public LS454Pool(User user) {
-    setSecurityProfile(new SecurityProfile(user));
-    setPlatformType(PlatformType.LS454);
-  }
+    public LS454Pool(User user) {
+        setSecurityProfile(new SecurityProfile(user));
+        setPlatformType(PlatformType.LS454);
+    }
 }

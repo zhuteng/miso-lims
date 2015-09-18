@@ -49,65 +49,68 @@ import java.util.Set;
  * @since 0.1.2
  */
 public class RunFailedResponderService extends AbstractResponderService {
-  protected static final Logger log = LoggerFactory.getLogger(RunFailedResponderService.class);
+    protected static final Logger log = LoggerFactory.getLogger(RunFailedResponderService.class);
 
-  private Set<AlerterService> alerterServices = new HashSet<AlerterService>();
+    private Set<AlerterService> alerterServices = new HashSet<AlerterService>();
 
-  public RunFailedResponderService() {}
-
-  public Set<AlerterService> getAlerterServices() {
-    return alerterServices;
-  }
-
-  public void setAlerterServices(Set<AlerterService> alerterServices) {
-    this.alerterServices = alerterServices;
-  }
-
-  @Override
-  public boolean respondsTo(Event event) {
-    if (event instanceof RunEvent) {
-      RunEvent re = (RunEvent)event;
-      Run r = re.getEventObject();
-      if (re.getEventType().equals(MisoEventType.RUN_FAILED) && r.getStatus() != null && r.getStatus().getHealth().equals(HealthType.Failed)) {
-        log.info("Run "+ r.getAlias() +": " + re.getEventMessage());
-        return true;
-      }
+    public RunFailedResponderService() {
     }
-    return false;
-  }
 
-  @Override
-  public void generateResponse(Event event) {
-    if (event instanceof RunEvent) {
-      RunEvent re = (RunEvent)event;
-      Run r = re.getEventObject();
-
-      for (User user : r.getWatchers()) {
-        Alert a = new DefaultAlert(user);
-        a.setAlertLevel(AlertLevel.CRITICAL);
-        a.setAlertTitle("Run Failed: " + r.getAlias());
-
-        StringBuilder at = new StringBuilder();
-        at.append("The following Run has been set to FAILED: "+r.getAlias()+" ("+event.getEventMessage()+"). Please view Run " +r.getId()+ " in MISO for more information");
-        if (event.getEventContext().has("baseURL")) {
-          at.append(":\n\n" + event.getEventContext().getString("baseURL")+"/run/"+r.getId());
-        }
-        a.setAlertText(at.toString());
-
-        for (AlerterService as : alerterServices) {
-          try {
-            as.raiseAlert(a);
-          }
-          catch (AlertingException e) {
-            log.error("Cannot raise user-level alert:" + e.getMessage());
-            e.printStackTrace();
-          }
-        }
-      }
-
-      if (getSaveSystemAlert()) {
-        raiseSystemAlert(event);
-      }
+    public Set<AlerterService> getAlerterServices() {
+        return alerterServices;
     }
-  }
+
+    public void setAlerterServices(Set<AlerterService> alerterServices) {
+        this.alerterServices = alerterServices;
+    }
+
+    @Override
+    public boolean respondsTo(Event event) {
+        if (event instanceof RunEvent) {
+            RunEvent re = (RunEvent) event;
+            Run r = re.getEventObject();
+            if (re.getEventType().equals(MisoEventType.RUN_FAILED) && r.getStatus() != null &&
+                r.getStatus().getHealth().equals(HealthType.Failed)) {
+                log.info("Run " + r.getAlias() + ": " + re.getEventMessage());
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public void generateResponse(Event event) {
+        if (event instanceof RunEvent) {
+            RunEvent re = (RunEvent) event;
+            Run r = re.getEventObject();
+
+            for (User user : r.getWatchers()) {
+                Alert a = new DefaultAlert(user);
+                a.setAlertLevel(AlertLevel.CRITICAL);
+                a.setAlertTitle("Run Failed: " + r.getAlias());
+
+                StringBuilder at = new StringBuilder();
+                at.append(
+                    "The following Run has been set to FAILED: " + r.getAlias() + " (" + event.getEventMessage() + "). Please view Run " +
+                    r.getId() + " in MISO for more information");
+                if (event.getEventContext().has("baseURL")) {
+                    at.append(":\n\n" + event.getEventContext().getString("baseURL") + "/run/" + r.getId());
+                }
+                a.setAlertText(at.toString());
+
+                for (AlerterService as : alerterServices) {
+                    try {
+                        as.raiseAlert(a);
+                    } catch (AlertingException e) {
+                        log.error("Cannot raise user-level alert:" + e.getMessage());
+                        e.printStackTrace();
+                    }
+                }
+            }
+
+            if (getSaveSystemAlert()) {
+                raiseSystemAlert(event);
+            }
+        }
+    }
 }

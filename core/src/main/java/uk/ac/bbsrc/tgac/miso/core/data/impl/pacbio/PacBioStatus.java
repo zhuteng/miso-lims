@@ -35,19 +35,19 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
  * @since 0.1.6
  */
 public class PacBioStatus extends StatusImpl {
-  String metadata = null;
+    String metadata = null;
 
-  public PacBioStatus() {
-    setHealth(HealthType.Unknown);
-  }
+    public PacBioStatus() {
+        setHealth(HealthType.Unknown);
+    }
 
-  public PacBioStatus(String metadata) {
-    this.metadata = metadata;
-    //parseMetaData(metadata);
-  }
+    public PacBioStatus(String metadata) {
+        this.metadata = metadata;
+        //parseMetaData(metadata);
+    }
 
-  public void parseMetaData(String metadata) {
-    //System.out.println("PacBioStatus: parsing metadata -> "+metadata);
+    public void parseMetaData(String metadata) {
+        //System.out.println("PacBioStatus: parsing metadata -> "+metadata);
     /*
     try {
 
@@ -70,16 +70,16 @@ public class PacBioStatus extends StatusImpl {
       e.printStackTrace();
     }
     */
-  }
-
-  @Override
-  public String toString() {
-    StringBuffer sb = new StringBuffer();
-    sb.append(super.toString());
-    if (metadata != null) {
-      sb.append(" : ");
-      sb.append(metadata);
     }
-    return sb.toString();
-  }
+
+    @Override
+    public String toString() {
+        StringBuffer sb = new StringBuffer();
+        sb.append(super.toString());
+        if (metadata != null) {
+            sb.append(" : ");
+            sb.append(metadata);
+        }
+        return sb.toString();
+    }
 }

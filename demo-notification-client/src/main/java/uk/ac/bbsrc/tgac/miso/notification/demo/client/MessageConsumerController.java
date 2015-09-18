@@ -55,54 +55,54 @@ import java.util.Map;
  * @since 0.1.4
  */
 @Controller
-@RequestMapping(value="/consumer")
+@RequestMapping(value = "/consumer")
 public class MessageConsumerController {
-  protected static final Logger log = LoggerFactory.getLogger(MessageConsumerController.class);
+    protected static final Logger log = LoggerFactory.getLogger(MessageConsumerController.class);
 
-  @Autowired
-  private NotificationGatewayService notificationGatewayService;
+    @Autowired
+    private NotificationGatewayService notificationGatewayService;
 
-  @Autowired
-  private com.eaglegenomics.simlims.core.manager.SecurityManager securityManager;
+    @Autowired
+    private com.eaglegenomics.simlims.core.manager.SecurityManager securityManager;
 
-  @Autowired
-  private uk.ac.bbsrc.tgac.miso.core.manager.RequestManager requestManager;
+    @Autowired
+    private uk.ac.bbsrc.tgac.miso.core.manager.RequestManager requestManager;
 
-  public void setNotificationGatewayService(NotificationGatewayService notificationGatewayService) {
-    this.notificationGatewayService = notificationGatewayService;
-  }
-
-  public void setRequestManager(RequestManager requestManager) {
-    this.requestManager = requestManager;
-  }
-
-  public void setSecurityManager(SecurityManager securityManager) {
-    this.securityManager = securityManager;
-  }
-
-  @RequestMapping(value="/illumina/run/status", method = RequestMethod.POST)
-  public String consumeGatewayIlluminaStatus(HttpServletRequest request) throws IOException {
-    for (NotificationGateway s : notificationGatewayService.getGatewaysFor(PlatformType.ILLUMINA)) {
-      log.debug("Using " + s.toString());
-      s.consume(buildMessage(exposeRequest(request)));
-    }
-    return "redirect:/miso";
-  }
-
-  private MultiValueMap<String, String> exposeRequest(HttpServletRequest request) {
-    log.debug("Request size: "+request.getContentLength());
-    Map<String, Object> map = request.getParameterMap();
-    log.debug("RAW MAP: " + map.toString());
-    MultiValueMap<String, String> message = new LinkedMultiValueMap<String, String>();
-    for (String s : map.keySet()) {
-      log.debug("EXPOSING PARAM '" + s + "': " + LimsUtils.join(request.getParameterValues(s), ","));
-      message.put(s, Arrays.asList(request.getParameterValues(s)));
+    public void setNotificationGatewayService(NotificationGatewayService notificationGatewayService) {
+        this.notificationGatewayService = notificationGatewayService;
     }
 
-    return message;
-  }
+    public void setRequestManager(RequestManager requestManager) {
+        this.requestManager = requestManager;
+    }
 
-  private <T> Message<T> buildMessage(T payload) {
-    return MessageBuilder.withPayload(payload).setHeader("handler", requestManager).build();
-  }
+    public void setSecurityManager(SecurityManager securityManager) {
+        this.securityManager = securityManager;
+    }
+
+    @RequestMapping(value = "/illumina/run/status", method = RequestMethod.POST)
+    public String consumeGatewayIlluminaStatus(HttpServletRequest request) throws IOException {
+        for (NotificationGateway s : notificationGatewayService.getGatewaysFor(PlatformType.ILLUMINA)) {
+            log.debug("Using " + s.toString());
+            s.consume(buildMessage(exposeRequest(request)));
+        }
+        return "redirect:/miso";
+    }
+
+    private MultiValueMap<String, String> exposeRequest(HttpServletRequest request) {
+        log.debug("Request size: " + request.getContentLength());
+        Map<String, Object> map = request.getParameterMap();
+        log.debug("RAW MAP: " + map.toString());
+        MultiValueMap<String, String> message = new LinkedMultiValueMap<String, String>();
+        for (String s : map.keySet()) {
+            log.debug("EXPOSING PARAM '" + s + "': " + LimsUtils.join(request.getParameterValues(s), ","));
+            message.put(s, Arrays.asList(request.getParameterValues(s)));
+        }
+
+        return message;
+    }
+
+    private <T> Message<T> buildMessage(T payload) {
+        return MessageBuilder.withPayload(payload).setHeader("handler", requestManager).build();
+    }
 }

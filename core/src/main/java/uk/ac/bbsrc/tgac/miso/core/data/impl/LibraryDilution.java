@@ -44,34 +44,34 @@ import java.util.Set;
  * @since 0.0.2
  */
 public class LibraryDilution extends AbstractDilution implements Serializable {
-  private Library library;
-  public static final String UNITS = "nM";
+    private Library library;
+    public static final String UNITS = "nM";
 
-  /**
-   * Construct a new LibraryDilution with a default empty SecurityProfile
-   */
-  public LibraryDilution() {
-    setSecurityProfile(new SecurityProfile());
-  }
+    /**
+     * Construct a new LibraryDilution with a default empty SecurityProfile
+     */
+    public LibraryDilution() {
+        setSecurityProfile(new SecurityProfile());
+    }
 
-  /**
-   * Construct a new LibraryDilution with a SecurityProfile owned by the given User
-   *
-   * @param user of type User
-   */
-  public LibraryDilution(User user) {
-    setSecurityProfile(new SecurityProfile(user));
-  }
+    /**
+     * Construct a new LibraryDilution with a SecurityProfile owned by the given User
+     *
+     * @param user of type User
+     */
+    public LibraryDilution(User user) {
+        setSecurityProfile(new SecurityProfile(user));
+    }
 
-  public Library getLibrary() {
-    return library;
-  }
+    public Library getLibrary() {
+        return library;
+    }
 
-  public void setLibrary(Library library) {
-    this.library = library;
-  }
+    public void setLibrary(Library library) {
+        this.library = library;
+    }
 
-  public String getUnits() {
-    return UNITS;
-  }
+    public String getUnits() {
+        return UNITS;
+    }
 }

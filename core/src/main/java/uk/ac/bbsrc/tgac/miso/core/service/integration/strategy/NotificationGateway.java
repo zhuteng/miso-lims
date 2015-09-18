@@ -35,10 +35,11 @@ import org.springframework.integration.annotation.Gateway;
  * @since 0.1.5
  */
 public interface NotificationGateway<T> {
-  /**
-   * Consume the given {@link Message} and have the parameters mapped via the {@link Gateway}
-   * @param m
-   */
-  @Gateway
-  void consume(Message<T> m);
+    /**
+     * Consume the given {@link Message} and have the parameters mapped via the {@link Gateway}
+     *
+     * @param m
+     */
+    @Gateway
+    void consume(Message<T> m);
 }

@@ -38,10 +38,10 @@ import org.springframework.integration.support.MessageBuilder;
  * @since version
  */
 public class TestReceiver {
-  protected static final Logger log = LoggerFactory.getLogger(TestReceiver.class);
+    protected static final Logger log = LoggerFactory.getLogger(TestReceiver.class);
 
-  public Message<String> receive() {
-    log.info("Successfully received request");
-    return MessageBuilder.withPayload("foo").build();
-  }
+    public Message<String> receive() {
+        log.info("Successfully received request");
+        return MessageBuilder.withPayload("foo").build();
+    }
 }

@@ -45,28 +45,26 @@ import java.io.IOException;
  * @since 0.1.2
  */
 public class DaoAlerterService implements AlerterService {
-  protected static final Logger log = LoggerFactory.getLogger(DaoAlerterService.class);
+    protected static final Logger log = LoggerFactory.getLogger(DaoAlerterService.class);
 
-  @Autowired
-  private AlertStore alertStore;
+    @Autowired
+    private AlertStore alertStore;
 
-  public void setAlertStore(AlertStore alertStore) {
-    this.alertStore = alertStore;
-  }
-
-  @Override
-  public void raiseAlert(Alert a) throws AlertingException {
-    try {
-      if (alertStore != null) {
-        alertStore.save(a);
-      }
-      else {
-        throw new RuntimeException("Cannot persist raised Alert. Specified Alert store is null");
-      }
+    public void setAlertStore(AlertStore alertStore) {
+        this.alertStore = alertStore;
     }
-    catch (IOException e) {
-      log.error("Cannot save alert to DAO: "+e.getMessage());
-      throw new AlertingException("Cannot save alert to DAO", e);
+
+    @Override
+    public void raiseAlert(Alert a) throws AlertingException {
+        try {
+            if (alertStore != null) {
+                alertStore.save(a);
+            } else {
+                throw new RuntimeException("Cannot persist raised Alert. Specified Alert store is null");
+            }
+        } catch (IOException e) {
+            log.error("Cannot save alert to DAO: " + e.getMessage());
+            throw new AlertingException("Cannot save alert to DAO", e);
+        }
     }
-  }
 }

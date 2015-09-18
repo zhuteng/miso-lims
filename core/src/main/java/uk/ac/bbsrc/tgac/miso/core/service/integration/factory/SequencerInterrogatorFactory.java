@@ -40,33 +40,28 @@ import uk.ac.bbsrc.tgac.miso.core.service.integration.strategy.interrogator.LS45
  */
 public class SequencerInterrogatorFactory {
 
-  /**
-   * Builds a SequencerInterrogator object from a given SequencerReference
-   *
-   * @param sr of type SequencerReference
-   * @return SequencerInterrogator
-   * @throws InterrogationException when an unsupported PlatformType is specified 
-   */
-  public static SequencerInterrogator getSequencerInterrogator(SequencerReference sr) throws InterrogationException {
-    if (sr.getPlatform().getPlatformType().equals(PlatformType.ILLUMINA)) {
-      return new SequencerInterrogator(new IlluminaSequencerInterrogationStrategy(), sr);
+    /**
+     * Builds a SequencerInterrogator object from a given SequencerReference
+     *
+     * @param sr of type SequencerReference
+     * @return SequencerInterrogator
+     * @throws InterrogationException when an unsupported PlatformType is specified
+     */
+    public static SequencerInterrogator getSequencerInterrogator(SequencerReference sr) throws InterrogationException {
+        if (sr.getPlatform().getPlatformType().equals(PlatformType.ILLUMINA)) {
+            return new SequencerInterrogator(new IlluminaSequencerInterrogationStrategy(), sr);
+        } else if (sr.getPlatform().getPlatformType().equals(PlatformType.LS454)) {
+            return new SequencerInterrogator(new LS454SequencerInterrogationStrategy(), sr);
+        } else if (sr.getPlatform().getPlatformType().equals(PlatformType.SOLID)) {
+            return new SequencerInterrogator(new SolidSequencerInterrogationStrategy(), sr);
+        } else if (sr.getPlatform().getPlatformType().equals(PlatformType.IONTORRENT)) {
+            //return new SequencerInterrogator(new SolidSequencerInterrogationStrategy(), sr);
+            throw new InterrogationException("Unsupported PlatformType");
+        } else if (sr.getPlatform().getPlatformType().equals(PlatformType.PACBIO)) {
+            //return new SequencerInterrogator(new SolidSequencerInterrogationStrategy(), sr);
+            throw new InterrogationException("Unsupported PlatformType");
+        } else {
+            throw new InterrogationException("Unrecognised PlatformType");
+        }
     }
-    else if (sr.getPlatform().getPlatformType().equals(PlatformType.LS454)) {
-      return new SequencerInterrogator(new LS454SequencerInterrogationStrategy(), sr);
-    }
-    else if (sr.getPlatform().getPlatformType().equals(PlatformType.SOLID)) {
-      return new SequencerInterrogator(new SolidSequencerInterrogationStrategy(), sr);
-    }
-    else if (sr.getPlatform().getPlatformType().equals(PlatformType.IONTORRENT)) {
-      //return new SequencerInterrogator(new SolidSequencerInterrogationStrategy(), sr);
-      throw new InterrogationException("Unsupported PlatformType");
-    }
-    else if (sr.getPlatform().getPlatformType().equals(PlatformType.PACBIO)) {
-      //return new SequencerInterrogator(new SolidSequencerInterrogationStrategy(), sr);
-      throw new InterrogationException("Unsupported PlatformType");
-    }
-    else {
-      throw new InterrogationException("Unrecognised PlatformType");
-    }
-  }
 }

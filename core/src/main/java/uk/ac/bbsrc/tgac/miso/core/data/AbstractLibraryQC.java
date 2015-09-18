@@ -32,73 +32,68 @@ import uk.ac.bbsrc.tgac.miso.core.exception.MalformedLibraryException;
  * @since 0.0.2
  */
 public abstract class AbstractLibraryQC extends AbstractQC implements LibraryQC {
-  public static final String UNITS = "nM";
+    public static final String UNITS = "nM";
 
-  private Double results;
-  private Integer insertSize;
-  private Library library;
+    private Double results;
+    private Integer insertSize;
+    private Library library;
 
-  public Library getLibrary() {
-    return library;
-  }
-
-  public void setLibrary(Library library) throws MalformedLibraryException {
-    this.library = library;
-  }
-
-  public Double getResults() {
-    return results;
-  }
-
-  public void setResults(Double results) {
-    this.results = results;
-  }
-
-  public Integer getInsertSize() {
-    return insertSize;
-  }
-
-  public void setInsertSize(Integer insertSize) {
-    this.insertSize = insertSize;
-  }  
-
-  /**
-   * Equivalency is based on getQcId() if set, otherwise on name
-   */
-  @Override
-  public boolean equals(Object obj) {
-    if (obj == null)
-      return false;
-    if (obj == this)
-      return true;
-    if (!(obj instanceof AbstractLibraryQC))
-      return false;
-    LibraryQC them = (LibraryQC) obj;
-    // If not saved, then compare resolved actual objects. Otherwise
-    // just compare IDs.
-    if (this.getId() == AbstractLibraryQC.UNSAVED_ID
-        || them.getId() == AbstractLibraryQC.UNSAVED_ID) {
-      return this.getQcCreator().equals(them.getQcCreator())
-             && this.getQcDate().equals(them.getQcDate())
-             && this.getQcType().equals(them.getQcType())
-             && this.getResults().equals(them.getResults());
+    public Library getLibrary() {
+        return library;
     }
-    else {
-      return this.getId() == them.getId();
-    }
-  }
 
-  @Override
-  public int hashCode() {
-    if (getId() != AbstractLibraryQC.UNSAVED_ID) {
-      return (int)getId();
+    public void setLibrary(Library library) throws MalformedLibraryException {
+        this.library = library;
     }
-    else {
-      int hashcode = getQcCreator().hashCode();
-      hashcode = 37 * hashcode + getQcDate().hashCode();
-      hashcode = 37 * hashcode + getQcType().hashCode();
-      hashcode = 37 * hashcode + getResults().hashCode();
-      return hashcode;
+
+    public Double getResults() {
+        return results;
     }
-  }
+
+    public void setResults(Double results) {
+        this.results = results;
+    }
+
+    public Integer getInsertSize() {
+        return insertSize;
+    }
+
+    public void setInsertSize(Integer insertSize) {
+        this.insertSize = insertSize;
+    }
+
+    /**
+     * Equivalency is based on getQcId() if set, otherwise on name
+     */
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null)
+            return false;
+        if (obj == this)
+            return true;
+        if (!(obj instanceof AbstractLibraryQC))
+            return false;
+        LibraryQC them = (LibraryQC) obj;
+        // If not saved, then compare resolved actual objects. Otherwise
+        // just compare IDs.
+        if (this.getId() == AbstractLibraryQC.UNSAVED_ID || them.getId() == AbstractLibraryQC.UNSAVED_ID) {
+            return this.getQcCreator().equals(them.getQcCreator()) && this.getQcDate().equals(them.getQcDate()) &&
+                   this.getQcType().equals(them.getQcType()) && this.getResults().equals(them.getResults());
+        } else {
+            return this.getId() == them.getId();
+        }
+    }
+
+    @Override
+    public int hashCode() {
+        if (getId() != AbstractLibraryQC.UNSAVED_ID) {
+            return (int) getId();
+        } else {
+            int hashcode = getQcCreator().hashCode();
+            hashcode = 37 * hashcode + getQcDate().hashCode();
+            hashcode = 37 * hashcode + getQcType().hashCode();
+            hashcode = 37 * hashcode + getResults().hashCode();
+            return hashcode;
+        }
+    }
 }

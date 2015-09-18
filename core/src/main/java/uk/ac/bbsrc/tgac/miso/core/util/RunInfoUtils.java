@@ -39,63 +39,62 @@ import java.util.Map;
  * @deprecated
  */
 public class RunInfoUtils {
-  protected static final Logger log = LoggerFactory.getLogger(RunInfoUtils.class);
+    protected static final Logger log = LoggerFactory.getLogger(RunInfoUtils.class);
 
-  /**
-   * Check the status of an Illumina run
-   *
-   * @param runName of type String
-   * @return Map<String, String>
-   * @throws IOException when
-   */
-  public static Map<String, String> checkIlluminaStatus(String runName) throws IOException {
-    ProcessBuilder pb = new ProcessBuilder();
-    pb.command("ssh", "davey@149.155.209.208", "./glob_illumina_status.pl", "-p", runName);
-    Process process = pb.start();
-    return LimsUtils.checkPipes(process);
-  }
+    /**
+     * Check the status of an Illumina run
+     *
+     * @param runName of type String
+     * @return Map<String, String>
+     * @throws IOException when
+     */
+    public static Map<String, String> checkIlluminaStatus(String runName) throws IOException {
+        ProcessBuilder pb = new ProcessBuilder();
+        pb.command("ssh", "davey@149.155.209.208", "./glob_illumina_status.pl", "-p", runName);
+        Process process = pb.start();
+        return LimsUtils.checkPipes(process);
+    }
 
-  /**
-   * Check if an Illumina run is completed
-   *
-   * @param runName of type String
-   * @return Map<String, String>
-   * @throws IOException when
-   */
-  public static Map<String, String> checkIlluminaCompleted(String runName) throws IOException {
-    ProcessBuilder pb = new ProcessBuilder();
-    pb.command("ssh", "davey@149.155.209.208", "./glob_illumina_complete.pl", "-p", runName);
-    Process process = pb.start();
-    return LimsUtils.checkPipes(process);
-  }
+    /**
+     * Check if an Illumina run is completed
+     *
+     * @param runName of type String
+     * @return Map<String, String>
+     * @throws IOException when
+     */
+    public static Map<String, String> checkIlluminaCompleted(String runName) throws IOException {
+        ProcessBuilder pb = new ProcessBuilder();
+        pb.command("ssh", "davey@149.155.209.208", "./glob_illumina_complete.pl", "-p", runName);
+        Process process = pb.start();
+        return LimsUtils.checkPipes(process);
+    }
 
-  /**
-   * Check the status of a 454 run
-   *
-   * @param runName of type String
-   * @return Map<String, String>
-   * @throws IOException when
-   */
-  public static Map<String, String> check454Status(String runName) throws IOException {
-    ProcessBuilder pb = new ProcessBuilder();
-    pb.command("ssh", "davey@149.155.209.208", "./glob_454_status.pl", "-p", runName);
-    Process process = pb.start();
-    return LimsUtils.checkPipes(process);
-  }
+    /**
+     * Check the status of a 454 run
+     *
+     * @param runName of type String
+     * @return Map<String, String>
+     * @throws IOException when
+     */
+    public static Map<String, String> check454Status(String runName) throws IOException {
+        ProcessBuilder pb = new ProcessBuilder();
+        pb.command("ssh", "davey@149.155.209.208", "./glob_454_status.pl", "-p", runName);
+        Process process = pb.start();
+        return LimsUtils.checkPipes(process);
+    }
 
-  /**
-   * Check if a 454 run is completed
-   *
-   * @param runName of type String
-   * @return Map<String, String>
-   * @throws IOException when
-   */
-  public static Map<String, String> check454Completed(String runName) throws IOException {
-    ProcessBuilder pb = new ProcessBuilder();
-    pb.command("ssh", "davey@149.155.209.208", "./glob_454_complete.pl", "-p", runName);
-    Process process = pb.start();
-    return LimsUtils.checkPipes(process);
-  }
-
+    /**
+     * Check if a 454 run is completed
+     *
+     * @param runName of type String
+     * @return Map<String, String>
+     * @throws IOException when
+     */
+    public static Map<String, String> check454Completed(String runName) throws IOException {
+        ProcessBuilder pb = new ProcessBuilder();
+        pb.command("ssh", "davey@149.155.209.208", "./glob_454_complete.pl", "-p", runName);
+        Process process = pb.start();
+        return LimsUtils.checkPipes(process);
+    }
 
 }

@@ -16,33 +16,33 @@ import java.util.*;
  * @since 0.1.9
  */
 public class DaoLookup {
-  protected static final Logger log = LoggerFactory.getLogger(DaoLookup.class);
-  private Map<Class<?>, Store<?>> daos = new HashMap<Class<?>, Store<?>>();
+    protected static final Logger log = LoggerFactory.getLogger(DaoLookup.class);
+    private Map<Class<?>, Store<?>> daos = new HashMap<Class<?>, Store<?>>();
 
-  public void setDaos(Map<Class<?>, Store<?>> daos) {
-    this.daos = daos;
-  }
-
-  public <T> Store<T> lookup(Class<? extends T> clz) {
-    Class<?> type = getAssignableClassFromClass(clz);
-    if (type != null) {
-      return (Store<T>)daos.get(getAssignableClassFromClass(clz));
+    public void setDaos(Map<Class<?>, Store<?>> daos) {
+        this.daos = daos;
     }
-    return null;
-  }
 
-  public Set<Class<?>> getDaoKeys() {
-    return daos.keySet();
-  }
-
-  public Class<?> getAssignableClassFromClass(Class<?> clz) {
-    for (Class<?> type : getDaoKeys()) {
-      if (type.isAssignableFrom(clz)) {
-        return type;
-      }
+    public <T> Store<T> lookup(Class<? extends T> clz) {
+        Class<?> type = getAssignableClassFromClass(clz);
+        if (type != null) {
+            return (Store<T>) daos.get(getAssignableClassFromClass(clz));
+        }
+        return null;
     }
-    return null;
-  }
+
+    public Set<Class<?>> getDaoKeys() {
+        return daos.keySet();
+    }
+
+    public Class<?> getAssignableClassFromClass(Class<?> clz) {
+        for (Class<?> type : getDaoKeys()) {
+            if (type.isAssignableFrom(clz)) {
+                return type;
+            }
+        }
+        return null;
+    }
 
   /*
   public <T> Set<Store<? extends T>> lookup(Class<?> clz) {

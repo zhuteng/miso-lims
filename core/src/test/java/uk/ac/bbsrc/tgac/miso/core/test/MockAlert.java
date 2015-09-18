@@ -39,115 +39,117 @@ import java.util.Date;
  * @since 0.1.2
  */
 public class MockAlert implements Alert {
-  private long alertId;
-  private String alertTitle;
-  private String alertText;
-  private User user;
-  private Date alertDate;
-  private boolean alertRead;
-  private AlertLevel alertLevel;
+    private long alertId;
+    private String alertTitle;
+    private String alertText;
+    private User user;
+    private Date alertDate;
+    private boolean alertRead;
+    private AlertLevel alertLevel;
 
-  public MockAlert(User user) {
-    this(user, AlertLevel.INFO);
-  }
-
-  public MockAlert(User user, AlertLevel alertLevel) {
-    this.user = user;
-    this.alertDate = new Date();
-    this.alertLevel = alertLevel;
-    this.alertText = "["+getAlertUser().getFullName()+"] Mock alert text";
-  }
-
-  @Override
-  public Long getAlertId() {
-    return 0L;
-  }
-
-  @Override
-  public void setAlertId(Long alertId) {
-    this.alertId = alertId;
-  }
-
-  @Override
-  public String getAlertTitle() {
-    return alertTitle;
-  }
-
-  @Override
-  public void setAlertTitle(String alertTitle) {
-    this.alertTitle = alertTitle;
-  }
-
-  @Override
-  public String getAlertText() {
-    return alertText;
-  }
-
-  @Override
-  public void setAlertText(String alertText) {
-    this.alertText = alertText;
-  }
-
-  @Override
-  public User getAlertUser() {
-    return this.user;
-  }
-
-  @Override
-  public Date getAlertDate() {
-    return alertDate;
-  }
-
-  @Override
-  public void setAlertDate(Date alertDate) {
-    this.alertDate = alertDate;
-  }
-
-  @Override
-  public boolean getAlertRead() {
-    return false;
-  }
-
-  @Override
-  public void setAlertRead(boolean alertRead) {
-    this.alertRead = alertRead;
-  }
-
-  @Override
-  public AlertLevel getAlertLevel() {
-    return alertLevel;
-  }
-
-  @Override
-  public void setAlertLevel(AlertLevel alertLevel) {
-    this.alertLevel = alertLevel;
-  }
-
-  @Override
-  public int compareTo(Object o) {
-    Alert a = (Alert)o;
-    if (getAlertId() != null && a.getAlertId() != null) {
-      if (getAlertId() < a.getAlertId()) return -1;
-      if (getAlertId() > a.getAlertId()) return 1;
+    public MockAlert(User user) {
+        this(user, AlertLevel.INFO);
     }
-    return 0;
-  }
 
-  @Override
-  public boolean isDeletable() {
-    return true;
-  }
+    public MockAlert(User user, AlertLevel alertLevel) {
+        this.user = user;
+        this.alertDate = new Date();
+        this.alertLevel = alertLevel;
+        this.alertText = "[" + getAlertUser().getFullName() + "] Mock alert text";
+    }
 
-  @Override
-  public String toString() {
-    StringBuilder sb = new StringBuilder();
-    sb.append(getAlertId());
-    sb.append(" : ");
-    sb.append(getAlertUser().getFullName());
-    sb.append(" : ");
-    sb.append(getAlertText());
-    sb.append(" : ");
-    sb.append(getAlertDate());
-    return sb.toString();
-  }
+    @Override
+    public Long getAlertId() {
+        return 0L;
+    }
+
+    @Override
+    public void setAlertId(Long alertId) {
+        this.alertId = alertId;
+    }
+
+    @Override
+    public String getAlertTitle() {
+        return alertTitle;
+    }
+
+    @Override
+    public void setAlertTitle(String alertTitle) {
+        this.alertTitle = alertTitle;
+    }
+
+    @Override
+    public String getAlertText() {
+        return alertText;
+    }
+
+    @Override
+    public void setAlertText(String alertText) {
+        this.alertText = alertText;
+    }
+
+    @Override
+    public User getAlertUser() {
+        return this.user;
+    }
+
+    @Override
+    public Date getAlertDate() {
+        return alertDate;
+    }
+
+    @Override
+    public void setAlertDate(Date alertDate) {
+        this.alertDate = alertDate;
+    }
+
+    @Override
+    public boolean getAlertRead() {
+        return false;
+    }
+
+    @Override
+    public void setAlertRead(boolean alertRead) {
+        this.alertRead = alertRead;
+    }
+
+    @Override
+    public AlertLevel getAlertLevel() {
+        return alertLevel;
+    }
+
+    @Override
+    public void setAlertLevel(AlertLevel alertLevel) {
+        this.alertLevel = alertLevel;
+    }
+
+    @Override
+    public int compareTo(Object o) {
+        Alert a = (Alert) o;
+        if (getAlertId() != null && a.getAlertId() != null) {
+            if (getAlertId() < a.getAlertId())
+                return -1;
+            if (getAlertId() > a.getAlertId())
+                return 1;
+        }
+        return 0;
+    }
+
+    @Override
+    public boolean isDeletable() {
+        return true;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(getAlertId());
+        sb.append(" : ");
+        sb.append(getAlertUser().getFullName());
+        sb.append(" : ");
+        sb.append(getAlertText());
+        sb.append(" : ");
+        sb.append(getAlertDate());
+        return sb.toString();
+    }
 }

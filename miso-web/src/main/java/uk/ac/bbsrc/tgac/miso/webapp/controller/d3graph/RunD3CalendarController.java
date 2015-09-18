@@ -23,7 +23,6 @@
 
 package uk.ac.bbsrc.tgac.miso.webapp.controller.d3graph;
 
-
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.apache.poi.openxml4j.exceptions.InvalidOperationException;
@@ -39,7 +38,6 @@ import uk.ac.bbsrc.tgac.miso.webapp.controller.EditProjectController;
 import java.io.IOException;
 import java.util.Collection;
 
-
 /**
  * Created by IntelliJ IDEA.
  * User: thankia
@@ -51,33 +49,34 @@ import java.util.Collection;
 @RequestMapping("/d3graph/run")
 @SessionAttributes("run")
 public class RunD3CalendarController {
-  protected static final Logger log = LoggerFactory.getLogger(EditProjectController.class);
+    protected static final Logger log = LoggerFactory.getLogger(EditProjectController.class);
 
-  @Autowired
-  private RequestManager requestManager;
+    @Autowired
+    private RequestManager requestManager;
 
-  @RequestMapping(method = RequestMethod.GET)
-  public @ResponseBody JSONArray graphd3Rest() throws IOException {
-    try {
-      Collection<Run> runs = requestManager.listAllRuns();
-      JSONArray runsArray = new JSONArray();
-      for (Run r : runs) {
-        runsArray.add(JSONObject.fromObject("{'ID':'" + r.getId()
-                                            + "','Name':'" + r.getName()
-                                            + "','Start':'" + (r.getStatus() != null ? r.getStatus().getStartDate() : "")
-                                            + "','Stop':'" + (r.getStatus() != null ? r.getStatus().getCompletionDate() : "")
-                                            + "','Instrument':'" + r.getSequencerReference().getId()
-                                            + "','InstrumentName':'" +  r.getSequencerReference().getPlatform().getInstrumentModel()
-                                            + "','Health':'" + (r.getStatus() != null && r.getStatus().getHealth() != null ? r.getStatus().getHealth().getKey() : "")
-                                            + "','Description':'" + r.getDescription()+  "'}"));
-      }
-      return runsArray;
+    @RequestMapping(method = RequestMethod.GET)
+    public
+    @ResponseBody
+    JSONArray graphd3Rest() throws IOException {
+        try {
+            Collection<Run> runs = requestManager.listAllRuns();
+            JSONArray runsArray = new JSONArray();
+            for (Run r : runs) {
+                runsArray.add(JSONObject.fromObject("{'ID':'" + r.getId() + "','Name':'" + r.getName() + "','Start':'" +
+                                                    (r.getStatus() != null ? r.getStatus().getStartDate() : "") + "','Stop':'" +
+                                                    (r.getStatus() != null ? r.getStatus().getCompletionDate() : "") + "','Instrument':'" +
+                                                    r.getSequencerReference().getId() + "','InstrumentName':'" +
+                                                    r.getSequencerReference().getPlatform().getInstrumentModel() + "','Health':'" +
+                                                    (r.getStatus() != null && r.getStatus().getHealth() != null ?
+                                                     r.getStatus().getHealth().getKey() :
+                                                     "") + "','Description':'" + r.getDescription() + "'}"));
+            }
+            return runsArray;
+        } catch (InvalidOperationException e) {
+            log.debug("Failed", e);
+            JSONArray runsArray = new JSONArray();
+            runsArray.add(JSONObject.fromObject("{'Error':" + e + "}"));
+            return runsArray;
+        }
     }
-    catch (InvalidOperationException e) {
-      log.debug("Failed", e);
-      JSONArray runsArray = new JSONArray();
-      runsArray.add(JSONObject.fromObject("{'Error':" + e + "}"));
-      return runsArray;
-    }
-  }
 }

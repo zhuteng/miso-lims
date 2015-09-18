@@ -36,5 +36,5 @@ import java.io.Serializable;
  * @since 0.0.2
  */
 public class ClusterKit extends AbstractKit implements Serializable {
-  public static final String PREFIX = "CKT";
+    public static final String PREFIX = "CKT";
 }

@@ -45,70 +45,67 @@ import java.util.Map;
  * @since 0.0.3
  */
 public class IlluminaCortexStatsHandler {
-  private Logger log = LoggerFactory.getLogger(getClass());
+    private Logger log = LoggerFactory.getLogger(getClass());
 
-  @Autowired
-  private MisoFilesManager misoFileManager;
+    @Autowired
+    private MisoFilesManager misoFileManager;
 
-  public void setMisoFileManager(MisoFilesManager misoFileManager) {
-    this.misoFileManager = misoFileManager;
-  }
-
-  @Autowired
-  private RequestManager requestManager;
-
-  public void setRequestManager(RequestManager requestManager) {
-    this.requestManager = requestManager;
-  }
-
-  public void parseStatsMessage(Message<Map<String, Map<String, byte[]>>> message) throws IOException {
-    Map<String, Map<String, byte[]>> a = message.getPayload();
-    for (String type: a.keySet()) {
-      Map<String, byte[]> b = a.get(type);
-      for (String filename : b.keySet()) {
-        log.info("Processing stats for: " + filename);
-        BufferedInputStream bis = new BufferedInputStream(new ByteArrayInputStream(b.get(filename)));
-        File outFile = null;
-        OutputStream out = null;
-        try {
-          outFile = new File(new File("/tmp/"), filename);
-          try {
-            out = new FileOutputStream(outFile);
-            byte[] buf = new byte[16884];
-            int len;
-            while ((len = bis.read(buf)) > 0) {
-              out.write(buf, 0, len);
-            }
-          }
-          catch (IOException e) {
-            log.error("Could not write temporary file: " + outFile.getAbsolutePath());
-            e.printStackTrace();
-          }
-          finally {
-            try {
-              bis.close();
-            } catch (IOException e) {
-              // ignore
-            }
-          }
-        }
-        finally {
-          if (out != null) {
-            out.close();
-          }
-          if (outFile != null) {
-            File newFile = misoFileManager.storeFile(Run.class, "stats", outFile);
-            if (newFile != null && outFile.delete()) {
-              File destination = new File(newFile.getParentFile(), newFile.getName().split("-")[0]);
-              if (LimsUtils.checkDirectory(destination, true)) {
-                if (LimsUtils.unzipFile(newFile, destination)) {
-                  newFile.delete();
-                }
-              }
-            }
-          }
-        }
-      }
+    public void setMisoFileManager(MisoFilesManager misoFileManager) {
+        this.misoFileManager = misoFileManager;
     }
-  }
+
+    @Autowired
+    private RequestManager requestManager;
+
+    public void setRequestManager(RequestManager requestManager) {
+        this.requestManager = requestManager;
+    }
+
+    public void parseStatsMessage(Message<Map<String, Map<String, byte[]>>> message) throws IOException {
+        Map<String, Map<String, byte[]>> a = message.getPayload();
+        for (String type : a.keySet()) {
+            Map<String, byte[]> b = a.get(type);
+            for (String filename : b.keySet()) {
+                log.info("Processing stats for: " + filename);
+                BufferedInputStream bis = new BufferedInputStream(new ByteArrayInputStream(b.get(filename)));
+                File outFile = null;
+                OutputStream out = null;
+                try {
+                    outFile = new File(new File("/tmp/"), filename);
+                    try {
+                        out = new FileOutputStream(outFile);
+                        byte[] buf = new byte[16884];
+                        int len;
+                        while ((len = bis.read(buf)) > 0) {
+                            out.write(buf, 0, len);
+                        }
+                    } catch (IOException e) {
+                        log.error("Could not write temporary file: " + outFile.getAbsolutePath());
+                        e.printStackTrace();
+                    } finally {
+                        try {
+                            bis.close();
+                        } catch (IOException e) {
+                            // ignore
+                        }
+                    }
+                } finally {
+                    if (out != null) {
+                        out.close();
+                    }
+                    if (outFile != null) {
+                        File newFile = misoFileManager.storeFile(Run.class, "stats", outFile);
+                        if (newFile != null && outFile.delete()) {
+                            File destination = new File(newFile.getParentFile(), newFile.getName().split("-")[0]);
+                            if (LimsUtils.checkDirectory(destination, true)) {
+                                if (LimsUtils.unzipFile(newFile, destination)) {
+                                    newFile.delete();
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
 }

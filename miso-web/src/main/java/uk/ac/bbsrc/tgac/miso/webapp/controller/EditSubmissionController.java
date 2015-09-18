@@ -56,59 +56,59 @@ import java.util.*;
 @RequestMapping("/submission")
 @SessionAttributes("submission")
 public class EditSubmissionController {
-  protected static final Logger log = LoggerFactory.getLogger(EditSubmissionController.class);
+    protected static final Logger log = LoggerFactory.getLogger(EditSubmissionController.class);
 
-  @Autowired
-  private SecurityManager securityManager;
+    @Autowired
+    private SecurityManager securityManager;
 
-  @Autowired
-  private RequestManager requestManager;
+    @Autowired
+    private RequestManager requestManager;
 
-  @Autowired
-  private DataObjectFactory dataObjectFactory;
+    @Autowired
+    private DataObjectFactory dataObjectFactory;
 
-  @Autowired
-  private FilesManager misoFileManager;
+    @Autowired
+    private FilesManager misoFileManager;
 
-  @Autowired
-  private SubmissionManager submissionManager;
+    @Autowired
+    private SubmissionManager submissionManager;
 
-  @Autowired
-  private JdbcTemplate interfaceTemplate;
+    @Autowired
+    private JdbcTemplate interfaceTemplate;
 
-  public void setInterfaceTemplate(JdbcTemplate interfaceTemplate) {
-    this.interfaceTemplate = interfaceTemplate;
-  }
- 
-  public void setDataObjectFactory(DataObjectFactory dataObjectFactory) {
-    this.dataObjectFactory = dataObjectFactory;
-  }
+    public void setInterfaceTemplate(JdbcTemplate interfaceTemplate) {
+        this.interfaceTemplate = interfaceTemplate;
+    }
 
-  public void setRequestManager(RequestManager requestManager) {
-    this.requestManager = requestManager;
-  }
+    public void setDataObjectFactory(DataObjectFactory dataObjectFactory) {
+        this.dataObjectFactory = dataObjectFactory;
+    }
 
-  public void setSecurityManager(SecurityManager securityManager) {
-    this.securityManager = securityManager;
-  }
+    public void setRequestManager(RequestManager requestManager) {
+        this.requestManager = requestManager;
+    }
 
-  public void setMisoFileManager(FilesManager misoFileManager) {
-    this.misoFileManager = misoFileManager;
-  }
+    public void setSecurityManager(SecurityManager securityManager) {
+        this.securityManager = securityManager;
+    }
 
-  public void setSubmissionManager(SubmissionManager submissionManager) {
-    this.submissionManager = submissionManager;
-  }
+    public void setMisoFileManager(FilesManager misoFileManager) {
+        this.misoFileManager = misoFileManager;
+    }
 
-  @ModelAttribute("maxLengths")
-  public Map<String, Integer> maxLengths() throws IOException {
-    return DbUtils.getColumnSizes(interfaceTemplate, "Submission");
-  }
+    public void setSubmissionManager(SubmissionManager submissionManager) {
+        this.submissionManager = submissionManager;
+    }
 
-  @ModelAttribute("projects")
-  public Collection<Project> populateProjects() throws IOException {
-    //User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-    List<Project> projects = new ArrayList<Project>(requestManager.listAllProjects());
+    @ModelAttribute("maxLengths")
+    public Map<String, Integer> maxLengths() throws IOException {
+        return DbUtils.getColumnSizes(interfaceTemplate, "Submission");
+    }
+
+    @ModelAttribute("projects")
+    public Collection<Project> populateProjects() throws IOException {
+        //User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
+        List<Project> projects = new ArrayList<Project>(requestManager.listAllProjects());
     /*
     for (Project p : projects) {
       Collection<Run> runs = requestManager.listAllRunsByProjectId(p.getProjectId());
@@ -136,101 +136,96 @@ public class EditSubmissionController {
         s.setExperiments(experiments);
       }
       */
-    //}
-    Collections.sort(projects);
-    return projects;
-  }
-
-  @ModelAttribute("studies")
-  public Collection<Study> populateStudies() throws IOException {
-    //User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-    return requestManager.listAllStudies();
-  }
-
-  @ModelAttribute("samples")
-  public Collection<Sample> populateSamples() throws IOException {
-    //User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-    return requestManager.listAllSamples();
-  }
-
-  @ModelAttribute("runs")
-  public Collection<Run> populateRuns() throws IOException {
-    //User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-    return requestManager.listAllRuns();
-  }
-
-  @ModelAttribute("experiments")
-  public Collection<Experiment> populateExperiments() throws IOException {
-    //User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-    return requestManager.listAllExperiments();
-  }
-
-  @ModelAttribute("availableElements")
-  public Collection<Submittable> populateElements() throws IOException {
-    ArrayList<Submittable> list = new ArrayList<Submittable>();
-    list.addAll(populateSamples());
-    list.addAll(populateStudies());
-    list.addAll(populateExperiments());
-    return list;
-  }
-
-  @RequestMapping(value = "/new", method = RequestMethod.GET)
-  public ModelAndView newSubmission(ModelMap model) throws IOException {
-    return setupForm(Submission.UNSAVED_ID, model);
-  }
-
-  @RequestMapping(value = "/{submissionId}", method = RequestMethod.GET)
-  public ModelAndView setupForm(@PathVariable Long submissionId,
-                                ModelMap model) throws IOException {
-    try {
-      Submission submission = null;
-      if (submissionId == Submission.UNSAVED_ID) {
-        User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-        submission = dataObjectFactory.getSubmission(user);
-        model.put("title", "New Submission");
-      }
-      else {
-        submission = requestManager.getSubmissionById(submissionId);
-        model.put("title", "Submission "+submissionId);
-        model.put("prettyMetadata", submissionManager.prettifySubmissionMetadata(submission));
-      }
-
-      if (submission == null) {
-        throw new SecurityException("No such Submission");
-      }
-     
-      model.put("formObj", submission);
-      model.put("submission", submission);
-      return new ModelAndView("/pages/editSubmission.jsp", model);
+        //}
+        Collections.sort(projects);
+        return projects;
     }
-    catch (IOException ex) {
-      if (log.isDebugEnabled()) {
-        log.debug("Failed to show submission", ex);
-      }
-      throw ex;
-    }
-    catch (SubmissionException e) {
-      if (log.isDebugEnabled()) {
-        log.debug("Failed to show submission", e);
-      }
-      throw new IOException(e);
-    }
-  }
 
-  @RequestMapping(method = RequestMethod.POST)
-  public String processSubmit(@ModelAttribute("submission") Submission submission,
-                              ModelMap model, SessionStatus session) throws IOException, MalformedRunException {
-    try {
-      requestManager.saveSubmission(submission);
-      session.setComplete();
-      model.clear();
-      return "redirect:/miso/submission/"+submission.getId();
+    @ModelAttribute("studies")
+    public Collection<Study> populateStudies() throws IOException {
+        //User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
+        return requestManager.listAllStudies();
     }
-    catch (IOException ex) {
-      if (log.isDebugEnabled()) {
-        log.debug("Failed to save submission", ex);
-      }
-      throw ex;
+
+    @ModelAttribute("samples")
+    public Collection<Sample> populateSamples() throws IOException {
+        //User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
+        return requestManager.listAllSamples();
     }
-  }
+
+    @ModelAttribute("runs")
+    public Collection<Run> populateRuns() throws IOException {
+        //User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
+        return requestManager.listAllRuns();
+    }
+
+    @ModelAttribute("experiments")
+    public Collection<Experiment> populateExperiments() throws IOException {
+        //User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
+        return requestManager.listAllExperiments();
+    }
+
+    @ModelAttribute("availableElements")
+    public Collection<Submittable> populateElements() throws IOException {
+        ArrayList<Submittable> list = new ArrayList<Submittable>();
+        list.addAll(populateSamples());
+        list.addAll(populateStudies());
+        list.addAll(populateExperiments());
+        return list;
+    }
+
+    @RequestMapping(value = "/new", method = RequestMethod.GET)
+    public ModelAndView newSubmission(ModelMap model) throws IOException {
+        return setupForm(Submission.UNSAVED_ID, model);
+    }
+
+    @RequestMapping(value = "/{submissionId}", method = RequestMethod.GET)
+    public ModelAndView setupForm(@PathVariable Long submissionId, ModelMap model) throws IOException {
+        try {
+            Submission submission = null;
+            if (submissionId == Submission.UNSAVED_ID) {
+                User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
+                submission = dataObjectFactory.getSubmission(user);
+                model.put("title", "New Submission");
+            } else {
+                submission = requestManager.getSubmissionById(submissionId);
+                model.put("title", "Submission " + submissionId);
+                model.put("prettyMetadata", submissionManager.prettifySubmissionMetadata(submission));
+            }
+
+            if (submission == null) {
+                throw new SecurityException("No such Submission");
+            }
+
+            model.put("formObj", submission);
+            model.put("submission", submission);
+            return new ModelAndView("/pages/editSubmission.jsp", model);
+        } catch (IOException ex) {
+            if (log.isDebugEnabled()) {
+                log.debug("Failed to show submission", ex);
+            }
+            throw ex;
+        } catch (SubmissionException e) {
+            if (log.isDebugEnabled()) {
+                log.debug("Failed to show submission", e);
+            }
+            throw new IOException(e);
+        }
+    }
+
+    @RequestMapping(method = RequestMethod.POST)
+    public String processSubmit(@ModelAttribute("submission") Submission submission, ModelMap model, SessionStatus session)
+        throws IOException, MalformedRunException {
+        try {
+            requestManager.saveSubmission(submission);
+            session.setComplete();
+            model.clear();
+            return "redirect:/miso/submission/" + submission.getId();
+        } catch (IOException ex) {
+            if (log.isDebugEnabled()) {
+                log.debug("Failed to save submission", ex);
+            }
+            throw ex;
+        }
+    }
 } 

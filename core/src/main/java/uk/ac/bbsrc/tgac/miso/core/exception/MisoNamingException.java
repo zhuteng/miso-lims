@@ -33,14 +33,14 @@ package uk.ac.bbsrc.tgac.miso.core.exception;
  * @since 0.0.3
  */
 public class MisoNamingException extends Exception {
-  public MisoNamingException(String s) {
-    super(s);
-  }
-
-  public MisoNamingException(String s, Throwable cause) {
-    super(s);
-    if (cause != null) {
-        initCause(cause);
+    public MisoNamingException(String s) {
+        super(s);
     }
-  }
+
+    public MisoNamingException(String s, Throwable cause) {
+        super(s);
+        if (cause != null) {
+            initCause(cause);
+        }
+    }
 }

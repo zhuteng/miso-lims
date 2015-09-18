@@ -38,14 +38,15 @@ import uk.ac.bbsrc.tgac.miso.core.data.Watchable;
  * @since 0.1.6
  */
 public class WatchManager {
-  protected static final Logger log = LoggerFactory.getLogger(WatchManager.class);
-  public void watch(Watchable w, User u) {
-    log.debug("Adding watcher "+u.getLoginName()+" to "+w.getWatchableIdentifier()+" via WatchManager");
-    w.addWatcher(u);
-  }
+    protected static final Logger log = LoggerFactory.getLogger(WatchManager.class);
 
-  public void unwatch(Watchable w, User u) {
-    log.debug("Removing watcher "+u.getLoginName()+" from "+w.getWatchableIdentifier()+" via WatchManager");
-    w.removeWatcher(u);
-  }
+    public void watch(Watchable w, User u) {
+        log.debug("Adding watcher " + u.getLoginName() + " to " + w.getWatchableIdentifier() + " via WatchManager");
+        w.addWatcher(u);
+    }
+
+    public void unwatch(Watchable w, User u) {
+        log.debug("Removing watcher " + u.getLoginName() + " from " + w.getWatchableIdentifier() + " via WatchManager");
+        w.removeWatcher(u);
+    }
 }

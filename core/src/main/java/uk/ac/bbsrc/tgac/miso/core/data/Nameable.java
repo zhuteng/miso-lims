@@ -10,17 +10,17 @@ package uk.ac.bbsrc.tgac.miso.core.data;
  * @since 0.1.8
  */
 public interface Nameable {
-   /**
-   * Returns the name of this Nameable object.
-   *
-   * @return String name.
-   */
-  public String getName();
+    /**
+     * Returns the name of this Nameable object.
+     *
+     * @return String name.
+     */
+    public String getName();
 
-   /**
-   * Returns the unique ID of this Nameable object.
-   *
-   * @return long id.
-   */
-  public long getId();
+    /**
+     * Returns the unique ID of this Nameable object.
+     *
+     * @return long id.
+     */
+    public long getId();
 }

@@ -51,90 +51,73 @@ import java.util.Set;
  * @since 0.0.2
  */
 public class MisoAnnotationProcessor extends AbstractProcessor {
-  public boolean process(Set<? extends TypeElement> typeElements,
-                         RoundEnvironment roundEnv) {
-    PrintWriter writer = null;
-    try {
-      // collection of captured classes
-      final Set<TypeElement> misoElements =
-          new HashSet<TypeElement>();
+    public boolean process(Set<? extends TypeElement> typeElements, RoundEnvironment roundEnv) {
+        PrintWriter writer = null;
+        try {
+            // collection of captured classes
+            final Set<TypeElement> misoElements = new HashSet<TypeElement>();
 
-      // check everything annotated with @MisoParameter annotations -
-      // we can only really apply this to String params
-      for (Element element : roundEnv.getElementsAnnotatedWith(
-          MisoParameter.class)) {
-        if (!(element.asType().toString().equals(String.class.getName()))) {
-          processingEnv.getMessager().printMessage(
-              Diagnostic.Kind.ERROR,
-              "@MisoParameter annotations can only be applied to " +
-                  String.class.getName() + " arguments (not " +
-                  element.asType().toString() + " '" +
-                  element.getSimpleName() + "')",
-              element);
-        }
-      }
-
-      // check all elements annotated with @MisoPlugin
-      for (Element element : roundEnv
-          .getElementsAnnotatedWith(MisoPlugin.class)) {
-        ElementVisitor<Void, Void> visitor =
-            new SimpleElementVisitor6<Void, Void>() {
-              public Void visitType(TypeElement element, Void aVoid) {
-                // check this type is a class
-                if (element.getKind().isClass()) {
-                  // this class is annotated with @MisoPlugin, write out an entry
-                  misoElements.add(element);
+            // check everything annotated with @MisoParameter annotations -
+            // we can only really apply this to String params
+            for (Element element : roundEnv.getElementsAnnotatedWith(MisoParameter.class)) {
+                if (!(element.asType().toString().equals(String.class.getName()))) {
+                    processingEnv.getMessager().printMessage(Diagnostic.Kind.ERROR, "@MisoParameter annotations can only be applied to " +
+                                                                                    String.class.getName() + " arguments (not " +
+                                                                                    element.asType().toString() + " '" +
+                                                                                    element.getSimpleName() + "')", element);
                 }
+            }
 
-                return super.visitType(element, aVoid);
-              }
-            };
-        element.accept(visitor, null);
-      }
+            // check all elements annotated with @MisoPlugin
+            for (Element element : roundEnv.getElementsAnnotatedWith(MisoPlugin.class)) {
+                ElementVisitor<Void, Void> visitor = new SimpleElementVisitor6<Void, Void>() {
+                    public Void visitType(TypeElement element, Void aVoid) {
+                        // check this type is a class
+                        if (element.getKind().isClass()) {
+                            // this class is annotated with @MisoPlugin, write out an entry
+                            misoElements.add(element);
+                        }
 
-      // now, iterate over all classes annotated with @MisoPlugin, and write to file
-      if (misoElements.size() > 0) {
-        // printwriter for writing list of MISO plugins
-        processingEnv.getMessager().printMessage(
-            Diagnostic.Kind.NOTE,
-            "Generating services for MISO plugins");
+                        return super.visitType(element, aVoid);
+                    }
+                };
+                element.accept(visitor, null);
+            }
 
-        FileObject fo = processingEnv.getFiler().createResource(
-            StandardLocation.CLASS_OUTPUT,
-            "",
-            "META-INF/miso/plugins");
+            // now, iterate over all classes annotated with @MisoPlugin, and write to file
+            if (misoElements.size() > 0) {
+                // printwriter for writing list of MISO plugins
+                processingEnv.getMessager().printMessage(Diagnostic.Kind.NOTE, "Generating services for MISO plugins");
 
-        Writer w = fo.openWriter();
-        writer = new PrintWriter(w);
+                FileObject fo = processingEnv.getFiler().createResource(StandardLocation.CLASS_OUTPUT, "", "META-INF/miso/plugins");
 
-        for (TypeElement misoElement : misoElements) {
-          writer.println(misoElement.getQualifiedName());
+                Writer w = fo.openWriter();
+                writer = new PrintWriter(w);
+
+                for (TypeElement misoElement : misoElements) {
+                    writer.println(misoElement.getQualifiedName());
+                }
+            }
+
+            return true;
+        } catch (IOException e) {
+            processingEnv.getMessager().printMessage(Diagnostic.Kind.ERROR, "Problem creating META-INF/miso/plugins file");
+            return false;
+        } finally {
+            if (writer != null) {
+                writer.close();
+            }
         }
-      }
-
-      return true;
     }
-    catch (IOException e) {
-      processingEnv.getMessager().printMessage(
-          Diagnostic.Kind.ERROR,
-          "Problem creating META-INF/miso/plugins file");
-      return false;
-    }
-    finally {
-      if (writer != null) {
-        writer.close();
-      }
-    }
-  }
 
-  public Set<String> getSupportedAnnotationTypes() {
-    Set<String> result = new HashSet<String>();
-    result.add(MisoPlugin.class.getName());
-    return result;
-  }
+    public Set<String> getSupportedAnnotationTypes() {
+        Set<String> result = new HashSet<String>();
+        result.add(MisoPlugin.class.getName());
+        return result;
+    }
 
-  public Set<String> getSupportedOptions() {
-    // no supported options
-    return Collections.emptySet();
-  }
+    public Set<String> getSupportedOptions() {
+        // no supported options
+        return Collections.emptySet();
+    }
 }

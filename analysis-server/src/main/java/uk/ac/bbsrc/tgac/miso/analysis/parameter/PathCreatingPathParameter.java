@@ -39,54 +39,53 @@ import java.io.IOException;
  * @since 0.1.2
  */
 public class PathCreatingPathParameter extends AbstractConanParameter implements Optionable {
-  private boolean optional = false;
+    private boolean optional = false;
 
-  public PathCreatingPathParameter(String name) {
-    super(name);
-  }
+    public PathCreatingPathParameter(String name) {
+        super(name);
+    }
 
-  public PathCreatingPathParameter(String name, boolean isBoolean) {
-    super(name, isBoolean);
-  }
+    public PathCreatingPathParameter(String name, boolean isBoolean) {
+        super(name, isBoolean);
+    }
 
-  public PathCreatingPathParameter(String name, String description) {
-    super(name, description);
-  }
+    public PathCreatingPathParameter(String name, String description) {
+        super(name, description);
+    }
 
-  public PathCreatingPathParameter(String name, String description, boolean isBoolean) {
-    super(name, description, isBoolean);
-  }
+    public PathCreatingPathParameter(String name, String description, boolean isBoolean) {
+        super(name, description, isBoolean);
+    }
 
-  @Override
-  public boolean validateParameterValue(String value) {
-    File f = new File(value);
-    try {
-      if (!StringUtils.containsWhitespace(value) && !value.contains("~")) {
-        if (!f.exists()) {
-          if (f.isDirectory()) {
-            return (f.mkdirs());
-          }
-          else {
-            if (!f.getParentFile().exists()) f.getParentFile().mkdirs();
-            return f.createNewFile() && f.delete();
-          }
+    @Override
+    public boolean validateParameterValue(String value) {
+        File f = new File(value);
+        try {
+            if (!StringUtils.containsWhitespace(value) && !value.contains("~")) {
+                if (!f.exists()) {
+                    if (f.isDirectory()) {
+                        return (f.mkdirs());
+                    } else {
+                        if (!f.getParentFile().exists())
+                            f.getParentFile().mkdirs();
+                        return f.createNewFile() && f.delete();
+                    }
+                }
+                return true;
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-        return true;
-      }
+        return false;
     }
-    catch (IOException e) {
-      e.printStackTrace();
+
+    @Override
+    public boolean isOptional() {
+        return optional;
     }
-    return false;
-  }
 
-  @Override
-  public boolean isOptional() {
-    return optional;
-  }
-
-  @Override
-  public void setOptional(boolean optional) {
-    this.optional = optional;
-  }
+    @Override
+    public void setOptional(boolean optional) {
+        this.optional = optional;
+    }
 }

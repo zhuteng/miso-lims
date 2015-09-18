@@ -38,5 +38,5 @@ import org.springframework.util.MultiValueMap;
  */
 public interface SolidStatusGateway {
     @Gateway(requestChannel = "solidStatusChannel")
-    void consume(Message<MultiValueMap<String, String>> message);  
+    void consume(Message<MultiValueMap<String, String>> message);
 }

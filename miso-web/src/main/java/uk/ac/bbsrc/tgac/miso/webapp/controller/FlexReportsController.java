@@ -71,58 +71,54 @@ import java.util.List;
 @RequestMapping("/flexreports")
 @Controller
 public class FlexReportsController {
-  protected static final Logger log = LoggerFactory.getLogger(FlexReportsController.class);
+    protected static final Logger log = LoggerFactory.getLogger(FlexReportsController.class);
 
-  private static final String HTML = "html";
-  private static final String PDF = "pdf";
-  private static final String XLS = "xls";
+    private static final String HTML = "html";
+    private static final String PDF = "pdf";
+    private static final String XLS = "xls";
 
-  @Autowired
-  private RequestManager requestManager;
+    @Autowired
+    private RequestManager requestManager;
 
-  public void setRequestManager(RequestManager requestManager) {
-    this.requestManager = requestManager;
-  }
-
-  @Autowired
-  private SecurityManager securityManager;
-
-  public void setSecurityManager(SecurityManager securityManager) {
-    this.securityManager = securityManager;
-  }
-
-  @Autowired
-  private JdbcTemplate interfaceTemplate;
-
-  public void setInterfaceTemplate(JdbcTemplate interfaceTemplate) {
-    this.interfaceTemplate = interfaceTemplate;
-  }
-
-
-  @RequestMapping(method = RequestMethod.GET)
-  public ModelAndView query(ModelMap modelMap) {
-    try {
-      modelMap.put("tables", DbUtils.getTables(interfaceTemplate));
+    public void setRequestManager(RequestManager requestManager) {
+        this.requestManager = requestManager;
     }
-    catch (MetaDataAccessException e) {
-      e.printStackTrace();
+
+    @Autowired
+    private SecurityManager securityManager;
+
+    public void setSecurityManager(SecurityManager securityManager) {
+        this.securityManager = securityManager;
     }
-    catch (SQLException e) {
-      e.printStackTrace();
+
+    @Autowired
+    private JdbcTemplate interfaceTemplate;
+
+    public void setInterfaceTemplate(JdbcTemplate interfaceTemplate) {
+        this.interfaceTemplate = interfaceTemplate;
     }
-    return new ModelAndView("/pages/flexreport.jsp", modelMap);
-  }
+
+    @RequestMapping(method = RequestMethod.GET)
+    public ModelAndView query(ModelMap modelMap) {
+        try {
+            modelMap.put("tables", DbUtils.getTables(interfaceTemplate));
+        } catch (MetaDataAccessException e) {
+            e.printStackTrace();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return new ModelAndView("/pages/flexreport.jsp", modelMap);
+    }
 
     @RequestMapping(method = RequestMethod.POST)
-  public void postReport(ModelMap modelMap, HttpServletRequest request, HttpServletResponse response) {
-    try {
-      String j = ServletRequestUtils.getRequiredStringParameter(request, "json");
-      JSONObject json = JSONObject.fromObject(j);
-      log.info(json.toString());
+    public void postReport(ModelMap modelMap, HttpServletRequest request, HttpServletResponse response) {
+        try {
+            String j = ServletRequestUtils.getRequiredStringParameter(request, "json");
+            JSONObject json = JSONObject.fromObject(j);
+            log.info(json.toString());
+        } catch (ServletRequestBindingException e) {
+            e.printStackTrace();
+        }
     }
-    catch (ServletRequestBindingException e) {
-      e.printStackTrace();
-    }
-  }
 
 }

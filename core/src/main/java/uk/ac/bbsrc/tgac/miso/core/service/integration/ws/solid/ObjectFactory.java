@@ -25,35 +25,30 @@ package uk.ac.bbsrc.tgac.miso.core.service.integration.ws.solid;
 
 import javax.xml.bind.annotation.XmlRegistry;
 
-
 /**
- * This object contains factory methods for each 
- * Java content interface and Java element interface 
- * generated in the uk.ac.bbsrc.tgac.miso.webapp.service.integration.solid.ws package. 
- * <p>An ObjectFactory allows you to programatically 
- * construct new instances of the Java representation 
- * for XML content. The Java representation of XML 
- * content can consist of schema derived interfaces 
- * and classes representing the binding of schema 
- * type definitions, element declarations and model 
- * groups.  Factory methods for each of these are 
+ * This object contains factory methods for each
+ * Java content interface and Java element interface
+ * generated in the uk.ac.bbsrc.tgac.miso.webapp.service.integration.solid.ws package.
+ * <p>An ObjectFactory allows you to programatically
+ * construct new instances of the Java representation
+ * for XML content. The Java representation of XML
+ * content can consist of schema derived interfaces
+ * and classes representing the binding of schema
+ * type definitions, element declarations and model
+ * groups.  Factory methods for each of these are
  * provided in this class.
- * 
  */
 @XmlRegistry
 public class ObjectFactory {
 
-
     /**
      * Create a new ObjectFactory that can be used to create new instances of schema derived classes for package: uk.ac.bbsrc.tgac.miso.webapp.service.integration.solid.ws
-     * 
      */
     public ObjectFactory() {
     }
 
     /**
      * Create an instance of {@link LibraryInfo }
-     * 
      */
     public LibraryInfo createLibraryInfo() {
         return new LibraryInfo();
@@ -61,7 +56,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link Run }
-     * 
      */
     public Run createRun() {
         return new Run();
@@ -69,7 +63,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link LogMessageArray }
-     * 
      */
     public LogMessageArray createLogMessageArray() {
         return new LogMessageArray();
@@ -77,7 +70,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link RunArray }
-     * 
      */
     public RunArray createRunArray() {
         return new RunArray();
@@ -85,7 +77,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link SampleInfo }
-     * 
      */
     public SampleInfo createSampleInfo() {
         return new SampleInfo();
@@ -93,7 +84,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link QualityMetrics }
-     * 
      */
     public QualityMetrics createQualityMetrics() {
         return new QualityMetrics();
@@ -101,7 +91,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link ClusterStatus }
-     * 
      */
     public ClusterStatus createClusterStatus() {
         return new ClusterStatus();
@@ -109,7 +98,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link QualityMetricsDetails }
-     * 
      */
     public QualityMetricsDetails createQualityMetricsDetails() {
         return new QualityMetricsDetails();
@@ -117,7 +105,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link JobQueue }
-     * 
      */
     public JobQueue createJobQueue() {
         return new JobQueue();
@@ -125,7 +112,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link QueueStatistics }
-     * 
      */
     public QueueStatistics createQueueStatistics() {
         return new QueueStatistics();
@@ -133,7 +119,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link LogMessage }
-     * 
      */
     public LogMessage createLogMessage() {
         return new LogMessage();

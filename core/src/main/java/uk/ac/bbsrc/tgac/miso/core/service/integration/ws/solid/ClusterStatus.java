@@ -30,12 +30,11 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
 
-
 /**
  * <p>Java class for clusterStatus complex type.
- * 
+ * <p/>
  * <p>The following schema fragment specifies the expected content contained within this class.
- * 
+ * <p/>
  * <pre>
  * &lt;complexType name="clusterStatus">
  *   &lt;complexContent>
@@ -58,24 +57,12 @@ import javax.xml.bind.annotation.XmlType;
  *   &lt;/complexContent>
  * &lt;/complexType>
  * </pre>
- * 
- * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "clusterStatus", propOrder = {
-    "avgLoad5",
-    "clusterName",
-    "diskSpaceImagesString",
-    "diskSpaceImagesTotal",
-    "diskSpaceImagesUsable",
-    "diskSpaceResultsString",
-    "diskSpaceResultsTotal",
-    "diskSpaceResultsUsable",
-    "numOfCPUs",
-    "queueStats",
-    "queues",
-    "xml"
-})
+@XmlType(name = "clusterStatus",
+         propOrder = { "avgLoad5", "clusterName", "diskSpaceImagesString", "diskSpaceImagesTotal", "diskSpaceImagesUsable",
+                       "diskSpaceResultsString", "diskSpaceResultsTotal", "diskSpaceResultsUsable", "numOfCPUs", "queueStats", "queues",
+                       "xml" })
 public class ClusterStatus {
 
     protected double avgLoad5;
@@ -94,7 +81,6 @@ public class ClusterStatus {
 
     /**
      * Gets the value of the avgLoad5 property.
-     * 
      */
     public double getAvgLoad5() {
         return avgLoad5;
@@ -102,7 +88,6 @@ public class ClusterStatus {
 
     /**
      * Sets the value of the avgLoad5 property.
-     * 
      */
     public void setAvgLoad5(double value) {
         this.avgLoad5 = value;
@@ -110,11 +95,9 @@ public class ClusterStatus {
 
     /**
      * Gets the value of the clusterName property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     * {@link String }
      */
     public String getClusterName() {
         return clusterName;
@@ -122,11 +105,9 @@ public class ClusterStatus {
 
     /**
      * Sets the value of the clusterName property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setClusterName(String value) {
         this.clusterName = value;
@@ -134,11 +115,9 @@ public class ClusterStatus {
 
     /**
      * Gets the value of the diskSpaceImagesString property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     * {@link String }
      */
     public String getDiskSpaceImagesString() {
         return diskSpaceImagesString;
@@ -146,11 +125,9 @@ public class ClusterStatus {
 
     /**
      * Sets the value of the diskSpaceImagesString property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setDiskSpaceImagesString(String value) {
         this.diskSpaceImagesString = value;
@@ -158,7 +135,6 @@ public class ClusterStatus {
 
     /**
      * Gets the value of the diskSpaceImagesTotal property.
-     * 
      */
     public long getDiskSpaceImagesTotal() {
         return diskSpaceImagesTotal;
@@ -166,7 +142,6 @@ public class ClusterStatus {
 
     /**
      * Sets the value of the diskSpaceImagesTotal property.
-     * 
      */
     public void setDiskSpaceImagesTotal(long value) {
         this.diskSpaceImagesTotal = value;
@@ -174,7 +149,6 @@ public class ClusterStatus {
 
     /**
      * Gets the value of the diskSpaceImagesUsable property.
-     * 
      */
     public long getDiskSpaceImagesUsable() {
         return diskSpaceImagesUsable;
@@ -182,7 +156,6 @@ public class ClusterStatus {
 
     /**
      * Sets the value of the diskSpaceImagesUsable property.
-     * 
      */
     public void setDiskSpaceImagesUsable(long value) {
         this.diskSpaceImagesUsable = value;
@@ -190,11 +163,9 @@ public class ClusterStatus {
 
     /**
      * Gets the value of the diskSpaceResultsString property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     * {@link String }
      */
     public String getDiskSpaceResultsString() {
         return diskSpaceResultsString;
@@ -202,11 +173,9 @@ public class ClusterStatus {
 
     /**
      * Sets the value of the diskSpaceResultsString property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setDiskSpaceResultsString(String value) {
         this.diskSpaceResultsString = value;
@@ -214,7 +183,6 @@ public class ClusterStatus {
 
     /**
      * Gets the value of the diskSpaceResultsTotal property.
-     * 
      */
     public long getDiskSpaceResultsTotal() {
         return diskSpaceResultsTotal;
@@ -222,7 +190,6 @@ public class ClusterStatus {
 
     /**
      * Sets the value of the diskSpaceResultsTotal property.
-     * 
      */
     public void setDiskSpaceResultsTotal(long value) {
         this.diskSpaceResultsTotal = value;
@@ -230,7 +197,6 @@ public class ClusterStatus {
 
     /**
      * Gets the value of the diskSpaceResultsUsable property.
-     * 
      */
     public long getDiskSpaceResultsUsable() {
         return diskSpaceResultsUsable;
@@ -238,7 +204,6 @@ public class ClusterStatus {
 
     /**
      * Sets the value of the diskSpaceResultsUsable property.
-     * 
      */
     public void setDiskSpaceResultsUsable(long value) {
         this.diskSpaceResultsUsable = value;
@@ -246,7 +211,6 @@ public class ClusterStatus {
 
     /**
      * Gets the value of the numOfCPUs property.
-     * 
      */
     public int getNumOfCPUs() {
         return numOfCPUs;
@@ -254,7 +218,6 @@ public class ClusterStatus {
 
     /**
      * Sets the value of the numOfCPUs property.
-     * 
      */
     public void setNumOfCPUs(int value) {
         this.numOfCPUs = value;
@@ -262,11 +225,9 @@ public class ClusterStatus {
 
     /**
      * Gets the value of the queueStats property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link QueueStatistics }
-     *     
+     *
+     * @return possible object is
+     * {@link QueueStatistics }
      */
     public QueueStatistics getQueueStats() {
         return queueStats;
@@ -274,11 +235,9 @@ public class ClusterStatus {
 
     /**
      * Sets the value of the queueStats property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link QueueStatistics }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link QueueStatistics }
      */
     public void setQueueStats(QueueStatistics value) {
         this.queueStats = value;
@@ -286,25 +245,23 @@ public class ClusterStatus {
 
     /**
      * Gets the value of the queues property.
-     * 
-     * <p>
+     * <p/>
+     * <p/>
      * This accessor method returns a reference to the live list,
      * not a snapshot. Therefore any modification you make to the
      * returned list will be present inside the JAXB object.
      * This is why there is not a <CODE>set</CODE> method for the queues property.
-     * 
-     * <p>
+     * <p/>
+     * <p/>
      * For example, to add a new item, do as follows:
      * <pre>
      *    getQueues().add(newItem);
      * </pre>
-     * 
-     * 
-     * <p>
+     * <p/>
+     * <p/>
+     * <p/>
      * Objects of the following type(s) are allowed in the list
      * {@link JobQueue }
-     * 
-     * 
      */
     public List<JobQueue> getQueues() {
         if (queues == null) {
@@ -315,11 +272,9 @@ public class ClusterStatus {
 
     /**
      * Gets the value of the xml property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     * {@link String }
      */
     public String getXml() {
         return xml;
@@ -327,11 +282,9 @@ public class ClusterStatus {
 
     /**
      * Sets the value of the xml property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setXml(String value) {
         this.xml = value;

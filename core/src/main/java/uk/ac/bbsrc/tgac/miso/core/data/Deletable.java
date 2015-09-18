@@ -35,11 +35,11 @@ import org.codehaus.jackson.annotate.JsonIgnore;
  * @since 0.0.3
  */
 public interface Deletable {
-  /**
-   * Ascertain whether this object is deletable given a set of underlying criteria
-   *
-   * @return boolean true if able to be deleted successfully
-   */
-  @JsonIgnore
-  public boolean isDeletable();
+    /**
+     * Ascertain whether this object is deletable given a set of underlying criteria
+     *
+     * @return boolean true if able to be deleted successfully
+     */
+    @JsonIgnore
+    public boolean isDeletable();
 }

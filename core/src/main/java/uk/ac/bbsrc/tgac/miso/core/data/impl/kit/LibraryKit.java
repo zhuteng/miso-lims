@@ -36,5 +36,5 @@ import java.io.Serializable;
  * @since 0.0.2
  */
 public class LibraryKit extends AbstractKit implements Serializable {
-  public static final String PREFIX = "LKT";
+    public static final String PREFIX = "LKT";
 }

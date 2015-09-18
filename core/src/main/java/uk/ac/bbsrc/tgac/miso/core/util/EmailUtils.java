@@ -40,28 +40,28 @@ import java.util.Properties;
  */
 public class EmailUtils {
 
-  /**
-   * Send an email to a recipient
-   *
-   * @param to of type String
-   * @param from of type String
-   * @param subject of type String
-   * @param text of type String
-   * @param mailProps of type Properties
-   * @throws javax.mail.MessagingException
-   */
-  public static void send(String to, String from, String subject, String text, Properties mailProps) throws MessagingException {
-    Session mailSession = Session.getDefaultInstance(mailProps);
-    Message simpleMessage = new MimeMessage(mailSession);
+    /**
+     * Send an email to a recipient
+     *
+     * @param to        of type String
+     * @param from      of type String
+     * @param subject   of type String
+     * @param text      of type String
+     * @param mailProps of type Properties
+     * @throws javax.mail.MessagingException
+     */
+    public static void send(String to, String from, String subject, String text, Properties mailProps) throws MessagingException {
+        Session mailSession = Session.getDefaultInstance(mailProps);
+        Message simpleMessage = new MimeMessage(mailSession);
 
-    InternetAddress fromAddress = new InternetAddress(from);
-    InternetAddress toAddress = new InternetAddress(to);
+        InternetAddress fromAddress = new InternetAddress(from);
+        InternetAddress toAddress = new InternetAddress(to);
 
-    simpleMessage.setFrom(fromAddress);
-    simpleMessage.setRecipient(Message.RecipientType.TO, toAddress);
-    simpleMessage.setSubject(subject);
-    simpleMessage.setText(text);
+        simpleMessage.setFrom(fromAddress);
+        simpleMessage.setRecipient(Message.RecipientType.TO, toAddress);
+        simpleMessage.setSubject(subject);
+        simpleMessage.setText(text);
 
-    Transport.send(simpleMessage);
-  }
+        Transport.send(simpleMessage);
+    }
 }

@@ -52,102 +52,93 @@ import java.util.Collection;
  * @since 0.1.3
  */
 public class SQLWatcherDAO implements WatcherStore {
-  private static final String WATCHER_SELECT =
-          "SELECT entityName, userId " +
-          "FROM Watcher";
+    private static final String WATCHER_SELECT = "SELECT entityName, userId " + "FROM Watcher";
 
-  private static final String WATCHERS_SELECT_BY_ENTITY_NAME =
-          WATCHER_SELECT + " WHERE entityName = ?";
+    private static final String WATCHERS_SELECT_BY_ENTITY_NAME = WATCHER_SELECT + " WHERE entityName = ?";
 
-  private static final String WATCHED_ENTITIES_BY_USER =
-          WATCHER_SELECT + " WHERE userId = ?";
+    private static final String WATCHED_ENTITIES_BY_USER = WATCHER_SELECT + " WHERE userId = ?";
 
-  private static final String WATCHER_DELETE_BY_USER_ID =
-          "DELETE FROM Watcher WHERE entityName=:entityName AND userId=:userId";
+    private static final String WATCHER_DELETE_BY_USER_ID = "DELETE FROM Watcher WHERE entityName=:entityName AND userId=:userId";
 
-  private static final String WATCHER_DELETE =
-          "DELETE FROM Watcher WHERE entityName=:entityName";
+    private static final String WATCHER_DELETE = "DELETE FROM Watcher WHERE entityName=:entityName";
 
-  protected static final Logger log = LoggerFactory.getLogger(SQLWatcherDAO.class);
+    protected static final Logger log = LoggerFactory.getLogger(SQLWatcherDAO.class);
 
-  @Autowired
-  private com.eaglegenomics.simlims.core.manager.SecurityManager securityManager;
+    @Autowired
+    private com.eaglegenomics.simlims.core.manager.SecurityManager securityManager;
 
-  private JdbcTemplate template;
+    private JdbcTemplate template;
 
-  public void setSecurityManager(SecurityManager securityManager) {
-    this.securityManager = securityManager;
-  }
-
-  public JdbcTemplate getJdbcTemplate() {
-    return template;
-  }
-
-  public void setJdbcTemplate(JdbcTemplate template) {
-    this.template = template;
-  }
-
-  @Override
-  public Collection<User> getWatchersByWatcherGroup(String groupName) throws IOException {
-    return securityManager.listUsersByGroupName(groupName);
-  }
-
-  @Override
-  public Collection<User> getWatchersByEntityName(String entityName) throws IOException {
-    return template.query(WATCHERS_SELECT_BY_ENTITY_NAME, new Object[]{entityName}, new WatcherMapper());
-  }
-
-//  @Override
-//  public Collection<Watchable> getWatchedEntitiesByUserId(Long userId) throws IOException {
-//    return template.query(WATCHED_ENTITIES_BY_USER, new Object[]{userId}, new WatchedEntityMapper());
-//  }
-
-  public boolean removeWatchedEntity(Watchable watchable) throws IOException {
-    MapSqlParameterSource eParams = new MapSqlParameterSource();
-    eParams.addValue("entityName", watchable.getWatchableIdentifier());
-    NamedParameterJdbcTemplate eNamedTemplate = new NamedParameterJdbcTemplate(template);
-    return eNamedTemplate.update(WATCHER_DELETE, eParams) == 1;
-  }
-
-  public boolean removeWatchedEntityByUser(Watchable watchable, User user) throws IOException {
-    if (user != null) {
-      MapSqlParameterSource eParams = new MapSqlParameterSource();
-      eParams.addValue("entityName", watchable.getWatchableIdentifier());
-      eParams.addValue("userId", user.getUserId());
-
-      log.debug("DAO removal of " + user.getUserId() + " from " + watchable.getWatchableIdentifier());
-
-      NamedParameterJdbcTemplate eNamedTemplate = new NamedParameterJdbcTemplate(template);
-      return eNamedTemplate.update(WATCHER_DELETE_BY_USER_ID, eParams) == 1;
+    public void setSecurityManager(SecurityManager securityManager) {
+        this.securityManager = securityManager;
     }
-    return false;
-  }
 
-  @Override
-  public void saveWatchedEntityUser(Watchable watchable, User user) throws IOException {
-    if (user != null) {
-      SimpleJdbcInsert fInsert = new SimpleJdbcInsert(template).withTableName("Watcher");
-      MapSqlParameterSource fcParams = new MapSqlParameterSource();
-      fcParams.addValue("entityName", watchable.getWatchableIdentifier())
-              .addValue("userId", user.getUserId());
-      try {
-        fInsert.execute(fcParams);
-        log.debug("DAO insert of " + user.getUserId() + " on " + watchable.getWatchableIdentifier());
-      }
-      catch(DuplicateKeyException dke) {
-        log.debug("This Watcher combination already exists - not inserting: " + dke.getMessage());
-      }
+    public JdbcTemplate getJdbcTemplate() {
+        return template;
     }
-  }
 
-  public class WatcherMapper implements RowMapper<User> {
-    public User mapRow(ResultSet rs, int rowNum) throws SQLException {
-      try {
-        return securityManager.getUserById(rs.getLong("userId"));
-      }
-      catch (IOException e) {
-        throw new SQLException(e);
-      }
+    public void setJdbcTemplate(JdbcTemplate template) {
+        this.template = template;
     }
-  }
+
+    @Override
+    public Collection<User> getWatchersByWatcherGroup(String groupName) throws IOException {
+        return securityManager.listUsersByGroupName(groupName);
+    }
+
+    @Override
+    public Collection<User> getWatchersByEntityName(String entityName) throws IOException {
+        return template.query(WATCHERS_SELECT_BY_ENTITY_NAME, new Object[] { entityName }, new WatcherMapper());
+    }
+
+    //  @Override
+    //  public Collection<Watchable> getWatchedEntitiesByUserId(Long userId) throws IOException {
+    //    return template.query(WATCHED_ENTITIES_BY_USER, new Object[]{userId}, new WatchedEntityMapper());
+    //  }
+
+    public boolean removeWatchedEntity(Watchable watchable) throws IOException {
+        MapSqlParameterSource eParams = new MapSqlParameterSource();
+        eParams.addValue("entityName", watchable.getWatchableIdentifier());
+        NamedParameterJdbcTemplate eNamedTemplate = new NamedParameterJdbcTemplate(template);
+        return eNamedTemplate.update(WATCHER_DELETE, eParams) == 1;
+    }
+
+    public boolean removeWatchedEntityByUser(Watchable watchable, User user) throws IOException {
+        if (user != null) {
+            MapSqlParameterSource eParams = new MapSqlParameterSource();
+            eParams.addValue("entityName", watchable.getWatchableIdentifier());
+            eParams.addValue("userId", user.getUserId());
+
+            log.debug("DAO removal of " + user.getUserId() + " from " + watchable.getWatchableIdentifier());
+
+            NamedParameterJdbcTemplate eNamedTemplate = new NamedParameterJdbcTemplate(template);
+            return eNamedTemplate.update(WATCHER_DELETE_BY_USER_ID, eParams) == 1;
+        }
+        return false;
+    }
+
+    @Override
+    public void saveWatchedEntityUser(Watchable watchable, User user) throws IOException {
+        if (user != null) {
+            SimpleJdbcInsert fInsert = new SimpleJdbcInsert(template).withTableName("Watcher");
+            MapSqlParameterSource fcParams = new MapSqlParameterSource();
+            fcParams.addValue("entityName", watchable.getWatchableIdentifier()).addValue("userId", user.getUserId());
+            try {
+                fInsert.execute(fcParams);
+                log.debug("DAO insert of " + user.getUserId() + " on " + watchable.getWatchableIdentifier());
+            } catch (DuplicateKeyException dke) {
+                log.debug("This Watcher combination already exists - not inserting: " + dke.getMessage());
+            }
+        }
+    }
+
+    public class WatcherMapper implements RowMapper<User> {
+        public User mapRow(ResultSet rs, int rowNum) throws SQLException {
+            try {
+                return securityManager.getUserById(rs.getLong("userId"));
+            } catch (IOException e) {
+                throw new SQLException(e);
+            }
+        }
+    }
 }

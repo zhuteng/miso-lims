@@ -48,57 +48,56 @@ import java.util.Map;
  * @since 0.1.2
  */
 public class LocalGzipProcess implements ConanProcess {
-  private Logger log = LoggerFactory.getLogger(getClass());
+    private Logger log = LoggerFactory.getLogger(getClass());
 
-  private final Collection<ConanParameter> parameters;
-  private final PathCreatingPathParameter fileParameter;
-  private final FlagParameter compressionParameter;
+    private final Collection<ConanParameter> parameters;
+    private final PathCreatingPathParameter fileParameter;
+    private final FlagParameter compressionParameter;
 
-  public LocalGzipProcess() {
-    fileParameter = new PathCreatingPathParameter("file");
-    compressionParameter = new FlagParameter("compression");
+    public LocalGzipProcess() {
+        fileParameter = new PathCreatingPathParameter("file");
+        compressionParameter = new FlagParameter("compression");
 
-    parameters = new ArrayList<ConanParameter>();
-    parameters.add(fileParameter);
-    parameters.add(compressionParameter);
-  }
-
-  protected Logger getLog() {
-    return log;
-  }
-
-  @Override
-  public boolean execute(Map<ConanParameter, String> parameters) throws ProcessExecutionException, IllegalArgumentException, InterruptedException {
-    getLog().info("Executing " + getName() + " with the following parameters: " + parameters.toString());
-    String command = "gzip -" + parameters.get(compressionParameter) + " " + parameters.get(fileParameter);
-    try {
-      getLog().info("Issuing command: [" + command + "]");
-      ProcessRunner runner = new ProcessRunner();
-      runner.redirectStderr(true);
-      String[] output = runner.runCommmand(command);
-      if (output.length > 0) {
-          getLog().info("Response from command [" + command + "]: " +
-                                 output.length + " lines, first line was " + output[0]);
-      }
+        parameters = new ArrayList<ConanParameter>();
+        parameters.add(fileParameter);
+        parameters.add(compressionParameter);
     }
-    catch (IOException e) {
-      e.printStackTrace();
-      return false;
-    }
-    catch (CommandExecutionException e) {
-      e.printStackTrace();
-      return false;
-    }
-    return true;
-  }
 
-  @Override
-  public String getName() {
-    return "local_gzip";
-  }
+    protected Logger getLog() {
+        return log;
+    }
 
-  @Override
-  public Collection<ConanParameter> getParameters() {
-    return parameters;
-  }
+    @Override
+    public boolean execute(Map<ConanParameter, String> parameters)
+        throws ProcessExecutionException, IllegalArgumentException, InterruptedException {
+        getLog().info("Executing " + getName() + " with the following parameters: " + parameters.toString());
+        String command = "gzip -" + parameters.get(compressionParameter) + " " + parameters.get(fileParameter);
+        try {
+            getLog().info("Issuing command: [" + command + "]");
+            ProcessRunner runner = new ProcessRunner();
+            runner.redirectStderr(true);
+            String[] output = runner.runCommmand(command);
+            if (output.length > 0) {
+                getLog().info("Response from command [" + command + "]: " +
+                              output.length + " lines, first line was " + output[0]);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        } catch (CommandExecutionException e) {
+            e.printStackTrace();
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public String getName() {
+        return "local_gzip";
+    }
+
+    @Override
+    public Collection<ConanParameter> getParameters() {
+        return parameters;
+    }
 }

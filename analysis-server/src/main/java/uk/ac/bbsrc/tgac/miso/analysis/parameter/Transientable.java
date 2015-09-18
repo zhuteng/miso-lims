@@ -33,6 +33,6 @@ package uk.ac.bbsrc.tgac.miso.analysis.parameter;
  * @since 0.1.6
  */
 public interface Transientable {
-  boolean isTransient();
-  void setTransient(boolean t);
+    boolean isTransient();
+    void setTransient(boolean t);
 }

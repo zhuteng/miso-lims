@@ -50,90 +50,87 @@ import java.util.*;
  * @since 0.0.2
  */
 public class MisoPropertyExporter extends PropertyPlaceholderConfigurer {
-  protected static final Logger log = LoggerFactory.getLogger(MisoPropertyExporter.class);
+    protected static final Logger log = LoggerFactory.getLogger(MisoPropertyExporter.class);
 
-  private Map<String, String> resolvedProperties;
-  
-  @Override
-  protected void processProperties(ConfigurableListableBeanFactory beanFactoryToProcess,
-                                   Properties misoProps) throws BeansException {
+    private Map<String, String> resolvedProperties;
 
-    String baseStoragePath = misoProps.getProperty("miso.baseDirectory");
-    if (baseStoragePath != null) {
-      //append a trailing slash if one is missing
-      if (!baseStoragePath.endsWith("/")) {
-        baseStoragePath+="/";
-      }
-
-      // set a system property to the base directory so that other systems can be configured based on this path
-      // e.g. ehcache DiskStores
-      System.setProperty("miso.baseDirectory", baseStoragePath);
-
-      Map<String, String> propchecks = MisoWebUtils.checkCorePropertiesFiles(baseStoragePath);
-      if (propchecks.keySet().contains("error")) {
-        throw new BeanInitializationException(propchecks.get("error"));
-      }
-
-      List<String> propertiesList = Arrays.asList(new File(baseStoragePath).list(new PropertiesFilenameFilter()));
-      for (String propPath : propertiesList) {
-        log.debug("Attempting to load " + baseStoragePath+propPath);
-        Properties tempProps;
-
-        try {
-          InputStream in = new FileInputStream(new File(baseStoragePath, propPath));
-          tempProps = new Properties();
-          try {
-            tempProps.load(in);
-            log.debug("Loaded " + tempProps.keySet() + " from " + propPath);
-            CollectionUtils.mergePropertiesIntoMap(tempProps, misoProps);
-          }
-          catch (IOException e) {
-            throw new InvalidPropertyException(MisoPropertyExporter.class, "All", "Cannot load " + baseStoragePath+propPath + " properties. Cannot read file!");
-          }
-        }
-        catch (FileNotFoundException e) {
-          throw new InvalidPropertyException(MisoPropertyExporter.class, "All", "Cannot load " + baseStoragePath+propPath + " properties. File does not exist!");
-        }
-      }
-
-      //override any config file security.method property with that from the system env
-      if (System.getenv("security.method") != null) {
-        misoProps.put("security.method", System.getenv("security.method"));
-        log.debug("Set security.method to " + misoProps.get("security.method"));
-      }
-
-      super.processProperties(beanFactoryToProcess, misoProps);
-      resolvedProperties = new HashMap<String, String>();
-      for (Object key : misoProps.keySet()) {
-        String keyStr = key.toString();
-
-        //doesn't seem to resolve properties properly - just end up null
-        //resolvedProperties.put(keyStr, resolvePlaceholder(props.getProperty(keyStr), props, SYSTEM_PROPERTIES_MODE_OVERRIDE));
-        resolvedProperties.put(keyStr, misoProps.getProperty(keyStr));
-      }
-    }
-    else {
-      throw new InvalidPropertyException(MisoPropertyExporter.class,
-        "miso.baseDirectory",
-        "Cannot resolve miso.baseDirectory. This should be specified in the " +
-        "miso.properties file which should be made available on the classpath.");
-    }
-  }
-
-  public Map<String, String> getResolvedProperties() {
-    return Collections.unmodifiableMap(resolvedProperties);
-  }
-
-  public Properties getPropertiesAsProperties() {
-    Properties props = new Properties();
-    props.putAll(Collections.unmodifiableMap(resolvedProperties));
-    return props;
-  }
-
-  protected class PropertiesFilenameFilter implements FilenameFilter {
     @Override
-    public boolean accept(File dir, String name) {
-      return name.endsWith(".properties"); 
+    protected void processProperties(ConfigurableListableBeanFactory beanFactoryToProcess, Properties misoProps) throws BeansException {
+
+        String baseStoragePath = misoProps.getProperty("miso.baseDirectory");
+        if (baseStoragePath != null) {
+            //append a trailing slash if one is missing
+            if (!baseStoragePath.endsWith("/")) {
+                baseStoragePath += "/";
+            }
+
+            // set a system property to the base directory so that other systems can be configured based on this path
+            // e.g. ehcache DiskStores
+            System.setProperty("miso.baseDirectory", baseStoragePath);
+
+            Map<String, String> propchecks = MisoWebUtils.checkCorePropertiesFiles(baseStoragePath);
+            if (propchecks.keySet().contains("error")) {
+                throw new BeanInitializationException(propchecks.get("error"));
+            }
+
+            List<String> propertiesList = Arrays.asList(new File(baseStoragePath).list(new PropertiesFilenameFilter()));
+            for (String propPath : propertiesList) {
+                log.debug("Attempting to load " + baseStoragePath + propPath);
+                Properties tempProps;
+
+                try {
+                    InputStream in = new FileInputStream(new File(baseStoragePath, propPath));
+                    tempProps = new Properties();
+                    try {
+                        tempProps.load(in);
+                        log.debug("Loaded " + tempProps.keySet() + " from " + propPath);
+                        CollectionUtils.mergePropertiesIntoMap(tempProps, misoProps);
+                    } catch (IOException e) {
+                        throw new InvalidPropertyException(MisoPropertyExporter.class, "All",
+                                                           "Cannot load " + baseStoragePath + propPath + " properties. Cannot read file!");
+                    }
+                } catch (FileNotFoundException e) {
+                    throw new InvalidPropertyException(MisoPropertyExporter.class, "All",
+                                                       "Cannot load " + baseStoragePath + propPath + " properties. File does not exist!");
+                }
+            }
+
+            //override any config file security.method property with that from the system env
+            if (System.getenv("security.method") != null) {
+                misoProps.put("security.method", System.getenv("security.method"));
+                log.debug("Set security.method to " + misoProps.get("security.method"));
+            }
+
+            super.processProperties(beanFactoryToProcess, misoProps);
+            resolvedProperties = new HashMap<String, String>();
+            for (Object key : misoProps.keySet()) {
+                String keyStr = key.toString();
+
+                //doesn't seem to resolve properties properly - just end up null
+                //resolvedProperties.put(keyStr, resolvePlaceholder(props.getProperty(keyStr), props, SYSTEM_PROPERTIES_MODE_OVERRIDE));
+                resolvedProperties.put(keyStr, misoProps.getProperty(keyStr));
+            }
+        } else {
+            throw new InvalidPropertyException(MisoPropertyExporter.class, "miso.baseDirectory",
+                                               "Cannot resolve miso.baseDirectory. This should be specified in the " +
+                                               "miso.properties file which should be made available on the classpath.");
+        }
     }
-  }
+
+    public Map<String, String> getResolvedProperties() {
+        return Collections.unmodifiableMap(resolvedProperties);
+    }
+
+    public Properties getPropertiesAsProperties() {
+        Properties props = new Properties();
+        props.putAll(Collections.unmodifiableMap(resolvedProperties));
+        return props;
+    }
+
+    protected class PropertiesFilenameFilter implements FilenameFilter {
+        @Override
+        public boolean accept(File dir, String name) {
+            return name.endsWith(".properties");
+        }
+    }
 }

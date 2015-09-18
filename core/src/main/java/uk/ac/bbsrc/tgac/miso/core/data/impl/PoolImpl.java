@@ -41,47 +41,47 @@ import java.util.Collection;
  * @since 0.0.2
  */
 public class PoolImpl<P extends Poolable> extends AbstractPool<P> implements Serializable {
-  public static final String PREFIX = "MPO";
+    public static final String PREFIX = "MPO";
 
-  private String units = "";
-  private PlatformType platformType;
+    private String units = "";
+    private PlatformType platformType;
 
-  public PoolImpl() {
-    setSecurityProfile(new SecurityProfile());
-  }
+    public PoolImpl() {
+        setSecurityProfile(new SecurityProfile());
+    }
 
-  public PoolImpl(User user) {
-    setSecurityProfile(new SecurityProfile(user));
-  }
+    public PoolImpl(User user) {
+        setSecurityProfile(new SecurityProfile(user));
+    }
 
-  public String getUnits() {
-    return this.units;
-  }
+    public String getUnits() {
+        return this.units;
+    }
 
-  public void setUnits(String units) {
-    this.units = units;
-  }
+    public void setUnits(String units) {
+        this.units = units;
+    }
 
-  @Override
-  public PlatformType getPlatformType() {
-    return platformType;
-  }
+    @Override
+    public PlatformType getPlatformType() {
+        return platformType;
+    }
 
-  @Override
-  public void setPlatformType(PlatformType platformType) {
-    this.platformType = platformType;
-  }
+    @Override
+    public void setPlatformType(PlatformType platformType) {
+        this.platformType = platformType;
+    }
 
-  @Override
-  public String toString() {
-    StringBuffer sb = new StringBuffer();
-    sb.append(getName());
-    sb.append(" : ");
-    sb.append(getAlias());
-    sb.append(" : ");
-    sb.append(getCreationDate());
-    sb.append(" : ");
-    sb.append(getConcentration());
-    return sb.toString();
-  }
+    @Override
+    public String toString() {
+        StringBuffer sb = new StringBuffer();
+        sb.append(getName());
+        sb.append(" : ");
+        sb.append(getAlias());
+        sb.append(" : ");
+        sb.append(getCreationDate());
+        sb.append(" : ");
+        sb.append(getConcentration());
+        return sb.toString();
+    }
 }

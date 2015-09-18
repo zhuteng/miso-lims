@@ -55,86 +55,72 @@ import java.io.OutputStream;
 @Controller
 @RequestMapping("/download")
 public class DownloadController {
-  protected static final Logger log = LoggerFactory.getLogger(DownloadController.class);
+    protected static final Logger log = LoggerFactory.getLogger(DownloadController.class);
 
-  @Autowired
-  private SecurityManager securityManager;
+    @Autowired
+    private SecurityManager securityManager;
 
-  @Autowired
-  private RequestManager requestManager;
+    @Autowired
+    private RequestManager requestManager;
 
-  @Autowired
-  private FilesManager filesManager;
+    @Autowired
+    private FilesManager filesManager;
 
-  public void setSecurityManager(SecurityManager securityManager) {
-    this.securityManager = securityManager;
-  }
-
-  public void setRequestManager(RequestManager requestManager) {
-    this.requestManager = requestManager;
-  }
-
-  public void setFilesManager(FilesManager filesManager) {
-    this.filesManager = filesManager;
-  }
-
-  @RequestMapping(value = "/project/{id}/{hashcode}", method = RequestMethod.GET)
-  protected void downloadProjectFile(@PathVariable Long id,
-                                     @PathVariable Integer hashcode,
-                                     HttpServletResponse response)
-          throws Exception {
-    User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-    Project project = requestManager.getProjectById(id);
-    if (project.userCanRead(user)) {
-      lookupAndRetrieveFile(Project.class, id.toString(), hashcode, response);
+    public void setSecurityManager(SecurityManager securityManager) {
+        this.securityManager = securityManager;
     }
-    else {
-      throw new SecurityException("Access denied");
+
+    public void setRequestManager(RequestManager requestManager) {
+        this.requestManager = requestManager;
     }
-  }
 
-  @RequestMapping(value = "/plate/forms/{hashcode}", method = RequestMethod.GET)
-  protected void downloadPlateExportFile(@PathVariable Integer hashcode,
-                                     HttpServletResponse response)
-      throws Exception {
-      lookupAndRetrieveFile(Plate.class,  "forms", hashcode, response);
-  }
-
-  @RequestMapping(value = "/plate/csv/{hashcode}", method = RequestMethod.GET)
-  protected void downloadPlateCSVExportFile(@PathVariable Integer hashcode,
-                                         HttpServletResponse response)
-      throws Exception {
-    lookupAndRetrieveFile(Plate.class,  "csv", hashcode, response);
-  }
-
-  @RequestMapping(value = "/sample/forms/{hashcode}", method = RequestMethod.GET)
-  protected void downloadSampleExportFile(@PathVariable Integer hashcode,
-                                         HttpServletResponse response)
-      throws Exception {
-    lookupAndRetrieveFile(Sample.class,  "forms", hashcode, response);
-  }
-
-  @RequestMapping(value = "/library/forms/{hashcode}", method = RequestMethod.GET)
-  protected void downloadLibraryExportFile(@PathVariable Integer hashcode,
-                                          HttpServletResponse response)
-      throws Exception {
-    lookupAndRetrieveFile(Library.class,  "forms", hashcode, response);
-  }
-
-  @RequestMapping(value = "/submission/{id}/{hashcode}", method = RequestMethod.GET)
-  protected void downloadSubmissionFile(@PathVariable Long id,
-                                     @PathVariable Integer hashcode,
-                                     HttpServletResponse response)
-          throws Exception {
-    User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-    Submission submission = requestManager.getSubmissionById(id);
-    if (submission.userCanRead(user)) {
-      lookupAndRetrieveFile(Submission.class, "SUB"+id, hashcode, response);
+    public void setFilesManager(FilesManager filesManager) {
+        this.filesManager = filesManager;
     }
-    else {
-      throw new SecurityException("Access denied");
+
+    @RequestMapping(value = "/project/{id}/{hashcode}", method = RequestMethod.GET)
+    protected void downloadProjectFile(@PathVariable Long id, @PathVariable Integer hashcode, HttpServletResponse response)
+        throws Exception {
+        User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
+        Project project = requestManager.getProjectById(id);
+        if (project.userCanRead(user)) {
+            lookupAndRetrieveFile(Project.class, id.toString(), hashcode, response);
+        } else {
+            throw new SecurityException("Access denied");
+        }
     }
-  }
+
+    @RequestMapping(value = "/plate/forms/{hashcode}", method = RequestMethod.GET)
+    protected void downloadPlateExportFile(@PathVariable Integer hashcode, HttpServletResponse response) throws Exception {
+        lookupAndRetrieveFile(Plate.class, "forms", hashcode, response);
+    }
+
+    @RequestMapping(value = "/plate/csv/{hashcode}", method = RequestMethod.GET)
+    protected void downloadPlateCSVExportFile(@PathVariable Integer hashcode, HttpServletResponse response) throws Exception {
+        lookupAndRetrieveFile(Plate.class, "csv", hashcode, response);
+    }
+
+    @RequestMapping(value = "/sample/forms/{hashcode}", method = RequestMethod.GET)
+    protected void downloadSampleExportFile(@PathVariable Integer hashcode, HttpServletResponse response) throws Exception {
+        lookupAndRetrieveFile(Sample.class, "forms", hashcode, response);
+    }
+
+    @RequestMapping(value = "/library/forms/{hashcode}", method = RequestMethod.GET)
+    protected void downloadLibraryExportFile(@PathVariable Integer hashcode, HttpServletResponse response) throws Exception {
+        lookupAndRetrieveFile(Library.class, "forms", hashcode, response);
+    }
+
+    @RequestMapping(value = "/submission/{id}/{hashcode}", method = RequestMethod.GET)
+    protected void downloadSubmissionFile(@PathVariable Long id, @PathVariable Integer hashcode, HttpServletResponse response)
+        throws Exception {
+        User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
+        Submission submission = requestManager.getSubmissionById(id);
+        if (submission.userCanRead(user)) {
+            lookupAndRetrieveFile(Submission.class, "SUB" + id, hashcode, response);
+        } else {
+            throw new SecurityException("Access denied");
+        }
+    }
 
   /*
   @RequestMapping(value = "/{type}/{id}/{hashcode}", method = RequestMethod.GET)
@@ -148,62 +134,55 @@ public class DownloadController {
   }
   */
 
-  @RequestMapping(value = "/libraryqc/{id}/{hashcode}", method = RequestMethod.GET)
-  protected void downloadLibraryQcFile(@PathVariable Long id,
-                                     @PathVariable Integer hashcode,
-                                     HttpServletResponse response)
-          throws Exception {
-    User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-    Library library = requestManager.getLibraryById(id);
-    if (library.userCanRead(user)) {
-      lookupAndRetrieveFile(LibraryQC.class, id.toString(), hashcode, response);
-    }
-    else {
-      throw new SecurityException("Access denied");
-    }
-  }
-
-  @RequestMapping(value = "/sampleqc/{id}/{hashcode}", method = RequestMethod.GET)
-  protected void downloadSampleQcFile(@PathVariable Long id,
-                                     @PathVariable Integer hashcode,
-                                     HttpServletResponse response)
-          throws Exception {
-    User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-    SampleQC qc = requestManager.getSampleQCById(id);
-    if (qc.userCanRead(user)) {
-      lookupAndRetrieveFile(SampleQC.class, id.toString(), hashcode, response);
-    }
-    else {
-      throw new SecurityException("Access denied");
-    }
-  }
-
-  private void lookupAndRetrieveFile(Class cl, String id, Integer hashcode, HttpServletResponse response) throws IOException {
-    //lookup
-    String filename = null;
-    for (String s : filesManager.getFileNames(cl, id)) {
-      if (s.hashCode() == hashcode) {
-        filename = s;
-      }
+    @RequestMapping(value = "/libraryqc/{id}/{hashcode}", method = RequestMethod.GET)
+    protected void downloadLibraryQcFile(@PathVariable Long id, @PathVariable Integer hashcode, HttpServletResponse response)
+        throws Exception {
+        User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
+        Library library = requestManager.getLibraryById(id);
+        if (library.userCanRead(user)) {
+            lookupAndRetrieveFile(LibraryQC.class, id.toString(), hashcode, response);
+        } else {
+            throw new SecurityException("Access denied");
+        }
     }
 
-    response.setHeader("Content-Disposition", "attachment; filename=" + filename);
-    OutputStream responseStream = response.getOutputStream();
+    @RequestMapping(value = "/sampleqc/{id}/{hashcode}", method = RequestMethod.GET)
+    protected void downloadSampleQcFile(@PathVariable Long id, @PathVariable Integer hashcode, HttpServletResponse response)
+        throws Exception {
+        User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
+        SampleQC qc = requestManager.getSampleQCById(id);
+        if (qc.userCanRead(user)) {
+            lookupAndRetrieveFile(SampleQC.class, id.toString(), hashcode, response);
+        } else {
+            throw new SecurityException("Access denied");
+        }
+    }
 
-    //retrieval
-    if (filename != null) {
-      File file = filesManager.getFile(cl, id, filename);
-      FileInputStream fis = new FileInputStream(file);
-      int read = 0;
-      byte[] bytes = new byte[1024];
-      while ((read = fis.read(bytes)) != -1) {
-        responseStream.write(bytes, 0, read);
-      }
-      responseStream.flush();
-      responseStream.close();
+    private void lookupAndRetrieveFile(Class cl, String id, Integer hashcode, HttpServletResponse response) throws IOException {
+        //lookup
+        String filename = null;
+        for (String s : filesManager.getFileNames(cl, id)) {
+            if (s.hashCode() == hashcode) {
+                filename = s;
+            }
+        }
+
+        response.setHeader("Content-Disposition", "attachment; filename=" + filename);
+        OutputStream responseStream = response.getOutputStream();
+
+        //retrieval
+        if (filename != null) {
+            File file = filesManager.getFile(cl, id, filename);
+            FileInputStream fis = new FileInputStream(file);
+            int read = 0;
+            byte[] bytes = new byte[1024];
+            while ((read = fis.read(bytes)) != -1) {
+                responseStream.write(bytes, 0, read);
+            }
+            responseStream.flush();
+            responseStream.close();
+        } else {
+            throw new IOException("Cannot open file. Please check that it exists and is readable.");
+        }
     }
-    else {
-      throw new IOException("Cannot open file. Please check that it exists and is readable.");
-    }
-  }
 }

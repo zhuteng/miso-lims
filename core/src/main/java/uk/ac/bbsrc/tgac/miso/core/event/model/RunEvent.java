@@ -38,37 +38,37 @@ import uk.ac.bbsrc.tgac.miso.core.event.type.MisoEventType;
  * @since 0.1.2
  */
 public class RunEvent implements Event<Run> {
-  private Run run;
-  private String message;
-  private MisoEventType eventType;
-  private JSONObject eventContext = new JSONObject();
+    private Run run;
+    private String message;
+    private MisoEventType eventType;
+    private JSONObject eventContext = new JSONObject();
 
-  public RunEvent(Run run, MisoEventType eventType, String message) {
-    this.run = run;
-    this.message = message;
-    this.eventType = eventType;
-  }
+    public RunEvent(Run run, MisoEventType eventType, String message) {
+        this.run = run;
+        this.message = message;
+        this.eventType = eventType;
+    }
 
-  public Run getEventObject() {
-    return this.run;
-  }
+    public Run getEventObject() {
+        return this.run;
+    }
 
-  @Override
-  public MisoEventType getEventType() {
-    return eventType;
-  }
+    @Override
+    public MisoEventType getEventType() {
+        return eventType;
+    }
 
-  @Override
-  public String getEventMessage() {
-    return message;
-  }
+    @Override
+    public String getEventMessage() {
+        return message;
+    }
 
-  @Override
-  public JSONObject getEventContext() {
-    return eventContext;
-  }
+    @Override
+    public JSONObject getEventContext() {
+        return eventContext;
+    }
 
-  public void setEventContext(JSONObject eventContext) {
-    this.eventContext = eventContext;
-  }
+    public void setEventContext(JSONObject eventContext) {
+        this.eventContext = eventContext;
+    }
 }

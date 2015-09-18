@@ -13,7 +13,7 @@ import net.sourceforge.fluxion.spi.Spi;
  */
 @Spi
 public interface NameGenerator<T> {
-  public String getGeneratorName();
-  public String generateName(T t);
-  public Class<T> nameGeneratorFor();
+    public String getGeneratorName();
+    public String generateName(T t);
+    public Class<T> nameGeneratorFor();
 }

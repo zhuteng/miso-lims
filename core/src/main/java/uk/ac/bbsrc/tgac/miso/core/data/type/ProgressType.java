@@ -35,67 +35,67 @@ import java.util.Map;
  * @since 0.0.2
  */
 public enum ProgressType {
-  UNKNOWN("Unknown"),
-  ACTIVE("Active"),
-  INACTIVE("Inactive"),
-  CANCELLED("Cancelled"),
-  PROPOSED("Proposed"),
-  PENDING("Pending"),
-  APPROVED("Approved"),
-  COMPLETED("Completed");
+    UNKNOWN("Unknown"),
+    ACTIVE("Active"),
+    INACTIVE("Inactive"),
+    CANCELLED("Cancelled"),
+    PROPOSED("Proposed"),
+    PENDING("Pending"),
+    APPROVED("Approved"),
+    COMPLETED("Completed");
 
-  /**
-   * Field key
-   */
-  private String key;
-  /**
-   * Field lookup
-   */
-  private static final Map<String, ProgressType> lookup = new HashMap<String, ProgressType>();
+    /**
+     * Field key
+     */
+    private String key;
+    /**
+     * Field lookup
+     */
+    private static final Map<String, ProgressType> lookup = new HashMap<String, ProgressType>();
 
-  static {
-    for (ProgressType s : EnumSet.allOf(ProgressType.class))
-      lookup.put(s.getKey(), s);
-  }
-
-  /**
-   * Constructs a ProgressType based on a given key
-   *
-   * @param key of type String
-   */
-  ProgressType(String key) {
-    this.key = key;
-  }
-
-  /**
-   * Returns a ProgressType given an enum key
-   *
-   * @param key of type String
-   * @return ProgressType
-   */
-  public static ProgressType get(String key) {
-    return lookup.get(key);
-  }
-
-  /**
-   * Returns the key of this ProgressType enum.
-   *
-   * @return String key.
-   */
-  public String getKey() {
-    return key;
-  }
-
-  /**
-   * Returns the keys of this ProgressType enum.
-   *
-   * @return ArrayList<String> keys.
-   */
-  public static ArrayList<String> getKeys() {
-    ArrayList<String> keys = new ArrayList<String>();
-    for (ProgressType h : ProgressType.values()) {
-      keys.add(h.getKey());
+    static {
+        for (ProgressType s : EnumSet.allOf(ProgressType.class))
+            lookup.put(s.getKey(), s);
     }
-    return keys;
-  }
+
+    /**
+     * Constructs a ProgressType based on a given key
+     *
+     * @param key of type String
+     */
+    ProgressType(String key) {
+        this.key = key;
+    }
+
+    /**
+     * Returns a ProgressType given an enum key
+     *
+     * @param key of type String
+     * @return ProgressType
+     */
+    public static ProgressType get(String key) {
+        return lookup.get(key);
+    }
+
+    /**
+     * Returns the key of this ProgressType enum.
+     *
+     * @return String key.
+     */
+    public String getKey() {
+        return key;
+    }
+
+    /**
+     * Returns the keys of this ProgressType enum.
+     *
+     * @return ArrayList<String> keys.
+     */
+    public static ArrayList<String> getKeys() {
+        ArrayList<String> keys = new ArrayList<String>();
+        for (ProgressType h : ProgressType.values()) {
+            keys.add(h.getKey());
+        }
+        return keys;
+    }
 }

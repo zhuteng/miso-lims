@@ -40,71 +40,75 @@ import org.springframework.security.core.context.SecurityContextHolder;
 @Aspect
 public class LogAspect {
 
-  /** Field log  */
-  protected Logger log;
+    /**
+     * Field log
+     */
+    protected Logger log;
 
-  /**
-   * Constructor LogAspect creates a new LogAspect instance with a given Logger name
-   *
-   * @param logName of type String
-   */
-  public LogAspect(String logName) {
-    this.log = LoggerFactory.getLogger(logName);
-  }
-
-  /**
-   * For a successful event, given a supplied JoinPoint, log advice to the logger defined in the aspect object
-   *
-   * @param join of type JoinPoint
-   */
-  public void logEvent(JoinPoint join) {
-    String name = "SERVICE";
-    if (SecurityContextHolder.getContext().getAuthentication() != null) {
-      name = SecurityContextHolder.getContext().getAuthentication().getName();
+    /**
+     * Constructor LogAspect creates a new LogAspect instance with a given Logger name
+     *
+     * @param logName of type String
+     */
+    public LogAspect(String logName) {
+        this.log = LoggerFactory.getLogger(logName);
     }
-    StringBuilder sb = new StringBuilder();
-    sb.append("OK [").append(name).append("] ").append(join.toString()).append(" [\n");
-    for (Object o : join.getArgs()) {
-      sb.append("-> ").append(o).append("\n");
+
+    /**
+     * For a successful event, given a supplied JoinPoint, log advice to the logger defined in the aspect object
+     *
+     * @param join of type JoinPoint
+     */
+    public void logEvent(JoinPoint join) {
+        String name = "SERVICE";
+        if (SecurityContextHolder.getContext().getAuthentication() != null) {
+            name = SecurityContextHolder.getContext().getAuthentication().getName();
+        }
+        StringBuilder sb = new StringBuilder();
+        sb.append("OK [").append(name).append("] ").append(join.toString()).append(" [\n");
+        for (Object o : join.getArgs()) {
+            sb.append("-> ").append(o).append("\n");
+        }
+        sb.append("]\n");
+        log.info(sb.toString());
     }
-    sb.append("]\n");
-    log.info(sb.toString());
-  }
 
-  /**
-   * For a failed event, given a supplied JoinPoint and exception, log advice to the logger defined in the aspect object
-   *
-   * @param join of type JoinPoint
-   * @param e of type Exception
-   */
-  public void logFailedEvent(JoinPoint join, Exception e) {
-    String name = "SERVICE:"+e.getClass().getSimpleName();
-    if (SecurityContextHolder.getContext().getAuthentication() != null) {
-      name = SecurityContextHolder.getContext().getAuthentication().getName();
+    /**
+     * For a failed event, given a supplied JoinPoint and exception, log advice to the logger defined in the aspect object
+     *
+     * @param join of type JoinPoint
+     * @param e    of type Exception
+     */
+    public void logFailedEvent(JoinPoint join, Exception e) {
+        String name = "SERVICE:" + e.getClass().getSimpleName();
+        if (SecurityContextHolder.getContext().getAuthentication() != null) {
+            name = SecurityContextHolder.getContext().getAuthentication().getName();
+        }
+        this.log.warn("FAIL [" + name + "] " + join.toString() + " [" + join.getArgs()[0] + "] -> " + e.getMessage());
     }
-    this.log.warn("FAIL ["+ name +"] "+join.toString()+" [" + join.getArgs()[0] +"] -> "+e.getMessage());
-  }
 
-  /**
-   * For a successful AJAX event, given a supplied JoinPoint and JSON query, log advice to the logger defined in the aspect object
-   *
-   * @param join of type JoinPoint
-   * @param json of type JSONObject
-   */
-  @AfterReturning(pointcut="@annotation(LoggedAction)", returning="json")
-  public void logAjaxEvent(JoinPoint join, JSONObject json) {
-    System.out.println("logAjaxEvent: " + join.toString());
-    this.log.info("AJAX OK ["+ SecurityContextHolder.getContext().getAuthentication().getName()+"] "+join.toString()+" [" + json.toString() +"]");
-  }
+    /**
+     * For a successful AJAX event, given a supplied JoinPoint and JSON query, log advice to the logger defined in the aspect object
+     *
+     * @param join of type JoinPoint
+     * @param json of type JSONObject
+     */
+    @AfterReturning(pointcut = "@annotation(LoggedAction)", returning = "json")
+    public void logAjaxEvent(JoinPoint join, JSONObject json) {
+        System.out.println("logAjaxEvent: " + join.toString());
+        this.log.info("AJAX OK [" + SecurityContextHolder.getContext().getAuthentication().getName() + "] " + join.toString() + " [" +
+                      json.toString() + "]");
+    }
 
-  /**
-   * For a failed AJAX event, given a supplied JoinPoint, JSON query and exception, log advice to the logger defined in the aspect object
-   *
-   * @param join of type JoinPoint
-   * @param json of type JSONObject
-   * @param e of type Exception
-   */
-  public void logFailedAjaxEvent(JoinPoint join, JSONObject json, Exception e) {
-    this.log.warn("AJAX FAIL ["+ SecurityContextHolder.getContext().getAuthentication().getName()+"] "+join.toString()+" [" + json.toString() +"] -> "+e.getMessage());
-  }
+    /**
+     * For a failed AJAX event, given a supplied JoinPoint, JSON query and exception, log advice to the logger defined in the aspect object
+     *
+     * @param join of type JoinPoint
+     * @param json of type JSONObject
+     * @param e    of type Exception
+     */
+    public void logFailedAjaxEvent(JoinPoint join, JSONObject json, Exception e) {
+        this.log.warn("AJAX FAIL [" + SecurityContextHolder.getContext().getAuthentication().getName() + "] " + join.toString() + " [" +
+                      json.toString() + "] -> " + e.getMessage());
+    }
 }

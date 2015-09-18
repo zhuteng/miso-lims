@@ -44,57 +44,55 @@ import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
 @Controller
 public class ListUsersController {
-  protected static final Logger log = LoggerFactory.getLogger(ListUsersController.class);
+    protected static final Logger log = LoggerFactory.getLogger(ListUsersController.class);
 
-  @Autowired
-  private SecurityManager securityManager;
+    @Autowired
+    private SecurityManager securityManager;
 
-  @Autowired
-  private SessionRegistryImpl sessionRegistry;
+    @Autowired
+    private SessionRegistryImpl sessionRegistry;
 
-  public void setSecurityManager(SecurityManager securityManager) {
-    assert (securityManager != null);
-    this.securityManager = securityManager;
-  }
+    public void setSecurityManager(SecurityManager securityManager) {
+        assert (securityManager != null);
+        this.securityManager = securityManager;
+    }
 
-  @RequestMapping("/admin/users")
-  public ModelAndView adminListUsers(ModelMap model) throws IOException {
-    try {
+    @RequestMapping("/admin/users")
+    public ModelAndView adminListUsers(ModelMap model) throws IOException {
+        try {
 
-      log.info("Logged in users: " + sessionRegistry.getAllPrincipals().size());
+            log.info("Logged in users: " + sessionRegistry.getAllPrincipals().size());
 
-      List<Object> nonExpiredUsers = new ArrayList<Object>();
-      for (Object o : sessionRegistry.getAllPrincipals()) {
-        List<SessionInformation> sessinfo = sessionRegistry.getAllSessions(o, false);
-        for (SessionInformation si : sessinfo) {
-          if (!si.isExpired()) {
-            nonExpiredUsers.add(o);
-          }
+            List<Object> nonExpiredUsers = new ArrayList<Object>();
+            for (Object o : sessionRegistry.getAllPrincipals()) {
+                List<SessionInformation> sessinfo = sessionRegistry.getAllSessions(o, false);
+                for (SessionInformation si : sessinfo) {
+                    if (!si.isExpired()) {
+                        nonExpiredUsers.add(o);
+                    }
+                }
+            }
+            model.addAttribute("loggedInUsers", nonExpiredUsers);
+            model.addAttribute("total", nonExpiredUsers.size());
+
+            return new ModelAndView("/pages/listUsers.jsp", "users", securityManager.listAllUsers());
+        } catch (IOException ex) {
+            if (log.isDebugEnabled()) {
+                log.debug("Failed to list users", ex);
+            }
+            throw ex;
         }
-      }
-      model.addAttribute("loggedInUsers", nonExpiredUsers);
-      model.addAttribute("total", nonExpiredUsers.size());
+    }
 
-      return new ModelAndView("/pages/listUsers.jsp", "users", securityManager.listAllUsers());
+    @RequestMapping("/tech/users")
+    public ModelAndView techListUsers() throws IOException {
+        try {
+            return new ModelAndView("/pages/listUsers.jsp", "users", securityManager.listAllUsers());
+        } catch (IOException ex) {
+            if (log.isDebugEnabled()) {
+                log.debug("Failed to list users", ex);
+            }
+            throw ex;
+        }
     }
-    catch (IOException ex) {
-      if (log.isDebugEnabled()) {
-        log.debug("Failed to list users", ex);
-      }
-      throw ex;
-    }
-  }
-
-  @RequestMapping("/tech/users")
-  public ModelAndView techListUsers() throws IOException {
-    try {
-      return new ModelAndView("/pages/listUsers.jsp", "users", securityManager.listAllUsers());
-    }
-    catch (IOException ex) {
-      if (log.isDebugEnabled()) {
-        log.debug("Failed to list users", ex);
-      }
-      throw ex;
-    }
-  }
 }

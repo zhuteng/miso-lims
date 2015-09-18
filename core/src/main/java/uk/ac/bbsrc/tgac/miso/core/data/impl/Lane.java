@@ -38,7 +38,7 @@ import javax.persistence.*;
 
 /**
  * Concrete implementation of a Partition to represent a Lane in a sequencing platform that uses lanes, e.g.
- *  Illumina
+ * Illumina
  *
  * @author Rob Davey
  * @since 0.0.2
@@ -47,29 +47,29 @@ import javax.persistence.*;
 @Table(name = "`Lane`")
 @JsonSerialize(typing = JsonSerialize.Typing.STATIC, include = JsonSerialize.Inclusion.NON_NULL)
 //@JsonIdentityInfo(generator = ObjectIdGenerators.IntSequenceGenerator.class, property = "@id")
-@JsonTypeInfo(use=JsonTypeInfo.Id.CLASS, include= JsonTypeInfo.As.PROPERTY, property="@class")
-@JsonIgnoreProperties({"securityProfile","flowcell"})
+@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
+@JsonIgnoreProperties({ "securityProfile", "flowcell" })
 @Deprecated
 public class Lane extends PartitionImpl {
-  public static final Long UNSAVED_ID = 0L;
-  
-  @Id
-  @GeneratedValue(strategy = GenerationType.AUTO)
-  public Long laneId = Lane.UNSAVED_ID;
+    public static final Long UNSAVED_ID = 0L;
 
-  /**
-   * Construct a new Lane with a default empty SecurityProfile
-   */
-  public Lane() {
-    setSecurityProfile(new SecurityProfile());
-  }
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    public Long laneId = Lane.UNSAVED_ID;
 
-  /**
-   * Construct a new Lane with a SecurityProfile owned by the given User
-   *
-   * @param user of type User
-   */
-  public Lane(User user) {
-    setSecurityProfile(new SecurityProfile(user));
-  }
+    /**
+     * Construct a new Lane with a default empty SecurityProfile
+     */
+    public Lane() {
+        setSecurityProfile(new SecurityProfile());
+    }
+
+    /**
+     * Construct a new Lane with a SecurityProfile owned by the given User
+     *
+     * @param user of type User
+     */
+    public Lane(User user) {
+        setSecurityProfile(new SecurityProfile(user));
+    }
 }

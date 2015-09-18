@@ -27,7 +27,7 @@ import java.lang.annotation.*;
 
 /**
  * uk.ac.bbsrc.tgac.miso.core.plugin.annotation
-  * <p/>
+ * <p/>
  * Info
  *
  * @author Tony Burdett
@@ -39,19 +39,19 @@ import java.lang.annotation.*;
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface MisoPlugin {
-  /**
-   * The tool name.  When using this annotation, you can legitimately supply any
-   * string.
-   *
-   * @return the name assigned to this tool
-   */
-  String name();
+    /**
+     * The tool name.  When using this annotation, you can legitimately supply any
+     * string.
+     *
+     * @return the name assigned to this tool
+     */
+    String name();
 
-  /**
-   * The tool description.  This is optional.
-   *
-   * @return the description of this tool.  If not assigned, the description is
-   *         an empty string
-   */
-  String description() default "";
+    /**
+     * The tool description.  This is optional.
+     *
+     * @return the description of this tool.  If not assigned, the description is
+     * an empty string
+     */
+    String description() default "";
 }

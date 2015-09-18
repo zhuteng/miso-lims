@@ -46,73 +46,73 @@ import java.util.*;
  */
 @ServiceProvider
 public class RapidLibraryTagBarcodeStrategy implements TagBarcodeStrategy, RequestManagerAware {
-  protected static final Logger log = LoggerFactory.getLogger(RapidLibraryTagBarcodeStrategy.class);
+    protected static final Logger log = LoggerFactory.getLogger(RapidLibraryTagBarcodeStrategy.class);
 
-  private Map<Integer, Set<TagBarcode>> tagBarcodeMap = new HashMap<Integer, Set<TagBarcode>>();
+    private Map<Integer, Set<TagBarcode>> tagBarcodeMap = new HashMap<Integer, Set<TagBarcode>>();
 
-  private RequestManager requestManager;
+    private RequestManager requestManager;
 
-  @Override
-  public RequestManager getRequestManager() {
-    return requestManager;
-  }
+    @Override
+    public RequestManager getRequestManager() {
+        return requestManager;
+    }
 
-  @Override
-  public void setRequestManager(RequestManager requestManager) {
-    this.requestManager = requestManager;
-  }
+    @Override
+    public void setRequestManager(RequestManager requestManager) {
+        this.requestManager = requestManager;
+    }
 
-  @Override
-  public final String getName() {
-    return "454 Rapid Library";
-  }
+    @Override
+    public final String getName() {
+        return "454 Rapid Library";
+    }
 
-  @Override
-  public PlatformType getPlatformType() {
-    return PlatformType.LS454;
-  }
+    @Override
+    public PlatformType getPlatformType() {
+        return PlatformType.LS454;
+    }
 
-  @Override
-  public final int getNumApplicableBarcodes() {
-    return 1;
-  }
+    @Override
+    public final int getNumApplicableBarcodes() {
+        return 1;
+    }
 
-  @Override
-  public Map<Integer, Set<TagBarcode>> getApplicableBarcodes() {
-    if (tagBarcodeMap.isEmpty()) {
-      if (requestManager != null) {
-        tagBarcodeMap.put(1, new TreeSet<TagBarcode>());
+    @Override
+    public Map<Integer, Set<TagBarcode>> getApplicableBarcodes() {
+        if (tagBarcodeMap.isEmpty()) {
+            if (requestManager != null) {
+                tagBarcodeMap.put(1, new TreeSet<TagBarcode>());
 
-        try {
-          List<TagBarcode> barcodes = new ArrayList<TagBarcode>(requestManager.listAllTagBarcodesByPlatform(PlatformType.LS454.getKey()));
-          for (TagBarcode t : barcodes) {
-            if (getName().equals(t.getStrategyName()) &&
-                t.getName() != null &&
-                t.getName().startsWith("RL")) {
-              log.debug("Registering tag barcode: " + t.getName());
-              tagBarcodeMap.get(1).add(t);
+                try {
+                    List<TagBarcode> barcodes = new ArrayList<TagBarcode>(
+                        requestManager.listAllTagBarcodesByPlatform(PlatformType.LS454.getKey()));
+                    for (TagBarcode t : barcodes) {
+                        if (getName().equals(t.getStrategyName()) &&
+                            t.getName() != null &&
+                            t.getName().startsWith("RL")) {
+                            log.debug("Registering tag barcode: " + t.getName());
+                            tagBarcodeMap.get(1).add(t);
+                        }
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
-          }
         }
-        catch (IOException e) {
-          e.printStackTrace();
+        return tagBarcodeMap;
+    }
+
+    @Override
+    public Set<TagBarcode> getApplicableBarcodesForPosition(int position) {
+        if (position < 1 || position > getNumApplicableBarcodes()) {
+            throw new IndexOutOfBoundsException("This TagBarcodeStrategy only has " + getNumApplicableBarcodes() + " valid positions");
         }
-      }
+        return tagBarcodeMap.get(position);
     }
-    return tagBarcodeMap;
-  }
 
-  @Override
-  public Set<TagBarcode> getApplicableBarcodesForPosition(int position) {
-    if (position < 1 || position > getNumApplicableBarcodes()) {
-      throw new IndexOutOfBoundsException("This TagBarcodeStrategy only has " + getNumApplicableBarcodes() + " valid positions");
+    @Override
+    public void reload() {
+        tagBarcodeMap.clear();
+        getApplicableBarcodes();
     }
-    return tagBarcodeMap.get(position);
-  }
-
-  @Override
-  public void reload() {
-    tagBarcodeMap.clear();
-    getApplicableBarcodes();
-  }
 }

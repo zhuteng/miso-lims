@@ -45,24 +45,23 @@ import org.springframework.batch.core.repository.JobRestartException;
  */
 public class JobLaunchingHandler {
 
-  private JobLocator jobLocator;
-  private JobLauncher jobLauncher;
+    private JobLocator jobLocator;
+    private JobLauncher jobLauncher;
 
-  public JobLaunchingHandler(JobLocator jobLocator, JobLauncher jobLauncher) {
-    super();
-    this.jobLocator = jobLocator;
-    this.jobLauncher = jobLauncher;
-  }
-
-  public JobExecution launch(JobLaunchRequest request)
-          throws JobExecutionAlreadyRunningException, JobRestartException,
-                 JobInstanceAlreadyCompleteException, JobParametersInvalidException,
-                 NoSuchJobException {
-    Job job = new SimpleJob(request.getJobName());
-    JobParametersBuilder builder = new JobParametersBuilder();
-    for (Map.Entry<String, String> entry : request.getJobParameters().entrySet()) {
-      builder.addString(entry.getKey(), entry.getValue());
+    public JobLaunchingHandler(JobLocator jobLocator, JobLauncher jobLauncher) {
+        super();
+        this.jobLocator = jobLocator;
+        this.jobLauncher = jobLauncher;
     }
-    return jobLauncher.run(job, builder.toJobParameters());
-  }
+
+    public JobExecution launch(JobLaunchRequest request)
+        throws JobExecutionAlreadyRunningException, JobRestartException, JobInstanceAlreadyCompleteException, JobParametersInvalidException,
+               NoSuchJobException {
+        Job job = new SimpleJob(request.getJobName());
+        JobParametersBuilder builder = new JobParametersBuilder();
+        for (Map.Entry<String, String> entry : request.getJobParameters().entrySet()) {
+            builder.addString(entry.getKey(), entry.getValue());
+        }
+        return jobLauncher.run(job, builder.toJobParameters());
+    }
 }

@@ -39,34 +39,34 @@ import java.util.Properties;
  */
 public class JobLaunchRequest {
 
-  private String jobName;
+    private String jobName;
 
-  private Map<String, String> jobParameters;
+    private Map<String, String> jobParameters;
 
-  public JobLaunchRequest(String jobName) {
-    this(jobName, Collections.EMPTY_MAP);
-  }
-
-  public JobLaunchRequest(String jobName, Map<String, String> jobParameters) {
-    super();
-    this.jobName = jobName;
-    this.jobParameters = jobParameters;
-  }
-
-  public JobLaunchRequest(String jobName, Properties jobParametersAsProps) {
-    this(jobName);
-    this.jobParameters = new HashMap<String, String>();
-    for (Map.Entry<?, ?> entry : jobParametersAsProps.entrySet()) {
-      this.jobParameters.put(entry.getKey().toString(), entry.getValue().toString());
+    public JobLaunchRequest(String jobName) {
+        this(jobName, Collections.EMPTY_MAP);
     }
-  }
 
-  public String getJobName() {
-    return jobName;
-  }
+    public JobLaunchRequest(String jobName, Map<String, String> jobParameters) {
+        super();
+        this.jobName = jobName;
+        this.jobParameters = jobParameters;
+    }
 
-  public Map<String, String> getJobParameters() {
-    return jobParameters == null ? Collections.EMPTY_MAP : Collections.unmodifiableMap(jobParameters);
-  }
+    public JobLaunchRequest(String jobName, Properties jobParametersAsProps) {
+        this(jobName);
+        this.jobParameters = new HashMap<String, String>();
+        for (Map.Entry<?, ?> entry : jobParametersAsProps.entrySet()) {
+            this.jobParameters.put(entry.getKey().toString(), entry.getValue().toString());
+        }
+    }
+
+    public String getJobName() {
+        return jobName;
+    }
+
+    public Map<String, String> getJobParameters() {
+        return jobParameters == null ? Collections.EMPTY_MAP : Collections.unmodifiableMap(jobParameters);
+    }
 }
 

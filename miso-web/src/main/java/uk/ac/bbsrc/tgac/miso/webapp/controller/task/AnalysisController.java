@@ -57,135 +57,137 @@ import java.util.*;
 @Controller
 //@SessionAttributes("tasks")
 public class AnalysisController {
-  protected static final Logger log = LoggerFactory.getLogger(AnalysisController.class);
+    protected static final Logger log = LoggerFactory.getLogger(AnalysisController.class);
 
-  @Autowired
-  private SecurityManager securityManager;
+    @Autowired
+    private SecurityManager securityManager;
 
-  @Autowired
-  private RequestManager requestManager;
+    @Autowired
+    private RequestManager requestManager;
 
-  @Autowired
-  private AnalysisQueryService queryService;
+    @Autowired
+    private AnalysisQueryService queryService;
 
-  public AnalysisQueryService getQueryService() {
-    return queryService;
-  }
-
-  public void setQueryService(AnalysisQueryService queryService) {
-    this.queryService = queryService;
-  }
-
-  public void setSecurityManager(SecurityManager securityManager) {
-    this.securityManager = securityManager;
-  }
-
-  public void setRequestManager(uk.ac.bbsrc.tgac.miso.core.manager.RequestManager requestManager) {
-    this.requestManager = requestManager;
-  }
-
-  @RequestMapping(value = "/analysis", method = RequestMethod.GET)
-  public ModelAndView view(ModelMap model) throws IOException {
-    return new ModelAndView("/pages/listAnalysisTasks.jsp", model);
-  }
-
-  @RequestMapping(value = "/analysis/new/run/{runId}", method = RequestMethod.GET)
-  public ModelAndView runTask(@PathVariable long runId, ModelMap model) throws IOException, IntegrationException {
-    Run run = requestManager.getRunById(runId);
-    if (run == null) {
-      throw new SecurityException("No such Run.");
+    public AnalysisQueryService getQueryService() {
+        return queryService;
     }
-    else {
-      User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
 
-      model.put("run", run);
+    public void setQueryService(AnalysisQueryService queryService) {
+        this.queryService = queryService;
+    }
 
-      Map<String, String> map = new HashMap<String,String>();
-      map.put("RunAccession", run.getAlias());
-      map.put("basecall-path", run.getFilePath()+"/Data/Intensities/BaseCalls");
-//      map.put("fastq-path", run.getFilePath()+"/Data/Intensities/BaseCalls/PAP");
-//      map.put("makefile-path", run.getFilePath()+"/Data/Intensities/BaseCalls/PAP/Makefile");
-//      map.put("sample-sheet-path", run.getFilePath()+"/Data/Intensities/BaseCalls/SampleSheet-pap.csv");
+    public void setSecurityManager(SecurityManager securityManager) {
+        this.securityManager = securityManager;
+    }
 
-      map.put("fastq-path", "/net/tgac-labdata-nfs/ifs/TGAC/NGS_data/qc/"+run.getAlias()+"/PAP");
-      map.put("makefile-path", "/net/tgac-labdata-nfs/ifs/TGAC/NGS_data/qc/"+run.getAlias()+"/PAP/Makefile");
-      map.put("sample-sheet-path", "/net/tgac-labdata-nfs/ifs/TGAC/NGS_data/qc/"+run.getAlias()+"/SampleSheet-PAP.csv");
+    public void setRequestManager(uk.ac.bbsrc.tgac.miso.core.manager.RequestManager requestManager) {
+        this.requestManager = requestManager;
+    }
 
-      map.put("instrument-id", run.getSequencerReference().getName());
+    @RequestMapping(value = "/analysis", method = RequestMethod.GET)
+    public ModelAndView view(ModelMap model) throws IOException {
+        return new ModelAndView("/pages/listAnalysisTasks.jsp", model);
+    }
 
-      SequencerPartitionContainer<SequencerPoolPartition> f = ((RunImpl) run).getSequencerPartitionContainers().get(0);
-      String laneValue = "8";
-      String naType = "dna";
-      String indexValue = "6";
+    @RequestMapping(value = "/analysis/new/run/{runId}", method = RequestMethod.GET)
+    public ModelAndView runTask(@PathVariable long runId, ModelMap model) throws IOException, IntegrationException {
+        Run run = requestManager.getRunById(runId);
+        if (run == null) {
+            throw new SecurityException("No such Run.");
+        } else {
+            User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
 
-      if (f != null && f.getPartitions().size() != 0) {
-        laneValue = String.valueOf(f.getPartitions().size());
-        Pool<? extends Poolable> p = f.getPartitionAt(1).getPool();
-        if (p != null) {
-          if (!p.getPoolableElements().isEmpty()) {
-            Poolable pable = p.getPoolableElements().iterator().next();
-            if (pable instanceof Dilution) {
-              Library l = ((Dilution) pable).getLibrary();
-              if ("RNA-Seq".equals(l.getLibraryStrategyType().getName())) naType = "rna";
-              for (TagBarcode tb : l.getTagBarcodes().values()) {
-                indexValue = Integer.toString(tb.getSequence().length());
-              }
+            model.put("run", run);
+
+            Map<String, String> map = new HashMap<String, String>();
+            map.put("RunAccession", run.getAlias());
+            map.put("basecall-path", run.getFilePath() + "/Data/Intensities/BaseCalls");
+            //      map.put("fastq-path", run.getFilePath()+"/Data/Intensities/BaseCalls/PAP");
+            //      map.put("makefile-path", run.getFilePath()+"/Data/Intensities/BaseCalls/PAP/Makefile");
+            //      map.put("sample-sheet-path", run.getFilePath()+"/Data/Intensities/BaseCalls/SampleSheet-pap.csv");
+
+            map.put("fastq-path", "/net/tgac-labdata-nfs/ifs/TGAC/NGS_data/qc/" + run.getAlias() + "/PAP");
+            map.put("makefile-path", "/net/tgac-labdata-nfs/ifs/TGAC/NGS_data/qc/" + run.getAlias() + "/PAP/Makefile");
+            map.put("sample-sheet-path", "/net/tgac-labdata-nfs/ifs/TGAC/NGS_data/qc/" + run.getAlias() + "/SampleSheet-PAP.csv");
+
+            map.put("instrument-id", run.getSequencerReference().getName());
+
+            SequencerPartitionContainer<SequencerPoolPartition> f = ((RunImpl) run).getSequencerPartitionContainers().get(0);
+            String laneValue = "8";
+            String naType = "dna";
+            String indexValue = "6";
+
+            if (f != null && f.getPartitions().size() != 0) {
+                laneValue = String.valueOf(f.getPartitions().size());
+                Pool<? extends Poolable> p = f.getPartitionAt(1).getPool();
+                if (p != null) {
+                    if (!p.getPoolableElements().isEmpty()) {
+                        Poolable pable = p.getPoolableElements().iterator().next();
+                        if (pable instanceof Dilution) {
+                            Library l = ((Dilution) pable).getLibrary();
+                            if ("RNA-Seq".equals(l.getLibraryStrategyType().getName()))
+                                naType = "rna";
+                            for (TagBarcode tb : l.getTagBarcodes().values()) {
+                                indexValue = Integer.toString(tb.getSequence().length());
+                            }
+                        }
+                    }
+                } else {
+                    throw new IntegrationException("Cannot start analysis pipelines on a run with no pools on any lanes.");
+                }
             }
-          }
+
+            String instrumentModel = run.getSequencerReference().getPlatform().getInstrumentModel();
+            if ("Illumina MiSeq".equals(instrumentModel) || "Illumina NextSeq 500".equals(instrumentModel)) {
+                //append the base mask property for miseq runs
+                String basesMask = "y" + run.getCycles() + ",i" + indexValue;
+                if (run.getPairedEnd()) {
+                    basesMask += ",y" + run.getCycles();
+                }
+                map.put("use-bases-mask", basesMask);
+            }
+
+            map.put("lane-value", laneValue);
+            map.put("nucleic-acid-type", naType);
+
+            map.put("sample-sheet-string",
+                    RunProcessingUtils.buildIlluminaDemultiplexCSV(run, f, "1.8.2", user.getFullName()).replaceAll("\n", "\\\n"));
+
+            map.put("contaminant-list", "ecoli,phix_174,human_chr17,arabidopsis_chloroplast,vectors");
+
+            map.put("username", user.getLoginName());
+
+            map.put("paired-end", String.valueOf(run.getPairedEnd()));
+
+            map.put("email-report", "on");
+            map.put("ignore-missing-stats", "on");
+            map.put("ignore-missing-bcls", "on");
+            map.put("ignore-missing-controls", "on");
+            map.put("allow-mismatch", "on");
+
+            model.put("defaultRunValues", map);
+
+            List<String> pipelineNames = new ArrayList<String>();
+            for (JSONObject pipeline : (Iterable<JSONObject>) queryService.getPipelines()) {
+                pipelineNames.add(pipeline.getString("name"));
+            }
+            Collections.sort(pipelineNames);
+            model.put("pipelines", pipelineNames);
+
+            return new ModelAndView("/pages/createAnalysisTask.jsp", model);
         }
-        else {
-          throw new IntegrationException("Cannot start analysis pipelines on a run with no pools on any lanes.");
-        }
-      }
-
-      String instrumentModel = run.getSequencerReference().getPlatform().getInstrumentModel();
-      if ("Illumina MiSeq".equals(instrumentModel) || "Illumina NextSeq 500".equals(instrumentModel)) {
-        //append the base mask property for miseq runs
-        String basesMask = "y"+run.getCycles()+",i"+indexValue;
-        if (run.getPairedEnd()) {
-          basesMask += ",y"+run.getCycles();
-        }
-        map.put("use-bases-mask", basesMask);
-      }
-
-      map.put("lane-value", laneValue);
-      map.put("nucleic-acid-type", naType);
-
-      map.put("sample-sheet-string", RunProcessingUtils.buildIlluminaDemultiplexCSV(run, f, "1.8.2", user.getFullName()).replaceAll("\n", "\\\n"));
-
-      map.put("contaminant-list", "ecoli,phix_174,human_chr17,arabidopsis_chloroplast,vectors");
-
-      map.put("username", user.getLoginName());
-
-      map.put("paired-end", String.valueOf(run.getPairedEnd()));
-
-      map.put("email-report", "on");
-      map.put("ignore-missing-stats", "on");
-      map.put("ignore-missing-bcls", "on");
-      map.put("ignore-missing-controls", "on");
-      map.put("allow-mismatch", "on");
-
-      model.put("defaultRunValues", map);
-
-      List<String> pipelineNames = new ArrayList<String>();
-      for (JSONObject pipeline : (Iterable<JSONObject>)queryService.getPipelines()) {
-        pipelineNames.add(pipeline.getString("name"));
-      }
-      Collections.sort(pipelineNames);
-      model.put("pipelines", pipelineNames);
-
-      return new ModelAndView("/pages/createAnalysisTask.jsp", model);
     }
-  }
 
-  /**
-   * Gets the {@link uk.ac.ebi.fgpt.conan.model.ConanTask} with the given ID.
-   *
-   * @param taskID the ID of the task to retrieve
-   * @return the task assigned this ID
-   */
-  @RequestMapping(value = "/analysis/task/{taskID}", method = RequestMethod.GET)
-  public @ResponseBody ConanTask<? extends ConanPipeline> getTask(@PathVariable String taskID) {
+    /**
+     * Gets the {@link uk.ac.ebi.fgpt.conan.model.ConanTask} with the given ID.
+     *
+     * @param taskID the ID of the task to retrieve
+     * @return the task assigned this ID
+     */
+    @RequestMapping(value = "/analysis/task/{taskID}", method = RequestMethod.GET)
+    public
+    @ResponseBody
+    ConanTask<? extends ConanPipeline> getTask(@PathVariable String taskID) {
     /*
     try {
       return getQueryService().getTask(taskID);
@@ -195,17 +197,19 @@ public class AnalysisController {
       return null;
     }
     */
-    return null;
-  }
+        return null;
+    }
 
-  /**
-   * Returns a list of all submitted tasks, in submission order. This includes all pending, running and completed
-   * tasks - basically a history of everything that has ever been submitted.
-   *
-   * @return the list of all submitted tasks
-   */
-  @RequestMapping(value = "/analysis/tasks", method = RequestMethod.GET)
-  public @ResponseBody List<ConanTask<? extends ConanPipeline>> getTasks() {
+    /**
+     * Returns a list of all submitted tasks, in submission order. This includes all pending, running and completed
+     * tasks - basically a history of everything that has ever been submitted.
+     *
+     * @return the list of all submitted tasks
+     */
+    @RequestMapping(value = "/analysis/tasks", method = RequestMethod.GET)
+    public
+    @ResponseBody
+    List<ConanTask<? extends ConanPipeline>> getTasks() {
 /*    try {
       return getQueryService().getTasks();
     }
@@ -213,18 +217,20 @@ public class AnalysisController {
       e.printStackTrace();
       return null;
     }*/
-    return null;
-  }
+        return null;
+    }
 
-  /**
-   * Returns a list of all tasks that have been submitted but are pending execution.  Tasks in this list may have been
-   * executed but failed: tasks that fail should highlight their failure to the submitter, and flag the task as
-   * pending.
-   *
-   * @return a list of all tasks pending execution
-   */
-  @RequestMapping(value = "/analysis/tasks", method = RequestMethod.GET, params = "pending")
-  public @ResponseBody List<ConanTask<? extends ConanPipeline>> getPendingTasks() {
+    /**
+     * Returns a list of all tasks that have been submitted but are pending execution.  Tasks in this list may have been
+     * executed but failed: tasks that fail should highlight their failure to the submitter, and flag the task as
+     * pending.
+     *
+     * @return a list of all tasks pending execution
+     */
+    @RequestMapping(value = "/analysis/tasks", method = RequestMethod.GET, params = "pending")
+    public
+    @ResponseBody
+    List<ConanTask<? extends ConanPipeline>> getPendingTasks() {
 /*    try {
       return getQueryService().getPendingTasks();
     }
@@ -232,16 +238,18 @@ public class AnalysisController {
       e.printStackTrace();
       return null;
     }*/
-    return null;
-  }
+        return null;
+    }
 
-  /**
-   * Returns a list of all tasks that are currently being executed.
-   *
-   * @return the currently executing tasks
-   */
-  @RequestMapping(value = "/analysis/tasks", method = RequestMethod.GET, params = "running")
-  public @ResponseBody List<ConanTask<? extends ConanPipeline>> getRunningTasks() {
+    /**
+     * Returns a list of all tasks that are currently being executed.
+     *
+     * @return the currently executing tasks
+     */
+    @RequestMapping(value = "/analysis/tasks", method = RequestMethod.GET, params = "running")
+    public
+    @ResponseBody
+    List<ConanTask<? extends ConanPipeline>> getRunningTasks() {
 /*    try {
       return getQueryService().getRunningTasks();
     }
@@ -249,18 +257,20 @@ public class AnalysisController {
       e.printStackTrace();
       return null;
     }*/
-    return null;
-  }
+        return null;
+    }
 
-  /**
-   * Returns a list of all tasks that have been executed and completed.  This includes tasks that completed
-   * successfully, and those that completed because a process failed and was subsequently marked as complete by the
-   * submitter.
-   *
-   * @return the tasks that have completed
-   */
-  @RequestMapping(value = "/analysis/tasks", method = RequestMethod.GET, params = "complete")
-  public @ResponseBody List<ConanTask<? extends ConanPipeline>> getCompletedTasks() {
+    /**
+     * Returns a list of all tasks that have been executed and completed.  This includes tasks that completed
+     * successfully, and those that completed because a process failed and was subsequently marked as complete by the
+     * submitter.
+     *
+     * @return the tasks that have completed
+     */
+    @RequestMapping(value = "/analysis/tasks", method = RequestMethod.GET, params = "complete")
+    public
+    @ResponseBody
+    List<ConanTask<? extends ConanPipeline>> getCompletedTasks() {
 /*    try {
       return getQueryService().getCompletedTasks();
     }
@@ -268,17 +278,19 @@ public class AnalysisController {
       e.printStackTrace();
       return null;
     }*/
-    return null;
-  }
+        return null;
+    }
 
-  /**
-   * Returns a list of all submitted tasks, in submission order. This includes all pending, running and completed
-   * tasks - basically a history of everything that has ever been submitted.
-   *
-   * @return the list of all submitted tasks
-   */
-  @RequestMapping(value = "/analysis/pipeline/{pipelineName}", method = RequestMethod.GET)
-  public @ResponseBody ConanPipeline getPipeline(@PathVariable String pipelineName) {
+    /**
+     * Returns a list of all submitted tasks, in submission order. This includes all pending, running and completed
+     * tasks - basically a history of everything that has ever been submitted.
+     *
+     * @return the list of all submitted tasks
+     */
+    @RequestMapping(value = "/analysis/pipeline/{pipelineName}", method = RequestMethod.GET)
+    public
+    @ResponseBody
+    ConanPipeline getPipeline(@PathVariable String pipelineName) {
 /*    try {
       return getQueryService().getPipeline(pipelineName);
     }
@@ -286,18 +298,20 @@ public class AnalysisController {
       e.printStackTrace();
       return null;
     }*/
-    return null;
-  }
+        return null;
+    }
 
-  /**
-   * Returns a list of all tasks that have been executed and completed.  This includes tasks that completed
-   * successfully, and those that completed because a process failed and was subsequently marked as complete by the
-   * submitter.
-   *
-   * @return the tasks that have completed
-   */
-  @RequestMapping(value = "/analysis/pipelines", method = RequestMethod.GET)
-  public @ResponseBody List<ConanPipeline> getPipelines() {
+    /**
+     * Returns a list of all tasks that have been executed and completed.  This includes tasks that completed
+     * successfully, and those that completed because a process failed and was subsequently marked as complete by the
+     * submitter.
+     *
+     * @return the tasks that have completed
+     */
+    @RequestMapping(value = "/analysis/pipelines", method = RequestMethod.GET)
+    public
+    @ResponseBody
+    List<ConanPipeline> getPipelines() {
 /*    try {
       return getQueryService().getPipelines();
     }
@@ -305,8 +319,8 @@ public class AnalysisController {
       e.printStackTrace();
       return null;
     }*/
-    return null;
-  }
+        return null;
+    }
 
 /*
   @RequestMapping(value = "/task/{taskId}", method = RequestMethod.POST)

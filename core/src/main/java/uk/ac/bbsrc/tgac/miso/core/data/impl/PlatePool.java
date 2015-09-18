@@ -41,20 +41,20 @@ import java.util.LinkedList;
  * @since 0.1.4
  */
 public class PlatePool extends PoolImpl<Plate<LinkedList<Library>, Library>> implements Serializable {
-  public static final String PREFIX = "UPO";
-  private final String units = "nM";
+    public static final String PREFIX = "UPO";
+    private final String units = "nM";
 
-  public PlatePool() {
-    setSecurityProfile(new SecurityProfile());
-  }
+    public PlatePool() {
+        setSecurityProfile(new SecurityProfile());
+    }
 
-  public PlatePool(PlatformType platformType) {
-    setSecurityProfile(new SecurityProfile());
-    setPlatformType(platformType);
-  }
+    public PlatePool(PlatformType platformType) {
+        setSecurityProfile(new SecurityProfile());
+        setPlatformType(platformType);
+    }
 
-  public PlatePool(User user, PlatformType platformType) {
-    setSecurityProfile(new SecurityProfile(user));
-    setPlatformType(platformType);
-  }
+    public PlatePool(User user, PlatformType platformType) {
+        setSecurityProfile(new SecurityProfile(user));
+        setPlatformType(platformType);
+    }
 }

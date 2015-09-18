@@ -46,19 +46,19 @@ import java.util.Map;
  */
 @ServiceProvider
 public class SolidNotificationConsumerStrategy implements NotificationConsumerStrategy {
-  protected static final Logger log = LoggerFactory.getLogger(SolidNotificationConsumerStrategy.class);
+    protected static final Logger log = LoggerFactory.getLogger(SolidNotificationConsumerStrategy.class);
 
-  public String getName() {
-    return "SolidNotificationConsumer";
-  }
+    public String getName() {
+        return "SolidNotificationConsumer";
+    }
 
-  @Override
-  public void consume(Message<Map<String, List<String>>> m) throws InterrogationException {
-    new SolidNotificationMessageConsumerMechanism().consume(m);
-  }
+    @Override
+    public void consume(Message<Map<String, List<String>>> m) throws InterrogationException {
+        new SolidNotificationMessageConsumerMechanism().consume(m);
+    }
 
-  @Override
-  public boolean isStrategyFor(PlatformType pt) {
-    return (pt.equals(PlatformType.SOLID));
-  }
+    @Override
+    public boolean isStrategyFor(PlatformType pt) {
+        return (pt.equals(PlatformType.SOLID));
+    }
 }

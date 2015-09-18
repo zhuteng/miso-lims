@@ -38,61 +38,65 @@ import java.util.Map;
  * @since 0.0.3
  */
 public enum PlateMaterialType {
-  BACTERIA("Bacteria"),
-  DNA("DNA"),
-  RAD("RAD"),
-  NEXTERA("Nextera");
+    BACTERIA("Bacteria"),
+    DNA("DNA"),
+    RAD("RAD"),
+    NEXTERA("Nextera");
 
-  /** Field key  */
-  private String key;
+    /**
+     * Field key
+     */
+    private String key;
 
-  /** Field lookup  */
-  private static final Map<String, PlateMaterialType> lookup = new HashMap<String, PlateMaterialType>();
+    /**
+     * Field lookup
+     */
+    private static final Map<String, PlateMaterialType> lookup = new HashMap<String, PlateMaterialType>();
 
-  static {
-    for (PlateMaterialType s : EnumSet.allOf(PlateMaterialType.class))
-      lookup.put(s.getKey(), s);
-  }
-
-  /**
-   * Constructs a PlateMaterialType based on a given key
-   *
-   * @param key of type String
-   */
-  PlateMaterialType(String key) {
-    this.key = key;
-  }
-
-  /**
-   * Returns a SubmissionActionType given an enum key
-   *
-   * @param key of type String
-   * @return SubmissionActionType
-   */
-  public static PlateMaterialType get(String key) {
-    return lookup.get(key);
-  }
-
-  /**
-   * Returns the key of this PlateMaterialType enum.
-   *
-   * @return String key.
-   */
-  public String getKey() {
-    return key;
-  }
-
-  /**
-   * Returns the keys of this PlateMaterialType enum.
-   *
-   * @return ArrayList<String> keys.
-   */
-  public static ArrayList<String> getKeys() {
-    ArrayList<String> keys = new ArrayList<String>();
-    for (PlateMaterialType h : PlateMaterialType.values()) {
-      keys.add(h.getKey());
+    static {
+        for (PlateMaterialType s : EnumSet.allOf(PlateMaterialType.class))
+            lookup.put(s.getKey(), s);
     }
-    return keys;
-  }
+
+    /**
+     * Constructs a PlateMaterialType based on a given key
+     *
+     * @param key of type String
+     */
+    PlateMaterialType(String key) {
+        this.key = key;
+    }
+
+    /**
+     * Returns a SubmissionActionType given an enum key
+     *
+     * @param key of type String
+     * @return SubmissionActionType
+     */
+    public static PlateMaterialType get(String key) {
+        return lookup.get(key);
+    }
+
+    /**
+     * Returns the key of this PlateMaterialType enum.
+     *
+     * @return String key.
+     */
+    public String getKey() {
+        return key;
+    }
+
+    /**
+     * Returns the keys of this PlateMaterialType enum.
+     *
+     * @return ArrayList<String> keys.
+     */
+    public static ArrayList<String> getKeys() {
+        ArrayList<String> keys = new ArrayList<String>();
+        for (PlateMaterialType h : PlateMaterialType.values()) {
+            keys.add(h.getKey());
+        }
+        return keys;
+    }
 }
 

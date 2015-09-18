@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,32 +39,33 @@ import org.slf4j.LoggerFactory;
  * To change this template use File | Settings | File Templates.
  */
 public class FTPUploadReport implements UploadReport {
-    private List<UploadJob> uploadJobs=new ArrayList<UploadJob>() {
+    private List<UploadJob> uploadJobs = new ArrayList<UploadJob>() {
     };
 
     private String status;
     private String message;
     protected static final Logger log = LoggerFactory.getLogger(FTPUploadReport.class);
+
     public FTPUploadReport(List<FTPUploadJob> FTPUploadJobs) {
-           log.debug("FTPUploadReport has been created for submission:" );
+        log.debug("FTPUploadReport has been created for submission:");
 
-           //this.uploadJobs = FTPUploadJobs;
+        //this.uploadJobs = FTPUploadJobs;
 
-           for(FTPUploadJob up: FTPUploadJobs){
-               log.debug("UploadJob: " + up.getFile() +" "+ up.getPercentageTransferred()+"% complete");
+        for (FTPUploadJob up : FTPUploadJobs) {
+            log.debug("UploadJob: " + up.getFile() + " " + up.getPercentageTransferred() + "% complete");
 
-               uploadJobs.add(up);
-           }
-       }
+            uploadJobs.add(up);
+        }
+    }
 
     @Override
     public void setStatus(String status) {
-        this.status=status;
+        this.status = status;
     }
 
     @Override
     public void setMessage(String message) {
-        this.message=message;
+        this.message = message;
     }
 
     @Override
@@ -76,18 +78,15 @@ public class FTPUploadReport implements UploadReport {
         return message;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
-
-
-    public Map<String, Object> getUploadReport(){
-        Map report= new HashMap<String, Object>();
-        for (UploadJob up: uploadJobs){
-            report.put(up.getFile().getName(),up.getPercentageTransferred());
+    public Map<String, Object> getUploadReport() {
+        Map report = new HashMap<String, Object>();
+        for (UploadJob up : uploadJobs) {
+            report.put(up.getFile().getName(), up.getPercentageTransferred());
             log.debug(up.getFile().getName());
         }
 
         return report;
     }
-
 
     @Override
     public List<UploadJob> getUploadJobs() {
@@ -103,6 +102,5 @@ public class FTPUploadReport implements UploadReport {
     public UploadJob getUploadJobByIndex() {
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
-
 
 }

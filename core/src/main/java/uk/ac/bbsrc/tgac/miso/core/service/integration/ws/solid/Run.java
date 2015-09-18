@@ -30,12 +30,11 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
 
-
 /**
  * <p>Java class for run complex type.
- * 
+ * <p/>
  * <p>The following schema fragment specifies the expected content contained within this class.
- * 
+ * <p/>
  * <pre>
  * &lt;complexType name="run">
  *   &lt;complexContent>
@@ -58,24 +57,11 @@ import javax.xml.bind.annotation.XmlType;
  *   &lt;/complexContent>
  * &lt;/complexType>
  * </pre>
- * 
- * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "run", propOrder = {
-    "creator",
-    "dateCompleted",
-    "dateCreated",
-    "dateStarted",
-    "flowcellNum",
-    "id",
-    "instrumentName",
-    "name",
-    "numberOfSamples",
-    "qualityMetrics",
-    "sampleInfoList",
-    "xml"
-})
+@XmlType(name = "run",
+         propOrder = { "creator", "dateCompleted", "dateCreated", "dateStarted", "flowcellNum", "id", "instrumentName", "name",
+                       "numberOfSamples", "qualityMetrics", "sampleInfoList", "xml" })
 public class Run {
 
     protected String creator;
@@ -95,11 +81,9 @@ public class Run {
 
     /**
      * Gets the value of the creator property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     * {@link String }
      */
     public String getCreator() {
         return creator;
@@ -107,11 +91,9 @@ public class Run {
 
     /**
      * Sets the value of the creator property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setCreator(String value) {
         this.creator = value;
@@ -119,11 +101,9 @@ public class Run {
 
     /**
      * Gets the value of the dateCompleted property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     * {@link String }
      */
     public String getDateCompleted() {
         return dateCompleted;
@@ -131,11 +111,9 @@ public class Run {
 
     /**
      * Sets the value of the dateCompleted property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setDateCompleted(String value) {
         this.dateCompleted = value;
@@ -143,11 +121,9 @@ public class Run {
 
     /**
      * Gets the value of the dateCreated property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     * {@link String }
      */
     public String getDateCreated() {
         return dateCreated;
@@ -155,11 +131,9 @@ public class Run {
 
     /**
      * Sets the value of the dateCreated property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setDateCreated(String value) {
         this.dateCreated = value;
@@ -167,11 +141,9 @@ public class Run {
 
     /**
      * Gets the value of the dateStarted property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     * {@link String }
      */
     public String getDateStarted() {
         return dateStarted;
@@ -179,11 +151,9 @@ public class Run {
 
     /**
      * Sets the value of the dateStarted property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setDateStarted(String value) {
         this.dateStarted = value;
@@ -191,11 +161,9 @@ public class Run {
 
     /**
      * Gets the value of the flowcellNum property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     * {@link String }
      */
     public String getFlowcellNum() {
         return flowcellNum;
@@ -203,11 +171,9 @@ public class Run {
 
     /**
      * Sets the value of the flowcellNum property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setFlowcellNum(String value) {
         this.flowcellNum = value;
@@ -215,11 +181,9 @@ public class Run {
 
     /**
      * Gets the value of the id property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     * {@link String }
      */
     public String getId() {
         return id;
@@ -227,11 +191,9 @@ public class Run {
 
     /**
      * Sets the value of the id property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setId(String value) {
         this.id = value;
@@ -239,11 +201,9 @@ public class Run {
 
     /**
      * Gets the value of the instrumentName property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     * {@link String }
      */
     public String getInstrumentName() {
         return instrumentName;
@@ -251,11 +211,9 @@ public class Run {
 
     /**
      * Sets the value of the instrumentName property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setInstrumentName(String value) {
         this.instrumentName = value;
@@ -263,11 +221,9 @@ public class Run {
 
     /**
      * Gets the value of the name property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     * {@link String }
      */
     public String getName() {
         return name;
@@ -275,11 +231,9 @@ public class Run {
 
     /**
      * Sets the value of the name property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setName(String value) {
         this.name = value;
@@ -287,11 +241,9 @@ public class Run {
 
     /**
      * Gets the value of the numberOfSamples property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link Integer }
-     *     
+     *
+     * @return possible object is
+     * {@link Integer }
      */
     public Integer getNumberOfSamples() {
         return numberOfSamples;
@@ -299,11 +251,9 @@ public class Run {
 
     /**
      * Sets the value of the numberOfSamples property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link Integer }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link Integer }
      */
     public void setNumberOfSamples(Integer value) {
         this.numberOfSamples = value;
@@ -311,25 +261,23 @@ public class Run {
 
     /**
      * Gets the value of the qualityMetrics property.
-     * 
-     * <p>
+     * <p/>
+     * <p/>
      * This accessor method returns a reference to the live list,
      * not a snapshot. Therefore any modification you make to the
      * returned list will be present inside the JAXB object.
      * This is why there is not a <CODE>set</CODE> method for the qualityMetrics property.
-     * 
-     * <p>
+     * <p/>
+     * <p/>
      * For example, to add a new item, do as follows:
      * <pre>
      *    getQualityMetrics().add(newItem);
      * </pre>
-     * 
-     * 
-     * <p>
+     * <p/>
+     * <p/>
+     * <p/>
      * Objects of the following type(s) are allowed in the list
      * {@link QualityMetrics }
-     * 
-     * 
      */
     public List<QualityMetrics> getQualityMetrics() {
         if (qualityMetrics == null) {
@@ -340,25 +288,23 @@ public class Run {
 
     /**
      * Gets the value of the sampleInfoList property.
-     * 
-     * <p>
+     * <p/>
+     * <p/>
      * This accessor method returns a reference to the live list,
      * not a snapshot. Therefore any modification you make to the
      * returned list will be present inside the JAXB object.
      * This is why there is not a <CODE>set</CODE> method for the sampleInfoList property.
-     * 
-     * <p>
+     * <p/>
+     * <p/>
      * For example, to add a new item, do as follows:
      * <pre>
      *    getSampleInfoList().add(newItem);
      * </pre>
-     * 
-     * 
-     * <p>
+     * <p/>
+     * <p/>
+     * <p/>
      * Objects of the following type(s) are allowed in the list
      * {@link SampleInfo }
-     * 
-     * 
      */
     public List<SampleInfo> getSampleInfoList() {
         if (sampleInfoList == null) {
@@ -369,11 +315,9 @@ public class Run {
 
     /**
      * Gets the value of the xml property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     * {@link String }
      */
     public String getXml() {
         return xml;
@@ -381,11 +325,9 @@ public class Run {
 
     /**
      * Sets the value of the xml property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setXml(String value) {
         this.xml = value;

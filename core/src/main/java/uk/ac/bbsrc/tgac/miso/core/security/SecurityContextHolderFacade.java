@@ -33,11 +33,11 @@ import org.springframework.security.core.context.SecurityContextHolder;
  * Time: 15:56:19
  */
 public class SecurityContextHolderFacade implements SecurityContextFacade {
-  public SecurityContext getContext() {
-    return SecurityContextHolder.getContext();
-  }
+    public SecurityContext getContext() {
+        return SecurityContextHolder.getContext();
+    }
 
-  public void setContext(SecurityContext securityContext) {
-    SecurityContextHolder.setContext(securityContext);
-  }
+    public void setContext(SecurityContext securityContext) {
+        SecurityContextHolder.setContext(securityContext);
+    }
 }

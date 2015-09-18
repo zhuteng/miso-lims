@@ -41,40 +41,37 @@ import java.io.IOException;
  */
 @Aspect
 public class ProjectAlertAspect {
-  private ProjectAlertManager projectAlertManager;
+    private ProjectAlertManager projectAlertManager;
 
-  public ProjectAlertAspect(ProjectAlertManager projectAlertManager) {
-    this.projectAlertManager = projectAlertManager;
-  }
+    public ProjectAlertAspect(ProjectAlertManager projectAlertManager) {
+        this.projectAlertManager = projectAlertManager;
+    }
 
-  public void removeWatcher(Project project, User user) {
-    try {
-      if (user != null) {
-        projectAlertManager.removeWatcher(project, user.getUserId());
-      }
+    public void removeWatcher(Project project, User user) {
+        try {
+            if (user != null) {
+                projectAlertManager.removeWatcher(project, user.getUserId());
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
-    catch (IOException e) {
-      e.printStackTrace();
-    }
-  }
 
-  public void addWatcher(Project project, User user) {
-    try {
-      if (user != null) {
-        projectAlertManager.addWatcher(project, user.getUserId());
-      }
+    public void addWatcher(Project project, User user) {
+        try {
+            if (user != null) {
+                projectAlertManager.addWatcher(project, user.getUserId());
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
-    catch (IOException e) {
-      e.printStackTrace();
-    }
-  }
 
-  public void update(Long projectId) {
-    try {
-      projectAlertManager.update(projectId);
+    public void update(Long projectId) {
+        try {
+            projectAlertManager.update(projectId);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
-    catch (IOException e) {
-      e.printStackTrace();
-    }
-  }
 }

@@ -55,32 +55,32 @@ import java.util.List;
  */
 @Controller
 public class ListStudiesController {
-  protected static final Logger log = LoggerFactory.getLogger(ListStudiesController.class);
+    protected static final Logger log = LoggerFactory.getLogger(ListStudiesController.class);
 
-  @Autowired
-  private SecurityManager securityManager;
+    @Autowired
+    private SecurityManager securityManager;
 
-  public void setSecurityManager(SecurityManager securityManager) {
-    this.securityManager = securityManager;
-  }
+    public void setSecurityManager(SecurityManager securityManager) {
+        this.securityManager = securityManager;
+    }
 
-  @Autowired
-  private RequestManager requestManager;
+    @Autowired
+    private RequestManager requestManager;
 
-  public void setRequestManager(RequestManager requestManager) {
-    this.requestManager = requestManager;
-  }
+    public void setRequestManager(RequestManager requestManager) {
+        this.requestManager = requestManager;
+    }
 
-  @RequestMapping(value = "/studies/rest/", method = RequestMethod.GET)
-  public
-  @ResponseBody
-  Collection<Study> jsonRest() throws IOException {
-    //User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-    return requestManager.listAllStudies();
-  }
+    @RequestMapping(value = "/studies/rest/", method = RequestMethod.GET)
+    public
+    @ResponseBody
+    Collection<Study> jsonRest() throws IOException {
+        //User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
+        return requestManager.listAllStudies();
+    }
 
-  @RequestMapping("/studies")
-  public ModelAndView listStudies() throws Exception {
-    return new ModelAndView("/pages/listStudies.jsp");
-  }
+    @RequestMapping("/studies")
+    public ModelAndView listStudies() throws Exception {
+        return new ModelAndView("/pages/listStudies.jsp");
+    }
 }

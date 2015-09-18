@@ -12,14 +12,14 @@ import net.sf.json.JSONObject;
  * @since 0.2.0
  */
 public interface WorkflowProcess {
-  public long getId();
+    public long getId();
 
-  public JSONObject getState();
+    public JSONObject getState();
 
-  public WorkflowProcessDefinition getDefinition();
+    public WorkflowProcessDefinition getDefinition();
 
-  public boolean isStarted();
-  public boolean isPaused();
-  public boolean isCompleted();
-  public boolean isFailed();
+    public boolean isStarted();
+    public boolean isPaused();
+    public boolean isCompleted();
+    public boolean isFailed();
 }

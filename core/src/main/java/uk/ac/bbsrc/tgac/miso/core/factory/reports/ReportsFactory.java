@@ -24,6 +24,7 @@
 package uk.ac.bbsrc.tgac.miso.core.factory.reports;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Reportable;
+
 import java.util.Collection;
 
 /**
@@ -35,6 +36,6 @@ import java.util.Collection;
  * @since 0.0.2
  */
 public interface ReportsFactory {
-  Object buildReport(Reportable r);
-  Object buildReport(Collection<? extends Reportable> r);
+    Object buildReport(Reportable r);
+    Object buildReport(Collection<? extends Reportable> r);
 }

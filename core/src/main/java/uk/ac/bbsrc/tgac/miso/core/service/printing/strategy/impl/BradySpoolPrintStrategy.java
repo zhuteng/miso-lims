@@ -44,26 +44,24 @@ import java.io.UnsupportedEncodingException;
  * @since 0.0.3
  */
 public class BradySpoolPrintStrategy implements PrintStrategy<String, BradySpoolPrintContext> {
-  protected static final Logger log = LoggerFactory.getLogger(BradyFtpPrintStrategy.class);
+    protected static final Logger log = LoggerFactory.getLogger(BradyFtpPrintStrategy.class);
 
-  @Override
-  public boolean print(String content, BradySpoolPrintContext context) throws IOException {
-    try {
-      byte[] printdata = content.getBytes("US-ASCII");
-      DocFlavor flavor = new DocFlavor("application/vnd.cups-raster", "[B");
-      if (context != null) {
-        DocPrintJob pjob = context.getPrintService().createPrintJob();
-        Doc doc = new SimpleDoc(printdata, flavor, null);
-        pjob.print(doc, null);
-        return true;
-      }
+    @Override
+    public boolean print(String content, BradySpoolPrintContext context) throws IOException {
+        try {
+            byte[] printdata = content.getBytes("US-ASCII");
+            DocFlavor flavor = new DocFlavor("application/vnd.cups-raster", "[B");
+            if (context != null) {
+                DocPrintJob pjob = context.getPrintService().createPrintJob();
+                Doc doc = new SimpleDoc(printdata, flavor, null);
+                pjob.print(doc, null);
+                return true;
+            }
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        } catch (PrintException e) {
+            e.printStackTrace();
+        }
+        return false;
     }
-    catch (UnsupportedEncodingException e) {
-      e.printStackTrace();
-    }
-    catch (PrintException e) {
-      e.printStackTrace();
-    }
-    return false;
-  }
 }

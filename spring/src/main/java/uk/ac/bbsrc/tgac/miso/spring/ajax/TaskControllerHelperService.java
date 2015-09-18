@@ -46,100 +46,93 @@ import javax.servlet.http.HttpSession;
  */
 @Ajaxified
 public class TaskControllerHelperService {
-  protected static final Logger log = LoggerFactory.getLogger(TaskControllerHelperService.class);
+    protected static final Logger log = LoggerFactory.getLogger(TaskControllerHelperService.class);
 
-  @Autowired
-  private AnalysisQueryService analysisQueryService;
+    @Autowired
+    private AnalysisQueryService analysisQueryService;
 
-  public AnalysisQueryService getAnalysisQueryService() {
-    return analysisQueryService;
-  }
+    public AnalysisQueryService getAnalysisQueryService() {
+        return analysisQueryService;
+    }
 
-  public void setAnalysisQueryService(AnalysisQueryService analysisQueryService) {
-    this.analysisQueryService = analysisQueryService;
-  }
+    public void setAnalysisQueryService(AnalysisQueryService analysisQueryService) {
+        this.analysisQueryService = analysisQueryService;
+    }
 
-  public JSONObject getPipeline(HttpSession session, JSONObject json) {
-    try {
-      if (json.has("pipeline")) {
-        JSONObject j = new JSONObject();
-        j.put("pipeline", getAnalysisQueryService().getPipeline(json.getString("pipeline")));
-        return j;
-      }
-      return JSONUtils.SimpleJSONError("No pipeline name specified");
+    public JSONObject getPipeline(HttpSession session, JSONObject json) {
+        try {
+            if (json.has("pipeline")) {
+                JSONObject j = new JSONObject();
+                j.put("pipeline", getAnalysisQueryService().getPipeline(json.getString("pipeline")));
+                return j;
+            }
+            return JSONUtils.SimpleJSONError("No pipeline name specified");
+        } catch (IntegrationException e) {
+            return JSONUtils.SimpleJSONError("Cannot populate pipeline: " + e.getMessage());
+        }
     }
-    catch (IntegrationException e) {
-      return JSONUtils.SimpleJSONError("Cannot populate pipeline: " + e.getMessage());
-    }
-  }
 
-  public JSONObject populateRunningTasks(HttpSession session, JSONObject json) {
-    try {
-      JSONObject j = new JSONObject();
-      j.put("runningTasks", getAnalysisQueryService().getRunningTasks());
-      return j;
+    public JSONObject populateRunningTasks(HttpSession session, JSONObject json) {
+        try {
+            JSONObject j = new JSONObject();
+            j.put("runningTasks", getAnalysisQueryService().getRunningTasks());
+            return j;
+        } catch (IntegrationException e) {
+            return JSONUtils.SimpleJSONError("Cannot populate running tasks: " + e.getMessage());
+        }
     }
-    catch (IntegrationException e) {
-      return JSONUtils.SimpleJSONError("Cannot populate running tasks: " + e.getMessage());
-    }
-  }
 
-  public JSONObject populatePendingTasks(HttpSession session, JSONObject json) {
-    try {
-      JSONObject j = new JSONObject();
-      j.put("pendingTasks", getAnalysisQueryService().getPendingTasks());
-      return j;
+    public JSONObject populatePendingTasks(HttpSession session, JSONObject json) {
+        try {
+            JSONObject j = new JSONObject();
+            j.put("pendingTasks", getAnalysisQueryService().getPendingTasks());
+            return j;
+        } catch (IntegrationException e) {
+            return JSONUtils.SimpleJSONError("Cannot populate pending tasks: " + e.getMessage());
+        }
     }
-    catch (IntegrationException e) {
-      return JSONUtils.SimpleJSONError("Cannot populate pending tasks: " + e.getMessage());
-    }
-  }
 
-  public JSONObject populateFailedTasks(HttpSession session, JSONObject json) {
-    try {
-      JSONObject j = new JSONObject();
-      j.put("failedTasks", getAnalysisQueryService().getFailedTasks());
-      return j;
+    public JSONObject populateFailedTasks(HttpSession session, JSONObject json) {
+        try {
+            JSONObject j = new JSONObject();
+            j.put("failedTasks", getAnalysisQueryService().getFailedTasks());
+            return j;
+        } catch (IntegrationException e) {
+            return JSONUtils.SimpleJSONError("Cannot populate running tasks: " + e.getMessage());
+        }
     }
-    catch (IntegrationException e) {
-      return JSONUtils.SimpleJSONError("Cannot populate running tasks: " + e.getMessage());
-    }
-  }
 
-  public JSONObject populateCompletedTasks(HttpSession session, JSONObject json) {
-    try {
-      JSONObject j = new JSONObject();
-      j.put("completedTasks", getAnalysisQueryService().getCompletedTasks());
-      return j;
+    public JSONObject populateCompletedTasks(HttpSession session, JSONObject json) {
+        try {
+            JSONObject j = new JSONObject();
+            j.put("completedTasks", getAnalysisQueryService().getCompletedTasks());
+            return j;
+        } catch (IntegrationException e) {
+            return JSONUtils.SimpleJSONError("Cannot populate completed tasks: " + e.getMessage());
+        }
     }
-    catch (IntegrationException e) {
-      return JSONUtils.SimpleJSONError("Cannot populate completed tasks: " + e.getMessage());
-    }
-  }
 
-  public JSONObject populatePipelines(HttpSession session, JSONObject json) {
-    try {
-      JSONObject j = new JSONObject();
-      j.put("pipelines", getAnalysisQueryService().getPipelines());
-      return j;
+    public JSONObject populatePipelines(HttpSession session, JSONObject json) {
+        try {
+            JSONObject j = new JSONObject();
+            j.put("pipelines", getAnalysisQueryService().getPipelines());
+            return j;
+        } catch (IntegrationException e) {
+            return JSONUtils.SimpleJSONError("Cannot populate pipelines: " + e.getMessage());
+        }
     }
-    catch (IntegrationException e) {
-      return JSONUtils.SimpleJSONError("Cannot populate pipelines: " + e.getMessage());
-    }
-  }
 
-  public JSONObject submitJob(HttpSession session, JSONObject json) {
-    try {
-      JSONObject out = new JSONObject();
-      JSONArray a = JSONArray.fromObject(json.getString("submit"));
-      for (JSONObject j : (Iterable<JSONObject>) a) {
-        out.put(j.getString("name"), j.getString("value"));
-      }
-      log.info("Submitting: " + out.toString());
-      return getAnalysisQueryService().submitTask(out);
+    public JSONObject submitJob(HttpSession session, JSONObject json) {
+        try {
+            JSONObject out = new JSONObject();
+            JSONArray a = JSONArray.fromObject(json.getString("submit"));
+            for (JSONObject j : (Iterable<JSONObject>) a) {
+                out.put(j.getString("name"), j.getString("value"));
+            }
+            log.info("Submitting: " + out.toString());
+            return getAnalysisQueryService().submitTask(out);
+        } catch (IntegrationException e) {
+            return JSONUtils.SimpleJSONError("Cannot populate pipelines: " + e.getMessage());
+        }
     }
-    catch (IntegrationException e) {
-      return JSONUtils.SimpleJSONError("Cannot populate pipelines: " + e.getMessage());
-    }
-  }
 }

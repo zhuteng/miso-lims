@@ -38,21 +38,21 @@ import java.util.List;
  * @since 0.0.3
  */
 public interface PrintJobStore extends Store<PrintJob> {
-  /**
-   * List all {@link PrintJob} objects that belong to a given {@link User}
-   *
-   * @param user of type User
-   * @return List<PrintJob>
-   * @throws IOException when
-   */
-  List<PrintJob> listByUser(User user) throws IOException;
+    /**
+     * List all {@link PrintJob} objects that belong to a given {@link User}
+     *
+     * @param user of type User
+     * @return List<PrintJob>
+     * @throws IOException when
+     */
+    List<PrintJob> listByUser(User user) throws IOException;
 
-  /**
-   * List all {@link PrintJob} objects that were printed by a given {@link MisoPrintService}
-   *
-   * @param service of type MisoPrintService
-   * @return List<PrintJob>
-   * @throws IOException when
-   */
-  List<PrintJob> listByPrintService(MisoPrintService service) throws IOException;
+    /**
+     * List all {@link PrintJob} objects that were printed by a given {@link MisoPrintService}
+     *
+     * @param service of type MisoPrintService
+     * @return List<PrintJob>
+     * @throws IOException when
+     */
+    List<PrintJob> listByPrintService(MisoPrintService service) throws IOException;
 }

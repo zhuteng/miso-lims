@@ -37,65 +37,65 @@ import java.util.Date;
  * @since 0.0.2
  */
 public interface QC extends Securable, Comparable, Deletable {
-  public long getId();
+    public long getId();
 
-  public void setId(long id);
+    public void setId(long id);
 
-  /**
-   * Returns the qcId of this QC object.
-   *
-   * @return Long qcId.
-   */
-  @Deprecated
-  public Long getQcId();
+    /**
+     * Returns the qcId of this QC object.
+     *
+     * @return Long qcId.
+     */
+    @Deprecated
+    public Long getQcId();
 
-  /**
-   * Sets the qcId of this QC object.
-   *
-   * @param qcId qcId.
-   */
-  @Deprecated
-  public void setQcId(Long qcId);
+    /**
+     * Sets the qcId of this QC object.
+     *
+     * @param qcId qcId.
+     */
+    @Deprecated
+    public void setQcId(Long qcId);
 
-  /**
-   * Returns the qcCreator of this QC object.
-   *
-   * @return String qcCreator.
-   */
-  public String getQcCreator();
+    /**
+     * Returns the qcCreator of this QC object.
+     *
+     * @return String qcCreator.
+     */
+    public String getQcCreator();
 
-  /**
-   * Sets the qcCreator of this QC object.
-   *
-   * @param creator qcCreator.
-   */
-  public void setQcCreator(String creator);
+    /**
+     * Sets the qcCreator of this QC object.
+     *
+     * @param creator qcCreator.
+     */
+    public void setQcCreator(String creator);
 
-  /**
-   * Returns the qcMethod of this QC object.
-   *
-   * @return String qcMethod.
-   */
-  public QcType getQcType();
+    /**
+     * Returns the qcMethod of this QC object.
+     *
+     * @return String qcMethod.
+     */
+    public QcType getQcType();
 
-  /**
-   * Sets the QcType of this QC object.
-   *
-   * @param type type.
-   */
-  public void setQcType(QcType type);
+    /**
+     * Sets the QcType of this QC object.
+     *
+     * @param type type.
+     */
+    public void setQcType(QcType type);
 
-  /**
-   * Returns the qcDate of this QC object.
-   *
-   * @return Date qcDate.
-   */
-  public Date getQcDate();
+    /**
+     * Returns the qcDate of this QC object.
+     *
+     * @return Date qcDate.
+     */
+    public Date getQcDate();
 
-  /**
-   * Sets the qcDate of this QC object.
-   *
-   * @param date qcDate.
-   */
-  public void setQcDate(Date date);
+    /**
+     * Sets the qcDate of this QC object.
+     *
+     * @param date qcDate.
+     */
+    public void setQcDate(Date date);
 }

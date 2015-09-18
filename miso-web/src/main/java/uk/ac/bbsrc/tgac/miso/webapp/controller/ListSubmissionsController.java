@@ -48,34 +48,33 @@ import java.util.List;
  */
 @Controller
 public class ListSubmissionsController {
-  protected static final Logger log = LoggerFactory.getLogger(ListSubmissionsController.class);
+    protected static final Logger log = LoggerFactory.getLogger(ListSubmissionsController.class);
 
-  @Autowired
-  private SecurityManager securityManager;
+    @Autowired
+    private SecurityManager securityManager;
 
-  public void setSecurityManager(SecurityManager securityManager) {
-    this.securityManager = securityManager;
-  }
-
-  @Autowired
-  private RequestManager requestManager;
-
-  public void setRequestManager(RequestManager requestManager) {
-    this.requestManager = requestManager;
-  }
-
-  @RequestMapping("/submissions")
-  public ModelAndView listSubmissions() throws IOException {
-    try {
-      List<Submission> subs = new ArrayList<Submission>(requestManager.listAllSubmissions());
-      Collections.sort(subs);
-      return new ModelAndView("/pages/listSubmissions.jsp", "submissions", subs);
+    public void setSecurityManager(SecurityManager securityManager) {
+        this.securityManager = securityManager;
     }
-    catch (IOException ex) {
-      if (log.isDebugEnabled()) {
-        log.debug("Failed to list submissions", ex);
-      }
-      throw ex;
+
+    @Autowired
+    private RequestManager requestManager;
+
+    public void setRequestManager(RequestManager requestManager) {
+        this.requestManager = requestManager;
     }
-  }
+
+    @RequestMapping("/submissions")
+    public ModelAndView listSubmissions() throws IOException {
+        try {
+            List<Submission> subs = new ArrayList<Submission>(requestManager.listAllSubmissions());
+            Collections.sort(subs);
+            return new ModelAndView("/pages/listSubmissions.jsp", "submissions", subs);
+        } catch (IOException ex) {
+            if (log.isDebugEnabled()) {
+                log.debug("Failed to list submissions", ex);
+            }
+            throw ex;
+        }
+    }
 }

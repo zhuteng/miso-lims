@@ -37,116 +37,116 @@ import java.util.List;
  * @since 0.0.2
  */
 public interface RunStore extends Store<Run>, Cascadable, Remover<Run>, NamingSchemeAware<Run> {
-  /**
-   * Retrieve a Run from an underlying data store given a Run ID
-   * <p/>
-   * This method intends to retrieve objects in an 'ignorant' fashion, i.e.  will not populate
-   * parent or child objects that could lead to a circular dependency
-   *
-   * @param runId of type long
-   * @return Run
-   * @throws IOException when
-   */
-  //Run lazyGet(long runId) throws IOException;
+    /**
+     * Retrieve a Run from an underlying data store given a Run ID
+     * <p/>
+     * This method intends to retrieve objects in an 'ignorant' fashion, i.e.  will not populate
+     * parent or child objects that could lead to a circular dependency
+     *
+     * @param runId of type long
+     * @return Run
+     * @throws IOException when
+     */
+    //Run lazyGet(long runId) throws IOException;
 
-  /**
-   * Gets the latest Run, by start date, that is associated with the given container
-   *
-   * @param containerId long
-   * @return Run
-   * @throws IOException
-   */
-  Run getLatestStartDateRunBySequencerPartitionContainerId(long containerId) throws IOException;
+    /**
+     * Gets the latest Run, by start date, that is associated with the given container
+     *
+     * @param containerId long
+     * @return Run
+     * @throws IOException
+     */
+    Run getLatestStartDateRunBySequencerPartitionContainerId(long containerId) throws IOException;
 
-  /**
-   * Gets the latest Run, by run ID, that is associated with the given container
-   *
-   * @param containerId long
-   * @return Run
-   * @throws IOException
-   */
-  Run getLatestRunIdRunBySequencerPartitionContainerId(long containerId) throws IOException;
+    /**
+     * Gets the latest Run, by run ID, that is associated with the given container
+     *
+     * @param containerId long
+     * @return Run
+     * @throws IOException
+     */
+    Run getLatestRunIdRunBySequencerPartitionContainerId(long containerId) throws IOException;
 
-  /**
-   * List all Runs that match a search criteria
-   *
-   * @param query of type String
-   * @return Collection<Run>
-   * @throws IOException when
-   */
-  Collection<Run> listBySearch(String query) throws IOException;
+    /**
+     * List all Runs that match a search criteria
+     *
+     * @param query of type String
+     * @return Collection<Run>
+     * @throws IOException when
+     */
+    Collection<Run> listBySearch(String query) throws IOException;
 
-  /**
-   * Retrieve a Run from an underlying data store given a Run alias
-   *
-   * @param alias of type String
-   * @return Run
-   * @throws IOException when
-   */
-  Run getByAlias(String alias) throws IOException;
+    /**
+     * Retrieve a Run from an underlying data store given a Run alias
+     *
+     * @param alias of type String
+     * @return Run
+     * @throws IOException when
+     */
+    Run getByAlias(String alias) throws IOException;
 
-  /**
-   * List all Runs related to an Experiment given an Experiment ID
-   *
-   * @param experimentId of type long
-   * @return List<Run>
-   * @throws IOException when
-   */
-  @Deprecated
-  List<Run> listByExperimentId(long experimentId) throws IOException;
+    /**
+     * List all Runs related to an Experiment given an Experiment ID
+     *
+     * @param experimentId of type long
+     * @return List<Run>
+     * @throws IOException when
+     */
+    @Deprecated
+    List<Run> listByExperimentId(long experimentId) throws IOException;
 
-  /**
-   * List all Runs using a Pool given a Pool ID
-   *
-   * @param poolId of type long
-   * @return List<Run>
-   * @throws IOException when
-   */  
-  List<Run> listByPoolId(long poolId) throws IOException;
+    /**
+     * List all Runs using a Pool given a Pool ID
+     *
+     * @param poolId of type long
+     * @return List<Run>
+     * @throws IOException when
+     */
+    List<Run> listByPoolId(long poolId) throws IOException;
 
-  /**
-   * List all Runs using a Container given a Container ID
-   *
-   * @param containerId of type long
-   * @return List<Run>
-   * @throws IOException when
-   */
-  List<Run> listBySequencerPartitionContainerId(long containerId) throws IOException;
+    /**
+     * List all Runs using a Container given a Container ID
+     *
+     * @param containerId of type long
+     * @return List<Run>
+     * @throws IOException when
+     */
+    List<Run> listBySequencerPartitionContainerId(long containerId) throws IOException;
 
-  /**
-   * List all Runs related to a Project given a Project ID
-   *
-   * @param projectId of type long
-   * @return List<Run>
-   * @throws IOException when
-   */
-  List<Run> listByProjectId(long projectId) throws IOException;
+    /**
+     * List all Runs related to a Project given a Project ID
+     *
+     * @param projectId of type long
+     * @return List<Run>
+     * @throws IOException when
+     */
+    List<Run> listByProjectId(long projectId) throws IOException;
 
-  /**
-   * List all Runs carried out on a Platform given a Platform ID 
-   *
-   * @param platformId of type long
-   * @return List<Run>
-   * @throws IOException when
-   */
-  List<Run> listByPlatformId(long platformId) throws IOException;
-  
-  /**
-   * List all Runs by their health given a HealthType 
-   *
-   * @param health of type String
-   * @return List<Run>
-   * @throws IOException when
-   */
-  List<Run> listByStatus(String health) throws IOException;
+    /**
+     * List all Runs carried out on a Platform given a Platform ID
+     *
+     * @param platformId of type long
+     * @return List<Run>
+     * @throws IOException when
+     */
+    List<Run> listByPlatformId(long platformId) throws IOException;
 
-  /**
-   * List all persisted objects
-   *
-   * @return Collection<Run>
-   * @throws IOException when the objects cannot be retrieved
-   */
-  Collection<Run> listAllWithLimit(long limit) throws IOException;
+    /**
+     * List all Runs by their health given a HealthType
+     *
+     * @param health of type String
+     * @return List<Run>
+     * @throws IOException when
+     */
+    List<Run> listByStatus(String health) throws IOException;
 
-  int[] saveAll(Collection<Run> runs) throws IOException;
+    /**
+     * List all persisted objects
+     *
+     * @return Collection<Run>
+     * @throws IOException when the objects cannot be retrieved
+     */
+    Collection<Run> listAllWithLimit(long limit) throws IOException;
+
+    int[] saveAll(Collection<Run> runs) throws IOException;
 }

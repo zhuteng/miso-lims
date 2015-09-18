@@ -62,198 +62,179 @@ import java.util.List;
  * @since 0.1.2
  */
 public class AnalysisRequestManager {
-  protected static final Logger log = LoggerFactory.getLogger(AnalysisRequestManager.class);
-  private ObjectMapper mapper = new ObjectMapper();
+    protected static final Logger log = LoggerFactory.getLogger(AnalysisRequestManager.class);
+    private ObjectMapper mapper = new ObjectMapper();
 
-  @Autowired
-  private ConanPipelineService conanPipelineService;
+    @Autowired
+    private ConanPipelineService conanPipelineService;
 
-  @Autowired
-  private ConanTaskService conanTaskService;
+    @Autowired
+    private ConanTaskService conanTaskService;
 
-  @Autowired
-  private ConanUserService conanUserService;
+    @Autowired
+    private ConanUserService conanUserService;
 
-  @Autowired
-  private ConanSubmissionService conanSubmissionService;
+    @Autowired
+    private ConanSubmissionService conanSubmissionService;
 
-  @Autowired
-  private ConanProcessService conanProcessService;
+    @Autowired
+    private ConanProcessService conanProcessService;
 
-  public ConanPipelineService getConanPipelineService() {
-    return conanPipelineService;
-  }
+    public ConanPipelineService getConanPipelineService() {
+        return conanPipelineService;
+    }
 
-  public void setConanPipelineService(ConanPipelineService conanPipelineService) {
-    this.conanPipelineService = conanPipelineService;
-  }
+    public void setConanPipelineService(ConanPipelineService conanPipelineService) {
+        this.conanPipelineService = conanPipelineService;
+    }
 
-  public ConanTaskService getConanTaskService() {
-    return this.conanTaskService;
-  }
+    public ConanTaskService getConanTaskService() {
+        return this.conanTaskService;
+    }
 
-  public void setConanTaskService(ConanTaskService conanTaskService) {
-    this.conanTaskService = conanTaskService;
-  }
+    public void setConanTaskService(ConanTaskService conanTaskService) {
+        this.conanTaskService = conanTaskService;
+    }
 
-  public ConanUserService getConanUserService() {
-    return conanUserService;
-  }
+    public ConanUserService getConanUserService() {
+        return conanUserService;
+    }
 
-  public void setConanUserService(ConanUserService conanUserService) {
-    this.conanUserService = conanUserService;
-  }
+    public void setConanUserService(ConanUserService conanUserService) {
+        this.conanUserService = conanUserService;
+    }
 
-  public void setConanSubmissionService(ConanSubmissionService conanSubmissionService) {
-    this.conanSubmissionService = conanSubmissionService;
-  }
+    public void setConanSubmissionService(ConanSubmissionService conanSubmissionService) {
+        this.conanSubmissionService = conanSubmissionService;
+    }
 
-  public ConanProcessService getConanProcessService() {
-    return conanProcessService;
-  }
+    public ConanProcessService getConanProcessService() {
+        return conanProcessService;
+    }
 
-  public void setConanProcessService(ConanProcessService conanProcessService) {
-    this.conanProcessService = conanProcessService;
-  }
+    public void setConanProcessService(ConanProcessService conanProcessService) {
+        this.conanProcessService = conanProcessService;
+    }
 
-  public String queryTasks(JSONObject query) {
-    String queryMethod = query.getString("query");
-    try {
-      Method m = getConanTaskService().getClass().getMethod(queryMethod);
-      if ("getTask".equals(queryMethod)) {
-        ConanTask<? extends ConanPipeline> task = (ConanTask<? extends ConanPipeline>)m.invoke(getConanTaskService(), null);
-        return mapper.writeValueAsString(task);
-      }
-      else {
-        if (queryMethod.contains("search") || queryMethod.contains("create")) {
-          throw new UnsupportedOperationException("Cannot call " +queryMethod+ ".");
+    public String queryTasks(JSONObject query) {
+        String queryMethod = query.getString("query");
+        try {
+            Method m = getConanTaskService().getClass().getMethod(queryMethod);
+            if ("getTask".equals(queryMethod)) {
+                ConanTask<? extends ConanPipeline> task = (ConanTask<? extends ConanPipeline>) m.invoke(getConanTaskService(), null);
+                return mapper.writeValueAsString(task);
+            } else {
+                if (queryMethod.contains("search") || queryMethod.contains("create")) {
+                    throw new UnsupportedOperationException("Cannot call " + queryMethod + ".");
+                } else {
+                    List<ConanTask<? extends ConanPipeline>> tasks = (List<ConanTask<? extends ConanPipeline>>) m
+                        .invoke(getConanTaskService(), null);
+                    return mapper.writeValueAsString(tasks);
+                }
+            }
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+            return "ERROR: " + e.getMessage();
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+            return "ERROR: " + e.getMessage();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+            return "ERROR: " + e.getMessage();
+        } catch (JsonMappingException e) {
+            e.printStackTrace();
+            return "ERROR: " + e.getMessage();
+        } catch (JsonGenerationException e) {
+            e.printStackTrace();
+            return "ERROR: " + e.getMessage();
+        } catch (IOException e) {
+            e.printStackTrace();
+            return "ERROR: " + e.getMessage();
         }
-        else {
-          List<ConanTask<? extends ConanPipeline>> tasks = (List<ConanTask<? extends ConanPipeline>>)m.invoke(getConanTaskService(), null);
-          return mapper.writeValueAsString(tasks);
+    }
+
+    //public void generateAndSubmitTask(TaskSubmissionRequest submissionRequest, User user) throws SubmissionException {
+    public void generateAndSubmitTask(TaskSubmissionRequest submissionRequest) throws SubmissionException {
+        ConanTask.Priority priority = ConanTask.Priority.valueOf(submissionRequest.getPriority());
+        log.info(submissionRequest.toString());
+
+        //reload pipelines at runtime - argh!
+        if (conanPipelineService instanceof DefaultPipelineService) {
+            ConanPipelineDAO c = ((DefaultPipelineService) conanPipelineService).getPipelineDAO();
+            if (c instanceof XMLLoadingPipelineDAO) {
+                ((XMLLoadingPipelineDAO) c).reset();
+            }
         }
-      }
-    }
-    catch (NoSuchMethodException e) {
-      e.printStackTrace();
-      return "ERROR: " + e.getMessage();
-    }
-    catch (InvocationTargetException e) {
-      e.printStackTrace();
-      return "ERROR: " + e.getMessage();
-    }
-    catch (IllegalAccessException e) {
-      e.printStackTrace();
-      return "ERROR: " + e.getMessage();
-    }
-    catch (JsonMappingException e) {
-      e.printStackTrace();
-      return "ERROR: " + e.getMessage();
-    }
-    catch (JsonGenerationException e) {
-      e.printStackTrace();
-      return "ERROR: " + e.getMessage();
-    }
-    catch (IOException e) {
-      e.printStackTrace();
-      return "ERROR: " + e.getMessage();
-    }
-  }
 
-  //public void generateAndSubmitTask(TaskSubmissionRequest submissionRequest, User user) throws SubmissionException {
-  public void generateAndSubmitTask(TaskSubmissionRequest submissionRequest) throws SubmissionException {
-    ConanTask.Priority priority = ConanTask.Priority.valueOf(submissionRequest.getPriority());
-    log.info(submissionRequest.toString());
+        ConanTask<? extends ConanPipeline> conanTask = conanTaskService
+            .createNewTask(submissionRequest.getPipelineName(), submissionRequest.getStartingProcessIndex(),
+                           submissionRequest.getInputParameters(), priority,
+                           //TODO - don't hardcode in the username
+                           conanUserService.getUserByUserName("tgaclims"));
 
-    //reload pipelines at runtime - argh!
-    if (conanPipelineService instanceof DefaultPipelineService) {
-      ConanPipelineDAO c = ((DefaultPipelineService) conanPipelineService).getPipelineDAO();
-      if (c instanceof XMLLoadingPipelineDAO) {
-        ((XMLLoadingPipelineDAO)c).reset();
-      }
+        // and submit the newly generated task
+        conanSubmissionService.submitTask(conanTask);
     }
 
-    ConanTask<? extends ConanPipeline> conanTask =
-            conanTaskService.createNewTask(submissionRequest.getPipelineName(),
-                                      submissionRequest.getStartingProcessIndex(),
-                                      submissionRequest.getInputParameters(),
-                                      priority,
-                                      //TODO - don't hardcode in the username
-                                      conanUserService.getUserByUserName("tgaclims"));
-
-    // and submit the newly generated task
-    conanSubmissionService.submitTask(conanTask);
-  }
-
-  //public String queryPipelines(JSONObject query, User user) {
-  public String queryPipelines(JSONObject query) {
-    String queryMethod = query.getString("query");
-    log.info(query.toString());
-    JSONObject params = query.getJSONObject("params");
-    try {
-      if ("getPipeline".equals(queryMethod)) {
-        if (params == null || params.isNullObject() || params.isEmpty() || !params.has("name")) {
-          throw new UnsupportedOperationException("Cannot call " +queryMethod+ " without a 'name' parameter.");
+    //public String queryPipelines(JSONObject query, User user) {
+    public String queryPipelines(JSONObject query) {
+        String queryMethod = query.getString("query");
+        log.info(query.toString());
+        JSONObject params = query.getJSONObject("params");
+        try {
+            if ("getPipeline".equals(queryMethod)) {
+                if (params == null || params.isNullObject() || params.isEmpty() || !params.has("name")) {
+                    throw new UnsupportedOperationException("Cannot call " + queryMethod + " without a 'name' parameter.");
+                } else {
+                    Method m = getConanPipelineService().getClass().getMethod(queryMethod, ConanUser.class, String.class);
+                    ConanPipeline pipeline = (ConanPipeline) m
+                        .invoke(getConanPipelineService(), getConanUserService().getUserByUserName("tgaclims"), params.getString("name"));
+                    return mapper.writeValueAsString(pipeline);
+                }
+            } else {
+                if (queryMethod.contains("reorder") || queryMethod.contains("load") || queryMethod.contains("create")) {
+                    throw new UnsupportedOperationException("Cannot call " + queryMethod + ".");
+                } else {
+                    if (params == null || params.isNullObject() || params.isEmpty()) {
+                        Method m = getConanPipelineService().getClass().getMethod(queryMethod, ConanUser.class);
+                        List<ConanPipeline> pipelines = (List<ConanPipeline>) m
+                            .invoke(getConanPipelineService(), getConanUserService().getUserByUserName("tgaclims"));
+                        return mapper.writeValueAsString(pipelines);
+                    } else {
+                        throw new UnsupportedOperationException("Cannot call " + queryMethod + ".");
+                    }
+                }
+            }
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+            return "ERROR: " + e.getMessage();
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+            return "ERROR: " + e.getMessage();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+            return "ERROR: " + e.getMessage();
+        } catch (JsonMappingException e) {
+            e.printStackTrace();
+            return "ERROR: " + e.getMessage();
+        } catch (JsonGenerationException e) {
+            e.printStackTrace();
+            return "ERROR: " + e.getMessage();
+        } catch (IOException e) {
+            e.printStackTrace();
+            return "ERROR: " + e.getMessage();
         }
-        else {
-          Method m = getConanPipelineService().getClass().getMethod(queryMethod, ConanUser.class, String.class);
-          ConanPipeline pipeline = (ConanPipeline) m.invoke(getConanPipelineService(), getConanUserService().getUserByUserName("tgaclims"), params.getString("name"));
-          return mapper.writeValueAsString(pipeline);
-        }
-      }
-      else {
-        if (queryMethod.contains("reorder") || queryMethod.contains("load") || queryMethod.contains("create")) {
-          throw new UnsupportedOperationException("Cannot call " +queryMethod+ ".");
-        }
-        else {
-          if (params == null || params.isNullObject() || params.isEmpty()) {
-            Method m = getConanPipelineService().getClass().getMethod(queryMethod, ConanUser.class);
-            List<ConanPipeline> pipelines = (List<ConanPipeline>)m.invoke(getConanPipelineService(), getConanUserService().getUserByUserName("tgaclims"));
-            return mapper.writeValueAsString(pipelines);
-          }
-          else {
-            throw new UnsupportedOperationException("Cannot call " +queryMethod+ ".");
-          }
-        }
-      }
-    }
-    catch (NoSuchMethodException e) {
-      e.printStackTrace();
-      return "ERROR: " + e.getMessage();
-    }
-    catch (InvocationTargetException e) {
-      e.printStackTrace();
-      return "ERROR: " + e.getMessage();
-    }
-    catch (IllegalAccessException e) {
-      e.printStackTrace();
-      return "ERROR: " + e.getMessage();
-    }
-    catch (JsonMappingException e) {
-      e.printStackTrace();
-      return "ERROR: " + e.getMessage();
-    }
-    catch (JsonGenerationException e) {
-      e.printStackTrace();
-      return "ERROR: " + e.getMessage();
-    }
-    catch (IOException e) {
-      e.printStackTrace();
-      return "ERROR: " + e.getMessage();
-    }
-  }
-
-  public void generateAndAddPipeline(PipelineRequest request) {
-    List<ConanProcess> conanProcesses = new ArrayList<ConanProcess>();
-    for (String processName : request.getProcesses()) {
-      ConanProcess conanProcess = getConanProcessService().getProcess(processName);
-      conanProcesses.add(conanProcess);
     }
 
-    conanPipelineService.createPipeline(request.getName(),
-                                        conanProcesses,
-                                        getConanUserService().getUserByUserName("tgaclims"),
-                                        request.isPrivate());
-  }
+    public void generateAndAddPipeline(PipelineRequest request) {
+        List<ConanProcess> conanProcesses = new ArrayList<ConanProcess>();
+        for (String processName : request.getProcesses()) {
+            ConanProcess conanProcess = getConanProcessService().getProcess(processName);
+            conanProcesses.add(conanProcess);
+        }
+
+        conanPipelineService
+            .createPipeline(request.getName(), conanProcesses, getConanUserService().getUserByUserName("tgaclims"), request.isPrivate());
+    }
 
 }

@@ -40,78 +40,78 @@ import java.util.List;
  */
 @Spi
 public interface SequencerInterrogationStrategy {
-  /**
-   * List the status of all runs exposed by a SequencerReference
-   *
-   * @param sr of type SequencerReference
-   * @return List<Status>
-   * @throws InterrogationException when
-   */
-  List<Status> listAllStatus(SequencerReference sr) throws InterrogationException;
+    /**
+     * List the status of all runs exposed by a SequencerReference
+     *
+     * @param sr of type SequencerReference
+     * @return List<Status>
+     * @throws InterrogationException when
+     */
+    List<Status> listAllStatus(SequencerReference sr) throws InterrogationException;
 
-  /**
-   * List the status of all runs for a given sequencer exposed by a SequencerReference
-   *
-   * @param sr of type SequencerReference
-   * @param name of type String
-   * @return List<Status>
-   * @throws InterrogationException when
-   */
-  List<Status> listAllStatusBySequencerName(SequencerReference sr, String name) throws InterrogationException;
+    /**
+     * List the status of all runs for a given sequencer exposed by a SequencerReference
+     *
+     * @param sr   of type SequencerReference
+     * @param name of type String
+     * @return List<Status>
+     * @throws InterrogationException when
+     */
+    List<Status> listAllStatusBySequencerName(SequencerReference sr, String name) throws InterrogationException;
 
-  /**
-   * List all runs of a given HealthType exposed by a SequencerReference
-   *
-   * @param sr of type SequencerReference
-   * @param healthType of type HealthType
-   * @return List<String>
-   * @throws InterrogationException when
-   */
-  List<String> listRunsByHealthType(SequencerReference sr, HealthType healthType) throws InterrogationException;
+    /**
+     * List all runs of a given HealthType exposed by a SequencerReference
+     *
+     * @param sr         of type SequencerReference
+     * @param healthType of type HealthType
+     * @return List<String>
+     * @throws InterrogationException when
+     */
+    List<String> listRunsByHealthType(SequencerReference sr, HealthType healthType) throws InterrogationException;
 
-  /**
-   * List all completed runs exposed by a SequencerReference
-   *
-   * @param sr of type SequencerReference
-   * @return List<String>
-   * @throws InterrogationException when
-   */
-  List<String> listAllCompleteRuns(SequencerReference sr) throws InterrogationException;
+    /**
+     * List all completed runs exposed by a SequencerReference
+     *
+     * @param sr of type SequencerReference
+     * @return List<String>
+     * @throws InterrogationException when
+     */
+    List<String> listAllCompleteRuns(SequencerReference sr) throws InterrogationException;
 
-  /**
-   * List all incomplete runs exposed by a SequencerReference
-   *
-   * @param sr of type SequencerReference
-   * @return List<String>
-   * @throws InterrogationException when
-   */
-  List<String> listAllIncompleteRuns(SequencerReference sr) throws InterrogationException;
+    /**
+     * List all incomplete runs exposed by a SequencerReference
+     *
+     * @param sr of type SequencerReference
+     * @return List<String>
+     * @throws InterrogationException when
+     */
+    List<String> listAllIncompleteRuns(SequencerReference sr) throws InterrogationException;
 
-  /**
-   * Get the status of a single run exposed by a SequencerReference
-   *
-   * @param sr of type SequencerReference
-   * @param runName of type String
-   * @return Status
-   * @throws InterrogationException when
-   */
-  Status getRunStatus(SequencerReference sr, String runName) throws InterrogationException;
+    /**
+     * Get the status of a single run exposed by a SequencerReference
+     *
+     * @param sr      of type SequencerReference
+     * @param runName of type String
+     * @return Status
+     * @throws InterrogationException when
+     */
+    Status getRunStatus(SequencerReference sr, String runName) throws InterrogationException;
 
-  /**
-   * Get general run information of a single run exposed by a SequencerReference 
-   *
-   * @param sr of type SequencerReference
-   * @param runName of type String
-   * @return JSONObject
-   * @throws InterrogationException when
-   */
-  JSONObject getRunInformation(SequencerReference sr, String runName) throws InterrogationException;
+    /**
+     * Get general run information of a single run exposed by a SequencerReference
+     *
+     * @param sr      of type SequencerReference
+     * @param runName of type String
+     * @return JSONObject
+     * @throws InterrogationException when
+     */
+    JSONObject getRunInformation(SequencerReference sr, String runName) throws InterrogationException;
 
-  /**
-   * Return true if this strategy is able to interrogate a given SequencerReference 
-   *
-   * @param sr of type SequencerReference
-   * @return boolean
-   */
-  boolean isStrategyFor(SequencerReference sr);
+    /**
+     * Return true if this strategy is able to interrogate a given SequencerReference
+     *
+     * @param sr of type SequencerReference
+     * @return boolean
+     */
+    boolean isStrategyFor(SequencerReference sr);
 }

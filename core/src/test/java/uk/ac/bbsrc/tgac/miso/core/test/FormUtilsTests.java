@@ -52,121 +52,114 @@ import java.util.List;
  * @since 0.1.1
  */
 public class FormUtilsTests {
-  protected static final Logger log = LoggerFactory.getLogger(FormUtilsTests.class);
+    protected static final Logger log = LoggerFactory.getLogger(FormUtilsTests.class);
 
-  private static File testSampleDeliveryFile;
-  private static File testSampleBulkInputOdsFile;
-  private static File testSampleBulkInputXlsFile;
+    private static File testSampleDeliveryFile;
+    private static File testSampleBulkInputOdsFile;
+    private static File testSampleBulkInputXlsFile;
 
-  static {
-    try {
-      testSampleDeliveryFile = File.createTempFile("test-sampleDeliveryForm", ".odt");
-      testSampleBulkInputOdsFile = File.createTempFile("test-sampleBulkInputOds", ".ods");
-      testSampleBulkInputXlsFile = File.createTempFile("test-sampleBulkInputXls", ".xlsx");
+    static {
+        try {
+            testSampleDeliveryFile = File.createTempFile("test-sampleDeliveryForm", ".odt");
+            testSampleBulkInputOdsFile = File.createTempFile("test-sampleBulkInputOds", ".ods");
+            testSampleBulkInputXlsFile = File.createTempFile("test-sampleBulkInputXls", ".xlsx");
+        } catch (IOException e) {
+            e.printStackTrace();
+            TestCase.fail();
+        }
     }
-    catch (IOException e) {
-      e.printStackTrace();
-      TestCase.fail();
-    }
-  }
 
-  @Test
-  public void testCreateSampleDeliveryForm() {
-    try {
-      uk.ac.bbsrc.tgac.miso.core.util.FormUtils.createSampleDeliveryForm(generateSamples(), testSampleDeliveryFile, true);
+    @Test
+    public void testCreateSampleDeliveryForm() {
+        try {
+            uk.ac.bbsrc.tgac.miso.core.util.FormUtils.createSampleDeliveryForm(generateSamples(), testSampleDeliveryFile, true);
+        } catch (Exception e) {
+            e.printStackTrace();
+            TestCase.fail();
+        }
     }
-    catch (Exception e) {
-      e.printStackTrace();
-      TestCase.fail();
-    }
-  }
 
-  @Test
-  public void testConvertToPdf() {
-    try {
-      OdfTextDocument oDoc = uk.ac.bbsrc.tgac.miso.core.util.FormUtils.createSampleDeliveryForm(generateSamples(), testSampleDeliveryFile, false);
-      uk.ac.bbsrc.tgac.miso.core.util.FormUtils.convertToPDF(oDoc);
+    @Test
+    public void testConvertToPdf() {
+        try {
+            OdfTextDocument oDoc = uk.ac.bbsrc.tgac.miso.core.util.FormUtils
+                .createSampleDeliveryForm(generateSamples(), testSampleDeliveryFile, false);
+            uk.ac.bbsrc.tgac.miso.core.util.FormUtils.convertToPDF(oDoc);
+        } catch (Exception e) {
+            e.printStackTrace();
+            TestCase.fail();
+        }
     }
-    catch (Exception e) {
-      e.printStackTrace();
-      TestCase.fail();
-    }
-  }
 
-  @Test
-  public void testImportSampleDeliveryForm() {
-    try {
-      List<Sample> samples = uk.ac.bbsrc.tgac.miso.core.util.FormUtils.importSampleDeliveryForm(testSampleDeliveryFile);
-      int numExpected = generateSamples().size();
-      if (samples.size() != numExpected) {
-        log.error("Expected samples in: " + numExpected + ". Number imported: " + samples.size());
-        TestCase.fail();
-      }
-      else {
-        log.info("Expected samples in: " + numExpected + ". Number imported: " + samples.size());
-      }
+    @Test
+    public void testImportSampleDeliveryForm() {
+        try {
+            List<Sample> samples = uk.ac.bbsrc.tgac.miso.core.util.FormUtils.importSampleDeliveryForm(testSampleDeliveryFile);
+            int numExpected = generateSamples().size();
+            if (samples.size() != numExpected) {
+                log.error("Expected samples in: " + numExpected + ". Number imported: " + samples.size());
+                TestCase.fail();
+            } else {
+                log.info("Expected samples in: " + numExpected + ". Number imported: " + samples.size());
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            TestCase.fail();
+        } finally {
+            testSampleDeliveryFile.delete();
+        }
     }
-    catch (Exception e) {
-      e.printStackTrace();
-      TestCase.fail();
-    }
-    finally {
-      testSampleDeliveryFile.delete();
-    }
-  }
 
-  @Test
-  public void testImportBulkInputODS() {
-    try {
-      InputStream in = FormUtilsTests.class.getClassLoader().getResourceAsStream("test-bulk_input.ods");
-      LimsUtils.writeFile(in, testSampleBulkInputOdsFile);
-      User u = new UserImpl();
-      u.setLoginName("testBulkImportUser");
-      List<Sample> samples = FormUtils.importSampleInputSpreadsheet(testSampleBulkInputOdsFile, u, new MockFormTestRequestManager(), new DefaultLibraryNamingScheme());
-      log.info("Imported :: " + LimsUtils.join(samples, " | "));
+    @Test
+    public void testImportBulkInputODS() {
+        try {
+            InputStream in = FormUtilsTests.class.getClassLoader().getResourceAsStream("test-bulk_input.ods");
+            LimsUtils.writeFile(in, testSampleBulkInputOdsFile);
+            User u = new UserImpl();
+            u.setLoginName("testBulkImportUser");
+            List<Sample> samples = FormUtils.importSampleInputSpreadsheet(testSampleBulkInputOdsFile, u, new MockFormTestRequestManager(),
+                                                                          new DefaultLibraryNamingScheme());
+            log.info("Imported :: " + LimsUtils.join(samples, " | "));
+        } catch (Exception e) {
+            e.printStackTrace();
+            TestCase.fail();
+        } finally {
+            testSampleBulkInputOdsFile.delete();
+        }
     }
-    catch (Exception e) {
-      e.printStackTrace();
-      TestCase.fail();
-    }
-    finally {
-      testSampleBulkInputOdsFile.delete();
-    }
-  }
 
-  @Test
-  public void testImportBulkInputXLS() {
-    try {
-      InputStream in = FormUtilsTests.class.getClassLoader().getResourceAsStream("test-bulk_input.xlsx");
-      LimsUtils.writeFile(in, testSampleBulkInputXlsFile);
-      User u = new UserImpl();
-      u.setLoginName("testBulkImportUser");
-      List<Sample> samples = FormUtils.importSampleInputSpreadsheet(testSampleBulkInputXlsFile, u, new MockFormTestRequestManager(), new DefaultLibraryNamingScheme());
-      log.info("Imported :: " + LimsUtils.join(samples, " | "));
+    @Test
+    public void testImportBulkInputXLS() {
+        try {
+            InputStream in = FormUtilsTests.class.getClassLoader().getResourceAsStream("test-bulk_input.xlsx");
+            LimsUtils.writeFile(in, testSampleBulkInputXlsFile);
+            User u = new UserImpl();
+            u.setLoginName("testBulkImportUser");
+            List<Sample> samples = FormUtils.importSampleInputSpreadsheet(testSampleBulkInputXlsFile, u, new MockFormTestRequestManager(),
+                                                                          new DefaultLibraryNamingScheme());
+            log.info("Imported :: " + LimsUtils.join(samples, " | "));
+        } catch (Exception e) {
+            e.printStackTrace();
+            TestCase.fail();
+        } finally {
+            testSampleBulkInputXlsFile.delete();
+        }
     }
-    catch (Exception e) {
-      e.printStackTrace();
-      TestCase.fail();
-    }
-    finally {
-      testSampleBulkInputXlsFile.delete();
-    }
-  }
 
-  private List<Sample> generateSamples() {
-    List<Sample> samples = new ArrayList<Sample>();
-    DataObjectFactory dataObjectFactory = new TgacDataObjectFactory();
+    private List<Sample> generateSamples() {
+        List<Sample> samples = new ArrayList<Sample>();
+        DataObjectFactory dataObjectFactory = new TgacDataObjectFactory();
 
-    for (int i = 1; i < 6; i++) {
-      Sample s = dataObjectFactory.getSample();
-      s.setId(i);
-      s.setName("SAM"+i);
-      s.setAlias("MI_S"+i+"_TestSample");
-      s.setScientificName("F.bar");
-      s.setIdentificationBarcode(s.getName() + "::" + s.getAlias());
-      samples.add(s);
+        for (int i = 1; i < 6; i++) {
+            Sample s = dataObjectFactory.getSample();
+            s.setId(i);
+            s.setName("SAM" + i);
+            s.setAlias("MI_S" + i + "_TestSample");
+            s.setScientificName("F.bar");
+            s.setIdentificationBarcode(s.getName() + "::" + s.getAlias());
+            samples.add(s);
+        }
+        Collections.sort(samples);
+        return samples;
     }
-    Collections.sort(samples);
-    return samples;
-  }
 }

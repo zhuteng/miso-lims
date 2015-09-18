@@ -37,5 +37,5 @@ import java.util.Set;
  * @since 0.0.3
  */
 public interface StringSetTransformer {
-  HashMap processXmls(Set<String> xmls);
+    HashMap processXmls(Set<String> xmls);
 }

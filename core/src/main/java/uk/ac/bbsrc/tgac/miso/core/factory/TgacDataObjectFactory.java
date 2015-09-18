@@ -50,346 +50,335 @@ import java.util.List;
  * @since 0.0.2
  */
 public class TgacDataObjectFactory extends DataObjectFactory {
-  @Override
-  public User getUser() {
-    return new UserImpl();
-  }
-
-  @Override
-  public Group getGroup() {
-    return new Group();
-  }
-
-  @Override
-  public Project getProject() {
-    return new ProjectImpl();
-  }
-
-  public Project getProject(User user) {
-    return new ProjectImpl(user);
-  }  
-
-  @Override
-  public Study getStudy() {
-    return new StudyImpl();
-  }
-
-  @Override
-  public Study getStudy(User user) {
-    return new StudyImpl(user);
-  }
-
-  @Override
-  public Experiment getExperiment() {
-    return new ExperimentImpl();
-  }
-
-  @Override
-  public Experiment getExperiment(User user) {
-    return new ExperimentImpl(user);
-  }
-
-  @Override
-  public Sample getSample() {
-    return new SampleImpl();
-  }
-
-  @Override
-  public Run getRun() {
-    return new RunImpl();
-  }
-
-  @Override
-  public Library getLibrary() {
-    return new LibraryImpl();
-  }
-
-  @Override
-  public Library getLibrary(User user) {
-    return new LibraryImpl(user);
-  }
-
-  @Override
-  public LibraryDilution getLibraryDilution() {
-    return new LibraryDilution();
-  }
-
-  @Override
-  public LibraryDilution getLibraryDilution(User user) {
-    return new LibraryDilution(user);
-  }
-
-  @Override
-  public emPCRDilution getEmPCRDilution() {
-    return new emPCRDilution();
-  }
-
-  @Override
-  public emPCRDilution getEmPCRDilution(User user) {
-    return new emPCRDilution(user);
-  }
-
-  @Override
-  public emPCR getEmPCR() {
-    return new emPCR();
-  }
-
-  @Override
-  public emPCR getEmPCR(User user) {
-    return new emPCR(user);
-  }
-
-  @Override
-  //public <T extends List<S>, S extends Plateable> Plate<T, S> getPlateOfSize(int size) {
-  public Plate<LinkedList<Plateable>, Plateable> getPlateOfSize(int size) {
-    return new PlateImpl<Plateable>(size);
-  }
-
-  @Override
-  public Plate<LinkedList<Plateable>, Plateable> getPlateOfSize(int size, User user) {
-    return new PlateImpl<Plateable>(size, user);
-  }
-
-  @Override
-  public Pool<? extends Poolable> getPool() {
-    return new PoolImpl<Poolable>();
-  }
-
-  public Pool<? extends Poolable> getPool(User user) {
-    return new PoolImpl<Poolable>(user);
-  }
-
-  @Override
-  @Deprecated
-  public IlluminaPool getIlluminaPool() {
-    return new IlluminaPool();
-  }
-
-  @Deprecated
-  public IlluminaPool getIlluminaPool(User user) {
-    return new IlluminaPool(user);
-  }
-
-  @Override
-  @Deprecated
-  public LS454Pool getLS454Pool() {
-    return new LS454Pool();
-  }
-
-  @Deprecated
-  public LS454Pool getLS454Pool(User user) {
-    return new LS454Pool(user);
-  }
-
-  @Override
-  @Deprecated
-  public SolidPool getSolidPool() {
-    return new SolidPool();
-  }
-
-  @Deprecated
-  public SolidPool getSolidPool(User user) {
-    return new SolidPool(user);
-  }
-
-  @Override
-  @Deprecated
-  public PacBioPool getPacBioPool() {
-    return new PacBioPool();
-  }
-
-  @Deprecated
-  public PacBioPool getPacBioPool(User user) {
-    return new PacBioPool(user);
-  }
-
-  @Override
-  @Deprecated
-  public emPCRPool getEmPCRPool(PlatformType platformType) {
-    return new emPCRPool(platformType);
-  }
-
-  @Deprecated
-  public emPCRPool getEmPCRPool(PlatformType platformType, User user) {
-    return new emPCRPool(user, platformType);
-  }
-
-  @Override
-  public SampleQC getSampleQC() {
-    return new SampleQCImpl();
-  }
-
-  @Override
-  public LibraryQC getLibraryQC() {
-    return new LibraryQCImpl();
-  }
-
-  @Override
-  public PoolQC getPoolQC() {
-    return new PoolQCImpl();
-  }
-
-  @Override
-  public RunQC getRunQC() {
-    return new RunQCImpl();
-  }
-
-  @Override
-  public Status getStatus() {
-    return new StatusImpl();
-  }
-
-  @Override
-  public SequencerReference getSequencerReference() {
-    return new SequencerReferenceImpl(null, null, null);
-  }
-
-  public Library getLibrary(Sample sample, User user) {
-    if (sample.userCanWrite(user)) {
-      return new LibraryImpl(sample, user);
+    @Override
+    public User getUser() {
+        return new UserImpl();
     }
-    else {
-      throw new SecurityException();
+
+    @Override
+    public Group getGroup() {
+        return new Group();
     }
-  }
 
-  public Study getStudy(Project project, User user) {
-    if (project.userCanWrite(user)) {
-      return new StudyImpl(project, user);
+    @Override
+    public Project getProject() {
+        return new ProjectImpl();
     }
-    else {
-      throw new SecurityException();
+
+    public Project getProject(User user) {
+        return new ProjectImpl(user);
     }
-  }
 
-  public Experiment getExperiment(Study study, User user) {
-    if (study.userCanWrite(user)) {
-      return new ExperimentImpl(study, user);
+    @Override
+    public Study getStudy() {
+        return new StudyImpl();
     }
-    else {
-      throw new SecurityException();
+
+    @Override
+    public Study getStudy(User user) {
+        return new StudyImpl(user);
     }
-  }
 
-  public Sample getSample(Project project, User user) {
-    if (project.userCanWrite(user)) {
-      return new SampleImpl(project, user);
+    @Override
+    public Experiment getExperiment() {
+        return new ExperimentImpl();
     }
-    else {
-      throw new SecurityException();
+
+    @Override
+    public Experiment getExperiment(User user) {
+        return new ExperimentImpl(user);
     }
-  }
 
-  public Sample getSample(User user) {
-    return new SampleImpl(user);
-  }
-
-  public SampleQC getSampleQC(Sample sample, User user) {
-    if (sample.userCanWrite(user)) {
-      return new SampleQCImpl(sample, user);
+    @Override
+    public Sample getSample() {
+        return new SampleImpl();
     }
-    else {
-      throw new SecurityException();
+
+    @Override
+    public Run getRun() {
+        return new RunImpl();
     }
-  }
 
-  public LibraryQC getLibraryQC(Library library, User user) {
-    if (library.userCanWrite(user)) {
-      return new LibraryQCImpl(library, user);
+    @Override
+    public Library getLibrary() {
+        return new LibraryImpl();
     }
-    else {
-      throw new SecurityException();
+
+    @Override
+    public Library getLibrary(User user) {
+        return new LibraryImpl(user);
     }
-  }
 
-  public Run getRun(Experiment experiment, User user) {
-    if (experiment.userCanWrite(user)) {
-      return new RunImpl(experiment, user);
+    @Override
+    public LibraryDilution getLibraryDilution() {
+        return new LibraryDilution();
     }
-    else {
-      throw new SecurityException();
+
+    @Override
+    public LibraryDilution getLibraryDilution(User user) {
+        return new LibraryDilution(user);
     }
-  }
 
-  public Run getRun(User user) {
-    return new RunImpl(user);
-  }
-
-  public Run getIlluminaRun() {
-    return new IlluminaRun();
-  }
-
-  public Run getIlluminaRun(User user) {
-    return new IlluminaRun(user);
-  }
-
-  public Run getIlluminaRun(Experiment experiment, User user) {
-    if (experiment.userCanWrite(user)) {
-      return new IlluminaRun(user);
+    @Override
+    public emPCRDilution getEmPCRDilution() {
+        return new emPCRDilution();
     }
-    else {
-      throw new SecurityException();
+
+    @Override
+    public emPCRDilution getEmPCRDilution(User user) {
+        return new emPCRDilution(user);
     }
-  }
 
-  public Run getLs454Run() {
-    return new LS454Run();
-  }
-
-  public Run getLs454Run(User user) {
-    return new LS454Run(user);
-  }
-
-  public Run getLs454Run(Experiment experiment, User user) {
-    if (experiment.userCanWrite(user)) {
-      return new LS454Run(user);
+    @Override
+    public emPCR getEmPCR() {
+        return new emPCR();
     }
-    else {
-      throw new SecurityException();
+
+    @Override
+    public emPCR getEmPCR(User user) {
+        return new emPCR(user);
     }
-  }
 
-  public Run getSolidRun() {
-    return new SolidRun();
-  }
-
-  public Run getSolidRun(User user) {
-    return new SolidRun(user);
-  }
-
-  public Run getSolidRun(Experiment experiment, User user) {
-    if (experiment.userCanWrite(user)) {
-      return new SolidRun(user);
-
+    @Override
+    //public <T extends List<S>, S extends Plateable> Plate<T, S> getPlateOfSize(int size) {
+    public Plate<LinkedList<Plateable>, Plateable> getPlateOfSize(int size) {
+        return new PlateImpl<Plateable>(size);
     }
-    else {
-      throw new SecurityException();
+
+    @Override
+    public Plate<LinkedList<Plateable>, Plateable> getPlateOfSize(int size, User user) {
+        return new PlateImpl<Plateable>(size, user);
     }
-  }
 
-  public Run getPacBioRun() {
-    return new PacBioRun();
-  }
-
-  public Run getPacBioRun(User user) {
-    return new PacBioRun(user);
-  }
-
-  public Run getPacBioRun(Experiment experiment, User user) {
-    if (experiment.userCanWrite(user)) {
-      return new PacBioRun(user);
-
+    @Override
+    public Pool<? extends Poolable> getPool() {
+        return new PoolImpl<Poolable>();
     }
-    else {
-      throw new SecurityException();
+
+    public Pool<? extends Poolable> getPool(User user) {
+        return new PoolImpl<Poolable>(user);
     }
-  }
-  
-  public Pool<? extends Poolable> getPoolOfType(PlatformType platformtype, User user) throws IllegalArgumentException {
-    if (platformtype != null) {
-      Pool<? extends Poolable> p = getPool(user);
-      p.setPlatformType(platformtype);
-      return p;
+
+    @Override
+    @Deprecated
+    public IlluminaPool getIlluminaPool() {
+        return new IlluminaPool();
+    }
+
+    @Deprecated
+    public IlluminaPool getIlluminaPool(User user) {
+        return new IlluminaPool(user);
+    }
+
+    @Override
+    @Deprecated
+    public LS454Pool getLS454Pool() {
+        return new LS454Pool();
+    }
+
+    @Deprecated
+    public LS454Pool getLS454Pool(User user) {
+        return new LS454Pool(user);
+    }
+
+    @Override
+    @Deprecated
+    public SolidPool getSolidPool() {
+        return new SolidPool();
+    }
+
+    @Deprecated
+    public SolidPool getSolidPool(User user) {
+        return new SolidPool(user);
+    }
+
+    @Override
+    @Deprecated
+    public PacBioPool getPacBioPool() {
+        return new PacBioPool();
+    }
+
+    @Deprecated
+    public PacBioPool getPacBioPool(User user) {
+        return new PacBioPool(user);
+    }
+
+    @Override
+    @Deprecated
+    public emPCRPool getEmPCRPool(PlatformType platformType) {
+        return new emPCRPool(platformType);
+    }
+
+    @Deprecated
+    public emPCRPool getEmPCRPool(PlatformType platformType, User user) {
+        return new emPCRPool(user, platformType);
+    }
+
+    @Override
+    public SampleQC getSampleQC() {
+        return new SampleQCImpl();
+    }
+
+    @Override
+    public LibraryQC getLibraryQC() {
+        return new LibraryQCImpl();
+    }
+
+    @Override
+    public PoolQC getPoolQC() {
+        return new PoolQCImpl();
+    }
+
+    @Override
+    public RunQC getRunQC() {
+        return new RunQCImpl();
+    }
+
+    @Override
+    public Status getStatus() {
+        return new StatusImpl();
+    }
+
+    @Override
+    public SequencerReference getSequencerReference() {
+        return new SequencerReferenceImpl(null, null, null);
+    }
+
+    public Library getLibrary(Sample sample, User user) {
+        if (sample.userCanWrite(user)) {
+            return new LibraryImpl(sample, user);
+        } else {
+            throw new SecurityException();
+        }
+    }
+
+    public Study getStudy(Project project, User user) {
+        if (project.userCanWrite(user)) {
+            return new StudyImpl(project, user);
+        } else {
+            throw new SecurityException();
+        }
+    }
+
+    public Experiment getExperiment(Study study, User user) {
+        if (study.userCanWrite(user)) {
+            return new ExperimentImpl(study, user);
+        } else {
+            throw new SecurityException();
+        }
+    }
+
+    public Sample getSample(Project project, User user) {
+        if (project.userCanWrite(user)) {
+            return new SampleImpl(project, user);
+        } else {
+            throw new SecurityException();
+        }
+    }
+
+    public Sample getSample(User user) {
+        return new SampleImpl(user);
+    }
+
+    public SampleQC getSampleQC(Sample sample, User user) {
+        if (sample.userCanWrite(user)) {
+            return new SampleQCImpl(sample, user);
+        } else {
+            throw new SecurityException();
+        }
+    }
+
+    public LibraryQC getLibraryQC(Library library, User user) {
+        if (library.userCanWrite(user)) {
+            return new LibraryQCImpl(library, user);
+        } else {
+            throw new SecurityException();
+        }
+    }
+
+    public Run getRun(Experiment experiment, User user) {
+        if (experiment.userCanWrite(user)) {
+            return new RunImpl(experiment, user);
+        } else {
+            throw new SecurityException();
+        }
+    }
+
+    public Run getRun(User user) {
+        return new RunImpl(user);
+    }
+
+    public Run getIlluminaRun() {
+        return new IlluminaRun();
+    }
+
+    public Run getIlluminaRun(User user) {
+        return new IlluminaRun(user);
+    }
+
+    public Run getIlluminaRun(Experiment experiment, User user) {
+        if (experiment.userCanWrite(user)) {
+            return new IlluminaRun(user);
+        } else {
+            throw new SecurityException();
+        }
+    }
+
+    public Run getLs454Run() {
+        return new LS454Run();
+    }
+
+    public Run getLs454Run(User user) {
+        return new LS454Run(user);
+    }
+
+    public Run getLs454Run(Experiment experiment, User user) {
+        if (experiment.userCanWrite(user)) {
+            return new LS454Run(user);
+        } else {
+            throw new SecurityException();
+        }
+    }
+
+    public Run getSolidRun() {
+        return new SolidRun();
+    }
+
+    public Run getSolidRun(User user) {
+        return new SolidRun(user);
+    }
+
+    public Run getSolidRun(Experiment experiment, User user) {
+        if (experiment.userCanWrite(user)) {
+            return new SolidRun(user);
+
+        } else {
+            throw new SecurityException();
+        }
+    }
+
+    public Run getPacBioRun() {
+        return new PacBioRun();
+    }
+
+    public Run getPacBioRun(User user) {
+        return new PacBioRun(user);
+    }
+
+    public Run getPacBioRun(Experiment experiment, User user) {
+        if (experiment.userCanWrite(user)) {
+            return new PacBioRun(user);
+
+        } else {
+            throw new SecurityException();
+        }
+    }
+
+    public Pool<? extends Poolable> getPoolOfType(PlatformType platformtype, User user) throws IllegalArgumentException {
+        if (platformtype != null) {
+            Pool<? extends Poolable> p = getPool(user);
+            p.setPlatformType(platformtype);
+            return p;
       /*
       if (platformtype.equals(PlatformType.ILLUMINA)) {
         return getIlluminaPool(user);
@@ -407,105 +396,91 @@ public class TgacDataObjectFactory extends DataObjectFactory {
         throw new IllegalArgumentException("Unrecognised PlatformType");
       }
       */
+        } else {
+            throw new IllegalArgumentException("Null PlatformType supplied");
+        }
     }
-    else {
-      throw new IllegalArgumentException("Null PlatformType supplied");
-    }
-  }
 
-  public Run getRunOfType(PlatformType platformtype) throws IllegalArgumentException {
-    if (platformtype != null) {
-      if (platformtype.equals(PlatformType.ILLUMINA)) {
-        return getIlluminaRun();
-      }
-      else if (platformtype.equals(PlatformType.LS454)) {
-        return getLs454Run();
-      }
-      else if (platformtype.equals(PlatformType.SOLID)) {
-        return getSolidRun();
-      }
-      else if (platformtype.equals(PlatformType.PACBIO)) {
-        return getPacBioRun();
-      }
-      else {
-        throw new IllegalArgumentException("Unrecognised PlatformType");
-      }
+    public Run getRunOfType(PlatformType platformtype) throws IllegalArgumentException {
+        if (platformtype != null) {
+            if (platformtype.equals(PlatformType.ILLUMINA)) {
+                return getIlluminaRun();
+            } else if (platformtype.equals(PlatformType.LS454)) {
+                return getLs454Run();
+            } else if (platformtype.equals(PlatformType.SOLID)) {
+                return getSolidRun();
+            } else if (platformtype.equals(PlatformType.PACBIO)) {
+                return getPacBioRun();
+            } else {
+                throw new IllegalArgumentException("Unrecognised PlatformType");
+            }
+        } else {
+            throw new IllegalArgumentException("Null PlatformType supplied");
+        }
     }
-    else {
-      throw new IllegalArgumentException("Null PlatformType supplied");
-    }
-  }
 
-  public Run getRunOfType(PlatformType platformtype, User user) throws IllegalArgumentException {
-    if (platformtype.equals(PlatformType.ILLUMINA)) {
-      return getIlluminaRun(user);
+    public Run getRunOfType(PlatformType platformtype, User user) throws IllegalArgumentException {
+        if (platformtype.equals(PlatformType.ILLUMINA)) {
+            return getIlluminaRun(user);
+        } else if (platformtype.equals(PlatformType.LS454)) {
+            return getLs454Run(user);
+        } else if (platformtype.equals(PlatformType.SOLID)) {
+            return getSolidRun(user);
+        } else if (platformtype.equals(PlatformType.PACBIO)) {
+            return getPacBioRun(user);
+        } else {
+            throw new IllegalArgumentException("Unrecognised PlatformType");
+        }
     }
-    else if (platformtype.equals(PlatformType.LS454)) {
-      return getLs454Run(user);
-    }
-    else if (platformtype.equals(PlatformType.SOLID)) {
-      return getSolidRun(user);
-    }
-    else if (platformtype.equals(PlatformType.PACBIO)) {
-      return getPacBioRun(user);
-    }
-    else {
-      throw new IllegalArgumentException("Unrecognised PlatformType");
-    }
-  }
 
-  @Override
-  public SequencerPartitionContainer<SequencerPoolPartition> getSequencerPartitionContainer() {
-    return new SequencerPartitionContainerImpl();
-  }
-
-  @Override
-  public SequencerPartitionContainer<SequencerPoolPartition> getSequencerPartitionContainer(User user) {
-    return new SequencerPartitionContainerImpl(user);
-  }
-
-  @Override
-  public SequencerPartitionContainer<SequencerPoolPartition> getSequencerPartitionContainer(Platform platformType) {
-    SequencerPartitionContainer<SequencerPoolPartition> s = new SequencerPartitionContainerImpl();
-    s.setPlatform(platformType);
-    return s;
-  }
-
-  @Override
-  public SequencerPartitionContainer<SequencerPoolPartition> getSequencerPartitionContainer(Platform platformType, User user) {
-    SequencerPartitionContainer<SequencerPoolPartition> s = new SequencerPartitionContainerImpl(user);
-    s.setPlatform(platformType);
-    return s;
-  }
-
-  @Override
-  public SequencerPoolPartition getSequencerPoolPartition() {
-    return new PartitionImpl();
-  }
-
-  public Run getRunOfType(PlatformType platformtype, Experiment experiment, User user) throws IllegalArgumentException {
-    if (platformtype.equals(PlatformType.ILLUMINA)) {
-      return getIlluminaRun(experiment, user);
+    @Override
+    public SequencerPartitionContainer<SequencerPoolPartition> getSequencerPartitionContainer() {
+        return new SequencerPartitionContainerImpl();
     }
-    else if (platformtype.equals(PlatformType.LS454)) {
-      return getLs454Run(experiment, user);
-    }
-    else if (platformtype.equals(PlatformType.SOLID)) {
-      return getSolidRun(experiment, user);
-    }
-    else if (platformtype.equals(PlatformType.PACBIO)) {
-      return getPacBioRun(user);
-    }
-    else {
-      throw new IllegalArgumentException("Unrecognised PlatformType");
-    }
-  }
 
-  public SubmissionImpl getSubmission() {
-    return new SubmissionImpl();
-  }
+    @Override
+    public SequencerPartitionContainer<SequencerPoolPartition> getSequencerPartitionContainer(User user) {
+        return new SequencerPartitionContainerImpl(user);
+    }
 
-  public SubmissionImpl getSubmission(User user) {
-    return new SubmissionImpl(user);
-  }
+    @Override
+    public SequencerPartitionContainer<SequencerPoolPartition> getSequencerPartitionContainer(Platform platformType) {
+        SequencerPartitionContainer<SequencerPoolPartition> s = new SequencerPartitionContainerImpl();
+        s.setPlatform(platformType);
+        return s;
+    }
+
+    @Override
+    public SequencerPartitionContainer<SequencerPoolPartition> getSequencerPartitionContainer(Platform platformType, User user) {
+        SequencerPartitionContainer<SequencerPoolPartition> s = new SequencerPartitionContainerImpl(user);
+        s.setPlatform(platformType);
+        return s;
+    }
+
+    @Override
+    public SequencerPoolPartition getSequencerPoolPartition() {
+        return new PartitionImpl();
+    }
+
+    public Run getRunOfType(PlatformType platformtype, Experiment experiment, User user) throws IllegalArgumentException {
+        if (platformtype.equals(PlatformType.ILLUMINA)) {
+            return getIlluminaRun(experiment, user);
+        } else if (platformtype.equals(PlatformType.LS454)) {
+            return getLs454Run(experiment, user);
+        } else if (platformtype.equals(PlatformType.SOLID)) {
+            return getSolidRun(experiment, user);
+        } else if (platformtype.equals(PlatformType.PACBIO)) {
+            return getPacBioRun(user);
+        } else {
+            throw new IllegalArgumentException("Unrecognised PlatformType");
+        }
+    }
+
+    public SubmissionImpl getSubmission() {
+        return new SubmissionImpl();
+    }
+
+    public SubmissionImpl getSubmission(User user) {
+        return new SubmissionImpl(user);
+    }
 }

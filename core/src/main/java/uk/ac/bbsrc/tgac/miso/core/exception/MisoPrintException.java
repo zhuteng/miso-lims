@@ -33,14 +33,14 @@ package uk.ac.bbsrc.tgac.miso.core.exception;
  * @since 0.0.3
  */
 public class MisoPrintException extends Exception {
-  public MisoPrintException(String s) {
-    super(s);
-  }
-
-  public MisoPrintException(String s, Throwable cause) {
-    super(s);
-    if (cause != null) {
-        initCause(cause);
+    public MisoPrintException(String s) {
+        super(s);
     }
-  }
+
+    public MisoPrintException(String s, Throwable cause) {
+        super(s);
+        if (cause != null) {
+            initCause(cause);
+        }
+    }
 }

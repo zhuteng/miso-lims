@@ -63,347 +63,351 @@ import java.util.*;
 @RequestMapping("/stats")
 @SessionAttributes("sequencerReference")
 public class StatsController {
-  protected static final Logger log = LoggerFactory.getLogger(StatsController.class);
+    protected static final Logger log = LoggerFactory.getLogger(StatsController.class);
 
-  @Autowired
-  private SecurityManager securityManager;
+    @Autowired
+    private SecurityManager securityManager;
 
-  public void setSecurityManager(SecurityManager securityManager) {
-    this.securityManager = securityManager;
-  }
-
-  @Autowired
-  private RequestManager requestManager;
-
-  public void setRequestManager(uk.ac.bbsrc.tgac.miso.core.manager.RequestManager requestManager) {
-    this.requestManager = requestManager;
-  }
-
-  public Collection<SequencerReference> populateSequencerReferences() throws IOException {
-    return requestManager.listAllSequencerReferences();
-  }
-
-  @RequestMapping(method = RequestMethod.GET)
-  public ModelAndView view(ModelMap model) throws IOException {
-    model.put("platformtype", "All");
-    model.put("sequencerReferences", populateSequencerReferences());
-    return new ModelAndView("/pages/viewStats.jsp", model);
-  }
-
-  @RequestMapping(value = "/sequencer/{referenceId}", method = RequestMethod.GET)
-  public ModelAndView viewSequencer(@PathVariable(value = "referenceId") Long referenceId, ModelMap model) throws IOException {
-    SequencerReference sr = requestManager.getSequencerReferenceById(referenceId);
-    if (sr != null) {
-      model.put("sequencerReference", sr);
-      String ip = sr.getIpAddress().toString();
-      if (ip.startsWith("/")) {
-        model.put("trimmedIpAddress", ip.substring(1));
-      }
-      else {
-        model.put("trimmedIpAddress", ip);
-      }
+    public void setSecurityManager(SecurityManager securityManager) {
+        this.securityManager = securityManager;
     }
-    else {
-      throw new IOException("Cannot retrieve the named Sequencer reference");
+
+    @Autowired
+    private RequestManager requestManager;
+
+    public void setRequestManager(uk.ac.bbsrc.tgac.miso.core.manager.RequestManager requestManager) {
+        this.requestManager = requestManager;
     }
-    return new ModelAndView("/pages/editSequencerReference.jsp", model);
-  }
 
-
-  @RequestMapping(value = "/sequencer", method = RequestMethod.POST)
-  public String processSubmit(@ModelAttribute("sequencerReference") SequencerReference sr,
-                              ModelMap model, SessionStatus session) throws IOException {
-    try {
-      requestManager.saveSequencerReference(sr);
-      session.setComplete();
-      model.clear();
-      return "redirect:/miso/stats";
+    public Collection<SequencerReference> populateSequencerReferences() throws IOException {
+        return requestManager.listAllSequencerReferences();
     }
-    catch (IOException ex) {
-      if (log.isDebugEnabled()) {
-        log.debug("Failed to save Sequencer Reference", ex);
-      }
-      throw ex;
+
+    @RequestMapping(method = RequestMethod.GET)
+    public ModelAndView view(ModelMap model) throws IOException {
+        model.put("platformtype", "All");
+        model.put("sequencerReferences", populateSequencerReferences());
+        return new ModelAndView("/pages/viewStats.jsp", model);
     }
-  }
 
-  @RequestMapping(value = "/ls454", method = RequestMethod.GET)
-  public ModelAndView allLs454Stats(ModelMap model) throws IOException {
-    model.put("platformtype", PlatformType.LS454);
-    Collection<SequencerReference> s = new ArrayList<SequencerReference>();
-    for (SequencerReference sr : populateSequencerReferences()) {
-      if (sr.getPlatform().getPlatformType().equals(PlatformType.LS454)) {
-        s.add(sr);
-      }
+    @RequestMapping(value = "/sequencer/{referenceId}", method = RequestMethod.GET)
+    public ModelAndView viewSequencer(@PathVariable(value = "referenceId") Long referenceId, ModelMap model) throws IOException {
+        SequencerReference sr = requestManager.getSequencerReferenceById(referenceId);
+        if (sr != null) {
+            model.put("sequencerReference", sr);
+            String ip = sr.getIpAddress().toString();
+            if (ip.startsWith("/")) {
+                model.put("trimmedIpAddress", ip.substring(1));
+            } else {
+                model.put("trimmedIpAddress", ip);
+            }
+        } else {
+            throw new IOException("Cannot retrieve the named Sequencer reference");
+        }
+        return new ModelAndView("/pages/editSequencerReference.jsp", model);
     }
-    model.put("sequencerReferences", s);
-    return new ModelAndView("/pages/viewStats.jsp", model);
-  }
 
-  @RequestMapping(value = "/ls454/{referenceId}", method = RequestMethod.GET)
-  public ModelAndView ls454Stats(@PathVariable(value = "referenceId") Long referenceId, ModelMap model) throws IOException {
-    model.put("platformtype", PlatformType.LS454);
-    SequencerReference sr = requestManager.getSequencerReferenceById(referenceId);
-    if (sr != null) {
-      if (!sr.getPlatform().getPlatformType().equals(PlatformType.LS454)) {
-        throw new IOException("Trying to interrogate a " + sr.getPlatform().getPlatformType().getKey() + " sequencer reference with a 454 strategy");
-      }
-      try {
-        SequencerInterrogator context = SequencerInterrogatorFactory.getSequencerInterrogator(sr);
+    @RequestMapping(value = "/sequencer", method = RequestMethod.POST)
+    public String processSubmit(@ModelAttribute("sequencerReference") SequencerReference sr, ModelMap model, SessionStatus session)
+        throws IOException {
+        try {
+            requestManager.saveSequencerReference(sr);
+            session.setComplete();
+            model.clear();
+            return "redirect:/miso/stats";
+        } catch (IOException ex) {
+            if (log.isDebugEnabled()) {
+                log.debug("Failed to save Sequencer Reference", ex);
+            }
+            throw ex;
+        }
+    }
 
-        model.put("stats", context.listAllStatus());
+    @RequestMapping(value = "/ls454", method = RequestMethod.GET)
+    public ModelAndView allLs454Stats(ModelMap model) throws IOException {
+        model.put("platformtype", PlatformType.LS454);
+        Collection<SequencerReference> s = new ArrayList<SequencerReference>();
+        for (SequencerReference sr : populateSequencerReferences()) {
+            if (sr.getPlatform().getPlatformType().equals(PlatformType.LS454)) {
+                s.add(sr);
+            }
+        }
+        model.put("sequencerReferences", s);
+        return new ModelAndView("/pages/viewStats.jsp", model);
+    }
+
+    @RequestMapping(value = "/ls454/{referenceId}", method = RequestMethod.GET)
+    public ModelAndView ls454Stats(@PathVariable(value = "referenceId") Long referenceId, ModelMap model) throws IOException {
+        model.put("platformtype", PlatformType.LS454);
+        SequencerReference sr = requestManager.getSequencerReferenceById(referenceId);
+        if (sr != null) {
+            if (!sr.getPlatform().getPlatformType().equals(PlatformType.LS454)) {
+                throw new IOException(
+                    "Trying to interrogate a " + sr.getPlatform().getPlatformType().getKey() + " sequencer reference with a 454 strategy");
+            }
+            try {
+                SequencerInterrogator context = SequencerInterrogatorFactory.getSequencerInterrogator(sr);
+
+                model.put("stats", context.listAllStatus());
+                model.put("referenceName", sr.getName());
+                model.put("referenceId", sr.getId());
+            } catch (InterrogationException e) {
+                model.put("error", MisoWebUtils
+                    .generateErrorDivMessage("Cannot retrieve status information for the given sequencer reference: " + sr.getName(),
+                                             e.getMessage()));
+                log.info(e.getMessage());
+                e.printStackTrace();
+            }
+        } else {
+            throw new IOException("Cannot retrieve the named Sequencer reference");
+        }
+        return new ModelAndView("/pages/viewStats.jsp", model);
+    }
+
+    @RequestMapping(value = "/ls454/{referenceId}/{runName}", method = RequestMethod.GET)
+    public ModelAndView ls454Stats(@PathVariable(value = "referenceId") Long referenceId, @PathVariable(value = "runName") String runName,
+                                   ModelMap model) throws IOException {
+        model.put("platformtype", PlatformType.LS454);
+        SequencerReference sr = requestManager.getSequencerReferenceById(referenceId);
+        if (sr != null) {
+            if (!sr.getPlatform().getPlatformType().equals(PlatformType.LS454)) {
+                throw new IOException(
+                    "Trying to interrogate a " + sr.getPlatform().getPlatformType().getKey() + " sequencer reference with a 454 strategy");
+            }
+            try {
+                SequencerInterrogator context = SequencerInterrogatorFactory.getSequencerInterrogator(sr);
+                Status status = context.getRunStatus(runName);
+                if (status != null) {
+                    model.put("referenceName", sr.getName());
+                    model.put("referenceId", sr.getId());
+                    model.put("runId", requestManager.getRunByAlias(runName).getId());
+                    model.put("runName", runName);
+                    model.put("runStatus", status);
+                } else {
+                    model.put("error",
+                              MisoWebUtils.generateErrorDivMessage("Cannot consume the xml file for the given run name: " + runName));
+                }
+            } catch (InterrogationException e) {
+                model.put("error", MisoWebUtils
+                    .generateErrorDivMessage("Cannot retrieve status information for the given sequencer reference: " + sr.getName(),
+                                             e.getMessage()));
+                log.info(e.getMessage());
+                e.printStackTrace();
+            }
+        } else {
+            throw new IOException("Cannot retrieve the named Sequencer reference");
+        }
+        return new ModelAndView("/pages/viewStats.jsp", model);
+    }
+
+    @RequestMapping(value = "/illumina", method = RequestMethod.GET)
+    public ModelAndView allIlluminaStats(ModelMap model) throws IOException {
+        model.put("platformtype", PlatformType.ILLUMINA);
+        Collection<SequencerReference> s = new ArrayList<SequencerReference>();
+        for (SequencerReference sr : populateSequencerReferences()) {
+            if (sr.getPlatform().getPlatformType().equals(PlatformType.ILLUMINA)) {
+                s.add(sr);
+            }
+        }
+        model.put("sequencerReferences", s);
+        return new ModelAndView("/pages/viewStats.jsp", model);
+    }
+
+    @RequestMapping(value = "/illumina/{referenceId}", method = RequestMethod.GET)
+    public ModelAndView illuminaStats(@PathVariable(value = "referenceId") Long referenceId, ModelMap model) throws IOException {
+        model.put("platformtype", PlatformType.ILLUMINA.getKey().toLowerCase());
+        SequencerReference sr = requestManager.getSequencerReferenceById(referenceId);
+        if (sr != null) {
+            if (!sr.getPlatform().getPlatformType().equals(PlatformType.ILLUMINA)) {
+                throw new IOException("Trying to interrogate a " + sr.getPlatform().getPlatformType().getKey() +
+                                      " sequencer reference with an Illumina strategy");
+            }
+            model.put("stats", requestManager.listAllStatusBySequencerName(sr.getName()));
+            model.put("referenceName", sr.getName());
+            model.put("referenceId", sr.getId());
+        } else {
+            model.put("error", "Cannot retrieve the given sequencer reference: " + referenceId);
+        }
+        return new ModelAndView("/pages/viewStats.jsp", model);
+    }
+
+    @RequestMapping(value = "/illumina/{referenceId}/{runName}", method = RequestMethod.GET)
+    public ModelAndView illuminaStats(@PathVariable(value = "referenceId") Long referenceId,
+                                      @PathVariable(value = "runName") String runName, ModelMap model) throws IOException {
+        model.put("platformtype", PlatformType.ILLUMINA);
+        SequencerReference sr = requestManager.getSequencerReferenceById(referenceId);
+        if (sr != null) {
+            if (!sr.getPlatform().getPlatformType().equals(PlatformType.ILLUMINA)) {
+                throw new IOException("Trying to interrogate a " + sr.getPlatform().getPlatformType().getKey() +
+                                      " sequencer reference with an Illumina strategy");
+            }
+
+            try {
+                Status status = requestManager.getStatusByRunName(runName);
+                if (status != null) {
+                    model.put("referenceName", sr.getName());
+                    model.put("referenceId", sr.getId());
+                    model.put("runId", requestManager.getRunByAlias(runName).getId());
+                    model.put("runName", runName);
+                    model.put("runStatus", status);
+
+                    InputStream in = StatsController.class.getResourceAsStream("/status/xsl/illumina/statusXml.xsl");
+                    if (in != null) {
+                        String xsl = LimsUtils.inputStreamToString(in);
+                        model.put("statusXml", (SubmissionUtils.xslTransform(status.getXml(), xsl)));
+                    }
+                } else {
+                    model.put("error",
+                              MisoWebUtils.generateErrorDivMessage("Cannot consume the xml file for the given run name: " + runName));
+                }
+            } catch (TransformerException e) {
+                model.put("error",
+                          MisoWebUtils.generateErrorDivMessage("Cannot retrieve status XML for the given run: " + runName, e.getMessage()));
+                e.printStackTrace();
+            }
+        } else {
+            model.put("error", "Cannot retrieve the given sequencer reference: " + referenceId);
+        }
+        return new ModelAndView("/pages/viewStats.jsp", model);
+    }
+
+    @RequestMapping(value = "/solid", method = RequestMethod.GET)
+    public ModelAndView allSolidStats(ModelMap model) throws IOException {
+        model.put("platformtype", PlatformType.SOLID);
+        Collection<SequencerReference> s = new ArrayList<SequencerReference>();
+        for (SequencerReference sr : populateSequencerReferences()) {
+            if (sr.getPlatform().getPlatformType().equals(PlatformType.SOLID)) {
+                s.add(sr);
+            }
+        }
+        model.put("sequencerReferences", s);
+        return new ModelAndView("/pages/viewStats.jsp", model);
+    }
+
+    @RequestMapping(value = "/solid/{referenceId}", method = RequestMethod.GET)
+    public ModelAndView solidStats(@PathVariable(value = "referenceId") Long referenceId, ModelMap model) throws IOException {
+        model.put("platformtype", PlatformType.SOLID);
+        SequencerReference sr = requestManager.getSequencerReferenceById(referenceId);
+
+        if (!sr.getPlatform().getPlatformType().equals(PlatformType.SOLID)) {
+            throw new IOException(
+                "Trying to interrogate a " + sr.getPlatform().getPlatformType().getKey() + " sequencer reference with a SOLiD strategy");
+        }
+
+        if (!sr.getPlatform().getInstrumentModel().contains("5500xl")) {
+            SolidService ss = new SolidService(new URL("http://" + sr.getFQDN() + ":8080/sets/webservice/solid?wsdl"),
+                                               new QName("http://solid.aga.appliedbiosystems.com", "SolidService"));
+            StringBuilder sb = new StringBuilder();
+            try {
+                InputStream in = StatsController.class.getResourceAsStream("/integration/solid/xsl/clusterStatus.xsl");
+                if (in != null) {
+                    String xsl = LimsUtils.inputStreamToString(in);
+                    sb.append(SubmissionUtils.xslTransform(ss.getSolidPort().getClusterStatus().getXml(), xsl));
+                }
+            } catch (TransformerException e) {
+                sb.append("Unable to transform Cluster Status XML: " + e.getMessage());
+                e.printStackTrace();
+            }
+            model.put("clusterStatus", sb.toString());
+        }
+
+        model.put("stats", requestManager.listAllStatusBySequencerName(sr.getName()));
         model.put("referenceName", sr.getName());
         model.put("referenceId", sr.getId());
-      }
-      catch (InterrogationException e) {
-        model.put("error", MisoWebUtils.generateErrorDivMessage("Cannot retrieve status information for the given sequencer reference: " + sr.getName(), e.getMessage()));
-        log.info(e.getMessage());
-        e.printStackTrace();
-      }
-    }
-    else {
-      throw new IOException("Cannot retrieve the named Sequencer reference");
-    }
-    return new ModelAndView("/pages/viewStats.jsp", model);
-  }
 
-  @RequestMapping(value = "/ls454/{referenceId}/{runName}", method = RequestMethod.GET)
-  public ModelAndView ls454Stats(@PathVariable(value = "referenceId") Long referenceId, @PathVariable(value = "runName") String runName, ModelMap model) throws IOException {
-    model.put("platformtype", PlatformType.LS454);
-    SequencerReference sr = requestManager.getSequencerReferenceById(referenceId);
-    if (sr != null) {
-      if (!sr.getPlatform().getPlatformType().equals(PlatformType.LS454)) {
-        throw new IOException("Trying to interrogate a " + sr.getPlatform().getPlatformType().getKey() + " sequencer reference with a 454 strategy");
-      }
-      try {
-        SequencerInterrogator context = SequencerInterrogatorFactory.getSequencerInterrogator(sr);
-        Status status = context.getRunStatus(runName);
-        if (status != null) {
-          model.put("referenceName", sr.getName());
-          model.put("referenceId", sr.getId());
-          model.put("runId", requestManager.getRunByAlias(runName).getId());
-          model.put("runName", runName);
-          model.put("runStatus", status);
+        return new ModelAndView("/pages/viewStats.jsp", model);
+    }
+
+    @RequestMapping(value = "/solid/{referenceId}/{runName}", method = RequestMethod.GET)
+    public ModelAndView solidStats(@PathVariable(value = "referenceId") Long referenceId, @PathVariable(value = "runName") String runName,
+                                   ModelMap model) throws IOException {
+        model.put("platformtype", PlatformType.SOLID);
+        SequencerReference sr = requestManager.getSequencerReferenceById(referenceId);
+        if (sr != null) {
+            if (!sr.getPlatform().getPlatformType().equals(PlatformType.SOLID)) {
+                throw new IOException("Trying to interrogate a " + sr.getPlatform().getPlatformType().getKey() +
+                                      " sequencer reference with an SOLiD strategy");
+            }
+
+            try {
+                Status status = requestManager.getStatusByRunName(runName);
+                if (status != null) {
+                    model.put("referenceName", sr.getName());
+                    model.put("referenceId", sr.getId());
+                    model.put("runId", requestManager.getRunByAlias(runName).getId());
+                    model.put("runName", runName);
+                    model.put("runStatus", status);
+
+                    InputStream in = StatsController.class.getResourceAsStream("/status/xsl/solid/statusXml.xsl");
+                    if (in != null) {
+                        String xsl = LimsUtils.inputStreamToString(in);
+                        model.put("statusXml", (SubmissionUtils.xslTransform(status.getXml(), xsl)));
+                    }
+                } else {
+                    model.put("error",
+                              MisoWebUtils.generateErrorDivMessage("Cannot consume the xml file for the given run name: " + runName));
+                }
+            } catch (TransformerException e) {
+                model.put("error",
+                          MisoWebUtils.generateErrorDivMessage("Cannot retrieve status XML for the given run: " + runName, e.getMessage()));
+                e.printStackTrace();
+            }
+        } else {
+            model.put("error", "Cannot retrieve the given sequencer reference: " + referenceId);
         }
-        else {
-          model.put("error", MisoWebUtils.generateErrorDivMessage("Cannot consume the xml file for the given run name: " + runName));
+        return new ModelAndView("/pages/viewStats.jsp", model);
+    }
+
+    @RequestMapping(value = "/pacbio", method = RequestMethod.GET)
+    public ModelAndView allPacbioStats(ModelMap model) throws IOException {
+        model.put("platformtype", PlatformType.PACBIO);
+        Collection<SequencerReference> s = new ArrayList<SequencerReference>();
+        for (SequencerReference sr : populateSequencerReferences()) {
+            if (sr.getPlatform().getPlatformType().equals(PlatformType.PACBIO)) {
+                s.add(sr);
+            }
         }
-      }
-      catch (InterrogationException e) {
-        model.put("error", MisoWebUtils.generateErrorDivMessage("Cannot retrieve status information for the given sequencer reference: " + sr.getName(), e.getMessage()));
-        log.info(e.getMessage());
-        e.printStackTrace();
-      }
+        model.put("sequencerReferences", s);
+        return new ModelAndView("/pages/viewStats.jsp", model);
     }
-    else {
-      throw new IOException("Cannot retrieve the named Sequencer reference");
-    }
-    return new ModelAndView("/pages/viewStats.jsp", model);
-  }
 
-  @RequestMapping(value = "/illumina", method = RequestMethod.GET)
-  public ModelAndView allIlluminaStats(ModelMap model) throws IOException {
-    model.put("platformtype", PlatformType.ILLUMINA);
-    Collection<SequencerReference> s = new ArrayList<SequencerReference>();
-    for (SequencerReference sr : populateSequencerReferences()) {
-      if (sr.getPlatform().getPlatformType().equals(PlatformType.ILLUMINA)) {
-        s.add(sr);
-      }
-    }
-    model.put("sequencerReferences", s);
-    return new ModelAndView("/pages/viewStats.jsp", model);
-  }
-
-  @RequestMapping(value = "/illumina/{referenceId}", method = RequestMethod.GET)
-  public ModelAndView illuminaStats(@PathVariable(value = "referenceId") Long referenceId, ModelMap model) throws IOException {
-    model.put("platformtype", PlatformType.ILLUMINA.getKey().toLowerCase());
-    SequencerReference sr = requestManager.getSequencerReferenceById(referenceId);
-    if (sr != null) {
-      if (!sr.getPlatform().getPlatformType().equals(PlatformType.ILLUMINA)) {
-        throw new IOException("Trying to interrogate a " + sr.getPlatform().getPlatformType().getKey() + " sequencer reference with an Illumina strategy");
-      }
-      model.put("stats", requestManager.listAllStatusBySequencerName(sr.getName()));
-      model.put("referenceName", sr.getName());
-      model.put("referenceId", sr.getId());
-    }
-    else {
-      model.put("error", "Cannot retrieve the given sequencer reference: " + referenceId);
-    }
-    return new ModelAndView("/pages/viewStats.jsp", model);
-  }
-
-  @RequestMapping(value = "/illumina/{referenceId}/{runName}", method = RequestMethod.GET)
-  public ModelAndView illuminaStats(@PathVariable(value = "referenceId") Long referenceId, @PathVariable(value = "runName") String runName, ModelMap model) throws IOException {
-    model.put("platformtype", PlatformType.ILLUMINA);
-    SequencerReference sr = requestManager.getSequencerReferenceById(referenceId);
-    if (sr != null) {
-      if (!sr.getPlatform().getPlatformType().equals(PlatformType.ILLUMINA)) {
-        throw new IOException("Trying to interrogate a " + sr.getPlatform().getPlatformType().getKey() + " sequencer reference with an Illumina strategy");
-      }
-      
-      try {
-        Status status = requestManager.getStatusByRunName(runName);
-        if (status != null) {
-          model.put("referenceName", sr.getName());
-          model.put("referenceId", sr.getId());
-          model.put("runId", requestManager.getRunByAlias(runName).getId());
-          model.put("runName", runName);
-          model.put("runStatus", status);
-
-          InputStream in = StatsController.class.getResourceAsStream("/status/xsl/illumina/statusXml.xsl");
-          if (in != null) {
-            String xsl = LimsUtils.inputStreamToString(in);
-            model.put("statusXml", (SubmissionUtils.xslTransform(status.getXml(), xsl)));
-          }
+    @RequestMapping(value = "/pacbio/{referenceId}", method = RequestMethod.GET)
+    public ModelAndView pacbioStats(@PathVariable(value = "referenceId") Long referenceId, ModelMap model) throws IOException {
+        model.put("platformtype", PlatformType.PACBIO.getKey().toLowerCase());
+        SequencerReference sr = requestManager.getSequencerReferenceById(referenceId);
+        if (sr != null) {
+            if (!sr.getPlatform().getPlatformType().equals(PlatformType.PACBIO)) {
+                throw new IOException("Trying to interrogate a " + sr.getPlatform().getPlatformType().getKey() +
+                                      " sequencer reference with a PacBio strategy");
+            }
+            model.put("stats", requestManager.listAllStatusBySequencerName(sr.getName()));
+            model.put("referenceName", sr.getName());
+            model.put("referenceId", sr.getId());
+        } else {
+            model.put("error", "Cannot retrieve the given sequencer reference: " + referenceId);
         }
-        else {
-          model.put("error", MisoWebUtils.generateErrorDivMessage("Cannot consume the xml file for the given run name: " + runName));
-        }
-      }
-      catch (TransformerException e) {
-        model.put("error", MisoWebUtils.generateErrorDivMessage("Cannot retrieve status XML for the given run: " + runName, e.getMessage()));
-        e.printStackTrace();
-      }
-    }
-    else {
-      model.put("error", "Cannot retrieve the given sequencer reference: " + referenceId);
-    }
-    return new ModelAndView("/pages/viewStats.jsp", model);
-  }
-
-  @RequestMapping(value = "/solid", method = RequestMethod.GET)
-  public ModelAndView allSolidStats(ModelMap model) throws IOException {
-    model.put("platformtype", PlatformType.SOLID);
-    Collection<SequencerReference> s = new ArrayList<SequencerReference>();
-    for (SequencerReference sr : populateSequencerReferences()) {
-      if (sr.getPlatform().getPlatformType().equals(PlatformType.SOLID)) {
-        s.add(sr);
-      }
-    }
-    model.put("sequencerReferences", s);
-    return new ModelAndView("/pages/viewStats.jsp", model);
-  }
-
-  @RequestMapping(value = "/solid/{referenceId}", method = RequestMethod.GET)
-  public ModelAndView solidStats(@PathVariable(value = "referenceId") Long referenceId, ModelMap model) throws IOException {
-    model.put("platformtype", PlatformType.SOLID);
-    SequencerReference sr = requestManager.getSequencerReferenceById(referenceId);
-
-    if (!sr.getPlatform().getPlatformType().equals(PlatformType.SOLID)) {
-      throw new IOException("Trying to interrogate a " + sr.getPlatform().getPlatformType().getKey() + " sequencer reference with a SOLiD strategy");
+        return new ModelAndView("/pages/viewStats.jsp", model);
     }
 
-    if (!sr.getPlatform().getInstrumentModel().contains("5500xl")) {
-      SolidService ss = new SolidService(new URL("http://"+sr.getFQDN()+":8080/sets/webservice/solid?wsdl"), new QName("http://solid.aga.appliedbiosystems.com", "SolidService"));
-      StringBuilder sb = new StringBuilder();
-      try {
-        InputStream in = StatsController.class.getResourceAsStream("/integration/solid/xsl/clusterStatus.xsl");
-        if (in != null) {
-          String xsl = LimsUtils.inputStreamToString(in);
-          sb.append(SubmissionUtils.xslTransform(ss.getSolidPort().getClusterStatus().getXml(), xsl));
-        }
-      }
-      catch (TransformerException e) {
-        sb.append("Unable to transform Cluster Status XML: " + e.getMessage());
-        e.printStackTrace();
-      }
-      model.put("clusterStatus", sb.toString());
-    }
-    
-    model.put("stats", requestManager.listAllStatusBySequencerName(sr.getName()));
-    model.put("referenceName", sr.getName());
-    model.put("referenceId", sr.getId());
+    @RequestMapping(value = "/pacbio/{referenceId}/{runName}", method = RequestMethod.GET)
+    public ModelAndView pacbioStats(@PathVariable(value = "referenceId") Long referenceId, @PathVariable(value = "runName") String runName,
+                                    ModelMap model) throws IOException {
+        model.put("platformtype", PlatformType.PACBIO);
+        SequencerReference sr = requestManager.getSequencerReferenceById(referenceId);
+        if (sr != null) {
+            if (!sr.getPlatform().getPlatformType().equals(PlatformType.PACBIO)) {
+                throw new IOException("Trying to interrogate a " + sr.getPlatform().getPlatformType().getKey() +
+                                      " sequencer reference with a PacBio strategy");
+            }
 
-    return new ModelAndView("/pages/viewStats.jsp", model);
-  }
-
-  @RequestMapping(value = "/solid/{referenceId}/{runName}", method = RequestMethod.GET)
-  public ModelAndView solidStats(@PathVariable(value = "referenceId") Long referenceId, @PathVariable(value = "runName") String runName, ModelMap model) throws IOException {
-    model.put("platformtype", PlatformType.SOLID);
-    SequencerReference sr = requestManager.getSequencerReferenceById(referenceId);
-    if (sr != null) {
-      if (!sr.getPlatform().getPlatformType().equals(PlatformType.SOLID)) {
-        throw new IOException("Trying to interrogate a " + sr.getPlatform().getPlatformType().getKey() + " sequencer reference with an SOLiD strategy");
-      }
-
-      try {
-        Status status = requestManager.getStatusByRunName(runName);
-        if (status != null) {
-          model.put("referenceName", sr.getName());
-          model.put("referenceId", sr.getId());
-          model.put("runId", requestManager.getRunByAlias(runName).getId());
-          model.put("runName", runName);
-          model.put("runStatus", status);
-
-          InputStream in = StatsController.class.getResourceAsStream("/status/xsl/solid/statusXml.xsl");
-          if (in != null) {
-            String xsl = LimsUtils.inputStreamToString(in);
-            model.put("statusXml", (SubmissionUtils.xslTransform(status.getXml(), xsl)));
-          }
-        }
-        else {
-          model.put("error", MisoWebUtils.generateErrorDivMessage("Cannot consume the xml file for the given run name: " + runName));
-        }
-      }
-      catch (TransformerException e) {
-        model.put("error", MisoWebUtils.generateErrorDivMessage("Cannot retrieve status XML for the given run: " + runName, e.getMessage()));
-        e.printStackTrace();
-      }
-    }
-    else {
-      model.put("error", "Cannot retrieve the given sequencer reference: " + referenceId);
-    }
-    return new ModelAndView("/pages/viewStats.jsp", model);
-  }
-
-  @RequestMapping(value = "/pacbio", method = RequestMethod.GET)
-  public ModelAndView allPacbioStats(ModelMap model) throws IOException {
-    model.put("platformtype", PlatformType.PACBIO);
-    Collection<SequencerReference> s = new ArrayList<SequencerReference>();
-    for (SequencerReference sr : populateSequencerReferences()) {
-      if (sr.getPlatform().getPlatformType().equals(PlatformType.PACBIO)) {
-        s.add(sr);
-      }
-    }
-    model.put("sequencerReferences", s);
-    return new ModelAndView("/pages/viewStats.jsp", model);
-  }
-
-  @RequestMapping(value = "/pacbio/{referenceId}", method = RequestMethod.GET)
-  public ModelAndView pacbioStats(@PathVariable(value = "referenceId") Long referenceId, ModelMap model) throws IOException {
-    model.put("platformtype", PlatformType.PACBIO.getKey().toLowerCase());
-    SequencerReference sr = requestManager.getSequencerReferenceById(referenceId);
-    if (sr != null) {
-      if (!sr.getPlatform().getPlatformType().equals(PlatformType.PACBIO)) {
-        throw new IOException("Trying to interrogate a " + sr.getPlatform().getPlatformType().getKey() + " sequencer reference with a PacBio strategy");
-      }
-      model.put("stats", requestManager.listAllStatusBySequencerName(sr.getName()));
-      model.put("referenceName", sr.getName());
-      model.put("referenceId", sr.getId());
-    }
-    else {
-      model.put("error", "Cannot retrieve the given sequencer reference: " + referenceId);
-    }
-    return new ModelAndView("/pages/viewStats.jsp", model);
-  }
-
-  @RequestMapping(value = "/pacbio/{referenceId}/{runName}", method = RequestMethod.GET)
-  public ModelAndView pacbioStats(@PathVariable(value = "referenceId") Long referenceId, @PathVariable(value = "runName") String runName, ModelMap model) throws IOException {
-    model.put("platformtype", PlatformType.PACBIO);
-    SequencerReference sr = requestManager.getSequencerReferenceById(referenceId);
-    if (sr != null) {
-      if (!sr.getPlatform().getPlatformType().equals(PlatformType.PACBIO)) {
-        throw new IOException("Trying to interrogate a " + sr.getPlatform().getPlatformType().getKey() + " sequencer reference with a PacBio strategy");
-      }
-
-//      try {
-        Status status = requestManager.getStatusByRunName(runName);
-        if (status != null) {
-          model.put("referenceName", sr.getName());
-          model.put("referenceId", sr.getId());
-          model.put("runId", requestManager.getRunByAlias(runName).getId());
-          model.put("runName", runName);
-          model.put("runStatus", status);
+            //      try {
+            Status status = requestManager.getStatusByRunName(runName);
+            if (status != null) {
+                model.put("referenceName", sr.getName());
+                model.put("referenceId", sr.getId());
+                model.put("runId", requestManager.getRunByAlias(runName).getId());
+                model.put("runName", runName);
+                model.put("runStatus", status);
 
           /*
           InputStream in = StatsController.class.getResourceAsStream("/status/xsl/illumina/statusXml.xsl");
@@ -412,29 +416,27 @@ public class StatsController {
             model.put("statusXml", (SubmissionUtils.xslTransform(status.getXml(), xsl)));
           }
           */
+            } else {
+                model.put("error", MisoWebUtils.generateErrorDivMessage("Cannot consume the xml file for the given run name: " + runName));
+            }
+            //      }
+            //      catch (TransformerException e) {
+            //        model.put("error", MisoWebUtils.generateErrorDivMessage("Cannot retrieve status XML for the given run: " + runName, e.getMessage()));
+            //        e.printStackTrace();
+            //      }
+            //      catch (InterrogationException e) {
+            //        model.put("error", MisoWebUtils.generateErrorDivMessage("Cannot retrieve status information for the given sequencer reference: " + sr.getName(), e.getMessage()));
+            //        log.info(e.getMessage());
+            //        e.printStackTrace();
+            //      }
+        } else {
+            model.put("error", "Cannot retrieve the given sequencer reference: " + referenceId);
         }
-        else {
-          model.put("error", MisoWebUtils.generateErrorDivMessage("Cannot consume the xml file for the given run name: " + runName));
-        }
-//      }
-//      catch (TransformerException e) {
-//        model.put("error", MisoWebUtils.generateErrorDivMessage("Cannot retrieve status XML for the given run: " + runName, e.getMessage()));
-//        e.printStackTrace();
-//      }
-//      catch (InterrogationException e) {
-//        model.put("error", MisoWebUtils.generateErrorDivMessage("Cannot retrieve status information for the given sequencer reference: " + sr.getName(), e.getMessage()));
-//        log.info(e.getMessage());
-//        e.printStackTrace();
-//      }
+        return new ModelAndView("/pages/viewStats.jsp", model);
     }
-    else {
-      model.put("error", "Cannot retrieve the given sequencer reference: " + referenceId);
-    }
-    return new ModelAndView("/pages/viewStats.jsp", model);
-  }
 
-  @RequestMapping(value = "/configure", method = RequestMethod.GET)
-  public ModelAndView configure(ModelMap model) throws IOException {
-    return new ModelAndView("/pages/configureStats.jsp", model);
-  }
+    @RequestMapping(value = "/configure", method = RequestMethod.GET)
+    public ModelAndView configure(ModelMap model) throws IOException {
+        return new ModelAndView("/pages/configureStats.jsp", model);
+    }
 }

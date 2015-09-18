@@ -51,150 +51,138 @@ import java.io.IOException;
  */
 @Ajaxified
 public class StatsControllerHelperService {
-  protected static final Logger log = LoggerFactory.getLogger(StatsControllerHelperService.class);
-  @Autowired
-  private SecurityManager securityManager;
-  @Autowired
-  private RequestManager requestManager;
+    protected static final Logger log = LoggerFactory.getLogger(StatsControllerHelperService.class);
+    @Autowired
+    private SecurityManager securityManager;
+    @Autowired
+    private RequestManager requestManager;
 
-  private RunStatsManager runStatsManager;
+    private RunStatsManager runStatsManager;
 
-  @Autowired
-  private NotificationQueryService notificationQueryService;
+    @Autowired
+    private NotificationQueryService notificationQueryService;
 
-  public void setSecurityManager(SecurityManager securityManager) {
-    this.securityManager = securityManager;
-  }
-
-  public void setRequestManager(RequestManager requestManager) {
-    this.requestManager = requestManager;
-  }
-
-  public void setRunStatsManager(RunStatsManager runStatsManager) {
-    this.runStatsManager = runStatsManager;
-  }
-
-  public void setNotificationQueryService(NotificationQueryService notificationQueryService) {
-    this.notificationQueryService = notificationQueryService;
-  }
-
-  public JSONObject getRunStats(HttpSession session, JSONObject json) {
-    if (runStatsManager != null) {
-      Long runId = json.getLong("runId");
-      try {
-        Run run = requestManager.getRunById(runId);
-        return runStatsManager.getSummaryStatsForRun(run);
-      }
-      catch (IOException e) {
-        e.printStackTrace();
-        return JSONUtils.SimpleJSONError("Cannot retrieve run: " + e.getMessage());
-      }
-      catch (RunStatsException e) {
-        e.printStackTrace();
-        return JSONUtils.SimpleJSONError("Cannot get stats for run: " + e.getMessage());
-      }
+    public void setSecurityManager(SecurityManager securityManager) {
+        this.securityManager = securityManager;
     }
-    else {
-      return JSONUtils.SimpleJSONError("Run stats manager is not set. No stats available.");
-    }
-  }
 
-  public JSONObject getPartitionStats(HttpSession session, JSONObject json) {
-    if (runStatsManager != null) {
-      Long runId = json.getLong("runId");
-      Integer partitionNumber = json.getInt("partitionNumber");
-      try {
-        Run run = requestManager.getRunById(runId);
-        return runStatsManager.getSummaryStatsForLane(run, partitionNumber);
-      }
-      catch (IOException e) {
-        e.printStackTrace();
-        return JSONUtils.SimpleJSONError("Cannot retrieve run: " + e.getMessage());
-      }
-      catch (RunStatsException e) {
-        e.printStackTrace();
-        return JSONUtils.SimpleJSONError("Cannot get stats for lane: " + e.getMessage());
-      }
+    public void setRequestManager(RequestManager requestManager) {
+        this.requestManager = requestManager;
     }
-    else {
-      return JSONUtils.SimpleJSONError("Run stats manager is not set. No stats available.");
-    }
-  }
 
-  public JSONObject getSummaryRunstatsDiagram(HttpSession session, JSONObject json) {
-    Long runId = json.getLong("runId");
-    Integer lane = json.getInt("lane");
-    try {
-      Run run = requestManager.getRunById(runId);
-      JSONObject resultJson = runStatsManager.getPerPositionBaseSequenceQualityForLane(run, lane);
-      return resultJson;
+    public void setRunStatsManager(RunStatsManager runStatsManager) {
+        this.runStatsManager = runStatsManager;
     }
-    catch (IOException e) {
-      log.debug("Failed", e);
-      return JSONUtils.SimpleJSONError("Failed");
-    }
-    catch (RunStatsException e) {
-      log.debug("Failed", e);
-      return JSONUtils.SimpleJSONError("Failed");
-    }
-  }
 
-  public JSONObject getInterOpMetrics(HttpSession session, JSONObject json) {
-    String runAlias = json.getString("runAlias");
-    String platformType = json.getString("platformType").toLowerCase();
-    try {
-      return notificationQueryService.getInterOpMetrics(runAlias, platformType);
+    public void setNotificationQueryService(NotificationQueryService notificationQueryService) {
+        this.notificationQueryService = notificationQueryService;
     }
-    catch (IntegrationException e) {
-      e.printStackTrace();
-      log.debug("Failed", e);
-      return JSONUtils.SimpleJSONError("Failed to retrieve InterOp metrics: " + e.getMessage());
-    }
-  }
 
-  public JSONObject getInterOpMetricsForLane(HttpSession session, JSONObject json) {
-    String runAlias = json.getString("runAlias");
-    String platformType = json.getString("platformType").toLowerCase();
-    int laneNum = json.getInt("lane");
-    try {
-      return notificationQueryService.getInterOpMetricsForLane(runAlias, platformType, laneNum);
-    }
-    catch (IntegrationException e) {
-      e.printStackTrace();
-      log.debug("Failed", e);
-      return JSONUtils.SimpleJSONError("Failed to retrieve InterOp metrics: " + e.getMessage());
-    }
-  }
-
-  public JSONObject updateRunProgress(HttpSession session, JSONObject json) {
-    String runAlias = json.getString("runAlias");
-    try {
-      Run run = requestManager.getRunByAlias(runAlias);
-      if (run != null && run.getStatus() != null && run.getStatus().getHealth().equals(HealthType.Unknown)) {
-        String platformType = json.getString("platformType").toLowerCase();
-        JSONObject response = notificationQueryService.getRunProgress(runAlias, platformType);
-        if (response.has("progress")) {
-          String progress = response.getString("progress");
-          if (!run.getStatus().getHealth().equals(HealthType.valueOf(progress))) {
-            run.getStatus().setHealth(HealthType.valueOf(progress));
-            requestManager.saveRun(run);
-            return response;
-          }
-          return JSONUtils.SimpleJSONResponse("No run progress change necessary for run " + runAlias);
+    public JSONObject getRunStats(HttpSession session, JSONObject json) {
+        if (runStatsManager != null) {
+            Long runId = json.getLong("runId");
+            try {
+                Run run = requestManager.getRunById(runId);
+                return runStatsManager.getSummaryStatsForRun(run);
+            } catch (IOException e) {
+                e.printStackTrace();
+                return JSONUtils.SimpleJSONError("Cannot retrieve run: " + e.getMessage());
+            } catch (RunStatsException e) {
+                e.printStackTrace();
+                return JSONUtils.SimpleJSONError("Cannot get stats for run: " + e.getMessage());
+            }
+        } else {
+            return JSONUtils.SimpleJSONError("Run stats manager is not set. No stats available.");
         }
-        return JSONUtils.SimpleJSONResponse("No run progress available for run " + runAlias);
-      }
-      return JSONUtils.SimpleJSONResponse("Run already set to non-Unknown: " + runAlias);
     }
-    catch (IntegrationException e) {
-      e.printStackTrace();
-      log.debug("Failed", e);
-      return JSONUtils.SimpleJSONError("Failed to retrieve run progress: " + e.getMessage());
+
+    public JSONObject getPartitionStats(HttpSession session, JSONObject json) {
+        if (runStatsManager != null) {
+            Long runId = json.getLong("runId");
+            Integer partitionNumber = json.getInt("partitionNumber");
+            try {
+                Run run = requestManager.getRunById(runId);
+                return runStatsManager.getSummaryStatsForLane(run, partitionNumber);
+            } catch (IOException e) {
+                e.printStackTrace();
+                return JSONUtils.SimpleJSONError("Cannot retrieve run: " + e.getMessage());
+            } catch (RunStatsException e) {
+                e.printStackTrace();
+                return JSONUtils.SimpleJSONError("Cannot get stats for lane: " + e.getMessage());
+            }
+        } else {
+            return JSONUtils.SimpleJSONError("Run stats manager is not set. No stats available.");
+        }
     }
-    catch (IOException e) {
-      e.printStackTrace();
-      log.debug("Failed", e);
-      return JSONUtils.SimpleJSONError("Failed to retrieve run progress: " + e.getMessage());
+
+    public JSONObject getSummaryRunstatsDiagram(HttpSession session, JSONObject json) {
+        Long runId = json.getLong("runId");
+        Integer lane = json.getInt("lane");
+        try {
+            Run run = requestManager.getRunById(runId);
+            JSONObject resultJson = runStatsManager.getPerPositionBaseSequenceQualityForLane(run, lane);
+            return resultJson;
+        } catch (IOException e) {
+            log.debug("Failed", e);
+            return JSONUtils.SimpleJSONError("Failed");
+        } catch (RunStatsException e) {
+            log.debug("Failed", e);
+            return JSONUtils.SimpleJSONError("Failed");
+        }
     }
-  }
+
+    public JSONObject getInterOpMetrics(HttpSession session, JSONObject json) {
+        String runAlias = json.getString("runAlias");
+        String platformType = json.getString("platformType").toLowerCase();
+        try {
+            return notificationQueryService.getInterOpMetrics(runAlias, platformType);
+        } catch (IntegrationException e) {
+            e.printStackTrace();
+            log.debug("Failed", e);
+            return JSONUtils.SimpleJSONError("Failed to retrieve InterOp metrics: " + e.getMessage());
+        }
+    }
+
+    public JSONObject getInterOpMetricsForLane(HttpSession session, JSONObject json) {
+        String runAlias = json.getString("runAlias");
+        String platformType = json.getString("platformType").toLowerCase();
+        int laneNum = json.getInt("lane");
+        try {
+            return notificationQueryService.getInterOpMetricsForLane(runAlias, platformType, laneNum);
+        } catch (IntegrationException e) {
+            e.printStackTrace();
+            log.debug("Failed", e);
+            return JSONUtils.SimpleJSONError("Failed to retrieve InterOp metrics: " + e.getMessage());
+        }
+    }
+
+    public JSONObject updateRunProgress(HttpSession session, JSONObject json) {
+        String runAlias = json.getString("runAlias");
+        try {
+            Run run = requestManager.getRunByAlias(runAlias);
+            if (run != null && run.getStatus() != null && run.getStatus().getHealth().equals(HealthType.Unknown)) {
+                String platformType = json.getString("platformType").toLowerCase();
+                JSONObject response = notificationQueryService.getRunProgress(runAlias, platformType);
+                if (response.has("progress")) {
+                    String progress = response.getString("progress");
+                    if (!run.getStatus().getHealth().equals(HealthType.valueOf(progress))) {
+                        run.getStatus().setHealth(HealthType.valueOf(progress));
+                        requestManager.saveRun(run);
+                        return response;
+                    }
+                    return JSONUtils.SimpleJSONResponse("No run progress change necessary for run " + runAlias);
+                }
+                return JSONUtils.SimpleJSONResponse("No run progress available for run " + runAlias);
+            }
+            return JSONUtils.SimpleJSONResponse("Run already set to non-Unknown: " + runAlias);
+        } catch (IntegrationException e) {
+            e.printStackTrace();
+            log.debug("Failed", e);
+            return JSONUtils.SimpleJSONError("Failed to retrieve run progress: " + e.getMessage());
+        } catch (IOException e) {
+            e.printStackTrace();
+            log.debug("Failed", e);
+            return JSONUtils.SimpleJSONError("Failed to retrieve run progress: " + e.getMessage());
+        }
+    }
 }

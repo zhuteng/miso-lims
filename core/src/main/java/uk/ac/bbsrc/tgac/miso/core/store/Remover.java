@@ -35,12 +35,12 @@ import java.io.IOException;
  * @since 0.0.3
  */
 public interface Remover<T extends Deletable> {
-  /**
-   * Remove object of given type T
-   *
-   * @param t of type T
-   * @return boolean true if removed successfully
-   * @throws java.io.IOException when the object cannot be removed
-   */
-  public boolean remove(T t) throws IOException;
+    /**
+     * Remove object of given type T
+     *
+     * @param t of type T
+     * @return boolean true if removed successfully
+     * @throws java.io.IOException when the object cannot be removed
+     */
+    public boolean remove(T t) throws IOException;
 }

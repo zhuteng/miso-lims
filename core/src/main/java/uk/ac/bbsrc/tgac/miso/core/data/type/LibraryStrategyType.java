@@ -38,108 +38,120 @@ import java.io.Serializable;
  * @since 0.0.2
  */
 public class LibraryStrategyType implements Comparable, Serializable {
-  /** Field UNSAVED_ID  */
-  public static final Long UNSAVED_ID = 0L;
+    /**
+     * Field UNSAVED_ID
+     */
+    public static final Long UNSAVED_ID = 0L;
 
-  /** Field libraryStrategyTypeId  */
-  @Id
-  @GeneratedValue(strategy = GenerationType.AUTO)
-  private long libraryStrategyTypeId = LibraryStrategyType.UNSAVED_ID;
-  /** Field name  */
-  private String name;
-  /** Field description  */
-  private String description;
+    /**
+     * Field libraryStrategyTypeId
+     */
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private long libraryStrategyTypeId = LibraryStrategyType.UNSAVED_ID;
+    /**
+     * Field name
+     */
+    private String name;
+    /**
+     * Field description
+     */
+    private String description;
 
-  /**
-   * Returns the libraryStrategyTypeId of this LibraryStrategyType object.
-   *
-   * @return Long libraryStrategyTypeId.
-   */
-  public Long getLibraryStrategyTypeId() {
-    return libraryStrategyTypeId;
-  }
-
-  /**
-   * Sets the libraryStrategyTypeId of this LibraryStrategyType object.
-   *
-   * @param libraryStrategyTypeId libraryStrategyTypeId.
-   */
-  public void setLibraryStrategyTypeId(Long libraryStrategyTypeId) {
-    this.libraryStrategyTypeId = libraryStrategyTypeId;
-  }
-
-  /**
-   * Returns the name of this LibraryStrategyType object.
-   *
-   * @return String name.
-   */
-  public String getName() {
-    return name;
-  }
-
-  /**
-   * Sets the name of this LibraryStrategyType object.
-   *
-   * @param name name.
-   */
-  public void setName(String name) {
-    this.name = name;
-  }
-
-  /**
-   * Returns the description of this LibraryStrategyType object.
-   *
-   * @return String description.
-   */
-  public String getDescription() {
-    return description;
-  }
-
-  /**
-   * Sets the description of this LibraryStrategyType object.
-   *
-   * @param description description.
-   */
-  public void setDescription(String description) {
-    this.description = description;
-  }
-
-  @Override
-  public boolean equals(Object obj) {
-    if (obj == null)
-      return false;
-    if (obj == this)
-      return true;
-    if (!(obj instanceof LibraryStrategyType))
-      return false;
-    LibraryStrategyType them = (LibraryStrategyType) obj;
-    // If not saved, then compare resolved actual objects. Otherwise
-    // just compare IDs.
-    return getName().equals(them.getName());
-  }
-
-  @Override
-  public int hashCode() {
-    if (getLibraryStrategyTypeId() != UNSAVED_ID) {
-      return getLibraryStrategyTypeId().intValue();
+    /**
+     * Returns the libraryStrategyTypeId of this LibraryStrategyType object.
+     *
+     * @return Long libraryStrategyTypeId.
+     */
+    public Long getLibraryStrategyTypeId() {
+        return libraryStrategyTypeId;
     }
-    else {
-      int hashcode = -1;
-      if (getName() != null) hashcode = 37 * hashcode + getName().hashCode();
-      if (getDescription() != null) hashcode = 37 * hashcode + getDescription().hashCode();
-      return hashcode;
+
+    /**
+     * Sets the libraryStrategyTypeId of this LibraryStrategyType object.
+     *
+     * @param libraryStrategyTypeId libraryStrategyTypeId.
+     */
+    public void setLibraryStrategyTypeId(Long libraryStrategyTypeId) {
+        this.libraryStrategyTypeId = libraryStrategyTypeId;
     }
-  }
 
-  @Override
-  public int compareTo(Object o) {
-    LibraryStrategyType t = (LibraryStrategyType)o;
+    /**
+     * Returns the name of this LibraryStrategyType object.
+     *
+     * @return String name.
+     */
+    public String getName() {
+        return name;
+    }
 
-    int name = getName().compareTo(t.getName());
-    if (name != 0) return name;
+    /**
+     * Sets the name of this LibraryStrategyType object.
+     *
+     * @param name name.
+     */
+    public void setName(String name) {
+        this.name = name;
+    }
 
-    if (getLibraryStrategyTypeId() < t.getLibraryStrategyTypeId()) return -1;
-    if (getLibraryStrategyTypeId() > t.getLibraryStrategyTypeId()) return 1;
-    return 0;
-  }
+    /**
+     * Returns the description of this LibraryStrategyType object.
+     *
+     * @return String description.
+     */
+    public String getDescription() {
+        return description;
+    }
+
+    /**
+     * Sets the description of this LibraryStrategyType object.
+     *
+     * @param description description.
+     */
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null)
+            return false;
+        if (obj == this)
+            return true;
+        if (!(obj instanceof LibraryStrategyType))
+            return false;
+        LibraryStrategyType them = (LibraryStrategyType) obj;
+        // If not saved, then compare resolved actual objects. Otherwise
+        // just compare IDs.
+        return getName().equals(them.getName());
+    }
+
+    @Override
+    public int hashCode() {
+        if (getLibraryStrategyTypeId() != UNSAVED_ID) {
+            return getLibraryStrategyTypeId().intValue();
+        } else {
+            int hashcode = -1;
+            if (getName() != null)
+                hashcode = 37 * hashcode + getName().hashCode();
+            if (getDescription() != null)
+                hashcode = 37 * hashcode + getDescription().hashCode();
+            return hashcode;
+        }
+    }
+
+    @Override
+    public int compareTo(Object o) {
+        LibraryStrategyType t = (LibraryStrategyType) o;
+
+        int name = getName().compareTo(t.getName());
+        if (name != 0)
+            return name;
+
+        if (getLibraryStrategyTypeId() < t.getLibraryStrategyTypeId())
+            return -1;
+        if (getLibraryStrategyTypeId() > t.getLibraryStrategyTypeId())
+            return 1;
+        return 0;
+    }
 }

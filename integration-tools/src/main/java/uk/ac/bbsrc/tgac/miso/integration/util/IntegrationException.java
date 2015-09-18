@@ -33,14 +33,14 @@ package uk.ac.bbsrc.tgac.miso.integration.util;
  * @since 0.0.2
  */
 public class IntegrationException extends Exception {
-  public IntegrationException(String s) {
-    super(s);
-  }
-
-  public IntegrationException(String s, Throwable cause) {
-    super(s);
-    if (cause != null) {
-        initCause(cause);
+    public IntegrationException(String s) {
+        super(s);
     }
-  }
+
+    public IntegrationException(String s, Throwable cause) {
+        super(s);
+        if (cause != null) {
+            initCause(cause);
+        }
+    }
 }

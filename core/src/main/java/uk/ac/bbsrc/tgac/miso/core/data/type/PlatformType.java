@@ -35,65 +35,65 @@ import java.util.Map;
  * @since 0.0.2
  */
 public enum PlatformType {
-  ILLUMINA("Illumina"),
-  LS454("LS454"),
-  SOLID("Solid"),
-  IONTORRENT("IonTorrent"),
-  PACBIO("PacBio"),
-  OXFORD_NANOPORE("OxfordNanopore");
+    ILLUMINA("Illumina"),
+    LS454("LS454"),
+    SOLID("Solid"),
+    IONTORRENT("IonTorrent"),
+    PACBIO("PacBio"),
+    OXFORD_NANOPORE("OxfordNanopore");
 
-  /**
-   * Field key
-   */
-  private String key;
-  /**
-   * Field lookup
-   */
-  private static final Map<String, PlatformType> lookup = new HashMap<String, PlatformType>();
+    /**
+     * Field key
+     */
+    private String key;
+    /**
+     * Field lookup
+     */
+    private static final Map<String, PlatformType> lookup = new HashMap<String, PlatformType>();
 
-  static {
-    for (PlatformType s : EnumSet.allOf(PlatformType.class))
-      lookup.put(s.getKey(), s);
-  }
-
-  /**
-   * Constructs a PlatformType based on a given key
-   *
-   * @param key of type String
-   */
-  PlatformType(String key) {
-    this.key = key;
-  }
-
-  /**
-   * Returns a PlatformType given an enum key
-   *
-   * @param key of type String
-   * @return PlatformType
-   */
-  public static PlatformType get(String key) {
-    return lookup.get(key);
-  }
-
-  /**
-   * Returns the key of this PlatformType enum.
-   *
-   * @return String key.
-   */
-  public String getKey() {
-    return key;
-  }
-
-  /**
-   * Returns the keys of this PlatformType enum.
-   *
-   * @return ArrayList<String> keys.
-   */
-  public static ArrayList<String> getKeys() {
-    ArrayList<String> keys = new ArrayList<String>();
-    for (PlatformType r : PlatformType.values()) {
-      keys.add(r.getKey());
+    static {
+        for (PlatformType s : EnumSet.allOf(PlatformType.class))
+            lookup.put(s.getKey(), s);
     }
-    return keys;
-  }
+
+    /**
+     * Constructs a PlatformType based on a given key
+     *
+     * @param key of type String
+     */
+    PlatformType(String key) {
+        this.key = key;
+    }
+
+    /**
+     * Returns a PlatformType given an enum key
+     *
+     * @param key of type String
+     * @return PlatformType
+     */
+    public static PlatformType get(String key) {
+        return lookup.get(key);
+    }
+
+    /**
+     * Returns the key of this PlatformType enum.
+     *
+     * @return String key.
+     */
+    public String getKey() {
+        return key;
+    }
+
+    /**
+     * Returns the keys of this PlatformType enum.
+     *
+     * @return ArrayList<String> keys.
+     */
+    public static ArrayList<String> getKeys() {
+        ArrayList<String> keys = new ArrayList<String>();
+        for (PlatformType r : PlatformType.values()) {
+            keys.add(r.getKey());
+        }
+        return keys;
+    }
 }

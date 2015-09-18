@@ -32,7 +32,9 @@ import org.springframework.transaction.annotation.Transactional;
 import uk.ac.bbsrc.tgac.miso.core.data.Status;
 
 import java.io.IOException;
-import java.lang.String;import java.lang.SuppressWarnings;import java.util.Collection;
+import java.lang.String;
+import java.lang.SuppressWarnings;
+import java.util.Collection;
 
 /**
  * com.eaglegenomics.miso.hibernatestore
@@ -43,34 +45,34 @@ import java.lang.String;import java.lang.SuppressWarnings;import java.util.Colle
  * @since 0.0.2
  */
 @Deprecated
-public class HibernateStatusStore  extends HibernateDaoSupport implements Store<Status> {
-  @Transactional(readOnly = false)
-  public long save(Status status) throws IOException {
-    getHibernateTemplate().saveOrUpdate(status);
-    //getHibernateTemplate().merge(status);
-    return status.getStatusId();
-  }
+public class HibernateStatusStore extends HibernateDaoSupport implements Store<Status> {
+    @Transactional(readOnly = false)
+    public long save(Status status) throws IOException {
+        getHibernateTemplate().saveOrUpdate(status);
+        //getHibernateTemplate().merge(status);
+        return status.getStatusId();
+    }
 
-  @Transactional(readOnly = true)
-  public Status get(long statusId) throws IOException {
-    //may have to check for null before the cast
-    return (Status) getHibernateTemplate().get(StatusImpl.class, statusId);
-  }
+    @Transactional(readOnly = true)
+    public Status get(long statusId) throws IOException {
+        //may have to check for null before the cast
+        return (Status) getHibernateTemplate().get(StatusImpl.class, statusId);
+    }
 
-  @Override
-  public Status lazyGet(long id) throws IOException {
-    return get(id);
-  }
+    @Override
+    public Status lazyGet(long id) throws IOException {
+        return get(id);
+    }
 
-  @Transactional(readOnly = true)
-  public Status get(String name) throws IOException {
-    //may have to check for null before the cast
-    return (Status) getHibernateTemplate().get(StatusImpl.class, name);
-  }
+    @Transactional(readOnly = true)
+    public Status get(String name) throws IOException {
+        //may have to check for null before the cast
+        return (Status) getHibernateTemplate().get(StatusImpl.class, name);
+    }
 
-  @Transactional(readOnly = true)
-  @SuppressWarnings("unchecked")
-  public Collection<Status> listAll() throws IOException {
+    @Transactional(readOnly = true)
+    @SuppressWarnings("unchecked")
+    public Collection<Status> listAll() throws IOException {
 /*    return (Collection<Status>) getHibernateTemplate().execute(
             new HibernateCallback() {
               public Object doInHibernate(Session session)
@@ -79,11 +81,11 @@ public class HibernateStatusStore  extends HibernateDaoSupport implements Store<
               }
             });
             */
-    return null;
-  }
+        return null;
+    }
 
-  @Override
-  public int count() throws IOException {
-    return 0;
-  }
+    @Override
+    public int count() throws IOException {
+        return 0;
+    }
 }

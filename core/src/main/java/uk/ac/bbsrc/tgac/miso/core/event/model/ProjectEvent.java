@@ -38,37 +38,37 @@ import uk.ac.bbsrc.tgac.miso.core.event.type.MisoEventType;
  * @since 0.1.3
  */
 public class ProjectEvent implements Event<Project> {
-  private Project project;
-  private String message;
-  private MisoEventType eventType;
-  private JSONObject eventContext = new JSONObject();
+    private Project project;
+    private String message;
+    private MisoEventType eventType;
+    private JSONObject eventContext = new JSONObject();
 
-  public ProjectEvent(Project project, MisoEventType eventType, String message) {
-    this.project = project;
-    this.message = message;
-    this.eventType = eventType;
-  }
+    public ProjectEvent(Project project, MisoEventType eventType, String message) {
+        this.project = project;
+        this.message = message;
+        this.eventType = eventType;
+    }
 
-  public Project getEventObject() {
-    return this.project;
-  }
+    public Project getEventObject() {
+        return this.project;
+    }
 
-  @Override
-  public JSONObject getEventContext() {
-    return eventContext;
-  }
+    @Override
+    public JSONObject getEventContext() {
+        return eventContext;
+    }
 
-  public void setEventContext(JSONObject eventContext) {
-    this.eventContext = eventContext;
-  }
+    public void setEventContext(JSONObject eventContext) {
+        this.eventContext = eventContext;
+    }
 
-  @Override
-  public MisoEventType getEventType() {
-    return eventType;
-  }
+    @Override
+    public MisoEventType getEventType() {
+        return eventType;
+    }
 
-  @Override
-  public String getEventMessage() {
-    return message;
-  }
+    @Override
+    public String getEventMessage() {
+        return message;
+    }
 }

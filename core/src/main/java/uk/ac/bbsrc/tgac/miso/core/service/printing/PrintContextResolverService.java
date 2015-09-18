@@ -39,6 +39,6 @@ import java.util.Collection;
  * @since 0.1.6
  */
 public interface PrintContextResolverService {
-  PrintContext getPrintContext(String contextName);
-  Collection<PrintContext> getPrintContexts();
+    PrintContext getPrintContext(String contextName);
+    Collection<PrintContext> getPrintContexts();
 }

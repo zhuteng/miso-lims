@@ -38,14 +38,14 @@ import uk.ac.bbsrc.tgac.miso.analysis.manager.AnalysisRequestManager;
  * @since 0.1.2
  */
 public class AnalysisServer {
-  protected static final Logger log = LoggerFactory.getLogger(AnalysisServer.class);
+    protected static final Logger log = LoggerFactory.getLogger(AnalysisServer.class);
 
-  public static void main(String[] args) {
-    log.info("Starting Analysis Server...");
+    public static void main(String[] args) {
+        log.info("Starting Analysis Server...");
 
-    ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("/analysis-server.xml");
+        ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("/analysis-server.xml");
 
-    AnalysisRequestManager manager = (AnalysisRequestManager) context.getBean("analysisManager");
-    log.info("READY: " + manager.getConanTaskService().getTasks().toString());
-  }
+        AnalysisRequestManager manager = (AnalysisRequestManager) context.getBean("analysisManager");
+        log.info("READY: " + manager.getConanTaskService().getTasks().toString());
+    }
 }

@@ -38,121 +38,122 @@ import java.util.Date;
  * @since 0.0.3
  */
 public abstract class AbstractQC implements QC {
-  public static final Long UNSAVED_ID = 0L;
+    public static final Long UNSAVED_ID = 0L;
 
-  @Id
-  @GeneratedValue(strategy = GenerationType.AUTO)
-  private long qcId = AbstractQC.UNSAVED_ID;
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private long qcId = AbstractQC.UNSAVED_ID;
 
-  private String qcUserName;
-  private QcType qcType;
-  private Date qcDate = new Date();
+    private String qcUserName;
+    private QcType qcType;
+    private Date qcDate = new Date();
 
-  @Deprecated
-  public Long getQcId() {
-    return qcId;
-  }
-
-  @Deprecated
-  public void setQcId(Long qcId) {
-    this.qcId = qcId;
-  }
-
-  @Override
-  public long getId() {
-    return qcId;
-  }
-
-  public void setId(long qcId) {
-    this.qcId = qcId;
-  }
-
-  public String getQcCreator() {
-    return qcUserName;
-  }
-
-  public void setQcCreator(String qcUserName) {
-    this.qcUserName = qcUserName;
-  }
-
-  public QcType getQcType() {
-    return qcType;
-  }
-
-  public void setQcType(QcType qcType) {
-    this.qcType = qcType;
-  }
-
-  public Date getQcDate() {
-    return qcDate;
-  }
-
-  public void setQcDate(Date qcDate) {
-    this.qcDate = qcDate;
-  }
-
-  public boolean isDeletable() {
-    return getId() != AbstractQC.UNSAVED_ID;
-  }
-
-  /**
-   * Equivalency is based on getQcId() if set, otherwise on name
-   */
-  @Override
-  public boolean equals(Object obj) {
-    if (obj == null)
-      return false;
-    if (obj == this)
-      return true;
-    if (!(obj instanceof QC))
-      return false;
-    QC them = (QC) obj;
-    // If not saved, then compare resolved actual objects. Otherwise
-    // just compare IDs.
-    if (this.getId() == AbstractQC.UNSAVED_ID
-        || them.getId() == AbstractQC.UNSAVED_ID) {
-      return this.getQcCreator().equals(them.getQcCreator())
-             && this.getQcDate().equals(them.getQcDate())
-             && this.getQcType().equals(them.getQcType());
+    @Deprecated
+    public Long getQcId() {
+        return qcId;
     }
-    else {
-      return this.getId() == them.getId();
-    }
-  }
 
-  @Override
-  public int hashCode() {
-    if (getId() != 0L && getId() != AbstractQC.UNSAVED_ID) {
-      return (int)getId();
+    @Deprecated
+    public void setQcId(Long qcId) {
+        this.qcId = qcId;
     }
-    else {
-      final int PRIME = 37;
-      int hashcode = -1;
-      if (getQcCreator() != null) hashcode = PRIME * hashcode + getQcCreator().hashCode();
-      if (getQcDate() != null) hashcode = PRIME * hashcode + getQcDate().hashCode();
-      if (getQcType() != null) hashcode = PRIME * hashcode + getQcType().hashCode();
-      return hashcode;
+
+    @Override
+    public long getId() {
+        return qcId;
     }
-  }
 
-  @Override
-  public int compareTo(Object o) {
-    QC t = (QC)o;
-    if (getId() < t.getId()) return -1;
-    if (getId() > t.getId()) return 1;
-    return 0;
-  }
+    public void setId(long qcId) {
+        this.qcId = qcId;
+    }
 
-  @Override
-  public String toString() {
-    StringBuilder sb = new StringBuilder();
-    sb.append(getId());
-    sb.append(" : ");
-    sb.append(getQcCreator());
-    sb.append(" : ");
-    sb.append(getQcDate());
-    sb.append(" : ");
-    sb.append(getQcType());
-    return sb.toString();
-  }
+    public String getQcCreator() {
+        return qcUserName;
+    }
+
+    public void setQcCreator(String qcUserName) {
+        this.qcUserName = qcUserName;
+    }
+
+    public QcType getQcType() {
+        return qcType;
+    }
+
+    public void setQcType(QcType qcType) {
+        this.qcType = qcType;
+    }
+
+    public Date getQcDate() {
+        return qcDate;
+    }
+
+    public void setQcDate(Date qcDate) {
+        this.qcDate = qcDate;
+    }
+
+    public boolean isDeletable() {
+        return getId() != AbstractQC.UNSAVED_ID;
+    }
+
+    /**
+     * Equivalency is based on getQcId() if set, otherwise on name
+     */
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null)
+            return false;
+        if (obj == this)
+            return true;
+        if (!(obj instanceof QC))
+            return false;
+        QC them = (QC) obj;
+        // If not saved, then compare resolved actual objects. Otherwise
+        // just compare IDs.
+        if (this.getId() == AbstractQC.UNSAVED_ID || them.getId() == AbstractQC.UNSAVED_ID) {
+            return this.getQcCreator().equals(them.getQcCreator()) && this.getQcDate().equals(them.getQcDate()) &&
+                   this.getQcType().equals(them.getQcType());
+        } else {
+            return this.getId() == them.getId();
+        }
+    }
+
+    @Override
+    public int hashCode() {
+        if (getId() != 0L && getId() != AbstractQC.UNSAVED_ID) {
+            return (int) getId();
+        } else {
+            final int PRIME = 37;
+            int hashcode = -1;
+            if (getQcCreator() != null)
+                hashcode = PRIME * hashcode + getQcCreator().hashCode();
+            if (getQcDate() != null)
+                hashcode = PRIME * hashcode + getQcDate().hashCode();
+            if (getQcType() != null)
+                hashcode = PRIME * hashcode + getQcType().hashCode();
+            return hashcode;
+        }
+    }
+
+    @Override
+    public int compareTo(Object o) {
+        QC t = (QC) o;
+        if (getId() < t.getId())
+            return -1;
+        if (getId() > t.getId())
+            return 1;
+        return 0;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(getId());
+        sb.append(" : ");
+        sb.append(getQcCreator());
+        sb.append(" : ");
+        sb.append(getQcDate());
+        sb.append(" : ");
+        sb.append(getQcType());
+        return sb.toString();
+    }
 }

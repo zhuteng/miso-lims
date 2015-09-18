@@ -34,12 +34,12 @@ import uk.ac.bbsrc.tgac.miso.core.exception.InterrogationException;
  */
 public interface ConsumerMechanism<R, O> {
     /**
-   * Consume a result R into an output O
-   *
-   * @param result of type R
-   * @return output of type O
-   * @throws uk.ac.bbsrc.tgac.miso.core.exception.InterrogationException when the incoming parameter cannot be
-   * consumed
-   */
-  O consume(R result) throws InterrogationException;
+     * Consume a result R into an output O
+     *
+     * @param result of type R
+     * @return output of type O
+     * @throws uk.ac.bbsrc.tgac.miso.core.exception.InterrogationException when the incoming parameter cannot be
+     *                                                                     consumed
+     */
+    O consume(R result) throws InterrogationException;
 }

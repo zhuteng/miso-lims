@@ -53,90 +53,90 @@ import java.util.*;
  * @since 0.0.2
  */
 @Controller
-@RequestMapping(value="/consumer")
+@RequestMapping(value = "/consumer")
 public class MessageConsumerController {
-  protected static final Logger log = LoggerFactory.getLogger(MessageConsumerController.class);
+    protected static final Logger log = LoggerFactory.getLogger(MessageConsumerController.class);
 
-  @Autowired
-  private NotificationGatewayService notificationGatewayService;
+    @Autowired
+    private NotificationGatewayService notificationGatewayService;
 
-  @Autowired
-  private SecurityManager securityManager;
+    @Autowired
+    private SecurityManager securityManager;
 
-  @Autowired
-  private RequestManager requestManager;
+    @Autowired
+    private RequestManager requestManager;
 
-  public void setNotificationGatewayService(NotificationGatewayService notificationGatewayService) {
-    this.notificationGatewayService = notificationGatewayService;
-  }
-
-  public void setRequestManager(RequestManager requestManager) {
-    this.requestManager = requestManager;
-  }
-
-  public void setSecurityManager(SecurityManager securityManager) {
-    this.securityManager = securityManager;
-  }
-
-  @RequestMapping(value="/illumina/run/status", method = RequestMethod.POST)
-  public String consumeGatewayIlluminaStatus(HttpServletRequest request) throws IOException {
-    for (NotificationGateway s : notificationGatewayService.getGatewaysFor(PlatformType.ILLUMINA)) {
-      log.debug("Using " + s.toString());
-      s.consume(buildMessage(exposeRequest(request)));
-    }
-    return "redirect:/miso";
-  }
-
-  @RequestMapping(value="/ls454/run/status", method = RequestMethod.POST)
-  public String consumeGateway454Status(HttpServletRequest request) throws IOException {
-    for (NotificationGateway s : notificationGatewayService.getGatewaysFor(PlatformType.LS454)) {
-      log.debug("Using " + s.toString());
-      s.consume(buildMessage(exposeRequest(request)));
-    }
-    return "redirect:/miso";
-  }
-
-  @RequestMapping(value="/solid/run/status", method = RequestMethod.POST)
-  public String consumeGatewaySolidStatus(HttpServletRequest request) throws IOException {
-    for (NotificationGateway s : notificationGatewayService.getGatewaysFor(PlatformType.SOLID)) {
-      log.debug("Using " + s.toString());
-      s.consume(buildMessage(exposeRequest(request)));
-    }
-    return "redirect:/miso";
-  }
-
-  @RequestMapping(value="/pacbio/run/status", method = RequestMethod.POST)
-  public String consumeGatewayPacbioStatus(HttpServletRequest request) throws IOException {
-    for (NotificationGateway s : notificationGatewayService.getGatewaysFor(PlatformType.PACBIO)) {
-      log.debug("Using " + s.toString());
-      s.consume(buildMessage(exposeRequest(request)));
-    }
-    return "redirect:/miso";
-  }
-
-  @RequestMapping(value="/iontorrent/run/status", method = RequestMethod.POST)
-  public String consumeGatewayIonTorrentStatus(HttpServletRequest request) throws IOException {
-    for (NotificationGateway s : notificationGatewayService.getGatewaysFor(PlatformType.IONTORRENT)) {
-      log.debug("Using " + s.toString());
-      s.consume(buildMessage(exposeRequest(request)));
-    }
-    return "redirect:/miso";
-  }
-
-  private MultiValueMap<String, String> exposeRequest(HttpServletRequest request) {
-    log.debug("Request size: "+request.getContentLength());
-    Map<String, Object> map = request.getParameterMap();
-    log.debug("RAW MAP: " + map.toString());
-    MultiValueMap<String, String> message = new LinkedMultiValueMap<String, String>();
-    for (String s : map.keySet()) {
-      log.debug("EXPOSING PARAM '" + s + "': " + LimsUtils.join(request.getParameterValues(s), ","));
-      message.put(s, Arrays.asList(request.getParameterValues(s)));
+    public void setNotificationGatewayService(NotificationGatewayService notificationGatewayService) {
+        this.notificationGatewayService = notificationGatewayService;
     }
 
-    return message;
-  }
+    public void setRequestManager(RequestManager requestManager) {
+        this.requestManager = requestManager;
+    }
 
-  private <T> Message<T> buildMessage(T payload) {
-    return MessageBuilder.withPayload(payload).setHeader("handler", requestManager).build();
-  }
+    public void setSecurityManager(SecurityManager securityManager) {
+        this.securityManager = securityManager;
+    }
+
+    @RequestMapping(value = "/illumina/run/status", method = RequestMethod.POST)
+    public String consumeGatewayIlluminaStatus(HttpServletRequest request) throws IOException {
+        for (NotificationGateway s : notificationGatewayService.getGatewaysFor(PlatformType.ILLUMINA)) {
+            log.debug("Using " + s.toString());
+            s.consume(buildMessage(exposeRequest(request)));
+        }
+        return "redirect:/miso";
+    }
+
+    @RequestMapping(value = "/ls454/run/status", method = RequestMethod.POST)
+    public String consumeGateway454Status(HttpServletRequest request) throws IOException {
+        for (NotificationGateway s : notificationGatewayService.getGatewaysFor(PlatformType.LS454)) {
+            log.debug("Using " + s.toString());
+            s.consume(buildMessage(exposeRequest(request)));
+        }
+        return "redirect:/miso";
+    }
+
+    @RequestMapping(value = "/solid/run/status", method = RequestMethod.POST)
+    public String consumeGatewaySolidStatus(HttpServletRequest request) throws IOException {
+        for (NotificationGateway s : notificationGatewayService.getGatewaysFor(PlatformType.SOLID)) {
+            log.debug("Using " + s.toString());
+            s.consume(buildMessage(exposeRequest(request)));
+        }
+        return "redirect:/miso";
+    }
+
+    @RequestMapping(value = "/pacbio/run/status", method = RequestMethod.POST)
+    public String consumeGatewayPacbioStatus(HttpServletRequest request) throws IOException {
+        for (NotificationGateway s : notificationGatewayService.getGatewaysFor(PlatformType.PACBIO)) {
+            log.debug("Using " + s.toString());
+            s.consume(buildMessage(exposeRequest(request)));
+        }
+        return "redirect:/miso";
+    }
+
+    @RequestMapping(value = "/iontorrent/run/status", method = RequestMethod.POST)
+    public String consumeGatewayIonTorrentStatus(HttpServletRequest request) throws IOException {
+        for (NotificationGateway s : notificationGatewayService.getGatewaysFor(PlatformType.IONTORRENT)) {
+            log.debug("Using " + s.toString());
+            s.consume(buildMessage(exposeRequest(request)));
+        }
+        return "redirect:/miso";
+    }
+
+    private MultiValueMap<String, String> exposeRequest(HttpServletRequest request) {
+        log.debug("Request size: " + request.getContentLength());
+        Map<String, Object> map = request.getParameterMap();
+        log.debug("RAW MAP: " + map.toString());
+        MultiValueMap<String, String> message = new LinkedMultiValueMap<String, String>();
+        for (String s : map.keySet()) {
+            log.debug("EXPOSING PARAM '" + s + "': " + LimsUtils.join(request.getParameterValues(s), ","));
+            message.put(s, Arrays.asList(request.getParameterValues(s)));
+        }
+
+        return message;
+    }
+
+    private <T> Message<T> buildMessage(T payload) {
+        return MessageBuilder.withPayload(payload).setHeader("handler", requestManager).build();
+    }
 }

@@ -56,112 +56,111 @@ import java.util.Collection;
 @RequestMapping("/rest/project")
 @SessionAttributes("project")
 public class ProjectRestController {
-  protected static final Logger log = LoggerFactory.getLogger(ProjectRestController.class);
+    protected static final Logger log = LoggerFactory.getLogger(ProjectRestController.class);
 
-  @Autowired
-  private RequestManager requestManager;
+    @Autowired
+    private RequestManager requestManager;
 
-  public void setRequestManager(RequestManager requestManager) {
-    this.requestManager = requestManager;
-  }
-
-  @RequestMapping(value = "/alias/{projectAlias}", method = RequestMethod.GET)
-  public @ResponseBody String getProjectByAlias(@PathVariable String projectAlias) throws IOException {
-    try {
-      Project project = requestManager.getProjectByAlias(projectAlias);
-      if (project != null) {
-        return getProjectById(project.getId());
-      }
-      return RestUtils.error("No such project with that alias.", "projectAlias", projectAlias).toString();
+    public void setRequestManager(RequestManager requestManager) {
+        this.requestManager = requestManager;
     }
-    catch (IOException ioe) {
-      return RestUtils.error("Cannot retrieve project: " + ioe.getMessage(), "projectAlias", projectAlias).toString();
-    }
-  }
 
-  @RequestMapping(value = "{projectId}", method = RequestMethod.GET)
-  public @ResponseBody String getProjectById(@PathVariable Long projectId) throws IOException {
-    ObjectMapper mapper = new ObjectMapper();
-    try {
-      Project project = requestManager.getProjectById(projectId);
-      if (project != null) {
-        for (Sample s : project.getSamples()) {
-          if (s.getLibraries().isEmpty()) {
-            for (Library l : requestManager.listAllLibrariesBySampleId(s.getId())) {
-              try {
-                s.addLibrary(l);
-              }
-              catch (MalformedLibraryException e) {
-                e.printStackTrace();
-              }
+    @RequestMapping(value = "/alias/{projectAlias}", method = RequestMethod.GET)
+    @ResponseBody
+    public String getProjectByAlias(@PathVariable String projectAlias) throws IOException {
+        try {
+            Project project = requestManager.getProjectByAlias(projectAlias);
+            if (project != null) {
+                return getProjectById(project.getId());
             }
-          }
-
-          if (s.getSampleQCs().isEmpty()) {
-            for (SampleQC qc : requestManager.listAllSampleQCsBySampleId(s.getId())) {
-              try {
-                s.addQc(qc);
-              }
-              catch (MalformedSampleQcException e) {
-                e.printStackTrace();
-              }
-            }
-          }
+            return RestUtils.error("No such project with that alias.", "projectAlias", projectAlias).toString();
+        } catch (IOException ioe) {
+            return RestUtils.error("Cannot retrieve project: " + ioe.getMessage(), "projectAlias", projectAlias).toString();
         }
+    }
+
+    @RequestMapping(value = "{projectId}", method = RequestMethod.GET)
+    @ResponseBody
+    public String getProjectById(@PathVariable Long projectId) throws IOException {
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            Project project = requestManager.getProjectById(projectId);
+            if (project != null) {
+                for (Sample s : project.getSamples()) {
+                    if (s.getLibraries().isEmpty()) {
+                        for (Library l : requestManager.listAllLibrariesBySampleId(s.getId())) {
+                            try {
+                                s.addLibrary(l);
+                            } catch (MalformedLibraryException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }
+
+                    if (s.getSampleQCs().isEmpty()) {
+                        for (SampleQC qc : requestManager.listAllSampleQCsBySampleId(s.getId())) {
+                            try {
+                                s.addQc(qc);
+                            } catch (MalformedSampleQcException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }
+                }
+                mapper.getSerializationConfig().addMixInAnnotations(Sample.class, SampleProjectAvoidanceMixin.class);
+                mapper.getSerializationConfig().addMixInAnnotations(Library.class, LibraryRecursionAvoidanceMixin.class);
+                mapper.getSerializationConfig().addMixInAnnotations(User.class, UserInfoMixin.class);
+                return mapper.writeValueAsString(project);
+            }
+            return mapper.writeValueAsString(RestUtils.error("No such project with that ID.", "projectId", projectId.toString()));
+        } catch (IOException ioe) {
+            return mapper
+                .writeValueAsString(RestUtils.error("Cannot retrieve project: " + ioe.getMessage(), "projectId", projectId.toString()));
+        }
+    }
+
+    @RequestMapping(value = "{projectId}/libraries", method = RequestMethod.GET)
+    @ResponseBody
+    public String getProjectLibraries(@PathVariable Long projectId) throws IOException {
+        Collection<Library> lp = requestManager.listAllLibrariesByProjectId(projectId);
+        for (Library l : lp) {
+            for (LibraryDilution dil : requestManager.listAllLibraryDilutionsByLibraryId(l.getId())) {
+                try {
+                    l.addDilution(dil);
+                } catch (MalformedDilutionException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            for (LibraryQC qc : requestManager.listAllLibraryQCsByLibraryId(l.getId())) {
+                try {
+                    l.addQc(qc);
+                } catch (MalformedLibraryQcException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        ObjectMapper mapper = new ObjectMapper();
         mapper.getSerializationConfig().addMixInAnnotations(Sample.class, SampleProjectAvoidanceMixin.class);
         mapper.getSerializationConfig().addMixInAnnotations(Library.class, LibraryRecursionAvoidanceMixin.class);
         mapper.getSerializationConfig().addMixInAnnotations(User.class, UserInfoMixin.class);
-        return mapper.writeValueAsString(project);
-      }
-      return mapper.writeValueAsString(RestUtils.error("No such project with that ID.", "projectId", projectId.toString()));
-    }
-    catch (IOException ioe) {
-      return mapper.writeValueAsString(RestUtils.error("Cannot retrieve project: " + ioe.getMessage(), "projectId", projectId.toString()));
-    }
-  }
-
-  @RequestMapping(value = "{projectId}/libraries", method = RequestMethod.GET)
-  public @ResponseBody String getProjectLibraries(@PathVariable Long projectId) throws IOException {
-    Collection<Library> lp = requestManager.listAllLibrariesByProjectId(projectId);
-    for (Library l : lp) {
-      for (LibraryDilution dil : requestManager.listAllLibraryDilutionsByLibraryId(l.getId())) {
-        try {
-          l.addDilution(dil);
-        }
-        catch (MalformedDilutionException e) {
-          e.printStackTrace();
-        }
-      }
-
-      for (LibraryQC qc : requestManager.listAllLibraryQCsByLibraryId(l.getId())) {
-        try {
-          l.addQc(qc);
-        }
-        catch (MalformedLibraryQcException e) {
-          e.printStackTrace();
-        }
-      }
+        return mapper.writeValueAsString(lp);
     }
 
-    ObjectMapper mapper = new ObjectMapper();
-    mapper.getSerializationConfig().addMixInAnnotations(Sample.class, SampleProjectAvoidanceMixin.class);
-    mapper.getSerializationConfig().addMixInAnnotations(Library.class, LibraryRecursionAvoidanceMixin.class);
-    mapper.getSerializationConfig().addMixInAnnotations(User.class, UserInfoMixin.class);
-    return mapper.writeValueAsString(lp);
-  }
+    @RequestMapping(method = RequestMethod.GET)
+    @ResponseBody
+    public String listAllProjects() throws IOException {
+        Collection<Project> lp = requestManager.listAllProjects();
+        for (Project p : lp) {
+            p.setSamples(requestManager.listAllSamplesByProjectId(p.getProjectId()));
+            p.setStudies(requestManager.listAllStudiesByProjectId(p.getProjectId()));
+        }
 
-  @RequestMapping(method = RequestMethod.GET)
-  public @ResponseBody String listAllProjects() throws IOException {
-    Collection<Project> lp = requestManager.listAllProjects();
-    for (Project p : lp) {
-      p.setSamples(requestManager.listAllSamplesByProjectId(p.getProjectId()));
-      p.setStudies(requestManager.listAllStudiesByProjectId(p.getProjectId()));
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.getSerializationConfig().addMixInAnnotations(Sample.class, SampleProjectAvoidanceMixin.class);
+        mapper.getSerializationConfig().addMixInAnnotations(Library.class, LibraryRecursionAvoidanceMixin.class);
+        mapper.getSerializationConfig().addMixInAnnotations(User.class, UserInfoMixin.class);
+        return mapper.writeValueAsString(lp);
     }
-
-    ObjectMapper mapper = new ObjectMapper();
-    mapper.getSerializationConfig().addMixInAnnotations(Sample.class, SampleProjectAvoidanceMixin.class);
-    mapper.getSerializationConfig().addMixInAnnotations(Library.class, LibraryRecursionAvoidanceMixin.class);
-    mapper.getSerializationConfig().addMixInAnnotations(User.class, UserInfoMixin.class);
-    return mapper.writeValueAsString(lp);
-  }
 }

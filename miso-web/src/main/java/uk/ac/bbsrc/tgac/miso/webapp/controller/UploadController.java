@@ -64,288 +64,277 @@ import java.util.*;
 @Controller
 @RequestMapping("/upload")
 public class UploadController {
-  protected static final Logger log = LoggerFactory.getLogger(UploadController.class);
-  @Autowired
-  private SecurityManager securityManager;
-  @Autowired
-  public RequestManager requestManager;
-  @Autowired
-  public FilesManager filesManager;
-  @Autowired
-  private MisoFilesManager misoFileManager;
-  @Autowired
-  public MisoFormsService misoFormsService;
-  @Autowired
-  private MisoNamingScheme<Library> libraryNamingScheme;
+    protected static final Logger log = LoggerFactory.getLogger(UploadController.class);
+    @Autowired
+    private SecurityManager securityManager;
+    @Autowired
+    public RequestManager requestManager;
+    @Autowired
+    public FilesManager filesManager;
+    @Autowired
+    private MisoFilesManager misoFileManager;
+    @Autowired
+    public MisoFormsService misoFormsService;
+    @Autowired
+    private MisoNamingScheme<Library> libraryNamingScheme;
 
-  public void setSecurityManager(SecurityManager securityManager) {
-    this.securityManager = securityManager;
-  }
-
-  public void setRequestManager(RequestManager requestManager) {
-    this.requestManager = requestManager;
-  }
-
-  public void setFilesManager(FilesManager filesManager) {
-    this.filesManager = filesManager;
-  }
-
-  public void setMisoFileManager(MisoFilesManager misoFileManager) {
-    this.misoFileManager = misoFileManager;
-  }
-
-  public void setMisoFormsService(MisoFormsService misoFormsService) {
-    this.misoFormsService = misoFormsService;
-  }
-
-  public void setLibraryNamingScheme(MisoNamingScheme<Library> libraryNamingScheme) {
-    this.libraryNamingScheme = libraryNamingScheme;
-  }
-
-  private Class lookupCoreClass(String className) throws ClassNotFoundException {
-    return this.getClass().getClassLoader().loadClass("uk.ac.bbsrc.tgac.miso.core." + className);
-  }
-
-  public void uploadFile(Class type, String qualifier, MultipartFile fileItem) throws IOException {
-    File dir = new File(filesManager.getFileStorageDirectory() + File.separator + type.getSimpleName().toLowerCase() + File.separator + qualifier);
-    if (LimsUtils.checkDirectory(dir, true)) {
-      log.info("Attempting to store " + dir.toString() + File.separator + fileItem.getOriginalFilename());
-      fileItem.transferTo(new File(dir + File.separator + fileItem.getOriginalFilename().replaceAll("\\s", "_")));
+    public void setSecurityManager(SecurityManager securityManager) {
+        this.securityManager = securityManager;
     }
-    else {
-      throw new IOException("Cannot upload file - check that the directory specified in miso.properties exists and is writable");
+
+    public void setRequestManager(RequestManager requestManager) {
+        this.requestManager = requestManager;
     }
-  }
 
-  public void uploadFile(Object type, String qualifier, MultipartFile fileItem) throws IOException {
-    uploadFile(type.getClass(), qualifier, fileItem);
-  }
-
-
-  @RequestMapping(value = "/project", method = RequestMethod.POST)
-  public void uploadProjectDocument(MultipartHttpServletRequest request) throws IOException {
-    String projectId = request.getParameter("projectId");
-
-    for (MultipartFile fileItem : getMultipartFiles(request)) {
-      uploadFile(Project.class, projectId, fileItem);
+    public void setFilesManager(FilesManager filesManager) {
+        this.filesManager = filesManager;
     }
-  }
 
-  @RequestMapping(value = "/project/sample-delivery-form", method = RequestMethod.POST)
-  public String uploadProjectSampleDeliveryForm(MultipartHttpServletRequest request) throws IOException {
-    String projectId = request.getParameter("projectId");
-
-    boolean taxonCheck = (Boolean) request.getSession().getServletContext().getAttribute("taxonLookupEnabled");
-
-    try {
-      for (MultipartFile fileItem : getMultipartFiles(request)) {
-        uploadFile(Project.class, projectId, fileItem);
-        File f = filesManager.getFile(Project.class, projectId, fileItem.getOriginalFilename().replaceAll("\\s+", "_"));
-        List<Sample> samples = FormUtils.importSampleDeliveryForm(f);
-        log.info("Importing samples from form: " + samples.toString());
-        misoFormsService.importSampleDeliveryFormSamples(samples, taxonCheck);
-      }
-      return "redirect:/miso/project/" + projectId;
+    public void setMisoFileManager(MisoFilesManager misoFileManager) {
+        this.misoFileManager = misoFileManager;
     }
-    catch (Exception e) {
-      log.error("SAMPLE IMPORT FAIL:", e);
-      throw new IOException(e);
+
+    public void setMisoFormsService(MisoFormsService misoFormsService) {
+        this.misoFormsService = misoFormsService;
     }
-  }
 
-  @RequestMapping(value = "/project/bulk-input-form", method = RequestMethod.POST)
-  public void uploadProjectBulkInputForm(MultipartHttpServletRequest request) throws IOException {
-    String projectId = request.getParameter("projectId");
+    public void setLibraryNamingScheme(MisoNamingScheme<Library> libraryNamingScheme) {
+        this.libraryNamingScheme = libraryNamingScheme;
+    }
 
-    try {
-      for (MultipartFile fileItem : getMultipartFiles(request)) {
-        uploadFile(Project.class, projectId, fileItem);
-        File f = filesManager.getFile(Project.class, projectId, fileItem.getOriginalFilename().replaceAll("\\s+", "_"));
-        User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-        List<Sample> samples = FormUtils.importSampleInputSpreadsheet(f, user, requestManager, libraryNamingScheme);
+    private Class lookupCoreClass(String className) throws ClassNotFoundException {
+        return this.getClass().getClassLoader().loadClass("uk.ac.bbsrc.tgac.miso.core." + className);
+    }
 
-        ObjectMapper mapper = new ObjectMapper();
-
-        JSONArray a = new JSONArray();
-        for (Sample s : samples) {
-          a.add(JSONObject.fromObject(mapper.writeValueAsString(s)));
+    public void uploadFile(Class type, String qualifier, MultipartFile fileItem) throws IOException {
+        File dir = new File(
+            filesManager.getFileStorageDirectory() + File.separator + type.getSimpleName().toLowerCase() + File.separator + qualifier);
+        if (LimsUtils.checkDirectory(dir, true)) {
+            log.info("Attempting to store " + dir.toString() + File.separator + fileItem.getOriginalFilename());
+            fileItem.transferTo(new File(dir + File.separator + fileItem.getOriginalFilename().replaceAll("\\s", "_")));
+        } else {
+            throw new IOException("Cannot upload file - check that the directory specified in miso.properties exists and is writable");
         }
-        JSONObject o = new JSONObject();
-        o.put("bulksamples", a);
-        log.info(o.toString());
-
-        request.getSession(false).setAttribute("bulksamples", o);
-      }
-    }
-    catch (Exception e) {
-      log.error("SAMPLE IMPORT FAIL:" + e.getMessage());
-      //JSONObject o = new JSONObject();
-      //o.put("bulkerror", "Cannot import bulk spreadsheet: " + e.getMessage());
-      //log.error(o.toString());
-      //request.getSession(false).setAttribute("bulkerror", o);
-    }
-  }
-
-  @RequestMapping(value = "/project/plate-form", method = RequestMethod.POST)
-  public void uploadProjectPlateInputForm(MultipartHttpServletRequest request, HttpServletResponse response) throws IOException {
-    String projectId = request.getParameter("projectId");
-
-    try {
-      JSONArray a = new JSONArray();
-      JSONObject o = new JSONObject();
-
-      for (MultipartFile fileItem : getMultipartFiles(request)) {
-        uploadFile(Project.class, projectId, fileItem);
-        File f = filesManager.getFile(Project.class, projectId, fileItem.getOriginalFilename().replaceAll("\\s+", "_"));
-        User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-        //Map<String, Pool<Plate<LinkedList<Library>, Library>>> pooledPlates = FormUtils.importPlateInputSpreadsheet(f, user, requestManager, libraryNamingScheme);
-        Map<String, PlatePool> pooledPlates = FormUtils.importPlateInputSpreadsheet(f, user, requestManager, libraryNamingScheme);
-
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.getSerializationConfig().addMixInAnnotations(Sample.class, SampleRecursionAvoidanceMixin.class);
-
-        String s = mapper.writerWithType(new TypeReference<Collection<PlatePool>>() {
-        })
-            .writeValueAsString(pooledPlates.values());
-        a.add(JSONArray.fromObject(s));
-      }
-      o.put("pools", a);
-      log.info(o.toString());
-
-      response.setContentType("text/html");
-
-      PrintWriter out = response.getWriter();
-      out.println("<input type='hidden' id='uploadresponsebody' value='" + o.toString() + "'/>");
-    }
-    catch (Exception e) {
-      e.printStackTrace();
-    }
-  }
-
-  @RequestMapping(value = "/plate/plate-form", method = RequestMethod.POST)
-  public void uploadPlateInputForm(MultipartHttpServletRequest request, HttpServletResponse response) throws IOException {
-    try {
-      JSONArray a = new JSONArray();
-      JSONObject o = new JSONObject();
-
-      for (MultipartFile fileItem : getMultipartFiles(request)) {
-        uploadFile(Plate.class, "forms", fileItem);
-        File f = filesManager.getFile(Plate.class, "forms", fileItem.getOriginalFilename().replaceAll("\\s+", "_"));
-        User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-        //Map<String, Pool<Plate<LinkedList<Library>, Library>>> pooledPlates = FormUtils.importPlateInputSpreadsheet(f, user, requestManager, libraryNamingScheme);
-        Map<String, PlatePool> pooledPlates = FormUtils.importPlateInputSpreadsheet(f, user, requestManager, libraryNamingScheme);
-
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.getSerializationConfig().addMixInAnnotations(Sample.class, SampleRecursionAvoidanceMixin.class);
-
-        String s = mapper.writerWithType(new TypeReference<Collection<PlatePool>>() {
-        })
-            .writeValueAsString(pooledPlates.values());
-        a.add(JSONArray.fromObject(s));
-      }
-      o.put("pools", a);
-      log.info(o.toString());
-
-      response.setContentType("text/html");
-
-      PrintWriter out = response.getWriter();
-      out.println("<input type='hidden' id='uploadresponsebody' value='" + o.toString() + "'/>");
-    }
-    catch (Exception e) {
-      e.printStackTrace();
-    }
-  }
-
-  @RequestMapping(value = "/importexport/samplesheet", method = RequestMethod.POST)
-  public void uploadSampleSheet(MultipartHttpServletRequest request, HttpServletResponse response) throws IOException {
-    try {
-      JSONArray jsonArray = new JSONArray();
-      for (MultipartFile fileItem : getMultipartFiles(request)) {
-        uploadFile(Sample.class, "forms", fileItem);
-        File f = filesManager.getFile(Sample.class, "forms", fileItem.getOriginalFilename().replaceAll("\\s+", "_"));
-        User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-        jsonArray = FormUtils.preProcessSampleSheetImport(f, user, requestManager);
-      }
-      response.setContentType("text/html");
-      PrintWriter out = response.getWriter();
-      out.println("<input type='hidden' id='uploadresponsebody' value='" + jsonArray + "'/>");
-    }
-    catch (Exception e) {
-      e.printStackTrace();
-    }
-  }
-
-  @RequestMapping(value = "/importexport/librarypoolsheet", method = RequestMethod.POST)
-  public void uploadLibraryPoolSheet(MultipartHttpServletRequest request, HttpServletResponse response) throws IOException {
-    try {
-      JSONObject result = new JSONObject();
-      for (MultipartFile fileItem : getMultipartFiles(request)) {
-        uploadFile(Library.class, "forms", fileItem);
-        File f = filesManager.getFile(Library.class, "forms", fileItem.getOriginalFilename().replaceAll("\\s+", "_"));
-        User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-        result = FormUtils.preProcessLibraryPoolSheetImport(f, user, requestManager);
-      }
-
-      response.setContentType("text/html");
-      PrintWriter out = response.getWriter();
-      out.println("<input type='hidden' id='uploadresponsebody' value='" + result + "'/>");
     }
 
-    catch (Exception e) {
-      e.printStackTrace();
+    public void uploadFile(Object type, String qualifier, MultipartFile fileItem) throws IOException {
+        uploadFile(type.getClass(), qualifier, fileItem);
     }
-  }
 
-  @RequestMapping(value = "/libraryqc", method = RequestMethod.POST)
-  public void uploadLibraryQcDocument(MultipartHttpServletRequest request) throws IOException {
-    String libraryId = request.getParameter("libraryId");
+    @RequestMapping(value = "/project", method = RequestMethod.POST)
+    public void uploadProjectDocument(MultipartHttpServletRequest request) throws IOException {
+        String projectId = request.getParameter("projectId");
 
-    for (MultipartFile fileItem : getMultipartFiles(request)) {
-      uploadFile(LibraryQC.class, libraryId + File.separator + "qc" + File.separator, fileItem);
-    }
-  }
-
-  @RequestMapping(value = "/sampleqc", method = RequestMethod.POST)
-  public void uploadSampleQcDocument(MultipartHttpServletRequest request) throws IOException {
-    String sampleId = request.getParameter("sampleId");
-
-    for (MultipartFile fileItem : getMultipartFiles(request)) {
-      uploadFile(SampleQC.class, sampleId + File.separator + "qc" + File.separator, fileItem);
-    }
-  }
-
-  @RequestMapping(value = "/dilution-to-pool", method = RequestMethod.POST)
-  public void uploadLibraryList(MultipartHttpServletRequest request) throws IOException {
-    try {
-      HashSet<String> librarySet = new HashSet<String>();
-      for (MultipartFile fileItem : getMultipartFiles(request)) {
-        for (String s : new String(fileItem.getBytes()).split("\n")) {
-          librarySet.add(s);
+        for (MultipartFile fileItem : getMultipartFiles(request)) {
+            uploadFile(Project.class, projectId, fileItem);
         }
-      }
-
-      JSONArray a = JSONArray.fromObject(librarySet);
-      JSONObject o = new JSONObject();
-      o.put("barcodes", a);
-      log.debug(o.toString());
-
-      request.getSession(false).setAttribute("barcodes", o);
     }
-    catch (Exception e) {
-      log.debug("UPLOAD FAIL:", e);
-      //return JSONUtils.SimpleJSONError("Upload failed: "+e.getMessage());
-    }
-  }
 
-  private List<MultipartFile> getMultipartFiles(MultipartHttpServletRequest request) {
-    List<MultipartFile> files = new ArrayList<MultipartFile>();
-    Map<String, MultipartFile> fMap = request.getFileMap();
-    for (String fileName : fMap.keySet()) {
-      MultipartFile fileItem = fMap.get(fileName);
-      if (fileItem.getSize() > 0) {
-        files.add(fileItem);
-      }
+    @RequestMapping(value = "/project/sample-delivery-form", method = RequestMethod.POST)
+    public String uploadProjectSampleDeliveryForm(MultipartHttpServletRequest request) throws IOException {
+        String projectId = request.getParameter("projectId");
+
+        boolean taxonCheck = (Boolean) request.getSession().getServletContext().getAttribute("taxonLookupEnabled");
+
+        try {
+            for (MultipartFile fileItem : getMultipartFiles(request)) {
+                uploadFile(Project.class, projectId, fileItem);
+                File f = filesManager.getFile(Project.class, projectId, fileItem.getOriginalFilename().replaceAll("\\s+", "_"));
+                List<Sample> samples = FormUtils.importSampleDeliveryForm(f);
+                log.info("Importing samples from form: " + samples.toString());
+                misoFormsService.importSampleDeliveryFormSamples(samples, taxonCheck);
+            }
+            return "redirect:/miso/project/" + projectId;
+        } catch (Exception e) {
+            log.error("SAMPLE IMPORT FAIL:", e);
+            throw new IOException(e);
+        }
     }
-    return files;
-  }
+
+    @RequestMapping(value = "/project/bulk-input-form", method = RequestMethod.POST)
+    public void uploadProjectBulkInputForm(MultipartHttpServletRequest request) throws IOException {
+        String projectId = request.getParameter("projectId");
+
+        try {
+            for (MultipartFile fileItem : getMultipartFiles(request)) {
+                uploadFile(Project.class, projectId, fileItem);
+                File f = filesManager.getFile(Project.class, projectId, fileItem.getOriginalFilename().replaceAll("\\s+", "_"));
+                User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
+                List<Sample> samples = FormUtils.importSampleInputSpreadsheet(f, user, requestManager, libraryNamingScheme);
+
+                ObjectMapper mapper = new ObjectMapper();
+
+                JSONArray a = new JSONArray();
+                for (Sample s : samples) {
+                    a.add(JSONObject.fromObject(mapper.writeValueAsString(s)));
+                }
+                JSONObject o = new JSONObject();
+                o.put("bulksamples", a);
+                log.info(o.toString());
+
+                request.getSession(false).setAttribute("bulksamples", o);
+            }
+        } catch (Exception e) {
+            log.error("SAMPLE IMPORT FAIL:" + e.getMessage());
+            //JSONObject o = new JSONObject();
+            //o.put("bulkerror", "Cannot import bulk spreadsheet: " + e.getMessage());
+            //log.error(o.toString());
+            //request.getSession(false).setAttribute("bulkerror", o);
+        }
+    }
+
+    @RequestMapping(value = "/project/plate-form", method = RequestMethod.POST)
+    public void uploadProjectPlateInputForm(MultipartHttpServletRequest request, HttpServletResponse response) throws IOException {
+        String projectId = request.getParameter("projectId");
+
+        try {
+            JSONArray a = new JSONArray();
+            JSONObject o = new JSONObject();
+
+            for (MultipartFile fileItem : getMultipartFiles(request)) {
+                uploadFile(Project.class, projectId, fileItem);
+                File f = filesManager.getFile(Project.class, projectId, fileItem.getOriginalFilename().replaceAll("\\s+", "_"));
+                User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
+                //Map<String, Pool<Plate<LinkedList<Library>, Library>>> pooledPlates = FormUtils.importPlateInputSpreadsheet(f, user, requestManager, libraryNamingScheme);
+                Map<String, PlatePool> pooledPlates = FormUtils.importPlateInputSpreadsheet(f, user, requestManager, libraryNamingScheme);
+
+                ObjectMapper mapper = new ObjectMapper();
+                mapper.getSerializationConfig().addMixInAnnotations(Sample.class, SampleRecursionAvoidanceMixin.class);
+
+                String s = mapper.writerWithType(new TypeReference<Collection<PlatePool>>() {
+                }).writeValueAsString(pooledPlates.values());
+                a.add(JSONArray.fromObject(s));
+            }
+            o.put("pools", a);
+            log.info(o.toString());
+
+            response.setContentType("text/html");
+
+            PrintWriter out = response.getWriter();
+            out.println("<input type='hidden' id='uploadresponsebody' value='" + o.toString() + "'/>");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @RequestMapping(value = "/plate/plate-form", method = RequestMethod.POST)
+    public void uploadPlateInputForm(MultipartHttpServletRequest request, HttpServletResponse response) throws IOException {
+        try {
+            JSONArray a = new JSONArray();
+            JSONObject o = new JSONObject();
+
+            for (MultipartFile fileItem : getMultipartFiles(request)) {
+                uploadFile(Plate.class, "forms", fileItem);
+                File f = filesManager.getFile(Plate.class, "forms", fileItem.getOriginalFilename().replaceAll("\\s+", "_"));
+                User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
+                //Map<String, Pool<Plate<LinkedList<Library>, Library>>> pooledPlates = FormUtils.importPlateInputSpreadsheet(f, user, requestManager, libraryNamingScheme);
+                Map<String, PlatePool> pooledPlates = FormUtils.importPlateInputSpreadsheet(f, user, requestManager, libraryNamingScheme);
+
+                ObjectMapper mapper = new ObjectMapper();
+                mapper.getSerializationConfig().addMixInAnnotations(Sample.class, SampleRecursionAvoidanceMixin.class);
+
+                String s = mapper.writerWithType(new TypeReference<Collection<PlatePool>>() {
+                }).writeValueAsString(pooledPlates.values());
+                a.add(JSONArray.fromObject(s));
+            }
+            o.put("pools", a);
+            log.info(o.toString());
+
+            response.setContentType("text/html");
+
+            PrintWriter out = response.getWriter();
+            out.println("<input type='hidden' id='uploadresponsebody' value='" + o.toString() + "'/>");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @RequestMapping(value = "/importexport/samplesheet", method = RequestMethod.POST)
+    public void uploadSampleSheet(MultipartHttpServletRequest request, HttpServletResponse response) throws IOException {
+        try {
+            JSONArray jsonArray = new JSONArray();
+            for (MultipartFile fileItem : getMultipartFiles(request)) {
+                uploadFile(Sample.class, "forms", fileItem);
+                File f = filesManager.getFile(Sample.class, "forms", fileItem.getOriginalFilename().replaceAll("\\s+", "_"));
+                User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
+                jsonArray = FormUtils.preProcessSampleSheetImport(f, user, requestManager);
+            }
+            response.setContentType("text/html");
+            PrintWriter out = response.getWriter();
+            out.println("<input type='hidden' id='uploadresponsebody' value='" + jsonArray + "'/>");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @RequestMapping(value = "/importexport/librarypoolsheet", method = RequestMethod.POST)
+    public void uploadLibraryPoolSheet(MultipartHttpServletRequest request, HttpServletResponse response) throws IOException {
+        try {
+            JSONObject result = new JSONObject();
+            for (MultipartFile fileItem : getMultipartFiles(request)) {
+                uploadFile(Library.class, "forms", fileItem);
+                File f = filesManager.getFile(Library.class, "forms", fileItem.getOriginalFilename().replaceAll("\\s+", "_"));
+                User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
+                result = FormUtils.preProcessLibraryPoolSheetImport(f, user, requestManager);
+            }
+
+            response.setContentType("text/html");
+            PrintWriter out = response.getWriter();
+            out.println("<input type='hidden' id='uploadresponsebody' value='" + result + "'/>");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @RequestMapping(value = "/libraryqc", method = RequestMethod.POST)
+    public void uploadLibraryQcDocument(MultipartHttpServletRequest request) throws IOException {
+        String libraryId = request.getParameter("libraryId");
+
+        for (MultipartFile fileItem : getMultipartFiles(request)) {
+            uploadFile(LibraryQC.class, libraryId + File.separator + "qc" + File.separator, fileItem);
+        }
+    }
+
+    @RequestMapping(value = "/sampleqc", method = RequestMethod.POST)
+    public void uploadSampleQcDocument(MultipartHttpServletRequest request) throws IOException {
+        String sampleId = request.getParameter("sampleId");
+
+        for (MultipartFile fileItem : getMultipartFiles(request)) {
+            uploadFile(SampleQC.class, sampleId + File.separator + "qc" + File.separator, fileItem);
+        }
+    }
+
+    @RequestMapping(value = "/dilution-to-pool", method = RequestMethod.POST)
+    public void uploadLibraryList(MultipartHttpServletRequest request) throws IOException {
+        try {
+            HashSet<String> librarySet = new HashSet<String>();
+            for (MultipartFile fileItem : getMultipartFiles(request)) {
+                for (String s : new String(fileItem.getBytes()).split("\n")) {
+                    librarySet.add(s);
+                }
+            }
+
+            JSONArray a = JSONArray.fromObject(librarySet);
+            JSONObject o = new JSONObject();
+            o.put("barcodes", a);
+            log.debug(o.toString());
+
+            request.getSession(false).setAttribute("barcodes", o);
+        } catch (Exception e) {
+            log.debug("UPLOAD FAIL:", e);
+            //return JSONUtils.SimpleJSONError("Upload failed: "+e.getMessage());
+        }
+    }
+
+    private List<MultipartFile> getMultipartFiles(MultipartHttpServletRequest request) {
+        List<MultipartFile> files = new ArrayList<MultipartFile>();
+        Map<String, MultipartFile> fMap = request.getFileMap();
+        for (String fileName : fMap.keySet()) {
+            MultipartFile fileItem = fMap.get(fileName);
+            if (fileItem.getSize() > 0) {
+                files.add(fileItem);
+            }
+        }
+        return files;
+    }
 }

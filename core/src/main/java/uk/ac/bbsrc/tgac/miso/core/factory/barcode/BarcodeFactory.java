@@ -66,151 +66,152 @@ import java.util.Map;
  * @since 0.0.3
  */
 public class BarcodeFactory {
-  protected static final Logger log = LoggerFactory.getLogger(BarcodeFactory.class);
+    protected static final Logger log = LoggerFactory.getLogger(BarcodeFactory.class);
 
-  public final BarcodeGenerator CODABAR = new CodabarBean();
-  public final BarcodeGenerator CODE128 = new Code128Bean();
-  public final BarcodeGenerator CODE39 = new Code39Bean();
-  public final BarcodeGenerator DATAMATRIX = new DataMatrixBean();
-  public final BarcodeGenerator EAN128 = new EAN128Bean();
-  public final BarcodeGenerator EAN13 = new EAN13Bean();
-  public final BarcodeGenerator EAN8 = new EAN8Bean();
-  public final BarcodeGenerator INTERLEAVED2OF5 = new Interleaved2Of5Bean();
-  public final BarcodeGenerator PDF417 = new PDF417Bean();
-  public final BarcodeGenerator ROYALMAILCBC = new RoyalMailCBCBean();
-  public final BarcodeGenerator UPCA = new UPCABean();
-  public final BarcodeGenerator UPCE = new UPCEBean();
-  public final BarcodeGenerator USPSINTELLIGENTMAIL = new USPSIntelligentMailBean();
+    public final BarcodeGenerator CODABAR = new CodabarBean();
+    public final BarcodeGenerator CODE128 = new Code128Bean();
+    public final BarcodeGenerator CODE39 = new Code39Bean();
+    public final BarcodeGenerator DATAMATRIX = new DataMatrixBean();
+    public final BarcodeGenerator EAN128 = new EAN128Bean();
+    public final BarcodeGenerator EAN13 = new EAN13Bean();
+    public final BarcodeGenerator EAN8 = new EAN8Bean();
+    public final BarcodeGenerator INTERLEAVED2OF5 = new Interleaved2Of5Bean();
+    public final BarcodeGenerator PDF417 = new PDF417Bean();
+    public final BarcodeGenerator ROYALMAILCBC = new RoyalMailCBCBean();
+    public final BarcodeGenerator UPCA = new UPCABean();
+    public final BarcodeGenerator UPCE = new UPCEBean();
+    public final BarcodeGenerator USPSINTELLIGENTMAIL = new USPSIntelligentMailBean();
 
-  private int bitmapResolution = 150;
-  private int imageType = BufferedImage.TYPE_BYTE_GRAY;
-  private boolean antialias = true;
-  private int orientation = 0;
-  private String outputType = "png";
-  private float pointPixels = 4.0f;
+    private int bitmapResolution = 150;
+    private int imageType = BufferedImage.TYPE_BYTE_GRAY;
+    private boolean antialias = true;
+    private int orientation = 0;
+    private String outputType = "png";
+    private float pointPixels = 4.0f;
 
-  private static final Map<String, BarcodeGenerator> generators = new HashMap<String, BarcodeGenerator>();
+    private static final Map<String, BarcodeGenerator> generators = new HashMap<String, BarcodeGenerator>();
 
-  public BarcodeFactory() {
-    generators.put("CODABAR", CODABAR);
-    generators.put("CODE128", CODE128);
-    generators.put("CODE39", CODE39);
-    generators.put("DATAMATRIX", DATAMATRIX);
-    generators.put("EAN128", EAN128);
-    generators.put("EAN13", EAN13);
-    generators.put("EAN8", EAN8);
-    generators.put("INTERLEAVED2OF5", INTERLEAVED2OF5);
-    generators.put("PDF417", PDF417);
-    generators.put("ROYALMAILCBC", ROYALMAILCBC);
-    generators.put("UPCA", UPCA);
-    generators.put("UPCE", UPCE);
-    generators.put("USPSINTELLIGENTMAIL", USPSINTELLIGENTMAIL);
-  }
-
-  public static BarcodeGenerator lookupGenerator(String name) {
-    return generators.get(name);
-  }
-
-  public void setPointPixels(float pointPixels) {
-    this.pointPixels = pointPixels;
-  }
-
-  public int getBitmapResolution() {
-    return bitmapResolution;
-  }
-
-  public void setBitmapResolution(int bitmapResolution) {
-    this.bitmapResolution = bitmapResolution;
-  }
-
-  public int getImageType() {
-    return imageType;
-  }
-
-  public void setImageType(int imageType) {
-    this.imageType = imageType;
-  }
-
-  public boolean isAntialias() {
-    return antialias;
-  }
-
-  public void setAntialias(boolean antialias) {
-    this.antialias = antialias;
-  }
-
-  public int getOrientation() {
-    return orientation;
-  }
-
-  public void setOrientation(int orientation) {
-    this.orientation = orientation;
-  }
-
-  public String getOutputType() {
-    return outputType;
-  }
-
-  public void setOutputType(String outputType) {
-    this.outputType = outputType;
-  }
-
-  private RenderedImage getImage(Barcodable barcodable, BarcodeGenerator barcodeGenerator, BarcodeDimension dimension) throws IOException {
-    String input = barcodable.getIdentificationBarcode();
-
-    if (input != null && !"".equals(input)) {
-      String enc = new String(Base64.encodeBase64(input.getBytes("UTF-8")));
-
-      BitmapCanvasProvider provider = new BitmapCanvasProvider(bitmapResolution, imageType, antialias, orientation);
-      provider.establishDimensions(dimension);
-      if (barcodeGenerator instanceof AbstractBarcodeBean) {
-        AbstractBarcodeBean bean = (AbstractBarcodeBean)barcodeGenerator;
-        bean.setModuleWidth(UnitConv.in2mm(pointPixels / bitmapResolution));
-        bean.doQuietZone(false);
-        bean.generateBarcode(provider, enc);
-      }
-      else {
-        barcodeGenerator.generateBarcode(provider, enc);
-      }
-      provider.finish();
-      return provider.getBufferedImage();
+    public BarcodeFactory() {
+        generators.put("CODABAR", CODABAR);
+        generators.put("CODE128", CODE128);
+        generators.put("CODE39", CODE39);
+        generators.put("DATAMATRIX", DATAMATRIX);
+        generators.put("EAN128", EAN128);
+        generators.put("EAN13", EAN13);
+        generators.put("EAN8", EAN8);
+        generators.put("INTERLEAVED2OF5", INTERLEAVED2OF5);
+        generators.put("PDF417", PDF417);
+        generators.put("ROYALMAILCBC", ROYALMAILCBC);
+        generators.put("UPCA", UPCA);
+        generators.put("UPCE", UPCE);
+        generators.put("USPSINTELLIGENTMAIL", USPSINTELLIGENTMAIL);
     }
-    return null;
-  }
 
-  private void writeImageToStream(RenderedImage image, OutputStream output) throws IOException {
-    ImageIO.write(image, outputType, output);
-  }
+    public static BarcodeGenerator lookupGenerator(String name) {
+        return generators.get(name);
+    }
 
-  public RenderedImage generateBarcode(Barcodable barcodable, BarcodeGenerator barcodeGenerator) throws IOException {
-    return getImage(barcodable, barcodeGenerator, new BarcodeDimension(100, 100));
-  }
+    public void setPointPixels(float pointPixels) {
+        this.pointPixels = pointPixels;
+    }
 
-  public RenderedImage generateBarcode(Barcodable barcodable, BarcodeGenerator barcodeGenerator, BarcodeDimension dim) throws IOException {
-    return getImage(barcodable, barcodeGenerator, dim);
-  }
+    public int getBitmapResolution() {
+        return bitmapResolution;
+    }
 
-  public void generateBarcode(Barcodable barcodable, BarcodeGenerator barcodeGenerator, OutputStream output) throws IOException {
-    writeImageToStream(getImage(barcodable, barcodeGenerator, new BarcodeDimension(100, 100)), output);
-  }
+    public void setBitmapResolution(int bitmapResolution) {
+        this.bitmapResolution = bitmapResolution;
+    }
 
-  public RenderedImage generateSquareDataMatrix(Barcodable barcodable, int width) throws IOException {
-    DataMatrixBean dmb = (DataMatrixBean)DATAMATRIX;
-    dmb.setShape(SymbolShapeHint.FORCE_SQUARE);
-    return getImage(barcodable, dmb, new BarcodeDimension(width, width));
-  }
+    public int getImageType() {
+        return imageType;
+    }
 
-  public void generateSquareDataMatrix(Barcodable barcodable, int width, OutputStream output) throws IOException {
-    writeImageToStream(generateSquareDataMatrix(barcodable, width), output);
-  }
+    public void setImageType(int imageType) {
+        this.imageType = imageType;
+    }
 
-  public RenderedImage generateRectDataMatrix(Barcodable barcodable, int width, int height) throws IOException {
-    DataMatrixBean dmb = (DataMatrixBean)DATAMATRIX;
-    dmb.setShape(SymbolShapeHint.FORCE_RECTANGLE);
-    return getImage(barcodable, dmb, new BarcodeDimension(width, height));  
-  }
+    public boolean isAntialias() {
+        return antialias;
+    }
 
-  public void generateRectDataMatrix(Barcodable barcodable, int width, int height, OutputStream output) throws IOException {
-    writeImageToStream(generateRectDataMatrix(barcodable, width, height), output);
-  }
+    public void setAntialias(boolean antialias) {
+        this.antialias = antialias;
+    }
+
+    public int getOrientation() {
+        return orientation;
+    }
+
+    public void setOrientation(int orientation) {
+        this.orientation = orientation;
+    }
+
+    public String getOutputType() {
+        return outputType;
+    }
+
+    public void setOutputType(String outputType) {
+        this.outputType = outputType;
+    }
+
+    private RenderedImage getImage(Barcodable barcodable, BarcodeGenerator barcodeGenerator, BarcodeDimension dimension)
+        throws IOException {
+        String input = barcodable.getIdentificationBarcode();
+
+        if (input != null && !"".equals(input)) {
+            String enc = new String(Base64.encodeBase64(input.getBytes("UTF-8")));
+
+            BitmapCanvasProvider provider = new BitmapCanvasProvider(bitmapResolution, imageType, antialias, orientation);
+            provider.establishDimensions(dimension);
+            if (barcodeGenerator instanceof AbstractBarcodeBean) {
+                AbstractBarcodeBean bean = (AbstractBarcodeBean) barcodeGenerator;
+                bean.setModuleWidth(UnitConv.in2mm(pointPixels / bitmapResolution));
+                bean.doQuietZone(false);
+                bean.generateBarcode(provider, enc);
+            } else {
+                barcodeGenerator.generateBarcode(provider, enc);
+            }
+            provider.finish();
+            return provider.getBufferedImage();
+        }
+        return null;
+    }
+
+    private void writeImageToStream(RenderedImage image, OutputStream output) throws IOException {
+        ImageIO.write(image, outputType, output);
+    }
+
+    public RenderedImage generateBarcode(Barcodable barcodable, BarcodeGenerator barcodeGenerator) throws IOException {
+        return getImage(barcodable, barcodeGenerator, new BarcodeDimension(100, 100));
+    }
+
+    public RenderedImage generateBarcode(Barcodable barcodable, BarcodeGenerator barcodeGenerator, BarcodeDimension dim)
+        throws IOException {
+        return getImage(barcodable, barcodeGenerator, dim);
+    }
+
+    public void generateBarcode(Barcodable barcodable, BarcodeGenerator barcodeGenerator, OutputStream output) throws IOException {
+        writeImageToStream(getImage(barcodable, barcodeGenerator, new BarcodeDimension(100, 100)), output);
+    }
+
+    public RenderedImage generateSquareDataMatrix(Barcodable barcodable, int width) throws IOException {
+        DataMatrixBean dmb = (DataMatrixBean) DATAMATRIX;
+        dmb.setShape(SymbolShapeHint.FORCE_SQUARE);
+        return getImage(barcodable, dmb, new BarcodeDimension(width, width));
+    }
+
+    public void generateSquareDataMatrix(Barcodable barcodable, int width, OutputStream output) throws IOException {
+        writeImageToStream(generateSquareDataMatrix(barcodable, width), output);
+    }
+
+    public RenderedImage generateRectDataMatrix(Barcodable barcodable, int width, int height) throws IOException {
+        DataMatrixBean dmb = (DataMatrixBean) DATAMATRIX;
+        dmb.setShape(SymbolShapeHint.FORCE_RECTANGLE);
+        return getImage(barcodable, dmb, new BarcodeDimension(width, height));
+    }
+
+    public void generateRectDataMatrix(Barcodable barcodable, int width, int height, OutputStream output) throws IOException {
+        writeImageToStream(generateRectDataMatrix(barcodable, width, height), output);
+    }
 }

@@ -53,213 +53,198 @@ import java.util.*;
  * @since 0.1.6
  */
 public class RunStatsManager {
-  protected static final Logger log = LoggerFactory.getLogger(RunStatsManager.class);
+    protected static final Logger log = LoggerFactory.getLogger(RunStatsManager.class);
 
-  Reports reports;
+    Reports reports;
 
-  ReportsDecorator reportsDecorator;
+    ReportsDecorator reportsDecorator;
 
-  public RunStatsManager(DataSource dataSource) {
-    this.reports = new Reports(dataSource);
-    this.reportsDecorator = new ReportsDecorator(reports);
-  }
-
-  public RunStatsManager(JdbcTemplate template) {
-    this(template.getDataSource());
-  }
-
-  public List<String> listPerBaseSummaryAnalyses() throws RunStatsException {
-    try {
-      return reports.listPerBaseSummaryAnalyses();
-    }
-    catch (SQLException e) {
-      throw new RunStatsException("Cannot retrieve the list of per-base summary analyses: " + e.getMessage());
-    }
-  }
-
-  public List<String> listGlobalRunAnalyses() throws RunStatsException {
-    try {
-      return reports.listGlobalAnalyses();
-    }
-    catch (SQLException e) {
-      throw new RunStatsException("Cannot retrieve the list of global run-based analyses: " + e.getMessage());
-    }
-  }
-
-  public boolean hasStatsForRun(Run run) throws RunStatsException {
-    Map<RunProperty, String> map = new HashMap<RunProperty, String>();
-    map.put(RunProperty.run, run.getAlias());
-    try {
-      ReportTable rt = reports.getAverageValues(map);
-      return rt != null && !rt.isEmpty();
-    }
-    catch (SQLException e) {
-      e.printStackTrace();
-      return false;
-    }
-  }
-
-  public JSONObject getSummaryStatsForRun(Run run) throws RunStatsException {
-    JSONObject report = new JSONObject();
-    ReportTable rt;
-
-    Map<RunProperty, String> map = new HashMap<RunProperty, String>();
-    map.put(RunProperty.run, run.getAlias());
-    try {
-      rt = reports.getAverageValues(map);
-      if (rt == null) {
-        return null;
-      }
-      report.put("runSummary", JSONArray.fromObject(rt.toJSON()));
-    }
-    catch (SQLException e) {
-      e.printStackTrace();
-    }
-    catch (IOException e) {
-      e.printStackTrace();
+    public RunStatsManager(DataSource dataSource) {
+        this.reports = new Reports(dataSource);
+        this.reportsDecorator = new ReportsDecorator(reports);
     }
 
-    if (!((RunImpl) run).getSequencerPartitionContainers().isEmpty()) {
-      JSONObject containers = new JSONObject();
-      for (SequencerPartitionContainer<SequencerPoolPartition> container : ((RunImpl) run).getSequencerPartitionContainers()) {
-        JSONObject f = new JSONObject();
-        f.put("idBarcode", container.getIdentificationBarcode());
+    public RunStatsManager(JdbcTemplate template) {
+        this(template.getDataSource());
+    }
 
-        JSONArray partitions = new JSONArray();
-        for (SequencerPoolPartition part : container.getPartitions()) {
-          JSONObject partition = new JSONObject();
+    public List<String> listPerBaseSummaryAnalyses() throws RunStatsException {
+        try {
+            return reports.listPerBaseSummaryAnalyses();
+        } catch (SQLException e) {
+            throw new RunStatsException("Cannot retrieve the list of per-base summary analyses: " + e.getMessage());
+        }
+    }
 
-          map.put(RunProperty.lane, Integer.toString(part.getPartitionNumber()));
+    public List<String> listGlobalRunAnalyses() throws RunStatsException {
+        try {
+            return reports.listGlobalAnalyses();
+        } catch (SQLException e) {
+            throw new RunStatsException("Cannot retrieve the list of global run-based analyses: " + e.getMessage());
+        }
+    }
 
-          try {
+    public boolean hasStatsForRun(Run run) throws RunStatsException {
+        Map<RunProperty, String> map = new HashMap<RunProperty, String>();
+        map.put(RunProperty.run, run.getAlias());
+        try {
+            ReportTable rt = reports.getAverageValues(map);
+            return rt != null && !rt.isEmpty();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public JSONObject getSummaryStatsForRun(Run run) throws RunStatsException {
+        JSONObject report = new JSONObject();
+        ReportTable rt;
+
+        Map<RunProperty, String> map = new HashMap<RunProperty, String>();
+        map.put(RunProperty.run, run.getAlias());
+        try {
+            rt = reports.getAverageValues(map);
+            if (rt == null) {
+                return null;
+            }
+            report.put("runSummary", JSONArray.fromObject(rt.toJSON()));
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        if (!((RunImpl) run).getSequencerPartitionContainers().isEmpty()) {
+            JSONObject containers = new JSONObject();
+            for (SequencerPartitionContainer<SequencerPoolPartition> container : ((RunImpl) run).getSequencerPartitionContainers()) {
+                JSONObject f = new JSONObject();
+                f.put("idBarcode", container.getIdentificationBarcode());
+
+                JSONArray partitions = new JSONArray();
+                for (SequencerPoolPartition part : container.getPartitions()) {
+                    JSONObject partition = new JSONObject();
+
+                    map.put(RunProperty.lane, Integer.toString(part.getPartitionNumber()));
+
+                    try {
+                        rt = reports.getAverageValues(map);
+                        if (rt != null) {
+                            partition.put("partitionSummary", JSONArray.fromObject(rt.toJSON()));
+                        }
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+
+                    //clear any previous barcode query
+                    map.remove(RunProperty.barcode);
+                    if (part.getPool() != null) {
+                        Pool<? extends Poolable> pool = part.getPool();
+                        for (Dilution d : pool.getDilutions()) {
+                            Library l = d.getLibrary();
+                            if (!l.getTagBarcodes().isEmpty()) {
+                                for (TagBarcode tb : l.getTagBarcodes().values()) {
+                                    map.remove(RunProperty.barcode);
+                                    try {
+                                        map.put(RunProperty.barcode, tb.getSequence());
+                                        rt = reports.getAverageValues(map);
+                                        if (rt != null) {
+                                            partition.put(tb.getSequence(), JSONArray.fromObject(rt.toJSON()));
+                                        }
+                                    } catch (SQLException e) {
+                                        e.printStackTrace();
+                                    } catch (IOException e) {
+                                        e.printStackTrace();
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    partitions.add(part.getPartitionNumber() - 1, partition);
+                }
+                f.put("partitions", partitions);
+                containers.put(container.getId(), f);
+            }
+            report.put("containers", containers);
+        }
+        return report;
+    }
+
+    public JSONObject getSummaryStatsForLane(Run run, int laneNumber) throws RunStatsException {
+        Map<RunProperty, String> map = new HashMap<RunProperty, String>();
+        map.put(RunProperty.run, run.getAlias());
+        map.put(RunProperty.lane, String.valueOf(laneNumber));
+        ReportTable rt;
+
+        JSONObject partition = new JSONObject();
+        try {
             rt = reports.getAverageValues(map);
             if (rt != null) {
-              partition.put("partitionSummary", JSONArray.fromObject(rt.toJSON()));
+                partition.put("partitionSummary", JSONArray.fromObject(rt.toJSON()));
             }
-          }
-          catch (SQLException e) {
+        } catch (SQLException e) {
             e.printStackTrace();
-          }
-          catch (IOException e) {
+        } catch (IOException e) {
             e.printStackTrace();
-          }
-
-          //clear any previous barcode query
-          map.remove(RunProperty.barcode);
-          if (part.getPool() != null) {
-            Pool<? extends Poolable> pool = part.getPool();
-            for (Dilution d : pool.getDilutions()) {
-              Library l = d.getLibrary();
-              if (!l.getTagBarcodes().isEmpty()) {
-                for (TagBarcode tb : l.getTagBarcodes().values()) {
-                  map.remove(RunProperty.barcode);
-                  try {
-                    map.put(RunProperty.barcode, tb.getSequence());
-                    rt = reports.getAverageValues(map);
-                    if (rt != null) {
-                      partition.put(tb.getSequence(), JSONArray.fromObject(rt.toJSON()));
-                    }
-                  }
-                  catch (SQLException e) {
-                    e.printStackTrace();
-                  }
-                  catch (IOException e) {
-                    e.printStackTrace();
-                  }
-                }
-              }
-            }
-          }
-
-          partitions.add(part.getPartitionNumber() - 1, partition);
         }
-        f.put("partitions", partitions);
-        containers.put(container.getId(), f);
-      }
-      report.put("containers", containers);
-    }
-    return report;
-  }
 
-  public JSONObject getSummaryStatsForLane(Run run, int laneNumber) throws RunStatsException {
-    Map<RunProperty, String> map = new HashMap<RunProperty, String>();
-    map.put(RunProperty.run, run.getAlias());
-    map.put(RunProperty.lane, String.valueOf(laneNumber));
-    ReportTable rt;
-
-    JSONObject partition = new JSONObject();
-    try {
-      rt = reports.getAverageValues(map);
-      if (rt != null) {
-        partition.put("partitionSummary", JSONArray.fromObject(rt.toJSON()));
-      }
-    }
-    catch (SQLException e) {
-      e.printStackTrace();
-    }
-    catch (IOException e) {
-      e.printStackTrace();
-    }
-
-    //clear any previous barcode query
-    map.remove(RunProperty.barcode);
-    if (!((RunImpl) run).getSequencerPartitionContainers().isEmpty()) {
-      for (SequencerPartitionContainer<SequencerPoolPartition> container : ((RunImpl) run).getSequencerPartitionContainers()) {
-        SequencerPoolPartition part = container.getPartitionAt(laneNumber);
-        if (part.getPartitionNumber() == laneNumber) {
-          if (part.getPool() != null) {
-            Pool<? extends Poolable> pool = part.getPool();
-            for (Dilution d : pool.getDilutions()) {
-              Library l = d.getLibrary();
-              if (!l.getTagBarcodes().isEmpty()) {
-                for (TagBarcode tb : l.getTagBarcodes().values()) {
-                  map.remove(RunProperty.barcode);
-                  try {
-                    map.put(RunProperty.barcode, tb.getSequence());
-                    rt = reports.getAverageValues(map);
-                    if (rt != null) {
-                      partition.put(tb.getSequence(), JSONArray.fromObject(rt.toJSON()));
+        //clear any previous barcode query
+        map.remove(RunProperty.barcode);
+        if (!((RunImpl) run).getSequencerPartitionContainers().isEmpty()) {
+            for (SequencerPartitionContainer<SequencerPoolPartition> container : ((RunImpl) run).getSequencerPartitionContainers()) {
+                SequencerPoolPartition part = container.getPartitionAt(laneNumber);
+                if (part.getPartitionNumber() == laneNumber) {
+                    if (part.getPool() != null) {
+                        Pool<? extends Poolable> pool = part.getPool();
+                        for (Dilution d : pool.getDilutions()) {
+                            Library l = d.getLibrary();
+                            if (!l.getTagBarcodes().isEmpty()) {
+                                for (TagBarcode tb : l.getTagBarcodes().values()) {
+                                    map.remove(RunProperty.barcode);
+                                    try {
+                                        map.put(RunProperty.barcode, tb.getSequence());
+                                        rt = reports.getAverageValues(map);
+                                        if (rt != null) {
+                                            partition.put(tb.getSequence(), JSONArray.fromObject(rt.toJSON()));
+                                        }
+                                    } catch (SQLException e) {
+                                        e.printStackTrace();
+                                    } catch (IOException e) {
+                                        e.printStackTrace();
+                                    }
+                                }
+                            }
+                        }
                     }
-                  }
-                  catch (SQLException e) {
-                    e.printStackTrace();
-                  }
-                  catch (IOException e) {
-                    e.printStackTrace();
-                  }
+                    break;
                 }
-              }
             }
-          }
-          break;
         }
-      }
+
+        return partition;
     }
 
-    return partition;
-  }
+    public JSONObject getCompleteStatsForLane(String runAlias, int laneNumber) throws RunStatsException {
+        return null;
+    }
 
-  public JSONObject getCompleteStatsForLane(String runAlias, int laneNumber) throws RunStatsException {
-    return null;
-  }
+    public JSONObject getPerPositionBaseSequenceQualityForLane(Run run, int laneNumber) throws RunStatsException {
+        D3PlotConsumer d3p = new D3PlotConsumer(reportsDecorator);
+        try {
+            return d3p.getPerPositionBaseSequenceQualityForLane(run.getAlias(), run.getPairedEnd(), laneNumber);
+        } catch (ConsumerException e) {
+            throw new RunStatsException("Cannot generate D3 plot JSON for run " + run.getAlias() + ": " + e.getMessage());
+        }
+    }
 
-  public JSONObject getPerPositionBaseSequenceQualityForLane(Run run, int laneNumber) throws RunStatsException {
-    D3PlotConsumer d3p = new D3PlotConsumer(reportsDecorator);
-    try {
-      return d3p.getPerPositionBaseSequenceQualityForLane(run.getAlias(), run.getPairedEnd(), laneNumber);
+    public JSONObject getPerPositionBaseContentForLane(Run run, int laneNumber) throws RunStatsException {
+        D3PlotConsumer d3p = new D3PlotConsumer(reportsDecorator);
+        try {
+            return d3p.getPerPositionBaseContentForLane(run.getAlias(), run.getPairedEnd(), laneNumber);
+        } catch (ConsumerException e) {
+            throw new RunStatsException("Cannot generate D3 plot JSON for run " + run.getAlias() + ": " + e.getMessage());
+        }
     }
-    catch (ConsumerException e) {
-      throw new RunStatsException("Cannot generate D3 plot JSON for run " + run.getAlias() + ": " + e.getMessage());
-    }
-  }
-
-  public JSONObject getPerPositionBaseContentForLane(Run run, int laneNumber) throws RunStatsException {
-    D3PlotConsumer d3p = new D3PlotConsumer(reportsDecorator);
-    try {
-      return d3p.getPerPositionBaseContentForLane(run.getAlias(), run.getPairedEnd(), laneNumber);
-    }
-    catch (ConsumerException e) {
-      throw new RunStatsException("Cannot generate D3 plot JSON for run " + run.getAlias() + ": " + e.getMessage());
-    }
-  }
 }

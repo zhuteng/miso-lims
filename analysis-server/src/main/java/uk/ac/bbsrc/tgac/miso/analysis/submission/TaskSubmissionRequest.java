@@ -152,11 +152,12 @@ public class TaskSubmissionRequest {
         this.restApiKey = restApiKey;
     }
 
-    @Override public String toString() {
+    @Override
+    public String toString() {
         return "SubmissionRequest: " +
-                "pipelineName='" + pipelineName + "', " +
-                "startingProcessIndex='" + startingProcessIndex + "', " +
-                "inputParameters=" + inputParameters + "', " +
-                "priority='" + priority + "'";
+               "pipelineName='" + pipelineName + "', " +
+               "startingProcessIndex='" + startingProcessIndex + "', " +
+               "inputParameters=" + inputParameters + "', " +
+               "priority='" + priority + "'";
     }
 }

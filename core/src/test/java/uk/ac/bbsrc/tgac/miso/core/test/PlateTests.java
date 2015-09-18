@@ -50,49 +50,49 @@ import java.util.List;
  * @since 0.1.1
  */
 public class PlateTests {
-  protected static final Logger log = LoggerFactory.getLogger(PlateTests.class);
-  private DataObjectFactory dataObjectFactory;
+    protected static final Logger log = LoggerFactory.getLogger(PlateTests.class);
+    private DataObjectFactory dataObjectFactory;
 
-  @Before
-  public void setUp() {
-    dataObjectFactory = new TgacDataObjectFactory();
-  }
-
-  @Test
-  public void testConstructPlates() {
-    uk.ac.bbsrc.tgac.miso.core.data.Plate p = dataObjectFactory.getPlateOfSize(96);
-    log.info(p.getElementType().getName());
-  }
-
-  @Test
-  public void test384WellPlateConversion() {
-    log.info("Generating plates and libraries");
-    List<_96WellPlate> plates = new LinkedList<_96WellPlate>();
-    for (int p = 1; p < 5; p++) {
-      _96WellPlate plate = new _96WellPlate();
-
-      for (int i = 1; i < 97; i++) {
-        Library l = new LibraryImpl();
-        l.setAlias("P"+p+"_L"+i+"_TestLib");
-        plate.addElement(l);
-      }
-      plates.add(plate);
+    @Before
+    public void setUp() {
+        dataObjectFactory = new TgacDataObjectFactory();
     }
 
-    _384WellPlate finalPlate = new _384WellPlate();
-    finalPlate.setName("Test 384 Plate");
+    @Test
+    public void testConstructPlates() {
+        uk.ac.bbsrc.tgac.miso.core.data.Plate p = dataObjectFactory.getPlateOfSize(96);
+        log.info(p.getElementType().getName());
+    }
 
-    PlateConversionStrategy<_96WellPlate> pcs = new Default384WellPlateConversionStrategy();
-    finalPlate.setConversionStrategy(pcs);
+    @Test
+    public void test384WellPlateConversion() {
+        log.info("Generating plates and libraries");
+        List<_96WellPlate> plates = new LinkedList<_96WellPlate>();
+        for (int p = 1; p < 5; p++) {
+            _96WellPlate plate = new _96WellPlate();
 
-    log.info("Doing conversion from 4x 96-well to 1x 384-well");
-    finalPlate.setElementsAndDoConversion(plates);
+            for (int i = 1; i < 97; i++) {
+                Library l = new LibraryImpl();
+                l.setAlias("P" + p + "_L" + i + "_TestLib");
+                plate.addElement(l);
+            }
+            plates.add(plate);
+        }
 
-    System.out.println(finalPlate.toString());
-  }
+        _384WellPlate finalPlate = new _384WellPlate();
+        finalPlate.setName("Test 384 Plate");
 
-  @After
-  public void tearDown() {
-    dataObjectFactory = null;  
-  }
+        PlateConversionStrategy<_96WellPlate> pcs = new Default384WellPlateConversionStrategy();
+        finalPlate.setConversionStrategy(pcs);
+
+        log.info("Doing conversion from 4x 96-well to 1x 384-well");
+        finalPlate.setElementsAndDoConversion(plates);
+
+        System.out.println(finalPlate.toString());
+    }
+
+    @After
+    public void tearDown() {
+        dataObjectFactory = null;
+    }
 }

@@ -15,30 +15,30 @@ import java.util.Collection;
  * @since 0.2.1-SNAPSHOT
  */
 public abstract class UserInfoMixin {
-  @JsonIgnore()
-  abstract String getPassword();
+    @JsonIgnore()
+    abstract String getPassword();
 
-  @JsonIgnore()
-  abstract String getLoginName();
+    @JsonIgnore()
+    abstract String getLoginName();
 
-  @JsonIgnore()
-  abstract Collection<Group> getGroups();
+    @JsonIgnore()
+    abstract Collection<Group> getGroups();
 
-  @JsonIgnore()
-  abstract String[] getRoles();
+    @JsonIgnore()
+    abstract String[] getRoles();
 
-  @JsonIgnore()
-  abstract Collection<GrantedAuthority> getRolesAsAuthorities();
+    @JsonIgnore()
+    abstract Collection<GrantedAuthority> getRolesAsAuthorities();
 
-  @JsonIgnore()
-  abstract Collection<GrantedAuthority> getPermissionsAsAuthorities();
+    @JsonIgnore()
+    abstract Collection<GrantedAuthority> getPermissionsAsAuthorities();
 
-  @JsonIgnore()
-  abstract boolean isAdmin();
+    @JsonIgnore()
+    abstract boolean isAdmin();
 
-  @JsonIgnore()
-  abstract boolean isInternal();
+    @JsonIgnore()
+    abstract boolean isInternal();
 
-  @JsonIgnore()
-  abstract boolean isExternal();
+    @JsonIgnore()
+    abstract boolean isExternal();
 }

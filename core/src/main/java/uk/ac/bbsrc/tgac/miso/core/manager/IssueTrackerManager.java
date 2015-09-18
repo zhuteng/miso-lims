@@ -39,37 +39,39 @@ import java.io.IOException;
  */
 @Spi
 public interface IssueTrackerManager {
-  String OAUTH = "oauth";
-  String BASIC = "basic";
+    String OAUTH = "oauth";
+    String BASIC = "basic";
 
-  String getType();
+    String getType();
 
-  JSONObject getIssue(String issueKey) throws IOException;
-  String getBaseTrackerUrl();
+    JSONObject getIssue(String issueKey) throws IOException;
+    String getBaseTrackerUrl();
 
-  public enum TrackerType {
-    JIRA("jira"),
-    RT("RT");
+    public enum TrackerType {
+        JIRA("jira"),
+        RT("RT");
 
-    /** Field key  */
-    private String key;
+        /**
+         * Field key
+         */
+        private String key;
 
-    /**
-     * Constructs a TrackerType based on a given key
-     *
-     * @param key of type String
-     */
-    TrackerType(String key) {
-      this.key = key;
+        /**
+         * Constructs a TrackerType based on a given key
+         *
+         * @param key of type String
+         */
+        TrackerType(String key) {
+            this.key = key;
+        }
+
+        /**
+         * Returns the key of this TrackerType enum.
+         *
+         * @return String key.
+         */
+        public String getKey() {
+            return key;
+        }
     }
-
-    /**
-     * Returns the key of this TrackerType enum.
-     *
-     * @return String key.
-     */
-    public String getKey() {
-      return key;
-    }
-  }
 }

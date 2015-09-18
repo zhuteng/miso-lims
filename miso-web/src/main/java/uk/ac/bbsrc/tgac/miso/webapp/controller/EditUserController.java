@@ -56,245 +56,232 @@ import javax.servlet.http.HttpServletRequest;
 @Controller
 @SessionAttributes("user")
 public class EditUserController {
-  protected static final Logger log = LoggerFactory.getLogger(EditUserController.class);
+    protected static final Logger log = LoggerFactory.getLogger(EditUserController.class);
 
-  @Autowired
-  private SecurityManager securityManager;
+    @Autowired
+    private SecurityManager securityManager;
 
-  @Autowired
-  private PasswordCodecService passwordCodecService;
+    @Autowired
+    private PasswordCodecService passwordCodecService;
 
-  @Autowired
-  private ProtocolManager protocolManager;
+    @Autowired
+    private ProtocolManager protocolManager;
 
-  @Autowired
-  private DataObjectFactory dataObjectFactory;
+    @Autowired
+    private DataObjectFactory dataObjectFactory;
 
-  public void setDataObjectFactory(DataObjectFactory dataObjectFactory) {
-    this.dataObjectFactory = dataObjectFactory;
-  }
-
-  public void setProtocolManager(ProtocolManager protocolManager) {
-    this.protocolManager = protocolManager;
-  }
-
-  public void setSecurityManager(SecurityManager securityManager) {
-    this.securityManager = securityManager;
-  }
-
-  public void setPasswordCodecService(PasswordCodecService passwordCodecService) {
-    this.passwordCodecService = passwordCodecService;
-  }
-
-  @ModelAttribute("groups")
-  public Collection<Group> populateGroups() throws IOException {
-    try {
-      List<Group> groups = new ArrayList<Group>(securityManager.listAllGroups());
-      Collections.sort(groups);
-      return groups;
+    public void setDataObjectFactory(DataObjectFactory dataObjectFactory) {
+        this.dataObjectFactory = dataObjectFactory;
     }
-    catch (IOException ex) {
-      if (log.isDebugEnabled()) {
-        log.debug("Failed to list groups", ex);
-      }
-      throw ex;
-    }
-  }
 
-  @ModelAttribute("roles")
-  public Collection<String> populateRoles() throws IOException {
-    try {
-      Collection<String> roles = new ArrayList<String>();
-      for (Protocol protocol : protocolManager.listAllProtocols()) {
-        roles.add(protocol.getRole());
-      }
-      for (Activity activity : protocolManager.listAllActivities()) {
-        roles.add(activity.getRole());
-      }
-      return roles;
+    public void setProtocolManager(ProtocolManager protocolManager) {
+        this.protocolManager = protocolManager;
     }
-    catch (IOException ex) {
-      if (log.isDebugEnabled()) {
-        log.debug("Failed to list roles", ex);
-      }
-      throw ex;
-    }
-  }
 
-  @RequestMapping(value = "/user/{userId}", method = RequestMethod.GET)
-  public ModelAndView userForm(@PathVariable Long userId, ModelMap model, HttpServletRequest request) throws SecurityException, IOException {
-    try {
-      User user = securityManager.getUserById(userId);
-      if (user != null) {
-        if (SecurityContextHolder.getContext().getAuthentication().getName().equals(user.getLoginName())) {
-          model.put("user", user);
-          String securityMethod = (String)request.getSession().getServletContext().getAttribute("security.method");
-          model.put("securityMethod", securityMethod);
-
-          return new ModelAndView("/pages/editUser.jsp", model);
-        }
-        else {
-          throw new SecurityException("You can only edit your own user details.");
-        }
-      }
-      else {
-        throw new IOException("No such user");
-      }
+    public void setSecurityManager(SecurityManager securityManager) {
+        this.securityManager = securityManager;
     }
-    catch (IOException ex) {
-      if (log.isDebugEnabled()) {
-        log.debug("Failed to show user", ex);
-      }
-      throw ex;
-    }
-  }
 
-  @RequestMapping(value = "/admin/user/new", method = RequestMethod.GET)
-  public ModelAndView newSetupForm(ModelMap model, HttpServletRequest request) throws IOException {
-    String securityMethod = (String)request.getSession().getServletContext().getAttribute("security.method");
-    if ("ldap".equals(securityMethod)) {
-      throw new IOException("Cannot add users through the MISO interface for LDAP-managed security. Please add the LDAP user then log in as normal.");
+    public void setPasswordCodecService(PasswordCodecService passwordCodecService) {
+        this.passwordCodecService = passwordCodecService;
     }
-    else {
-      return adminSetupForm(UserImpl.UNSAVED_ID, model, request);
-    }
-  }
 
-  @RequestMapping(value = "/admin/user/{userId}", method = RequestMethod.GET)
-  public ModelAndView adminSetupForm(@PathVariable Long userId,
-                                     ModelMap model, HttpServletRequest request) throws IOException {
-    try {
-      model.put("user", userId == UserImpl.UNSAVED_ID ? dataObjectFactory.getUser()
-                                                      : securityManager.getUserById(userId));
-
-      String securityMethod = (String)request.getSession().getServletContext().getAttribute("security.method");
-      model.put("securityMethod", securityMethod);
-
-      return new ModelAndView("/pages/editUser.jsp", model);
-    }
-    catch (IOException ex) {
-      if (log.isDebugEnabled()) {
-        log.debug("Failed to show user", ex);
-      }
-      throw ex;
-    }
-  }
-
-  @RequestMapping(value = "/admin/user", method = RequestMethod.POST)
-  public String adminProcessSubmit(@ModelAttribute("user") User user,
-                                   ModelMap model, SessionStatus session, HttpServletRequest request) throws IOException {
-    try {
-      if (user.getUserId() == UserImpl.UNSAVED_ID) {
-        //new user. don't require a password to be set initially
-        if (!LimsUtils.isStringEmptyOrNull(request.getParameter("newpassword")) && !LimsUtils.isStringEmptyOrNull(request.getParameter("confirmpassword"))) {
-          if (request.getParameter("newpassword").equals(request.getParameter("confirmpassword"))) {
-            if (!"".equals(request.getParameter("newpassword")) && !"".equals(request.getParameter("confirmpassword"))) {
-              if (SecurityContextHolder.getContext().getAuthentication().getAuthorities().contains(new GrantedAuthorityImpl("ROLE_ADMIN"))) {
-                //auth'ed user is the account holder or an admin
-                log.info("Admin '"+SecurityContextHolder.getContext().getAuthentication().getName()+"' attempting user password change for user '"+user.getLoginName()+"'");
-                user.setPassword(request.getParameter("newpassword"));
-              }
-              else {
-                throw new IOException("Cannot create user - user isn't an admin.");
-              }
+    @ModelAttribute("groups")
+    public Collection<Group> populateGroups() throws IOException {
+        try {
+            List<Group> groups = new ArrayList<Group>(securityManager.listAllGroups());
+            Collections.sort(groups);
+            return groups;
+        } catch (IOException ex) {
+            if (log.isDebugEnabled()) {
+                log.debug("Failed to list groups", ex);
             }
-            else {
-              throw new IOException("New password cannot be empty");
-            }
-          }
-          else {
-            throw new IOException("New password and confirmation don't match.");
-          }
+            throw ex;
         }
-      }
-      else {
-        if (!LimsUtils.isStringEmptyOrNull(request.getParameter("password")) && !LimsUtils.isStringEmptyOrNull(request.getParameter("newpassword"))) {
-          if (!LimsUtils.isStringEmptyOrNull(request.getParameter("confirmpassword"))) {
-            if (request.getParameter("newpassword").equals(request.getParameter("confirmpassword"))) {
-              if (!"".equals(request.getParameter("newpassword")) && !"".equals(request.getParameter("confirmpassword"))) {
+    }
+
+    @ModelAttribute("roles")
+    public Collection<String> populateRoles() throws IOException {
+        try {
+            Collection<String> roles = new ArrayList<String>();
+            for (Protocol protocol : protocolManager.listAllProtocols()) {
+                roles.add(protocol.getRole());
+            }
+            for (Activity activity : protocolManager.listAllActivities()) {
+                roles.add(activity.getRole());
+            }
+            return roles;
+        } catch (IOException ex) {
+            if (log.isDebugEnabled()) {
+                log.debug("Failed to list roles", ex);
+            }
+            throw ex;
+        }
+    }
+
+    @RequestMapping(value = "/user/{userId}", method = RequestMethod.GET)
+    public ModelAndView userForm(@PathVariable Long userId, ModelMap model, HttpServletRequest request)
+        throws SecurityException, IOException {
+        try {
+            User user = securityManager.getUserById(userId);
+            if (user != null) {
                 if (SecurityContextHolder.getContext().getAuthentication().getName().equals(user.getLoginName())) {
-                  if (passwordCodecService.getEncoder().isPasswordValid(user.getPassword(), request.getParameter("password"), null)) {
-                    log.debug("User '"+user.getLoginName()+"' attempting own password change");
-                    user.setPassword(request.getParameter("newpassword"));
-                  }
-                }
-                else if (SecurityContextHolder.getContext().getAuthentication().getAuthorities().contains(new GrantedAuthorityImpl("ROLE_ADMIN"))) {
-                  //auth'ed user is the account holder or an admin
-                  log.info("Admin '"+SecurityContextHolder.getContext().getAuthentication().getName()+"' attempting user password change for user '"+user.getLoginName()+"'");
-                  user.setPassword(request.getParameter("newpassword"));
-                }
-                else {
-                  throw new IOException("Cannot update user - existing password check failed, or user isn't an admin.");
-                }
-              }
-              else {
-                throw new IOException("New password cannot be empty");
-              }
-            }
-            else {
-              throw new IOException("New password and confirmation don't match.");
-            }
-          }
-          else {
-            throw new IOException("You must supply a confirmation of your new password.");
-          }
-        }
-      }
+                    model.put("user", user);
+                    String securityMethod = (String) request.getSession().getServletContext().getAttribute("security.method");
+                    model.put("securityMethod", securityMethod);
 
-      securityManager.saveUser(user);
-      session.setComplete();
-      model.clear();
-      return "redirect:/miso/admin/users";
-    }
-    catch (IOException ex) {
-      if (log.isDebugEnabled()) {
-        log.debug("Failed to update user", ex);
-      }
-      throw ex;
-    }
-  }
-
-  @RequestMapping(value = "/user", method = RequestMethod.POST)
-  public String processSubmit(@ModelAttribute("user") User user,
-                                   ModelMap model, SessionStatus session, HttpServletRequest request) throws IOException {
-    try {
-      if (!LimsUtils.isStringEmptyOrNull(request.getParameter("password")) && !LimsUtils.isStringEmptyOrNull(request.getParameter("newpassword"))) {
-        if (!LimsUtils.isStringEmptyOrNull(request.getParameter("confirmpassword"))) {
-          if (request.getParameter("newpassword").equals(request.getParameter("confirmpassword"))) {
-            if (!"".equals(request.getParameter("newpassword")) && !"".equals(request.getParameter("confirmpassword"))) {
-              if (SecurityContextHolder.getContext().getAuthentication().getName().equals(user.getLoginName())) {
-                if (passwordCodecService.getEncoder().isPasswordValid(user.getPassword(), request.getParameter("password"), null)) {
-                  log.debug("User '"+user.getLoginName()+"' attempting own password change");
-                  user.setPassword(request.getParameter("newpassword"));
+                    return new ModelAndView("/pages/editUser.jsp", model);
+                } else {
+                    throw new SecurityException("You can only edit your own user details.");
                 }
-              }
-              else {
-                throw new IOException("Cannot update user - existing password check failed, or user isn't an admin.");
-              }
+            } else {
+                throw new IOException("No such user");
             }
-            else {
-              throw new IOException("New password cannot be empty");
+        } catch (IOException ex) {
+            if (log.isDebugEnabled()) {
+                log.debug("Failed to show user", ex);
             }
-          }
-          else {
-            throw new IOException("New password and confirmation don't match.");
-          }
+            throw ex;
         }
-        else {
-          throw new IOException("You must supply a confirmation of your new password.");
-        }
-      }
+    }
 
-      securityManager.saveUser(user);
-      session.setComplete();
-      model.clear();
-      return "redirect:/miso/myAccount";
+    @RequestMapping(value = "/admin/user/new", method = RequestMethod.GET)
+    public ModelAndView newSetupForm(ModelMap model, HttpServletRequest request) throws IOException {
+        String securityMethod = (String) request.getSession().getServletContext().getAttribute("security.method");
+        if ("ldap".equals(securityMethod)) {
+            throw new IOException(
+                "Cannot add users through the MISO interface for LDAP-managed security. Please add the LDAP user then log in as normal.");
+        } else {
+            return adminSetupForm(UserImpl.UNSAVED_ID, model, request);
+        }
     }
-    catch (IOException ex) {
-      if (log.isDebugEnabled()) {
-        log.debug("Failed to update user", ex);
-      }
-      throw ex;
+
+    @RequestMapping(value = "/admin/user/{userId}", method = RequestMethod.GET)
+    public ModelAndView adminSetupForm(@PathVariable Long userId, ModelMap model, HttpServletRequest request) throws IOException {
+        try {
+            model.put("user", userId == UserImpl.UNSAVED_ID ? dataObjectFactory.getUser() : securityManager.getUserById(userId));
+
+            String securityMethod = (String) request.getSession().getServletContext().getAttribute("security.method");
+            model.put("securityMethod", securityMethod);
+
+            return new ModelAndView("/pages/editUser.jsp", model);
+        } catch (IOException ex) {
+            if (log.isDebugEnabled()) {
+                log.debug("Failed to show user", ex);
+            }
+            throw ex;
+        }
     }
-  }
+
+    @RequestMapping(value = "/admin/user", method = RequestMethod.POST)
+    public String adminProcessSubmit(@ModelAttribute("user") User user, ModelMap model, SessionStatus session, HttpServletRequest request)
+        throws IOException {
+        try {
+            if (user.getUserId() == UserImpl.UNSAVED_ID) {
+                //new user. don't require a password to be set initially
+                if (!LimsUtils.isStringEmptyOrNull(request.getParameter("newpassword")) &&
+                    !LimsUtils.isStringEmptyOrNull(request.getParameter("confirmpassword"))) {
+                    if (request.getParameter("newpassword").equals(request.getParameter("confirmpassword"))) {
+                        if (!"".equals(request.getParameter("newpassword")) && !"".equals(request.getParameter("confirmpassword"))) {
+                            if (SecurityContextHolder.getContext().getAuthentication().getAuthorities()
+                                                     .contains(new GrantedAuthorityImpl("ROLE_ADMIN"))) {
+                                //auth'ed user is the account holder or an admin
+                                log.info("Admin '" + SecurityContextHolder.getContext().getAuthentication().getName() +
+                                         "' attempting user password change for user '" + user.getLoginName() + "'");
+                                user.setPassword(request.getParameter("newpassword"));
+                            } else {
+                                throw new IOException("Cannot create user - user isn't an admin.");
+                            }
+                        } else {
+                            throw new IOException("New password cannot be empty");
+                        }
+                    } else {
+                        throw new IOException("New password and confirmation don't match.");
+                    }
+                }
+            } else {
+                if (!LimsUtils.isStringEmptyOrNull(request.getParameter("password")) &&
+                    !LimsUtils.isStringEmptyOrNull(request.getParameter("newpassword"))) {
+                    if (!LimsUtils.isStringEmptyOrNull(request.getParameter("confirmpassword"))) {
+                        if (request.getParameter("newpassword").equals(request.getParameter("confirmpassword"))) {
+                            if (!"".equals(request.getParameter("newpassword")) && !"".equals(request.getParameter("confirmpassword"))) {
+                                if (SecurityContextHolder.getContext().getAuthentication().getName().equals(user.getLoginName())) {
+                                    if (passwordCodecService.getEncoder()
+                                                            .isPasswordValid(user.getPassword(), request.getParameter("password"), null)) {
+                                        log.debug("User '" + user.getLoginName() + "' attempting own password change");
+                                        user.setPassword(request.getParameter("newpassword"));
+                                    }
+                                } else if (SecurityContextHolder.getContext().getAuthentication().getAuthorities()
+                                                                .contains(new GrantedAuthorityImpl("ROLE_ADMIN"))) {
+                                    //auth'ed user is the account holder or an admin
+                                    log.info("Admin '" + SecurityContextHolder.getContext().getAuthentication().getName() +
+                                             "' attempting user password change for user '" + user.getLoginName() + "'");
+                                    user.setPassword(request.getParameter("newpassword"));
+                                } else {
+                                    throw new IOException("Cannot update user - existing password check failed, or user isn't an admin.");
+                                }
+                            } else {
+                                throw new IOException("New password cannot be empty");
+                            }
+                        } else {
+                            throw new IOException("New password and confirmation don't match.");
+                        }
+                    } else {
+                        throw new IOException("You must supply a confirmation of your new password.");
+                    }
+                }
+            }
+
+            securityManager.saveUser(user);
+            session.setComplete();
+            model.clear();
+            return "redirect:/miso/admin/users";
+        } catch (IOException ex) {
+            if (log.isDebugEnabled()) {
+                log.debug("Failed to update user", ex);
+            }
+            throw ex;
+        }
+    }
+
+    @RequestMapping(value = "/user", method = RequestMethod.POST)
+    public String processSubmit(@ModelAttribute("user") User user, ModelMap model, SessionStatus session, HttpServletRequest request)
+        throws IOException {
+        try {
+            if (!LimsUtils.isStringEmptyOrNull(request.getParameter("password")) &&
+                !LimsUtils.isStringEmptyOrNull(request.getParameter("newpassword"))) {
+                if (!LimsUtils.isStringEmptyOrNull(request.getParameter("confirmpassword"))) {
+                    if (request.getParameter("newpassword").equals(request.getParameter("confirmpassword"))) {
+                        if (!"".equals(request.getParameter("newpassword")) && !"".equals(request.getParameter("confirmpassword"))) {
+                            if (SecurityContextHolder.getContext().getAuthentication().getName().equals(user.getLoginName())) {
+                                if (passwordCodecService.getEncoder()
+                                                        .isPasswordValid(user.getPassword(), request.getParameter("password"), null)) {
+                                    log.debug("User '" + user.getLoginName() + "' attempting own password change");
+                                    user.setPassword(request.getParameter("newpassword"));
+                                }
+                            } else {
+                                throw new IOException("Cannot update user - existing password check failed, or user isn't an admin.");
+                            }
+                        } else {
+                            throw new IOException("New password cannot be empty");
+                        }
+                    } else {
+                        throw new IOException("New password and confirmation don't match.");
+                    }
+                } else {
+                    throw new IOException("You must supply a confirmation of your new password.");
+                }
+            }
+
+            securityManager.saveUser(user);
+            session.setComplete();
+            model.clear();
+            return "redirect:/miso/myAccount";
+        } catch (IOException ex) {
+            if (log.isDebugEnabled()) {
+                log.debug("Failed to update user", ex);
+            }
+            throw ex;
+        }
+    }
 }

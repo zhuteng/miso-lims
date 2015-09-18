@@ -15,11 +15,11 @@ import java.util.Collection;
  * @since 0.2.2
  */
 public abstract class ContainerRecursionAvoidanceMixin {
-  /**
-   * Ignore Sample.getLibraries() method by applying this mixin to a Jackson ObjectMapper
-   *
-   * @return Sample
-   */
-  @JsonIgnore()
-  abstract Collection<Partition> getPartitions();
+    /**
+     * Ignore Sample.getLibraries() method by applying this mixin to a Jackson ObjectMapper
+     *
+     * @return Sample
+     */
+    @JsonIgnore()
+    abstract Collection<Partition> getPartitions();
 }

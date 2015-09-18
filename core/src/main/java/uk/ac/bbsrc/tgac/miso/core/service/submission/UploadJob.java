@@ -33,23 +33,18 @@ import java.net.URI;
  * @since 0.0.2
  */
 public interface UploadJob {
-  /**
-   * Accepts sequence Datafiles
-   *
-   *
-   */
+    /**
+     * Accepts sequence Datafiles
+     */
 
+    public void setFile(File file);
 
-  public void setFile(File file);
+    public File getFile();
 
-  public File getFile();
+    public long getBytesTransferred();
 
-  public long getBytesTransferred();
+    public int getPercentageTransferred();
 
-  public int getPercentageTransferred();
-
-  public boolean isComplete();
-
-
+    public boolean isComplete();
 
 }

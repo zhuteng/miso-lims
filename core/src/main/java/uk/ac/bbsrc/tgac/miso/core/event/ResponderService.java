@@ -33,6 +33,6 @@ package uk.ac.bbsrc.tgac.miso.core.event;
  * @since 0.1.2
  */
 public interface ResponderService<T extends Event> {
-  boolean respondsTo(T t);
-  void generateResponse(T t);
+    boolean respondsTo(T t);
+    void generateResponse(T t);
 }

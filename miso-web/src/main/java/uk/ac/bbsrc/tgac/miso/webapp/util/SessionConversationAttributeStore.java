@@ -58,286 +58,278 @@ import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandl
  */
 public class SessionConversationAttributeStore implements SessionAttributeStore, InitializingBean {
 
-  private Logger _logger = Logger.getLogger(SessionConversationAttributeStore.class.getName());
+    private Logger _logger = Logger.getLogger(SessionConversationAttributeStore.class.getName());
 
-  private int _numConversationsToKeep = 10;
+    private int _numConversationsToKeep = 10;
 
-  @Autowired
-  //3.0.x -> 3.1.x change required - private AnnotationMethodHandlerAdapter annotationMethodHandlerAdapter;
-  private RequestMappingHandlerAdapter requestMappingHandlerAdapter;
+    @Autowired
+    //3.0.x -> 3.1.x change required - private AnnotationMethodHandlerAdapter annotationMethodHandlerAdapter;
+    private RequestMappingHandlerAdapter requestMappingHandlerAdapter;
 
-  public void afterPropertiesSet() throws Exception {
-    requestMappingHandlerAdapter.setSessionAttributeStore(this);
-  }
-
-  /* (non-Javadoc)
-  * @see org.springframework.web.bind.support.SessionAttributeStore#storeAttribute(org.springframework.web.context.request.WebRequest, java.lang.String, java.lang.Object)
-  */
-  public void storeAttribute(WebRequest request, String attributeName, Object attributeValue) {
-    Assert.notNull(request, "WebRequest must not be null");
-    Assert.notNull(attributeName, "Attribute name must not be null");
-    Assert.notNull(attributeValue, "Attribute value must not be null");
-
-    // look for a conversation id as a request parameter
-    String cId = getConversationIdFromRequest(request, attributeName);
-
-    // create a new conversation id if it does not exist.
-    if (cId == null || cId.trim().length() == 0) {
-      cId = String.valueOf(System.currentTimeMillis());
-
-      // set a request attribute so that the view can use it to pass along the
-      // conversation id.
-      request.setAttribute(attributeName + "_cId", cId, WebRequest.SCOPE_REQUEST);
+    public void afterPropertiesSet() throws Exception {
+        requestMappingHandlerAdapter.setSessionAttributeStore(this);
     }
 
-    // calculate the session lookup key.
-    String sessionLookupKey = calculateSessionLookupKey(attributeName, cId);
+    /* (non-Javadoc)
+    * @see org.springframework.web.bind.support.SessionAttributeStore#storeAttribute(org.springframework.web.context.request.WebRequest, java.lang.String, java.lang.Object)
+    */
+    public void storeAttribute(WebRequest request, String attributeName, Object attributeValue) {
+        Assert.notNull(request, "WebRequest must not be null");
+        Assert.notNull(attributeName, "Attribute name must not be null");
+        Assert.notNull(attributeValue, "Attribute value must not be null");
 
-    _logger.debug("storeAttribute - storing bean reference for (" + sessionLookupKey + ").");
+        // look for a conversation id as a request parameter
+        String cId = getConversationIdFromRequest(request, attributeName);
 
-    // set the attribute value in the session.
-    request.setAttribute(sessionLookupKey, attributeValue, WebRequest.SCOPE_SESSION);
+        // create a new conversation id if it does not exist.
+        if (cId == null || cId.trim().length() == 0) {
+            cId = String.valueOf(System.currentTimeMillis());
 
-    // handles adding to the queue and pruning old conversations if needed.
-    handleQueueActions(request, attributeName, cId);
-  }
-
-  /* (non-Javadoc)
-  * @see org.springframework.web.bind.support.SessionAttributeStore#retrieveAttribute(org.springframework.web.context.request.WebRequest, java.lang.String)
-  */
-  public Object retrieveAttribute(WebRequest request, String attributeName) {
-    Assert.notNull(request, "WebRequest must not be null");
-    Assert.notNull(attributeName, "Attribute name must not be null");
-
-    // calculate what the session attribute name should be.
-    String storeAttributeName = calculateAttributeNameInSession(request, attributeName);
-
-    _logger.debug("retrieveAttribute - retrieving bean reference for (" + storeAttributeName + ").");
-
-    // return the requested command object based upon the attribute
-    return request.getAttribute(storeAttributeName, WebRequest.SCOPE_SESSION);
-  }
-
-  /* (non-Javadoc)
-  * @see org.springframework.web.bind.support.SessionAttributeStore#cleanupAttribute(org.springframework.web.context.request.WebRequest, java.lang.String)
-  */
-  public void cleanupAttribute(WebRequest request, String attributeName) {
-    Assert.notNull(request, "WebRequest must not be null");
-    Assert.notNull(attributeName, "Attribute name must not be null");
-
-    if (_logger.isDebugEnabled()) {
-      String storeAttributeName = calculateAttributeNameInSession(request, attributeName);
-      _logger.debug("cleanupAttribute - removing bean reference for (" + storeAttributeName + ").");
-    }
-
-    // remove the entity from the session and from the queue
-    removeEntityFromSession(request, attributeName,
-                            getConversationIdFromRequest(request, attributeName));
-
-    dumpConversationQueuesToLog(request, attributeName);
-  }
-
-  /**
-   * calculates the attributeName to be looked up in the session.
-   *
-   * @param request
-   * @param attributeName
-   * @return
-   */
-  private String calculateAttributeNameInSession(WebRequest request, String attributeName) {
-    // look for a conversation id.
-    String cId = getConversationIdFromRequest(request, attributeName);
-
-    if (cId != null && cId.trim().length() > 0) {
-      attributeName = calculateSessionLookupKey(attributeName, cId);
-    }
-
-    return attributeName;
-  }
-
-  /**
-   * convience method to calculate the session lookup attribute name
-   *
-   * @param attributeName
-   * @param cId
-   * @return
-   */
-  private String calculateSessionLookupKey(String attributeName, String cId) {
-    return attributeName + "_" + cId;
-  }
-
-  /**
-   * gets the conversations holder or creates one if it does not exist.
-   *
-   * @param request
-   * @param attributeName
-   * @return
-   */
-  @SuppressWarnings("unchecked")
-  private Map<String, Queue<String>> getConversationsMap(WebRequest request) {
-
-    // get a reference to the conversation queue holder.
-    Map<String, Queue<String>> conversationQueueMap =
-            (Map<String, Queue<String>>) request.getAttribute(
-                    "_sessionConversations", WebRequest.SCOPE_SESSION);
-
-    // create the map if it does not exist.
-    if (conversationQueueMap == null) {
-      conversationQueueMap = new HashMap<String, Queue<String>>();
-
-      // store the map on the session.
-      request.setAttribute("_sessionConversations",
-                           conversationQueueMap, WebRequest.SCOPE_SESSION);
-    }
-
-    return conversationQueueMap;
-  }
-
-  /**
-   * @param conversationQueueMap
-   * @param attributeName
-   * @return
-   */
-  private void handleQueueActions(WebRequest request,
-                                  String attributeName, String conversationId) {
-
-    if (_numConversationsToKeep > 0) {
-
-      // get a reference to the conversation queue map
-      Map<String, Queue<String>> conversationQueueMap = getConversationsMap(request);
-
-      // get a reference to the conversation queue for the given attribute name
-      Queue<String> queue = conversationQueueMap.get(attributeName);
-
-      // create queue if necessary.
-      if (queue == null) {
-        // create new queue if needed.
-        queue = new LinkedList<String>();
-        conversationQueueMap.put(attributeName, queue);
-      }
-
-      // add the conversation id to the queue if it needs it.
-      if (!queue.contains(conversationId)) {
-        // add the cId to the queue.
-        queue.add(conversationId);
-
-        // since a new conversation id was added to the queue, we need to
-        // check to see if the queue needs to be pruned.
-        pruneQueueIfNeeded(request, queue, attributeName);
-      }
-
-      // dump to log what is in the queues
-      dumpConversationQueuesToLog(request, attributeName);
-    }
-  }
-
-  /**
-   * @param request
-   * @param queue
-   * @param attributeName
-   */
-  private void pruneQueueIfNeeded(WebRequest request, Queue<String> queue, String attributeName) {
-    // now check to see if we have hit the limit of conversations for the
-    // command name.
-    if (queue.size() > _numConversationsToKeep) {
-
-      if (_logger.isDebugEnabled()) {
-        for (Object str : queue.toArray()) {
-          _logger.debug("pruneQueueIfNeeded - (" + attributeName +
-                        ") queue entry (" + str + " " + new java.util.Date(Long.parseLong((String) str)));
+            // set a request attribute so that the view can use it to pass along the
+            // conversation id.
+            request.setAttribute(attributeName + "_cId", cId, WebRequest.SCOPE_REQUEST);
         }
-      }
 
-      // grab the next item to be removed.
-      String conversationId = queue.peek();
+        // calculate the session lookup key.
+        String sessionLookupKey = calculateSessionLookupKey(attributeName, cId);
 
-      if (conversationId != null) {
+        _logger.debug("storeAttribute - storing bean reference for (" + sessionLookupKey + ").");
 
-        _logger.debug("pruneQueueIfNeeded - (" + attributeName +
-                      ") removed (" + conversationId + " " + new java.util.Date(
-                Long.parseLong(conversationId)));
+        // set the attribute value in the session.
+        request.setAttribute(sessionLookupKey, attributeValue, WebRequest.SCOPE_SESSION);
 
-        // remove the reference object from the session.
-        removeEntityFromSession(request, attributeName, conversationId);
-      }
+        // handles adding to the queue and pruning old conversations if needed.
+        handleQueueActions(request, attributeName, cId);
     }
-  }
 
-  /**
-   * @param request
-   * @param attributeName
-   * @param fullAttributeName
-   */
-  private void removeEntityFromSession(WebRequest request, String attributeName,
-                                       String conversationId) {
+    /* (non-Javadoc)
+    * @see org.springframework.web.bind.support.SessionAttributeStore#retrieveAttribute(org.springframework.web.context.request.WebRequest, java.lang.String)
+    */
+    public Object retrieveAttribute(WebRequest request, String attributeName) {
+        Assert.notNull(request, "WebRequest must not be null");
+        Assert.notNull(attributeName, "Attribute name must not be null");
 
-    // calculate the full session store attribute name.
-    String fullAttributeName = calculateSessionLookupKey(attributeName, conversationId);
+        // calculate what the session attribute name should be.
+        String storeAttributeName = calculateAttributeNameInSession(request, attributeName);
 
-    // remove the attribute from the session.
-    request.removeAttribute(fullAttributeName, WebRequest.SCOPE_SESSION);
+        _logger.debug("retrieveAttribute - retrieving bean reference for (" + storeAttributeName + ").");
 
-    // remove the conversation from the queue
-    if (_numConversationsToKeep > 0) {
+        // return the requested command object based upon the attribute
+        return request.getAttribute(storeAttributeName, WebRequest.SCOPE_SESSION);
+    }
 
-      // get reference to the
-      Map<String, Queue<String>> conversationQueueHolder =
-              getConversationsMap(request);
+    /* (non-Javadoc)
+    * @see org.springframework.web.bind.support.SessionAttributeStore#cleanupAttribute(org.springframework.web.context.request.WebRequest, java.lang.String)
+    */
+    public void cleanupAttribute(WebRequest request, String attributeName) {
+        Assert.notNull(request, "WebRequest must not be null");
+        Assert.notNull(attributeName, "Attribute name must not be null");
 
-      // get conversation queue for the given attribute name
-      Queue<String> queue = conversationQueueHolder.get(attributeName);
-
-      // create queue if necessary.
-      if (queue != null) {
-        if (conversationId != null && conversationId.trim().length() > 0) {
-          queue.remove(conversationId);
+        if (_logger.isDebugEnabled()) {
+            String storeAttributeName = calculateAttributeNameInSession(request, attributeName);
+            _logger.debug("cleanupAttribute - removing bean reference for (" + storeAttributeName + ").");
         }
-      }
+
+        // remove the entity from the session and from the queue
+        removeEntityFromSession(request, attributeName, getConversationIdFromRequest(request, attributeName));
+
+        dumpConversationQueuesToLog(request, attributeName);
     }
-  }
 
-  /**
-   * Utility method to display what is currently in the queue.
-   *
-   * @param request
-   * @param attributeName
-   */
-  private void dumpConversationQueuesToLog(WebRequest request, String attributeName) {
+    /**
+     * calculates the attributeName to be looked up in the session.
+     *
+     * @param request
+     * @param attributeName
+     * @return
+     */
+    private String calculateAttributeNameInSession(WebRequest request, String attributeName) {
+        // look for a conversation id.
+        String cId = getConversationIdFromRequest(request, attributeName);
 
-    if (_logger.isDebugEnabled()) {
+        if (cId != null && cId.trim().length() > 0) {
+            attributeName = calculateSessionLookupKey(attributeName, cId);
+        }
 
-      // get the conversation queue map
-      Map<String, Queue<String>> conversationQueueMap =
-              getConversationsMap(request);
-
-      // iterate over the map
-      for (String key : conversationQueueMap.keySet()) {
-        LinkedList<String> ll = (LinkedList<String>) conversationQueueMap.get(key);
-        _logger.debug("dumpConversationQueuesLog - queue(" + key + ") - " + ll);
-      }
+        return attributeName;
     }
-  }
 
-  /**
-   * @return
-   */
-  public int getNumConversationsToKeep() {
-    return _numConversationsToKeep;
-  }
+    /**
+     * convience method to calculate the session lookup attribute name
+     *
+     * @param attributeName
+     * @param cId
+     * @return
+     */
+    private String calculateSessionLookupKey(String attributeName, String cId) {
+        return attributeName + "_" + cId;
+    }
 
-  /**
-   * @param numConversationsToKeep
-   */
-  public void setNumConversationsToKeep(int numConversationsToKeep) {
-    _numConversationsToKeep = numConversationsToKeep;
-  }
+    /**
+     * gets the conversations holder or creates one if it does not exist.
+     *
+     * @param request
+     * @param attributeName
+     * @return
+     */
+    @SuppressWarnings("unchecked")
+    private Map<String, Queue<String>> getConversationsMap(WebRequest request) {
 
-  /**
-   * @param request
-   * @param attributeName
-   * @return
-   */
-  private String getConversationIdFromRequest(WebRequest request, String attributeName) {
-    return request.getParameter(attributeName + "_cId");
-  }
+        // get a reference to the conversation queue holder.
+        Map<String, Queue<String>> conversationQueueMap = (Map<String, Queue<String>>) request
+            .getAttribute("_sessionConversations", WebRequest.SCOPE_SESSION);
+
+        // create the map if it does not exist.
+        if (conversationQueueMap == null) {
+            conversationQueueMap = new HashMap<String, Queue<String>>();
+
+            // store the map on the session.
+            request.setAttribute("_sessionConversations", conversationQueueMap, WebRequest.SCOPE_SESSION);
+        }
+
+        return conversationQueueMap;
+    }
+
+    /**
+     * @param conversationQueueMap
+     * @param attributeName
+     * @return
+     */
+    private void handleQueueActions(WebRequest request, String attributeName, String conversationId) {
+
+        if (_numConversationsToKeep > 0) {
+
+            // get a reference to the conversation queue map
+            Map<String, Queue<String>> conversationQueueMap = getConversationsMap(request);
+
+            // get a reference to the conversation queue for the given attribute name
+            Queue<String> queue = conversationQueueMap.get(attributeName);
+
+            // create queue if necessary.
+            if (queue == null) {
+                // create new queue if needed.
+                queue = new LinkedList<String>();
+                conversationQueueMap.put(attributeName, queue);
+            }
+
+            // add the conversation id to the queue if it needs it.
+            if (!queue.contains(conversationId)) {
+                // add the cId to the queue.
+                queue.add(conversationId);
+
+                // since a new conversation id was added to the queue, we need to
+                // check to see if the queue needs to be pruned.
+                pruneQueueIfNeeded(request, queue, attributeName);
+            }
+
+            // dump to log what is in the queues
+            dumpConversationQueuesToLog(request, attributeName);
+        }
+    }
+
+    /**
+     * @param request
+     * @param queue
+     * @param attributeName
+     */
+    private void pruneQueueIfNeeded(WebRequest request, Queue<String> queue, String attributeName) {
+        // now check to see if we have hit the limit of conversations for the
+        // command name.
+        if (queue.size() > _numConversationsToKeep) {
+
+            if (_logger.isDebugEnabled()) {
+                for (Object str : queue.toArray()) {
+                    _logger.debug("pruneQueueIfNeeded - (" + attributeName +
+                                  ") queue entry (" + str + " " + new java.util.Date(Long.parseLong((String) str)));
+                }
+            }
+
+            // grab the next item to be removed.
+            String conversationId = queue.peek();
+
+            if (conversationId != null) {
+
+                _logger.debug("pruneQueueIfNeeded - (" + attributeName +
+                              ") removed (" + conversationId + " " + new java.util.Date(Long.parseLong(conversationId)));
+
+                // remove the reference object from the session.
+                removeEntityFromSession(request, attributeName, conversationId);
+            }
+        }
+    }
+
+    /**
+     * @param request
+     * @param attributeName
+     * @param fullAttributeName
+     */
+    private void removeEntityFromSession(WebRequest request, String attributeName, String conversationId) {
+
+        // calculate the full session store attribute name.
+        String fullAttributeName = calculateSessionLookupKey(attributeName, conversationId);
+
+        // remove the attribute from the session.
+        request.removeAttribute(fullAttributeName, WebRequest.SCOPE_SESSION);
+
+        // remove the conversation from the queue
+        if (_numConversationsToKeep > 0) {
+
+            // get reference to the
+            Map<String, Queue<String>> conversationQueueHolder = getConversationsMap(request);
+
+            // get conversation queue for the given attribute name
+            Queue<String> queue = conversationQueueHolder.get(attributeName);
+
+            // create queue if necessary.
+            if (queue != null) {
+                if (conversationId != null && conversationId.trim().length() > 0) {
+                    queue.remove(conversationId);
+                }
+            }
+        }
+    }
+
+    /**
+     * Utility method to display what is currently in the queue.
+     *
+     * @param request
+     * @param attributeName
+     */
+    private void dumpConversationQueuesToLog(WebRequest request, String attributeName) {
+
+        if (_logger.isDebugEnabled()) {
+
+            // get the conversation queue map
+            Map<String, Queue<String>> conversationQueueMap = getConversationsMap(request);
+
+            // iterate over the map
+            for (String key : conversationQueueMap.keySet()) {
+                LinkedList<String> ll = (LinkedList<String>) conversationQueueMap.get(key);
+                _logger.debug("dumpConversationQueuesLog - queue(" + key + ") - " + ll);
+            }
+        }
+    }
+
+    /**
+     * @return
+     */
+    public int getNumConversationsToKeep() {
+        return _numConversationsToKeep;
+    }
+
+    /**
+     * @param numConversationsToKeep
+     */
+    public void setNumConversationsToKeep(int numConversationsToKeep) {
+        _numConversationsToKeep = numConversationsToKeep;
+    }
+
+    /**
+     * @param request
+     * @param attributeName
+     * @return
+     */
+    private String getConversationIdFromRequest(WebRequest request, String attributeName) {
+        return request.getParameter(attributeName + "_cId");
+    }
 }

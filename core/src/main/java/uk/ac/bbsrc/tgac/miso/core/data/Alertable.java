@@ -38,9 +38,9 @@ import java.util.Collection;
  * @since 0.1.9
  */
 public interface Alertable {
-  public boolean addListener(MisoListener listener);
+    public boolean addListener(MisoListener listener);
 
-  public boolean removeListener(MisoListener listener);
+    public boolean removeListener(MisoListener listener);
 
-  public Collection<MisoListener> getListeners();
+    public Collection<MisoListener> getListeners();
 }

@@ -15,11 +15,11 @@ import java.util.Set;
  * @since 0.1.9
  */
 public interface Plateable extends Nameable {
-   /**
-   * Returns the plates that this Plateable object is a part of.
-   *
-   * @return Set<Plate>
-   */
-  @JsonIgnore
-  public <T> Set<Plate<LinkedList<T>, T>> getPlates() throws Exception;
+    /**
+     * Returns the plates that this Plateable object is a part of.
+     *
+     * @return Set<Plate>
+     */
+    @JsonIgnore
+    public <T> Set<Plate<LinkedList<T>, T>> getPlates() throws Exception;
 }

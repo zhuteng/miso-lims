@@ -21,5 +21,5 @@
  * *********************************************************************
  */
 
-@javax.xml.bind.annotation.XmlSchema(namespace = "http://solid.aga.appliedbiosystems.com")
-package uk.ac.bbsrc.tgac.miso.core.service.integration.ws.solid;
+@javax.xml.bind.annotation.XmlSchema(
+    namespace = "http://solid.aga.appliedbiosystems.com") package uk.ac.bbsrc.tgac.miso.core.service.integration.ws.solid;

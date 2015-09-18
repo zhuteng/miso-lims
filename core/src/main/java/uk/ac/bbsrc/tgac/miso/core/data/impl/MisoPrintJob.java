@@ -35,5 +35,5 @@ import uk.ac.bbsrc.tgac.miso.core.data.AbstractPrintJob;
  * @since 0.0.3
  */
 public class MisoPrintJob extends AbstractPrintJob {
-  
+
 }

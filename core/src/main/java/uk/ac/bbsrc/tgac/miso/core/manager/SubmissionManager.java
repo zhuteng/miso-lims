@@ -34,53 +34,53 @@ import uk.ac.bbsrc.tgac.miso.core.service.submission.TransferMethod;
  * @author Rob Davey
  * @since 0.0.2
  */
-public interface  SubmissionManager<I, O, R> {
-  /**
-   * Sets the submissionStoragePath of this SubmissionManager object.
-   *
-   * @param path submissionStoragePath.
-   */
-  public void setSubmissionStoragePath(String path);
+public interface SubmissionManager<I, O, R> {
+    /**
+     * Sets the submissionStoragePath of this SubmissionManager object.
+     *
+     * @param path submissionStoragePath.
+     */
+    public void setSubmissionStoragePath(String path);
 
-  /**
-   * Returns the submissionStoragePath of this SubmissionManager object.
-   *
-   * @return String submissionStoragePath.
-   */
-  public String getSubmissionStoragePath();
+    /**
+     * Returns the submissionStoragePath of this SubmissionManager object.
+     *
+     * @return String submissionStoragePath.
+     */
+    public String getSubmissionStoragePath();
 
-  /**
-   * Sets the submissionEndPoint of this SubmissionManager object.
-   *
-   * @param o submissionEndPoint.
-   */
-  public void setSubmissionEndPoint(O o);
+    /**
+     * Sets the submissionEndPoint of this SubmissionManager object.
+     *
+     * @param o submissionEndPoint.
+     */
+    public void setSubmissionEndPoint(O o);
 
-  /**
-   * Returns the submissionEndPoint of this SubmissionManager object.
-   *
-   * @return O submissionEndPoint.
-   */
-  public O getSubmissionEndPoint();
+    /**
+     * Returns the submissionEndPoint of this SubmissionManager object.
+     *
+     * @return O submissionEndPoint.
+     */
+    public O getSubmissionEndPoint();
 
-  /**
-   * Submit the given submittable output type object to the submission endpoint and return any response
-   *
-   * @param i of type I
-   * @return R response from submission service to which the submission has been sent
-   * @throws SubmissionException when
-   */
-  public R submit(I i) throws SubmissionException;
+    /**
+     * Submit the given submittable output type object to the submission endpoint and return any response
+     *
+     * @param i of type I
+     * @return R response from submission service to which the submission has been sent
+     * @throws SubmissionException when
+     */
+    public R submit(I i) throws SubmissionException;
 
-  public Object parseResponse(R response);
+    public Object parseResponse(R response);
 
-  public String generateSubmissionMetadata(Submission submission) throws SubmissionException;
+    public String generateSubmissionMetadata(Submission submission) throws SubmissionException;
 
-  public String prettifySubmissionMetadata(Submission submission) throws SubmissionException;
+    public String prettifySubmissionMetadata(Submission submission) throws SubmissionException;
 
-  public String submitSequenceData(Submission submission);
+    public String submitSequenceData(Submission submission);
 
-  public void setTransferMethod(TransferMethod transferMethod);
+    public void setTransferMethod(TransferMethod transferMethod);
 
-  public UploadReport getUploadProgress(Long submissionId);
+    public UploadReport getUploadProgress(Long submissionId);
 }

@@ -40,81 +40,83 @@ import java.util.Queue;
  * @since 0.0.3
  */
 public class AbstractPrintJob implements PrintJob {
-  public static final Long UNSAVED_ID = 0L;
-  @Id
-  @GeneratedValue(strategy = GenerationType.AUTO)
-  private long jobId = AbstractPrintJob.UNSAVED_ID;
-  private Date printDate;
-  private User printUser;
-  private Queue<?> queuedElements;
-  private String status;
-  private MisoPrintService printService;
+    public static final Long UNSAVED_ID = 0L;
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private long jobId = AbstractPrintJob.UNSAVED_ID;
+    private Date printDate;
+    private User printUser;
+    private Queue<?> queuedElements;
+    private String status;
+    private MisoPrintService printService;
 
-  @Override
-  public void setJobId(Long jobId) {
-    this.jobId = jobId;
-  }
+    @Override
+    public void setJobId(Long jobId) {
+        this.jobId = jobId;
+    }
 
-  @Override
-  public Long getJobId() {
-    return jobId;
-  }
+    @Override
+    public Long getJobId() {
+        return jobId;
+    }
 
-  @Override
-  public void setPrintDate(Date printDate) {
-    this.printDate = printDate;
-  }
+    @Override
+    public void setPrintDate(Date printDate) {
+        this.printDate = printDate;
+    }
 
-  @Override
-  public Date getPrintDate() {
-    return printDate;
-  }
+    @Override
+    public Date getPrintDate() {
+        return printDate;
+    }
 
-  @Override
-  public void setPrintUser(User printUser) {
-    this.printUser = printUser;
-  }
+    @Override
+    public void setPrintUser(User printUser) {
+        this.printUser = printUser;
+    }
 
-  @Override
-  public User getPrintUser() {
-    return printUser;
-  }
+    @Override
+    public User getPrintUser() {
+        return printUser;
+    }
 
-  @Override
-  public void setPrintService(MisoPrintService printService) {
-    this.printService = printService;
-  }
+    @Override
+    public void setPrintService(MisoPrintService printService) {
+        this.printService = printService;
+    }
 
-  @Override
-  public MisoPrintService getPrintService() {
-    return printService;
-  }
+    @Override
+    public MisoPrintService getPrintService() {
+        return printService;
+    }
 
-  @Override
-  public void setQueuedElements(Queue<?> queuedElements) {
-    this.queuedElements = queuedElements;
-  }
+    @Override
+    public void setQueuedElements(Queue<?> queuedElements) {
+        this.queuedElements = queuedElements;
+    }
 
-  @Override
-  public Queue<?> getQueuedElements() {
-    return queuedElements;
-  }
+    @Override
+    public Queue<?> getQueuedElements() {
+        return queuedElements;
+    }
 
-  @Override
-  public void setStatus(String status) {
-    this.status = status;
-  }
+    @Override
+    public void setStatus(String status) {
+        this.status = status;
+    }
 
-  @Override
-  public String getStatus() {
-    return status;
-  }
+    @Override
+    public String getStatus() {
+        return status;
+    }
 
-  @Override
-  public int compareTo(Object o) {
-    PrintJob t = (PrintJob)o;
-    if (getJobId() < t.getJobId()) return -1;
-    if (getJobId() > t.getJobId()) return 1;
-    return 0;
-  }
+    @Override
+    public int compareTo(Object o) {
+        PrintJob t = (PrintJob) o;
+        if (getJobId() < t.getJobId())
+            return -1;
+        if (getJobId() > t.getJobId())
+            return 1;
+        return 0;
+    }
 }

@@ -68,147 +68,135 @@ import java.util.List;
  * @since 0.0.2
  */
 public class SQLEmPCRDAO implements EmPCRStore {
-  private static final String TABLE_NAME="emPCR";
+    private static final String TABLE_NAME = "emPCR";
 
-  public static String EMPCR_SELECT =
-          "SELECT pcrId, concentration, pcrUserName, creationDate, name, dilution_dilutionId, securityProfile_profileId " +
-          "FROM " + TABLE_NAME;
+    public static String EMPCR_SELECT =
+        "SELECT pcrId, concentration, pcrUserName, creationDate, name, dilution_dilutionId, securityProfile_profileId " +
+        "FROM " + TABLE_NAME;
 
-  public static final String EMPCR_SELECT_BY_PCR_ID =
-          EMPCR_SELECT + " WHERE pcrId=?";
+    public static final String EMPCR_SELECT_BY_PCR_ID = EMPCR_SELECT + " WHERE pcrId=?";
 
-  public static final String EMPCR_SELECT_BY_RELATED_DILUTION =
-          EMPCR_SELECT + " WHERE dilution_dilutionId=?";
+    public static final String EMPCR_SELECT_BY_RELATED_DILUTION = EMPCR_SELECT + " WHERE dilution_dilutionId=?";
 
-  public static String EMPCR_SELECT_BY_PROJECT =
-          "SELECT e.* FROM Project p " +
-          "INNER JOIN Sample sa ON sa.project_projectId = p.projectId " +
-          "INNER JOIN Library li ON li.sample_sampleId = sa.sampleId " +
-          "INNER JOIN LibraryDilution ld ON ld.library_libraryId = li.libraryId " +
-          "INNER JOIN "+TABLE_NAME+" e ON e.dilution_dilutionId = ld.dilutionId " +
-          "WHERE p.projectId=?";  
+    public static String EMPCR_SELECT_BY_PROJECT = "SELECT e.* FROM Project p " +
+                                                   "INNER JOIN Sample sa ON sa.project_projectId = p.projectId " +
+                                                   "INNER JOIN Library li ON li.sample_sampleId = sa.sampleId " +
+                                                   "INNER JOIN LibraryDilution ld ON ld.library_libraryId = li.libraryId " +
+                                                   "INNER JOIN " + TABLE_NAME + " e ON e.dilution_dilutionId = ld.dilutionId " +
+                                                   "WHERE p.projectId=?";
 
-  public static final String EMPCR_UPDATE =
-          "UPDATE " + TABLE_NAME +
-          " SET concentration=:concentration, pcrUserName=:pcrUserName, creationDate=:creationDate, name=:name, dilution_dilutionId=:dilution_dilutionId, securityProfile_profileId=:securityProfile_profileId " +
-          "WHERE pcrId=:pcrId";
+    public static final String EMPCR_UPDATE = "UPDATE " + TABLE_NAME +
+                                              " SET concentration=:concentration, pcrUserName=:pcrUserName, creationDate=:creationDate, name=:name, dilution_dilutionId=:dilution_dilutionId, securityProfile_profileId=:securityProfile_profileId " +
+                                              "WHERE pcrId=:pcrId";
 
-  public static final String EMPCR_DELETE =
-          "DELETE FROM "+TABLE_NAME+" WHERE pcrId=:pcrId";
+    public static final String EMPCR_DELETE = "DELETE FROM " + TABLE_NAME + " WHERE pcrId=:pcrId";
 
-  protected static final Logger log = LoggerFactory.getLogger(SQLEmPCRDAO.class);
+    protected static final Logger log = LoggerFactory.getLogger(SQLEmPCRDAO.class);
 
-  private JdbcTemplate template;
-  private LibraryDilutionStore libraryDilutionDAO;
-  private EmPCRDilutionStore emPCRDilutionDAO;
-  private CascadeType cascadeType;
-  private Store<SecurityProfile> securityProfileDAO;
+    private JdbcTemplate template;
+    private LibraryDilutionStore libraryDilutionDAO;
+    private EmPCRDilutionStore emPCRDilutionDAO;
+    private CascadeType cascadeType;
+    private Store<SecurityProfile> securityProfileDAO;
 
-  @Autowired
-  private MisoNamingScheme<emPCR> namingScheme;
+    @Autowired
+    private MisoNamingScheme<emPCR> namingScheme;
 
-  @Override
-  public MisoNamingScheme<emPCR> getNamingScheme() {
-    return namingScheme;
-  }
-
-  @Override
-  public void setNamingScheme(MisoNamingScheme<emPCR> namingScheme) {
-    this.namingScheme = namingScheme;
-  }
-
-  @Autowired
-  private CacheManager cacheManager;
-
-  public void setCacheManager(CacheManager cacheManager) {
-    this.cacheManager = cacheManager;
-  }
-
-  @Autowired
-  private DataObjectFactory dataObjectFactory;
-
-  public void setDataObjectFactory(DataObjectFactory dataObjectFactory) {
-    this.dataObjectFactory = dataObjectFactory;
-  }
-
-  public JdbcTemplate getJdbcTemplate() {
-    return template;
-  }
-
-  public void setJdbcTemplate(JdbcTemplate template) {
-    this.template = template;
-  }
-
-  public void setLibraryDilutionDAO(LibraryDilutionStore libraryDilutionDAO) {
-    this.libraryDilutionDAO = libraryDilutionDAO;
-  }
-
-  public void setEmPCRDilutionDAO(EmPCRDilutionStore emPCRDilutionDAO) {
-    this.emPCRDilutionDAO = emPCRDilutionDAO;
-  }
-
-  public void setCascadeType(CascadeType cascadeType) {
-    this.cascadeType = cascadeType;
-  }
-
-  public Store<SecurityProfile> getSecurityProfileDAO() {
-    return securityProfileDAO;
-  }
-
-  public void setSecurityProfileDAO(Store<SecurityProfile> securityProfileDAO) {
-    this.securityProfileDAO = securityProfileDAO;
-  }
-
-  @Transactional(readOnly = false, rollbackFor = IOException.class)
-  @TriggersRemove(cacheName={"emPCRCache", "lazyEmPCRCache"},
-                  keyGenerator = @KeyGenerator(
-                          name = "HashCodeCacheKeyGenerator",
-                          properties = {
-                                  @Property(name = "includeMethod", value = "false"),
-                                  @Property(name = "includeParameterTypes", value = "false")
-                          }
-                  )
-  )
-  public long save(emPCR pcr) throws IOException {
-    Long securityProfileId = pcr.getSecurityProfile().getProfileId();
-    if (securityProfileId == null || (this.cascadeType != null)) { // && this.cascadeType.equals(CascadeType.PERSIST))) {
-      securityProfileId = securityProfileDAO.save(pcr.getSecurityProfile());
+    @Override
+    public MisoNamingScheme<emPCR> getNamingScheme() {
+        return namingScheme;
     }
 
-    MapSqlParameterSource params = new MapSqlParameterSource();
-    params.addValue("concentration", pcr.getConcentration())
-          .addValue("creationDate", pcr.getCreationDate())
-          .addValue("pcrUserName", pcr.getPcrCreator())
-          .addValue("dilution_dilutionId", pcr.getLibraryDilution().getId())
-          .addValue("securityProfile_profileId", securityProfileId);
+    @Override
+    public void setNamingScheme(MisoNamingScheme<emPCR> namingScheme) {
+        this.namingScheme = namingScheme;
+    }
 
-    if (pcr.getId() == emPCR.UNSAVED_ID) {
-      SimpleJdbcInsert insert = new SimpleJdbcInsert(template)
-                              .withTableName(TABLE_NAME)
-                              .usingGeneratedKeyColumns("pcrId");
-      try {
-        pcr.setId(DbUtils.getAutoIncrement(template, TABLE_NAME));
+    @Autowired
+    private CacheManager cacheManager;
 
-        String name = namingScheme.generateNameFor("name", pcr);
-        pcr.setName(name);
+    public void setCacheManager(CacheManager cacheManager) {
+        this.cacheManager = cacheManager;
+    }
 
-        if (namingScheme.validateField("name", pcr.getName())) {
-          params.addValue("name", name);
+    @Autowired
+    private DataObjectFactory dataObjectFactory;
 
-          Number newId = insert.executeAndReturnKey(params);
-          if (newId.longValue() != pcr.getId()) {
-            log.error("Expected emPCR ID doesn't match returned value from database insert: rolling back...");
-            new NamedParameterJdbcTemplate(template).update(EMPCR_DELETE, new MapSqlParameterSource().addValue("pcrId", newId.longValue()));
-            throw new IOException("Something bad happened. Expected emPCR ID doesn't match returned value from DB insert");
-          }
+    public void setDataObjectFactory(DataObjectFactory dataObjectFactory) {
+        this.dataObjectFactory = dataObjectFactory;
+    }
+
+    public JdbcTemplate getJdbcTemplate() {
+        return template;
+    }
+
+    public void setJdbcTemplate(JdbcTemplate template) {
+        this.template = template;
+    }
+
+    public void setLibraryDilutionDAO(LibraryDilutionStore libraryDilutionDAO) {
+        this.libraryDilutionDAO = libraryDilutionDAO;
+    }
+
+    public void setEmPCRDilutionDAO(EmPCRDilutionStore emPCRDilutionDAO) {
+        this.emPCRDilutionDAO = emPCRDilutionDAO;
+    }
+
+    public void setCascadeType(CascadeType cascadeType) {
+        this.cascadeType = cascadeType;
+    }
+
+    public Store<SecurityProfile> getSecurityProfileDAO() {
+        return securityProfileDAO;
+    }
+
+    public void setSecurityProfileDAO(Store<SecurityProfile> securityProfileDAO) {
+        this.securityProfileDAO = securityProfileDAO;
+    }
+
+    @Transactional(readOnly = false, rollbackFor = IOException.class)
+    @TriggersRemove(cacheName = { "emPCRCache", "lazyEmPCRCache" },
+                    keyGenerator = @KeyGenerator(
+                        name = "HashCodeCacheKeyGenerator",
+                        properties = { @Property(name = "includeMethod",
+                                                 value = "false"), @Property(
+                            name = "includeParameterTypes",
+                            value = "false") }))
+    public long save(emPCR pcr) throws IOException {
+        Long securityProfileId = pcr.getSecurityProfile().getProfileId();
+        if (securityProfileId == null || (this.cascadeType != null)) { // && this.cascadeType.equals(CascadeType.PERSIST))) {
+            securityProfileId = securityProfileDAO.save(pcr.getSecurityProfile());
         }
-        else {
-          throw new IOException("Cannot save emPCR - invalid field:" + pcr.toString());
-        }
-      }
-      catch (MisoNamingException e) {
-        throw new IOException("Cannot save emPCR - issue with naming scheme", e);
-      }
+
+        MapSqlParameterSource params = new MapSqlParameterSource();
+        params.addValue("concentration", pcr.getConcentration()).addValue("creationDate", pcr.getCreationDate())
+              .addValue("pcrUserName", pcr.getPcrCreator()).addValue("dilution_dilutionId", pcr.getLibraryDilution().getId())
+              .addValue("securityProfile_profileId", securityProfileId);
+
+        if (pcr.getId() == emPCR.UNSAVED_ID) {
+            SimpleJdbcInsert insert = new SimpleJdbcInsert(template).withTableName(TABLE_NAME).usingGeneratedKeyColumns("pcrId");
+            try {
+                pcr.setId(DbUtils.getAutoIncrement(template, TABLE_NAME));
+
+                String name = namingScheme.generateNameFor("name", pcr);
+                pcr.setName(name);
+
+                if (namingScheme.validateField("name", pcr.getName())) {
+                    params.addValue("name", name);
+
+                    Number newId = insert.executeAndReturnKey(params);
+                    if (newId.longValue() != pcr.getId()) {
+                        log.error("Expected emPCR ID doesn't match returned value from database insert: rolling back...");
+                        new NamedParameterJdbcTemplate(template)
+                            .update(EMPCR_DELETE, new MapSqlParameterSource().addValue("pcrId", newId.longValue()));
+                        throw new IOException("Something bad happened. Expected emPCR ID doesn't match returned value from DB insert");
+                    }
+                } else {
+                    throw new IOException("Cannot save emPCR - invalid field:" + pcr.toString());
+                }
+            } catch (MisoNamingException e) {
+                throw new IOException("Cannot save emPCR - issue with naming scheme", e);
+            }
       /*
       String name = "EMP"+ DbUtils.getAutoIncrement(template, TABLE_NAME);
       params.addValue("name", name);
@@ -216,160 +204,145 @@ public class SQLEmPCRDAO implements EmPCRStore {
       pcr.setPcrId(newId.longValue());
       pcr.setName(name);
       */
-    }
-    else {
-      try {
-        if (namingScheme.validateField("name", pcr.getName())) {
-          params.addValue("pcrId", pcr.getId())
-                .addValue("name", pcr.getName());
-          NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
-          namedTemplate.update(EMPCR_UPDATE, params);
-        }
-        else {
-          throw new IOException("Cannot save emPCR - invalid field:" + pcr.toString());
-        }
-      }
-      catch (MisoNamingException e) {
-        throw new IOException("Cannot save emPCR - issue with naming scheme", e);
-      }
+        } else {
+            try {
+                if (namingScheme.validateField("name", pcr.getName())) {
+                    params.addValue("pcrId", pcr.getId()).addValue("name", pcr.getName());
+                    NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
+                    namedTemplate.update(EMPCR_UPDATE, params);
+                } else {
+                    throw new IOException("Cannot save emPCR - invalid field:" + pcr.toString());
+                }
+            } catch (MisoNamingException e) {
+                throw new IOException("Cannot save emPCR - issue with naming scheme", e);
+            }
       /*
       params.addValue("pcrId", pcr.getPcrId())
               .addValue("name", pcr.getName());
       NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
       namedTemplate.update(EMPCR_UPDATE, params);
       */
-    }
-
-    if (this.cascadeType != null) {
-      LibraryDilution ld = pcr.getLibraryDilution();
-      if (this.cascadeType.equals(CascadeType.PERSIST)) {
-        if (ld != null) libraryDilutionDAO.save(ld);
-      }
-      else if (this.cascadeType.equals(CascadeType.REMOVE)) {
-        if (ld != null) {
-          //Cache pc = cacheManager.getCache("libraryDilutionCache");
-          //pc.remove(DbUtils.hashCodeCacheKeyFor(ld.getId()));
-          DbUtils.updateCaches(cacheManager, ld, LibraryDilution.class);
         }
-      }
-    }
 
-    return pcr.getId();
-  }
-
-  @Cacheable(cacheName="emPCRCache",
-                  keyGenerator = @KeyGenerator(
-                          name = "HashCodeCacheKeyGenerator",
-                          properties = {
-                                  @Property(name = "includeMethod", value = "false"),
-                                  @Property(name = "includeParameterTypes", value = "false")
-                          }
-                  )
-  )
-  public emPCR get(long pcrId) throws IOException {
-    List eResults = template.query(EMPCR_SELECT_BY_PCR_ID, new Object[]{pcrId}, new EmPCRMapper());
-    emPCR e = eResults.size() > 0 ? (emPCR) eResults.get(0) : null;
-    return e;
-  }
-
-  public emPCR lazyGet(long pcrId) throws IOException {
-    List eResults = template.query(EMPCR_SELECT_BY_PCR_ID, new Object[]{pcrId}, new EmPCRMapper(true));
-    emPCR e = eResults.size() > 0 ? (emPCR) eResults.get(0) : null;
-    return e;
-  }
-
-  public Collection<emPCR> listAllByProjectId(long projectId) throws IOException {
-    return template.query(EMPCR_SELECT_BY_PROJECT, new Object[]{projectId}, new EmPCRMapper());
-  }
-
-  public Collection<emPCR> listAll() throws IOException {
-    return template.query(EMPCR_SELECT, new EmPCRMapper(true));
-  }
-
-  @Override
-  public int count() throws IOException {
-    return template.queryForInt("SELECT count(*) FROM "+TABLE_NAME);
-  }
-
-  public Collection<emPCR> listAllByDilutionId(long dilutionId) throws IOException {
-    return template.query(EMPCR_SELECT_BY_RELATED_DILUTION, new Object[]{dilutionId}, new EmPCRMapper());
-  }
-
-  @Transactional(readOnly = false, rollbackFor = IOException.class)
-  @TriggersRemove(
-          cacheName={"emPCRCache", "lazyEmPCRCache"},
-          keyGenerator = @KeyGenerator (
-              name = "HashCodeCacheKeyGenerator",
-              properties = {
-                      @Property(name="includeMethod", value="false"),
-                      @Property(name="includeParameterTypes", value="false")
-              }
-          )
-  )
-  public boolean remove(emPCR e) throws IOException {
-    NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
-    if (e.isDeletable() &&
-           (namedTemplate.update(EMPCR_DELETE,
-                            new MapSqlParameterSource().addValue("pcrId", e.getId())) == 1)) {
-      LibraryDilution ld = e.getLibraryDilution();
-      if (this.cascadeType.equals(CascadeType.PERSIST)) {
-        if (ld != null) libraryDilutionDAO.save(ld);
-      }
-      else if (this.cascadeType.equals(CascadeType.REMOVE)) {
-        if (ld != null) {
-          //Cache pc = cacheManager.getCache("emPCRDilutionCache");
-          //pc.remove(DbUtils.hashCodeCacheKeyFor(ld.getId()));
-          DbUtils.updateCaches(cacheManager, ld, LibraryDilution.class);
+        if (this.cascadeType != null) {
+            LibraryDilution ld = pcr.getLibraryDilution();
+            if (this.cascadeType.equals(CascadeType.PERSIST)) {
+                if (ld != null)
+                    libraryDilutionDAO.save(ld);
+            } else if (this.cascadeType.equals(CascadeType.REMOVE)) {
+                if (ld != null) {
+                    //Cache pc = cacheManager.getCache("libraryDilutionCache");
+                    //pc.remove(DbUtils.hashCodeCacheKeyFor(ld.getId()));
+                    DbUtils.updateCaches(cacheManager, ld, LibraryDilution.class);
+                }
+            }
         }
-      }
-      return true;
-    }
-    return false;
-  }
 
-  public class EmPCRMapper extends CacheAwareRowMapper<emPCR> {
-    public EmPCRMapper() {
-      super(emPCR.class);
+        return pcr.getId();
     }
 
-    public EmPCRMapper(boolean lazy) {
-      super(emPCR.class, lazy);
+    @Cacheable(cacheName = "emPCRCache",
+               keyGenerator = @KeyGenerator(
+                   name = "HashCodeCacheKeyGenerator",
+                   properties = { @Property(name = "includeMethod", value = "false"),
+                                  @Property(name = "includeParameterTypes", value = "false") }))
+    public emPCR get(long pcrId) throws IOException {
+        List eResults = template.query(EMPCR_SELECT_BY_PCR_ID, new Object[] { pcrId }, new EmPCRMapper());
+        emPCR e = eResults.size() > 0 ? (emPCR) eResults.get(0) : null;
+        return e;
     }
 
-    public emPCR mapRow(ResultSet rs, int rowNum) throws SQLException {
-      long id = rs.getLong("pcrId");
+    public emPCR lazyGet(long pcrId) throws IOException {
+        List eResults = template.query(EMPCR_SELECT_BY_PCR_ID, new Object[] { pcrId }, new EmPCRMapper(true));
+        emPCR e = eResults.size() > 0 ? (emPCR) eResults.get(0) : null;
+        return e;
+    }
 
-      if (isCacheEnabled() && lookupCache(cacheManager) != null) {
-        Element element;
-        if ((element = lookupCache(cacheManager).get(DbUtils.hashCodeCacheKeyFor(id))) != null) {
-          log.debug("Cache hit on map for emPCR " + id);
-          return (emPCR)element.getObjectValue();
+    public Collection<emPCR> listAllByProjectId(long projectId) throws IOException {
+        return template.query(EMPCR_SELECT_BY_PROJECT, new Object[] { projectId }, new EmPCRMapper());
+    }
+
+    public Collection<emPCR> listAll() throws IOException {
+        return template.query(EMPCR_SELECT, new EmPCRMapper(true));
+    }
+
+    @Override
+    public int count() throws IOException {
+        return template.queryForInt("SELECT count(*) FROM " + TABLE_NAME);
+    }
+
+    public Collection<emPCR> listAllByDilutionId(long dilutionId) throws IOException {
+        return template.query(EMPCR_SELECT_BY_RELATED_DILUTION, new Object[] { dilutionId }, new EmPCRMapper());
+    }
+
+    @Transactional(readOnly = false, rollbackFor = IOException.class)
+    @TriggersRemove(
+        cacheName = { "emPCRCache", "lazyEmPCRCache" },
+        keyGenerator = @KeyGenerator(
+            name = "HashCodeCacheKeyGenerator",
+            properties = { @Property(name = "includeMethod", value = "false"),
+                           @Property(name = "includeParameterTypes", value = "false") }))
+    public boolean remove(emPCR e) throws IOException {
+        NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
+        if (e.isDeletable() && (namedTemplate.update(EMPCR_DELETE, new MapSqlParameterSource().addValue("pcrId", e.getId())) == 1)) {
+            LibraryDilution ld = e.getLibraryDilution();
+            if (this.cascadeType.equals(CascadeType.PERSIST)) {
+                if (ld != null)
+                    libraryDilutionDAO.save(ld);
+            } else if (this.cascadeType.equals(CascadeType.REMOVE)) {
+                if (ld != null) {
+                    //Cache pc = cacheManager.getCache("emPCRDilutionCache");
+                    //pc.remove(DbUtils.hashCodeCacheKeyFor(ld.getId()));
+                    DbUtils.updateCaches(cacheManager, ld, LibraryDilution.class);
+                }
+            }
+            return true;
         }
-      }
-
-      emPCR pcr = dataObjectFactory.getEmPCR();
-      pcr.setId(id);
-      pcr.setConcentration(rs.getDouble("concentration"));
-      pcr.setName(rs.getString("name"));
-      pcr.setCreationDate(rs.getDate("creationDate"));
-      pcr.setPcrCreator(rs.getString("pcrUserName"));
-
-      try {
-        pcr.setSecurityProfile(securityProfileDAO.get(rs.getLong("securityProfile_profileId")));
-        pcr.setLibraryDilution(libraryDilutionDAO.get(rs.getLong("dilution_dilutionId")));
-        if (!isLazy()) {
-          pcr.setEmPcrDilutions(emPCRDilutionDAO.listAllByEmPCRId(id));
-        }
-      }
-      catch (IOException e1) {
-        e1.printStackTrace();
-      }
-
-      if (isCacheEnabled() && lookupCache(cacheManager) != null) {
-        lookupCache(cacheManager).put(new Element(DbUtils.hashCodeCacheKeyFor(id), pcr));
-      }
-
-      return pcr;
+        return false;
     }
-  }
+
+    public class EmPCRMapper extends CacheAwareRowMapper<emPCR> {
+        public EmPCRMapper() {
+            super(emPCR.class);
+        }
+
+        public EmPCRMapper(boolean lazy) {
+            super(emPCR.class, lazy);
+        }
+
+        public emPCR mapRow(ResultSet rs, int rowNum) throws SQLException {
+            long id = rs.getLong("pcrId");
+
+            if (isCacheEnabled() && lookupCache(cacheManager) != null) {
+                Element element;
+                if ((element = lookupCache(cacheManager).get(DbUtils.hashCodeCacheKeyFor(id))) != null) {
+                    log.debug("Cache hit on map for emPCR " + id);
+                    return (emPCR) element.getObjectValue();
+                }
+            }
+
+            emPCR pcr = dataObjectFactory.getEmPCR();
+            pcr.setId(id);
+            pcr.setConcentration(rs.getDouble("concentration"));
+            pcr.setName(rs.getString("name"));
+            pcr.setCreationDate(rs.getDate("creationDate"));
+            pcr.setPcrCreator(rs.getString("pcrUserName"));
+
+            try {
+                pcr.setSecurityProfile(securityProfileDAO.get(rs.getLong("securityProfile_profileId")));
+                pcr.setLibraryDilution(libraryDilutionDAO.get(rs.getLong("dilution_dilutionId")));
+                if (!isLazy()) {
+                    pcr.setEmPcrDilutions(emPCRDilutionDAO.listAllByEmPCRId(id));
+                }
+            } catch (IOException e1) {
+                e1.printStackTrace();
+            }
+
+            if (isCacheEnabled() && lookupCache(cacheManager) != null) {
+                lookupCache(cacheManager).put(new Element(DbUtils.hashCodeCacheKeyFor(id), pcr));
+            }
+
+            return pcr;
+        }
+    }
 }

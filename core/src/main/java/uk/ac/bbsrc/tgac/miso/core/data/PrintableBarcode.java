@@ -31,13 +31,12 @@ import java.lang.annotation.*;
  * This annotation is different from the {@link Barcodable} interface in that elements annotated with PrintableBarcode
  * are scanned for and loaded at runtime by the google-code {@link org.reflections.Reflections} system.
  *
- *
  * @author Rob Davey
  * @date 16/04/12
  * @since 0.1.6
  */
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.TYPE})
+@Target({ ElementType.TYPE })
 public @interface PrintableBarcode {
 }

@@ -32,14 +32,14 @@ package uk.ac.bbsrc.tgac.miso.core.exception;
  * @since 0.0.2
  */
 public class MalformedSampleException extends Exception {
-  public MalformedSampleException(String s) {
-    super(s);
-  }
-
-  public MalformedSampleException(String s, Throwable cause) {
-    super(s);
-    if (cause != null) {
-        initCause(cause);
+    public MalformedSampleException(String s) {
+        super(s);
     }
-  }
+
+    public MalformedSampleException(String s, Throwable cause) {
+        super(s);
+        if (cause != null) {
+            initCause(cause);
+        }
+    }
 }

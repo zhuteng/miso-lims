@@ -36,133 +36,134 @@ import javax.persistence.*;
  * @since 0.0.2
  */
 public abstract class AbstractPartition implements Partition {
-  public static final Long UNSAVED_ID = 0L;
+    public static final Long UNSAVED_ID = 0L;
 
-  @Id
-  @GeneratedValue(strategy = GenerationType.AUTO)
-  private long id = AbstractPartition.UNSAVED_ID;
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private long id = AbstractPartition.UNSAVED_ID;
 
-  @OneToOne(cascade = CascadeType.ALL)
-  private SecurityProfile securityProfile = null;
+    @OneToOne(cascade = CascadeType.ALL)
+    private SecurityProfile securityProfile = null;
 
-  private Integer partitionNumber;
-  private SequencerPartitionContainer sequencerPartitionContainer = null;
+    private Integer partitionNumber;
+    private SequencerPartitionContainer sequencerPartitionContainer = null;
 
-  public SequencerPartitionContainer getSequencerPartitionContainer() {
-    return this.sequencerPartitionContainer;
-  }
-
-  public void setSequencerPartitionContainer(SequencerPartitionContainer sequencerPartitionContainer) {
-    this.sequencerPartitionContainer = sequencerPartitionContainer;
-  }
-
-  public void setId(long id) {
-    this.id = id;
-  }
-
-  public long getId() {
-    return id;
-  }
-
-  public void setPartitionNumber(Integer partitionNumber) {
-    this.partitionNumber = partitionNumber;
-  }
-
-  public Integer getPartitionNumber() {
-    return partitionNumber;
-  }
-
-  public boolean userCanRead(User user) {
-    return securityProfile.userCanRead(user);
-  }
-
-  public boolean userCanWrite(User user) {
-    return securityProfile.userCanWrite(user);
-  }
-
-  public boolean isDeletable() {
-    return getId() != AbstractPartition.UNSAVED_ID;
-  }
-
-  public void setSecurityProfile(SecurityProfile securityProfile) {
-    this.securityProfile = securityProfile;
-  }
-
-  public SecurityProfile getSecurityProfile() {
-    return securityProfile;
-  }
-
-  public void inheritPermissions(SecurableByProfile parent) throws SecurityException {
-    if (parent.getSecurityProfile().getOwner() != null) {
-      setSecurityProfile(parent.getSecurityProfile());
+    public SequencerPartitionContainer getSequencerPartitionContainer() {
+        return this.sequencerPartitionContainer;
     }
-    else {
-      throw new SecurityException("Cannot inherit permissions when parent object owner is not set!");
-    }
-  }  
 
-  public abstract void buildSubmission();
+    public void setSequencerPartitionContainer(SequencerPartitionContainer sequencerPartitionContainer) {
+        this.sequencerPartitionContainer = sequencerPartitionContainer;
+    }
 
-  /**
-   * Equivalency is based on getProjectId() if set, otherwise on name,
-   * description and creation date.
-   */
-  @Override
-  public boolean equals(Object obj) {
-    if (obj == null)
-      return false;
-    if (obj == this)
-      return true;
-    if (!(obj instanceof AbstractPartition))
-      return false;
-    AbstractPartition them = (AbstractPartition) obj;
-    // If not saved, then compare resolved actual objects. Otherwise
-    // just compare IDs.
-    if (getId() == AbstractPartition.UNSAVED_ID
-        || them.getId() == AbstractPartition.UNSAVED_ID) {
-      return getPartitionNumber().equals(them.getPartitionNumber())
-             && getSequencerPartitionContainer().equals(them.getSequencerPartitionContainer());
+    public void setId(long id) {
+        this.id = id;
     }
-    else {
-      return this.getId() == them.getId();
-    }
-  }
 
-  @Override
-  public int hashCode() {
-    if (getId() != AbstractPartition.UNSAVED_ID) {
-      return (int)getId();
+    public long getId() {
+        return id;
     }
-    else {
-      final int PRIME = 37;
-      int hashcode = -1;
-      if (getPartitionNumber() != null) hashcode = PRIME * hashcode + getPartitionNumber().hashCode();
-      if (getSequencerPartitionContainer() != null) hashcode = PRIME * hashcode + getSequencerPartitionContainer().hashCode();
-      return hashcode;
-    }
-  }
 
-  @Override
-  public int compareTo(Object o) {
-    Partition t = (Partition)o;
-    if (getId() != 0L && t.getId() != 0L) {
-      if (getId() < t.getId()) return -1;
-      if (getId() > t.getId()) return 1;
+    public void setPartitionNumber(Integer partitionNumber) {
+        this.partitionNumber = partitionNumber;
     }
-    else {
-      if (getPartitionNumber() < t.getPartitionNumber()) return -1;
-      if (getPartitionNumber() > t.getPartitionNumber()) return 1;
-    }
-    return 0;
-  }
 
-  @Override
-  public String toString() {
-    StringBuilder sb = new StringBuilder();
-    sb.append(getId());
-    sb.append(" : ");
-    sb.append(getPartitionNumber());
-    sb.append(" : ");
-    return sb.toString();
-  }
+    public Integer getPartitionNumber() {
+        return partitionNumber;
+    }
+
+    public boolean userCanRead(User user) {
+        return securityProfile.userCanRead(user);
+    }
+
+    public boolean userCanWrite(User user) {
+        return securityProfile.userCanWrite(user);
+    }
+
+    public boolean isDeletable() {
+        return getId() != AbstractPartition.UNSAVED_ID;
+    }
+
+    public void setSecurityProfile(SecurityProfile securityProfile) {
+        this.securityProfile = securityProfile;
+    }
+
+    public SecurityProfile getSecurityProfile() {
+        return securityProfile;
+    }
+
+    public void inheritPermissions(SecurableByProfile parent) throws SecurityException {
+        if (parent.getSecurityProfile().getOwner() != null) {
+            setSecurityProfile(parent.getSecurityProfile());
+        } else {
+            throw new SecurityException("Cannot inherit permissions when parent object owner is not set!");
+        }
+    }
+
+    public abstract void buildSubmission();
+
+    /**
+     * Equivalency is based on getProjectId() if set, otherwise on name,
+     * description and creation date.
+     */
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null)
+            return false;
+        if (obj == this)
+            return true;
+        if (!(obj instanceof AbstractPartition))
+            return false;
+        AbstractPartition them = (AbstractPartition) obj;
+        // If not saved, then compare resolved actual objects. Otherwise
+        // just compare IDs.
+        if (getId() == AbstractPartition.UNSAVED_ID || them.getId() == AbstractPartition.UNSAVED_ID) {
+            return getPartitionNumber().equals(them.getPartitionNumber()) &&
+                   getSequencerPartitionContainer().equals(them.getSequencerPartitionContainer());
+        } else {
+            return this.getId() == them.getId();
+        }
+    }
+
+    @Override
+    public int hashCode() {
+        if (getId() != AbstractPartition.UNSAVED_ID) {
+            return (int) getId();
+        } else {
+            final int PRIME = 37;
+            int hashcode = -1;
+            if (getPartitionNumber() != null)
+                hashcode = PRIME * hashcode + getPartitionNumber().hashCode();
+            if (getSequencerPartitionContainer() != null)
+                hashcode = PRIME * hashcode + getSequencerPartitionContainer().hashCode();
+            return hashcode;
+        }
+    }
+
+    @Override
+    public int compareTo(Object o) {
+        Partition t = (Partition) o;
+        if (getId() != 0L && t.getId() != 0L) {
+            if (getId() < t.getId())
+                return -1;
+            if (getId() > t.getId())
+                return 1;
+        } else {
+            if (getPartitionNumber() < t.getPartitionNumber())
+                return -1;
+            if (getPartitionNumber() > t.getPartitionNumber())
+                return 1;
+        }
+        return 0;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(getId());
+        sb.append(" : ");
+        sb.append(getPartitionNumber());
+        sb.append(" : ");
+        return sb.toString();
+    }
 }

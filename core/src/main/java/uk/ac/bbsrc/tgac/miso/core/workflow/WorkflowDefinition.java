@@ -12,6 +12,6 @@ import java.util.List;
  * @since 0.2.0
  */
 public interface WorkflowDefinition {
-  public String getName();
-  public List<WorkflowProcess> getWorkflowProcesses();
+    public String getName();
+    public List<WorkflowProcess> getWorkflowProcesses();
 }

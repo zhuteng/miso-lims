@@ -40,16 +40,16 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
  */
 @Deprecated
 public class IlluminaPool extends PoolImpl<LibraryDilution> {
-  public static final String PREFIX = "IPO";
-  private final String units = "nM";
+    public static final String PREFIX = "IPO";
+    private final String units = "nM";
 
-  public IlluminaPool() {
-    setSecurityProfile(new SecurityProfile());
-    setPlatformType(PlatformType.ILLUMINA);
-  }
+    public IlluminaPool() {
+        setSecurityProfile(new SecurityProfile());
+        setPlatformType(PlatformType.ILLUMINA);
+    }
 
-  public IlluminaPool(User user) {
-    setSecurityProfile(new SecurityProfile(user));
-    setPlatformType(PlatformType.ILLUMINA);
-  }
+    public IlluminaPool(User user) {
+        setSecurityProfile(new SecurityProfile(user));
+        setPlatformType(PlatformType.ILLUMINA);
+    }
 }

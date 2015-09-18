@@ -43,40 +43,39 @@ import java.util.Properties;
  * @since 0.1.2
  */
 public class EmailAlerterService implements AlerterService {
-  protected static final Logger log = LoggerFactory.getLogger(EmailAlerterService.class);
+    protected static final Logger log = LoggerFactory.getLogger(EmailAlerterService.class);
 
-  private Properties mailProps = new Properties();
+    private Properties mailProps = new Properties();
 
-  public void setMailProps(Properties mailProps) {
-    this.mailProps = mailProps;
-  }
-
-  @Override
-  public void raiseAlert(Alert a) throws AlertingException {
-    if (!mailProps.containsKey("mail.smtp.host")) {
-      log.error("No SMTP host specified in the mail.properties configuration file. Cannot send email.");
-      throw new AlertingException("No SMTP host specified in the mail.properties configuration file. Cannot send email.");
+    public void setMailProps(Properties mailProps) {
+        this.mailProps = mailProps;
     }
-    else {
-      String from = mailProps.getProperty("mail.from");
-      if (from == null || "".equals(from)) {
-        from = "miso@your.miso.server";
-      }
 
-      String to = a.getAlertUser().getEmail();
-      String subject = "MISO ALERT: " + a.getAlertTitle();
-      String text = "Hello " +
-                    a.getAlertUser().getFullName() +
-                    ",\n\nMISO would like to tell you about something:\n\n" +
-                    a.getAlertTitle() + " ("+a.getAlertDate()+")" +
-                    "\n\n" +
-                    a.getAlertText();
-      try {
-        EmailUtils.send(to, from, subject, text, mailProps);
-      } catch (MessagingException e) {
-        log.error("Cannot send email to alert recipients:" + e.getMessage());
-        throw new AlertingException("Cannot send email to alert recipients", e);
-      }
+    @Override
+    public void raiseAlert(Alert a) throws AlertingException {
+        if (!mailProps.containsKey("mail.smtp.host")) {
+            log.error("No SMTP host specified in the mail.properties configuration file. Cannot send email.");
+            throw new AlertingException("No SMTP host specified in the mail.properties configuration file. Cannot send email.");
+        } else {
+            String from = mailProps.getProperty("mail.from");
+            if (from == null || "".equals(from)) {
+                from = "miso@your.miso.server";
+            }
+
+            String to = a.getAlertUser().getEmail();
+            String subject = "MISO ALERT: " + a.getAlertTitle();
+            String text = "Hello " +
+                          a.getAlertUser().getFullName() +
+                          ",\n\nMISO would like to tell you about something:\n\n" +
+                          a.getAlertTitle() + " (" + a.getAlertDate() + ")" +
+                          "\n\n" +
+                          a.getAlertText();
+            try {
+                EmailUtils.send(to, from, subject, text, mailProps);
+            } catch (MessagingException e) {
+                log.error("Cannot send email to alert recipients:" + e.getMessage());
+                throw new AlertingException("Cannot send email to alert recipients", e);
+            }
+        }
     }
-  }
 }

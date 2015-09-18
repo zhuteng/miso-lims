@@ -48,45 +48,45 @@ import java.io.IOException;
  */
 @ServiceProvider
 public class BradySpoolPrintContext implements PrintContext<File> {
-  protected static final Logger log = LoggerFactory.getLogger(BradySpoolPrintContext.class);
-  private BradySpoolPrintStrategy ps = new BradySpoolPrintStrategy();
-  public String host;
-  private PrintService printService;
+    protected static final Logger log = LoggerFactory.getLogger(BradySpoolPrintContext.class);
+    private BradySpoolPrintStrategy ps = new BradySpoolPrintStrategy();
+    public String host;
+    private PrintService printService;
 
-  public PrintService getPrintService() {
-    return printService;
-  }
+    public PrintService getPrintService() {
+        return printService;
+    }
 
-  public void setPrintService(PrintService printService) {
-    this.printService = printService;
-  }
+    public void setPrintService(PrintService printService) {
+        this.printService = printService;
+    }
 
-  public void setPrintStrategy(BradySpoolPrintStrategy ps) {
-    this.ps = ps;
-  }
+    public void setPrintStrategy(BradySpoolPrintStrategy ps) {
+        this.ps = ps;
+    }
 
-  @Override
-  public String getHost() {
-    return host;
-  }
+    @Override
+    public String getHost() {
+        return host;
+    }
 
-  public void setHost(String host) {
-    this.host = host;
-  }
+    public void setHost(String host) {
+        this.host = host;
+    }
 
-  @Override
-  public String getName() {
-    return "mach4-type-spool-printer";
-  }
+    @Override
+    public String getName() {
+        return "mach4-type-spool-printer";
+    }
 
-  @Override
-  public String getDescription() {
-    return "Prints to a Mach4-type printer via the normal spooling method";
-  }
+    @Override
+    public String getDescription() {
+        return "Prints to a Mach4-type printer via the normal spooling method";
+    }
 
-  @Override
-  public boolean print(File content) throws IOException {
-    String s = FileUtils.readFile(content);
-    return ps.print(s, this);
-  }
+    @Override
+    public boolean print(File content) throws IOException {
+        String s = FileUtils.readFile(content);
+        return ps.print(s, this);
+    }
 }

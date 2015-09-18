@@ -51,50 +51,49 @@ import java.util.Set;
  * @since 0.1.2
  */
 public class MockStatusChangedResponderService implements ResponderService {
-  protected static final Logger log = LoggerFactory.getLogger(MockRunResponderService.class);
+    protected static final Logger log = LoggerFactory.getLogger(MockRunResponderService.class);
 
-  private Set<AlerterService> alerterServices = new HashSet<AlerterService>();
+    private Set<AlerterService> alerterServices = new HashSet<AlerterService>();
 
-  public Set<AlerterService> getAlerterServices() {
-    return alerterServices;
-  }
+    public Set<AlerterService> getAlerterServices() {
+        return alerterServices;
+    }
 
-  public void setAlerterServices(Set<AlerterService> alerterServices) {
-    log.info("Setting " + alerterServices.size() + " alerter(s)");
-    this.alerterServices = alerterServices;
-  }
+    public void setAlerterServices(Set<AlerterService> alerterServices) {
+        log.info("Setting " + alerterServices.size() + " alerter(s)");
+        this.alerterServices = alerterServices;
+    }
 
-  @Override
-  public boolean respondsTo(Event event) {
-    if (event instanceof StatusChangedEvent) {
-      StatusChangedEvent se = (StatusChangedEvent)event;
-      Status s = se.getStatus();
-      log.info("Checking responder for status change event for " + se.getEventObject().getClass().getSimpleName());
-      if (s != null) {
-        if (s.getHealth().equals(HealthType.Failed) || s.getHealth().equals(HealthType.Completed)) {
-          return true;
+    @Override
+    public boolean respondsTo(Event event) {
+        if (event instanceof StatusChangedEvent) {
+            StatusChangedEvent se = (StatusChangedEvent) event;
+            Status s = se.getStatus();
+            log.info("Checking responder for status change event for " + se.getEventObject().getClass().getSimpleName());
+            if (s != null) {
+                if (s.getHealth().equals(HealthType.Failed) || s.getHealth().equals(HealthType.Completed)) {
+                    return true;
+                }
+            }
         }
-      }
+        return false;
     }
-    return false;
-  }
 
-  @Override
-  public void generateResponse(Event event) {
-    log.info("Responding to event: " + event.getEventMessage() + ". Raising alert...");
-    User u = new UserImpl();
-    u.setFullName("Bar baz");
-    Alert a = new MockAlert(u);
-    a.setAlertText(a.getAlertText() + " ("+event.getEventMessage()+")");
+    @Override
+    public void generateResponse(Event event) {
+        log.info("Responding to event: " + event.getEventMessage() + ". Raising alert...");
+        User u = new UserImpl();
+        u.setFullName("Bar baz");
+        Alert a = new MockAlert(u);
+        a.setAlertText(a.getAlertText() + " (" + event.getEventMessage() + ")");
 
-    for (AlerterService as : alerterServices) {
-      try {
-        as.raiseAlert(a);
-      }
-      catch (AlertingException e) {
-        log.error("Cannot raise user-level alert:" + e.getMessage());
-        e.printStackTrace();
-      }
+        for (AlerterService as : alerterServices) {
+            try {
+                as.raiseAlert(a);
+            } catch (AlertingException e) {
+                log.error("Cannot raise user-level alert:" + e.getMessage());
+                e.printStackTrace();
+            }
+        }
     }
-  }
 }

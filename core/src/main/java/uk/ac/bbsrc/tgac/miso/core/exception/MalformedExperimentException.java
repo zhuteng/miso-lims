@@ -32,14 +32,14 @@ package uk.ac.bbsrc.tgac.miso.core.exception;
  * @since 0.0.2
  */
 public class MalformedExperimentException extends Exception {
-  public MalformedExperimentException(String s) {
-    super(s);
-  }
-
-  public MalformedExperimentException(String s, Throwable cause) {
-    super(s);
-    if (cause != null) {
-        initCause(cause);
+    public MalformedExperimentException(String s) {
+        super(s);
     }
-  }
+
+    public MalformedExperimentException(String s, Throwable cause) {
+        super(s);
+        if (cause != null) {
+            initCause(cause);
+        }
+    }
 }

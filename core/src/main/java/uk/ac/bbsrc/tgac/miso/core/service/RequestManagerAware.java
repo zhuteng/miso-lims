@@ -35,6 +35,6 @@ import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
  * @since 0.1.6
  */
 public interface RequestManagerAware {
-  RequestManager getRequestManager();
-  void setRequestManager(RequestManager requestManager);
+    RequestManager getRequestManager();
+    void setRequestManager(RequestManager requestManager);
 }

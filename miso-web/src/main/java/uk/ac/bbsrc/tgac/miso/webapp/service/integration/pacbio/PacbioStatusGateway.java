@@ -37,9 +37,9 @@ import org.springframework.util.MultiValueMap;
  * @since 0.1.6
  */
 public interface PacbioStatusGateway {
-  @Gateway(requestChannel = "pacbioStatusChannel")
-  void consume(Message<MultiValueMap<String, String>> message);
+    @Gateway(requestChannel = "pacbioStatusChannel")
+    void consume(Message<MultiValueMap<String, String>> message);
 
-  @Gateway(requestChannel = "pacbioStatusChannel")
-  void consumeJSON(Message<String> message);
+    @Gateway(requestChannel = "pacbioStatusChannel")
+    void consumeJSON(Message<String> message);
 }

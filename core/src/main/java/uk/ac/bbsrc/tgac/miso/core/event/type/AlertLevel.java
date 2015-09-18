@@ -38,65 +38,65 @@ import java.util.Map;
  * @since 0.1.2
  */
 public enum AlertLevel {
-  INFO("INFO"),
-  LOW("LOW"),
-  MEDIUM("MEDIUM"),
-  HIGH("HIGH"),
-  CRITICAL("CRITICAL");
-  
-  /**
-   * Field key
-   */
-  private String key;
-  /**
-   * Field lookup
-   */
-  private static final Map<String, AlertLevel> lookup = new HashMap<String, AlertLevel>();
+    INFO("INFO"),
+    LOW("LOW"),
+    MEDIUM("MEDIUM"),
+    HIGH("HIGH"),
+    CRITICAL("CRITICAL");
 
-  static {
-    for (AlertLevel s : EnumSet.allOf(AlertLevel.class))
-      lookup.put(s.getKey(), s);
-  }
+    /**
+     * Field key
+     */
+    private String key;
+    /**
+     * Field lookup
+     */
+    private static final Map<String, AlertLevel> lookup = new HashMap<String, AlertLevel>();
 
-  /**
-   * Constructs a AlertLevel based on a given key
-   *
-   * @param key of type String
-   */
-  AlertLevel(String key) {
-    this.key = key;
-  }
-
-  /**
-   * Returns a AlertLevel given an enum key
-   *
-   * @param key of type String
-   * @return AlertType
-   */
-  public static AlertLevel get(String key) {
-    return lookup.get(key);
-  }
-
-  /**
-   * Returns the key of this AlertLevel enum.
-   *
-   * @return String key.
-   */
-  public String getKey() {
-    return key;
-  }
-
-  /**
-   * Returns the keys of this AlertLevel enum.
-   *
-   * @return ArrayList<String> keys.
-   */
-  public static ArrayList<String> getKeys() {
-    ArrayList<String> keys = new ArrayList<String>();
-    for (AlertLevel h : AlertLevel.values()) {
-      keys.add(h.getKey());
+    static {
+        for (AlertLevel s : EnumSet.allOf(AlertLevel.class))
+            lookup.put(s.getKey(), s);
     }
-    return keys;
-  }
+
+    /**
+     * Constructs a AlertLevel based on a given key
+     *
+     * @param key of type String
+     */
+    AlertLevel(String key) {
+        this.key = key;
+    }
+
+    /**
+     * Returns a AlertLevel given an enum key
+     *
+     * @param key of type String
+     * @return AlertType
+     */
+    public static AlertLevel get(String key) {
+        return lookup.get(key);
+    }
+
+    /**
+     * Returns the key of this AlertLevel enum.
+     *
+     * @return String key.
+     */
+    public String getKey() {
+        return key;
+    }
+
+    /**
+     * Returns the keys of this AlertLevel enum.
+     *
+     * @return ArrayList<String> keys.
+     */
+    public static ArrayList<String> getKeys() {
+        ArrayList<String> keys = new ArrayList<String>();
+        for (AlertLevel h : AlertLevel.values()) {
+            keys.add(h.getKey());
+        }
+        return keys;
+    }
 
 }

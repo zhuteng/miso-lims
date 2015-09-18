@@ -47,55 +47,53 @@ import java.io.IOException;
 @Ajaxified
 public class ExperimentSearchService {
 
-  protected static final Logger log = LoggerFactory.getLogger(ExperimentSearchService.class);
-  @Autowired
-  private SecurityManager securityManager;
-  @Autowired
-  private RequestManager requestManager;
+    protected static final Logger log = LoggerFactory.getLogger(ExperimentSearchService.class);
+    @Autowired
+    private SecurityManager securityManager;
+    @Autowired
+    private RequestManager requestManager;
 
-  public JSONObject illuminaExperimentSearch(HttpSession session, JSONObject json) {
-    StringBuffer sb = new StringBuffer();
-    String searchStr = (String) json.get("str");
-    String resultId = (String) json.get("id");
-    try {
-      User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-      if (searchStr.length() > 1) {
-        String str = searchStr.toLowerCase();
+    public JSONObject illuminaExperimentSearch(HttpSession session, JSONObject json) {
+        StringBuffer sb = new StringBuffer();
+        String searchStr = (String) json.get("str");
+        String resultId = (String) json.get("id");
+        try {
+            User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
+            if (searchStr.length() > 1) {
+                String str = searchStr.toLowerCase();
 
-        StringBuilder b = new StringBuilder();
+                StringBuilder b = new StringBuilder();
 
-        int numMatches = 0;
-        for (Experiment exp : requestManager.listAllExperiments()) {
-          String experimentName = exp.getName() == null ? null : exp.getName().toLowerCase();
-          long experimentId = exp.getId();
+                int numMatches = 0;
+                for (Experiment exp : requestManager.listAllExperiments()) {
+                    String experimentName = exp.getName() == null ? null : exp.getName().toLowerCase();
+                    long experimentId = exp.getId();
 
-          if (experimentName != null && (experimentName.equals(str) || experimentName.contains(str))) {
-            b.append("<li onclick=\"Search.insertResult(&#39;" + resultId + "&#39;,&#39;" + experimentId + "&#39;)\">" + exp.getName() + "(" + exp.getAlias() + ")</li>");
-            numMatches++;
-          }
+                    if (experimentName != null && (experimentName.equals(str) || experimentName.contains(str))) {
+                        b.append("<li onclick=\"Search.insertResult(&#39;" + resultId + "&#39;,&#39;" + experimentId + "&#39;)\">" +
+                                 exp.getName() + "(" + exp.getAlias() + ")</li>");
+                        numMatches++;
+                    }
+                }
+                if (numMatches == 0) {
+                    return JSONUtils.JSONObjectResponse("html", "No matches");
+                } else {
+                    return JSONUtils.JSONObjectResponse("html", "<div class=\"autocomplete\"><ul>" + b.toString() + "</ul></div>");
+                }
+            } else {
+                return JSONUtils.JSONObjectResponse("html", "Need a longer search pattern ...");
+            }
+        } catch (IOException e) {
+            log.debug("Failed", e);
+            return JSONUtils.SimpleJSONError("Failed");
         }
-        if (numMatches == 0) {
-          return JSONUtils.JSONObjectResponse("html", "No matches");
-        }
-        else {
-          return JSONUtils.JSONObjectResponse("html", "<div class=\"autocomplete\"><ul>" + b.toString() + "</ul></div>");
-        }
-      }
-      else {
-        return JSONUtils.JSONObjectResponse("html", "Need a longer search pattern ...");
-      }
     }
-    catch (IOException e) {
-      log.debug("Failed", e);
-      return JSONUtils.SimpleJSONError("Failed");
+
+    public void setSecurityManager(SecurityManager securityManager) {
+        this.securityManager = securityManager;
     }
-  }
 
-  public void setSecurityManager(SecurityManager securityManager) {
-    this.securityManager = securityManager;
-  }
-
-  public void setRequestManager(RequestManager requestManager) {
-    this.requestManager = requestManager;
-  }  
+    public void setRequestManager(RequestManager requestManager) {
+        this.requestManager = requestManager;
+    }
 }

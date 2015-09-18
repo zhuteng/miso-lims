@@ -51,74 +51,74 @@ import java.util.Set;
  * @since 0.1.2
  */
 public class RunTests {
-  protected static final Logger log = LoggerFactory.getLogger(RunTests.class);
-  private DataObjectFactory dataObjectFactory;
+    protected static final Logger log = LoggerFactory.getLogger(RunTests.class);
+    private DataObjectFactory dataObjectFactory;
 
-  @Before
-  public void setUp() {
-    dataObjectFactory = new TgacDataObjectFactory();
-  }
+    @Before
+    public void setUp() {
+        dataObjectFactory = new TgacDataObjectFactory();
+    }
 
-  @Test
-  public void testIlluminaRun() {
-    IlluminaRun r = (IlluminaRun)dataObjectFactory.getRunOfType(PlatformType.ILLUMINA);
-    r.setId(-1L);
+    @Test
+    public void testIlluminaRun() {
+        IlluminaRun r = (IlluminaRun) dataObjectFactory.getRunOfType(PlatformType.ILLUMINA);
+        r.setId(-1L);
 
-    log.info("Registering listeners");
+        log.info("Registering listeners");
 
-    MockRunListener foo = new MockRunListener();
+        MockRunListener foo = new MockRunListener();
 
-    Set<ResponderService> responders = new HashSet<ResponderService>();
-    MockRunResponderService runResponder = new MockRunResponderService();
-    MockStatusChangedResponderService statusResponder = new MockStatusChangedResponderService();
+        Set<ResponderService> responders = new HashSet<ResponderService>();
+        MockRunResponderService runResponder = new MockRunResponderService();
+        MockStatusChangedResponderService statusResponder = new MockStatusChangedResponderService();
 
-    Set<AlerterService> alerters = new HashSet<AlerterService>();
-    MockLogAlerterService logAlerter = new MockLogAlerterService();
-    alerters.add(logAlerter);
+        Set<AlerterService> alerters = new HashSet<AlerterService>();
+        MockLogAlerterService logAlerter = new MockLogAlerterService();
+        alerters.add(logAlerter);
 
-    //MockEmailAlerterService emailAlerter = new MockEmailAlerterService();
-    //alerters.add(emailAlerter);
+        //MockEmailAlerterService emailAlerter = new MockEmailAlerterService();
+        //alerters.add(emailAlerter);
 
-    runResponder.setAlerterServices(alerters);
-    statusResponder.setAlerterServices(alerters);
+        runResponder.setAlerterServices(alerters);
+        statusResponder.setAlerterServices(alerters);
 
-    responders.add(runResponder);
-    responders.add(statusResponder);
+        responders.add(runResponder);
+        responders.add(statusResponder);
 
-    foo.setResponderServices(responders);
-    r.addListener(foo);
+        foo.setResponderServices(responders);
+        r.addListener(foo);
 
-    log.info("Attempting to set status from "+r.getStatus().getHealth().getKey()+" to Unknown");
-    Status s = new StatusImpl();
-    s.setHealth(HealthType.Unknown);
-    r.setStatus(s);
+        log.info("Attempting to set status from " + r.getStatus().getHealth().getKey() + " to Unknown");
+        Status s = new StatusImpl();
+        s.setHealth(HealthType.Unknown);
+        r.setStatus(s);
 
-    log.info("Attempting to set status from "+r.getStatus().getHealth().getKey()+" to Started");
-    s = new StatusImpl();
-    s.setHealth(HealthType.Started);
-    r.setStatus(s);
+        log.info("Attempting to set status from " + r.getStatus().getHealth().getKey() + " to Started");
+        s = new StatusImpl();
+        s.setHealth(HealthType.Started);
+        r.setStatus(s);
 
-    log.info("Attempting to set status from "+r.getStatus().getHealth().getKey()+" to Stopped");
-    s = new StatusImpl();
-    s.setHealth(HealthType.Stopped);
-    r.setStatus(s);
+        log.info("Attempting to set status from " + r.getStatus().getHealth().getKey() + " to Stopped");
+        s = new StatusImpl();
+        s.setHealth(HealthType.Stopped);
+        r.setStatus(s);
 
-    log.info("Attempting to set status from "+r.getStatus().getHealth().getKey()+" to Failed");
-    s = new StatusImpl();
-    s.setHealth(HealthType.Failed);
-    r.setStatus(s);
+        log.info("Attempting to set status from " + r.getStatus().getHealth().getKey() + " to Failed");
+        s = new StatusImpl();
+        s.setHealth(HealthType.Failed);
+        r.setStatus(s);
 
-    log.info("Attempting to set status from "+r.getStatus().getHealth().getKey()+" to Completed");
-    s = new StatusImpl();
-    s.setHealth(HealthType.Completed);
-    r.setStatus(s);
+        log.info("Attempting to set status from " + r.getStatus().getHealth().getKey() + " to Completed");
+        s = new StatusImpl();
+        s.setHealth(HealthType.Completed);
+        r.setStatus(s);
 
-    log.info("Unregistering listeners");
-    r.removeListener(foo);
-  }
+        log.info("Unregistering listeners");
+        r.removeListener(foo);
+    }
 
-  @After
-  public void tearDown() {
-    dataObjectFactory = null;
-  }
+    @After
+    public void tearDown() {
+        dataObjectFactory = null;
+    }
 }

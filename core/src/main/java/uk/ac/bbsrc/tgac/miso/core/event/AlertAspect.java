@@ -32,6 +32,6 @@ package uk.ac.bbsrc.tgac.miso.core.event;
  * @since 0.1.3
  */
 public interface AlertAspect {
-  public void updateWatcher(Long userId);
-  public void update(Long entityId);
+    public void updateWatcher(Long userId);
+    public void update(Long entityId);
 }

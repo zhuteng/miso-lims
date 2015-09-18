@@ -37,13 +37,13 @@ import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
  * @since 0.1.6
  */
 public class SystemAlert extends DefaultAlert {
-  public SystemAlert() {
-    super(getDummySystemUser());
-  }
+    public SystemAlert() {
+        super(getDummySystemUser());
+    }
 
-  private static User getDummySystemUser() {
-    User dummySystemUser = new UserImpl();
-    dummySystemUser.setUserId(LimsUtils.SYSTEM_USER_ID);
-    return dummySystemUser;
-  }
+    private static User getDummySystemUser() {
+        User dummySystemUser = new UserImpl();
+        dummySystemUser.setUserId(LimsUtils.SYSTEM_USER_ID);
+        return dummySystemUser;
+    }
 }

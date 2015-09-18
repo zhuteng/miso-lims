@@ -42,45 +42,42 @@ import java.util.Map;
  * @since 0.1.3
  */
 public class PayloadTransformer {
-  protected static final Logger log = LoggerFactory.getLogger(PayloadTransformer.class);
+    protected static final Logger log = LoggerFactory.getLogger(PayloadTransformer.class);
 
-  public Object transform(byte[] payload) throws InvalidRequestParameterException {
-    String s = new String(payload);
-    JSONObject j = JSONObject.fromObject(s);
+    public Object transform(byte[] payload) throws InvalidRequestParameterException {
+        String s = new String(payload);
+        JSONObject j = JSONObject.fromObject(s);
 
-    if (j.has("submit")) {
-      return generateTaskSubmissionRequest(j);
+        if (j.has("submit")) {
+            return generateTaskSubmissionRequest(j);
+        } else if (j.has("query")) {
+            return generateQuery(j);
+        } else {
+            throw new InvalidRequestParameterException("Incoming request must be of type 'submit', 'tasks', or 'pipelines'");
+        }
     }
-    else if (j.has("query")) {
-      return generateQuery(j);
-    }
-    else {
-      throw new InvalidRequestParameterException("Incoming request must be of type 'submit', 'tasks', or 'pipelines'");
-    }
-  }
 
-  private TaskSubmissionRequest generateTaskSubmissionRequest(JSONObject j) throws InvalidRequestParameterException {
-    if (ProcessUtils.validateTaskRequestJSON(j)) {
-      JSONObject s = j.getJSONObject("submit");
-      Map<String, String> params = new HashMap<String, String>();
-      JSONObject jparams = s.getJSONObject("params");
-      for (Object key : jparams.keySet()) {
-        String k = (String)key;
-        params.put(k, jparams.getString(k));
-      }
-      return new TaskSubmissionRequest(s.getString("priority"), s.getString("pipeline"), params);
+    private TaskSubmissionRequest generateTaskSubmissionRequest(JSONObject j) throws InvalidRequestParameterException {
+        if (ProcessUtils.validateTaskRequestJSON(j)) {
+            JSONObject s = j.getJSONObject("submit");
+            Map<String, String> params = new HashMap<String, String>();
+            JSONObject jparams = s.getJSONObject("params");
+            for (Object key : jparams.keySet()) {
+                String k = (String) key;
+                params.put(k, jparams.getString(k));
+            }
+            return new TaskSubmissionRequest(s.getString("priority"), s.getString("pipeline"), params);
+        } else {
+            throw new InvalidRequestParameterException(
+                "Invalid parameters for task creation. Cannot create task submission request: " + j.toString());
+        }
     }
-    else {
-      throw new InvalidRequestParameterException("Invalid parameters for task creation. Cannot create task submission request: " + j.toString());
-    }
-  }
 
-  private JSONObject generateQuery(JSONObject j) throws InvalidRequestParameterException {
-    if (ProcessUtils.validateQueryJSON(j)) {
-      return j;
+    private JSONObject generateQuery(JSONObject j) throws InvalidRequestParameterException {
+        if (ProcessUtils.validateQueryJSON(j)) {
+            return j;
+        } else {
+            throw new InvalidRequestParameterException("Invalid query. Cannot perform query: " + j.toString());
+        }
     }
-    else {
-      throw new InvalidRequestParameterException("Invalid query. Cannot perform query: " + j.toString());
-    }
-  }
 }

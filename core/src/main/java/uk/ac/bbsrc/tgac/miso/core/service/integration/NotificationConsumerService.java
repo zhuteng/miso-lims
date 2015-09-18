@@ -35,17 +35,18 @@ import java.util.Collection;
  * @since 0.1.5
  */
 public interface NotificationConsumerService {
-  /**
-   * Get a {@link NotificationConsumerStrategy} by its name
-   *
-   * @param strategyName
-   * @return the unique {@link NotificationConsumerStrategy} that has this name, or null if none exists
-   */
-  NotificationConsumerStrategy getConsumerStrategy(String strategyName);
+    /**
+     * Get a {@link NotificationConsumerStrategy} by its name
+     *
+     * @param strategyName
+     * @return the unique {@link NotificationConsumerStrategy} that has this name, or null if none exists
+     */
+    NotificationConsumerStrategy getConsumerStrategy(String strategyName);
 
-  /**
-   * List all {@link NotificationConsumerStrategy} objects
-   * @return
-   */
-  Collection<NotificationConsumerStrategy> getConsumerStrategies();
+    /**
+     * List all {@link NotificationConsumerStrategy} objects
+     *
+     * @return
+     */
+    Collection<NotificationConsumerStrategy> getConsumerStrategies();
 }

@@ -43,35 +43,33 @@ import java.io.IOException;
  */
 @Aspect
 public class PoolAlertAspect {
-  protected static final Logger log = LoggerFactory.getLogger(PoolAlertAspect.class);
+    protected static final Logger log = LoggerFactory.getLogger(PoolAlertAspect.class);
 
-  private PoolAlertManager poolAlertManager;
+    private PoolAlertManager poolAlertManager;
 
-  public PoolAlertAspect(PoolAlertManager poolAlertManager) {
-    this.poolAlertManager = poolAlertManager;
-  }
+    public PoolAlertAspect(PoolAlertManager poolAlertManager) {
+        this.poolAlertManager = poolAlertManager;
+    }
 
-  public void removeWatcher(Pool pool, User user) {
-    try {
-      if (user != null) {
-        poolAlertManager.removeWatcher(pool, user.getUserId());
-      }
+    public void removeWatcher(Pool pool, User user) {
+        try {
+            if (user != null) {
+                poolAlertManager.removeWatcher(pool, user.getUserId());
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
-    catch (IOException e) {
-      e.printStackTrace();
-    }
-  }
 
-  public void addWatcher(Pool pool, User user) {
-    try {
-      if (user != null) {
-        poolAlertManager.addWatcher(pool, user.getUserId());
-      }
+    public void addWatcher(Pool pool, User user) {
+        try {
+            if (user != null) {
+                poolAlertManager.addWatcher(pool, user.getUserId());
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
-    catch (IOException e) {
-      e.printStackTrace();
-    }
-  }
   /*
   public void update(Long poolId) {
     try {
@@ -84,12 +82,11 @@ public class PoolAlertAspect {
   }
 */
 
-  public void update(Pool pool) {
-    try {
-      poolAlertManager.update(pool.getId());
+    public void update(Pool pool) {
+        try {
+            poolAlertManager.update(pool.getId());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
-    catch (IOException e) {
-      e.printStackTrace();
-    }
-  }
 }

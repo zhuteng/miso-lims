@@ -35,11 +35,11 @@ import java.util.Set;
  * @since 0.0.2
  */
 public interface TransferMethod {
-  /**
-   * Uploads sequence Datafiles
-   *
-   * @param dataFiles  set of datafiles
-   * @return UploadReport response
-   */
-  public UploadReport uploadSequenceData(Set<File> dataFiles, EndPoint endpoint) throws SubmissionException;
+    /**
+     * Uploads sequence Datafiles
+     *
+     * @param dataFiles set of datafiles
+     * @return UploadReport response
+     */
+    public UploadReport uploadSequenceData(Set<File> dataFiles, EndPoint endpoint) throws SubmissionException;
 }

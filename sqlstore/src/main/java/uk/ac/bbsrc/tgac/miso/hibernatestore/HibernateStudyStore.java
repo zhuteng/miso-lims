@@ -45,25 +45,25 @@ import java.util.Collection;
  */
 @Deprecated
 public class HibernateStudyStore extends HibernateDaoSupport implements Store<Study> {
-  @Transactional(readOnly = false)
-  public long save(Study study) throws IOException {
-    getHibernateTemplate().saveOrUpdate(study);
-    return study.getStudyId();
-  }
+    @Transactional(readOnly = false)
+    public long save(Study study) throws IOException {
+        getHibernateTemplate().saveOrUpdate(study);
+        return study.getStudyId();
+    }
 
-  @Transactional(readOnly = true)
-  public Study get(long studyId) throws IOException {
-    return (Study) getHibernateTemplate().get(AbstractStudy.class, studyId);
-  }
+    @Transactional(readOnly = true)
+    public Study get(long studyId) throws IOException {
+        return (Study) getHibernateTemplate().get(AbstractStudy.class, studyId);
+    }
 
-  @Override
-  public Study lazyGet(long id) throws IOException {
-    return get(id);
-  }
+    @Override
+    public Study lazyGet(long id) throws IOException {
+        return get(id);
+    }
 
-  @Transactional(readOnly = true)
-  @SuppressWarnings("unchecked")
-  public Collection<Study> listAll() throws IOException {
+    @Transactional(readOnly = true)
+    @SuppressWarnings("unchecked")
+    public Collection<Study> listAll() throws IOException {
 /*    return (Collection<Study>) getHibernateTemplate().execute(
             new HibernateCallback() {
               public Object doInHibernate(Session session)
@@ -72,11 +72,11 @@ public class HibernateStudyStore extends HibernateDaoSupport implements Store<St
               }
             });
             */
-    return null;
-  }
+        return null;
+    }
 
-  @Override
-  public int count() throws IOException {
-    return 0;
-  }
+    @Override
+    public int count() throws IOException {
+        return 0;
+    }
 }

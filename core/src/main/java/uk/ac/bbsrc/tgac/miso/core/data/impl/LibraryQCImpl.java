@@ -38,38 +38,36 @@ import java.io.Serializable;
  * @since 0.0.2
  */
 public class LibraryQCImpl extends AbstractLibraryQC implements Serializable {
-  /**
-   * Construct a new LibraryQC
-   */
-  public LibraryQCImpl() {
-  }
-
-  /**
-   * Construct a new LibraryQC from a parent Library, checking that the given User can read that Library 
-   *
-   * @param library of type Library
-   * @param user of type User
-   */
-  public LibraryQCImpl(Library library, User user) {
-    if (library.userCanRead(user)) {
-      try {
-        setLibrary(library);
-      }
-      catch (MalformedLibraryException e) {
-        e.printStackTrace();
-      }
-      //setSecurityProfile(experiment.getSecurityProfile());
+    /**
+     * Construct a new LibraryQC
+     */
+    public LibraryQCImpl() {
     }
-    else {
-      //setSecurityProfile(new SecurityProfile(user));
+
+    /**
+     * Construct a new LibraryQC from a parent Library, checking that the given User can read that Library
+     *
+     * @param library of type Library
+     * @param user    of type User
+     */
+    public LibraryQCImpl(Library library, User user) {
+        if (library.userCanRead(user)) {
+            try {
+                setLibrary(library);
+            } catch (MalformedLibraryException e) {
+                e.printStackTrace();
+            }
+            //setSecurityProfile(experiment.getSecurityProfile());
+        } else {
+            //setSecurityProfile(new SecurityProfile(user));
+        }
     }
-  }
 
-  public boolean userCanRead(User user) {
-    return true;
-  }
+    public boolean userCanRead(User user) {
+        return true;
+    }
 
-  public boolean userCanWrite(User user) {
-    return true;
-  }
+    public boolean userCanWrite(User user) {
+        return true;
+    }
 }

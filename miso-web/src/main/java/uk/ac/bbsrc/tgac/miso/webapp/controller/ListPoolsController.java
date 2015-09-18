@@ -49,67 +49,65 @@ import java.util.*;
  */
 @Controller
 public class ListPoolsController {
-  protected static final Logger log = LoggerFactory.getLogger(ListPoolsController.class);
+    protected static final Logger log = LoggerFactory.getLogger(ListPoolsController.class);
 
-  @Autowired
-  private SecurityManager securityManager;
+    @Autowired
+    private SecurityManager securityManager;
 
-  public void setSecurityManager(com.eaglegenomics.simlims.core.manager.SecurityManager securityManager) {
-    this.securityManager = securityManager;
-  }
+    public void setSecurityManager(com.eaglegenomics.simlims.core.manager.SecurityManager securityManager) {
+        this.securityManager = securityManager;
+    }
 
-  @Autowired
-  private RequestManager requestManager;
+    @Autowired
+    private RequestManager requestManager;
 
-  public void setRequestManager(RequestManager requestManager) {
-    this.requestManager = requestManager;
-  }
+    public void setRequestManager(RequestManager requestManager) {
+        this.requestManager = requestManager;
+    }
 
-  @ModelAttribute("platformTypes")
-  public Collection<String> populatePlatformTypes() {
-    return PlatformType.getKeys();
-  }
+    @ModelAttribute("platformTypes")
+    public Collection<String> populatePlatformTypes() {
+        return PlatformType.getKeys();
+    }
 
-  @RequestMapping("/pools")
-  public ModelAndView listPools() throws IOException {
-    return new ModelAndView("/pages/listPools.jsp");
-  }
+    @RequestMapping("/pools")
+    public ModelAndView listPools() throws IOException {
+        return new ModelAndView("/pages/listPools.jsp");
+    }
 
-  @RequestMapping("/pools/ready")
-  public ModelAndView listReadyPools(ModelMap model) throws IOException {
-    try {
+    @RequestMapping("/pools/ready")
+    public ModelAndView listReadyPools(ModelMap model) throws IOException {
+        try {
 
-      Map<String, List<Pool>> poolMap = new HashMap<>();
-      Map<String, List<Pool>> usedPoolMap = new HashMap<>();
+            Map<String, List<Pool>> poolMap = new HashMap<>();
+            Map<String, List<Pool>> usedPoolMap = new HashMap<>();
 
-      for (PlatformType pt : PlatformType.values()) {
-        List<Pool> pools = new ArrayList<Pool>();
-        List<Pool> poolsUsed = new ArrayList<Pool>();
-        for (Pool p : requestManager.listReadyPoolsByPlatform(pt)) {
-          if (requestManager.listRunsByPoolId(p.getId()).isEmpty()) {
-            pools.add(p);
-          }
-          else {
-            poolsUsed.add(p);
-          }
+            for (PlatformType pt : PlatformType.values()) {
+                List<Pool> pools = new ArrayList<Pool>();
+                List<Pool> poolsUsed = new ArrayList<Pool>();
+                for (Pool p : requestManager.listReadyPoolsByPlatform(pt)) {
+                    if (requestManager.listRunsByPoolId(p.getId()).isEmpty()) {
+                        pools.add(p);
+                    } else {
+                        poolsUsed.add(p);
+                    }
+                }
+                String ident = pt.getKey();
+
+                poolMap.put(ident, pools);
+                usedPoolMap.put(ident, poolsUsed);
+            }
+
+            model.addAttribute("pools", poolMap);
+            model.addAttribute("usedpools", usedPoolMap);
+
+            model.addAttribute("ready", true);
+            return new ModelAndView("/pages/readyPools.jsp", model);
+        } catch (IOException ex) {
+            if (log.isDebugEnabled()) {
+                log.debug("Failed to list pools", ex);
+            }
+            throw ex;
         }
-        String ident = pt.getKey();
-
-        poolMap.put(ident, pools);
-        usedPoolMap.put(ident, poolsUsed);
-      }
-
-      model.addAttribute("pools", poolMap);
-      model.addAttribute("usedpools", usedPoolMap);
-
-      model.addAttribute("ready", true);
-      return new ModelAndView("/pages/readyPools.jsp", model);
     }
-    catch (IOException ex) {
-      if (log.isDebugEnabled()) {
-        log.debug("Failed to list pools", ex);
-      }
-      throw ex;
-    }
-  }
 }

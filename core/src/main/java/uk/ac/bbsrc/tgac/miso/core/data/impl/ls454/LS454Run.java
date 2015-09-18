@@ -48,18 +48,18 @@ import javax.xml.parsers.ParserConfigurationException;
 @DiscriminatorValue("LS454")
 public class LS454Run extends RunImpl {
 
-  public LS454Run() {
-    setPlatformType(PlatformType.LS454);
-    setStatus(new StatusImpl());
-  }
+    public LS454Run() {
+        setPlatformType(PlatformType.LS454);
+        setStatus(new StatusImpl());
+    }
 
-  public LS454Run(User user) {
-    setPlatformType(PlatformType.LS454);
-    setStatus(new StatusImpl());
-    setSecurityProfile(new SecurityProfile(user));
-  }
+    public LS454Run(User user) {
+        setPlatformType(PlatformType.LS454);
+        setStatus(new StatusImpl());
+        setSecurityProfile(new SecurityProfile(user));
+    }
 
-  public void buildSubmission() {
+    public void buildSubmission() {
     /*
     try {
       DocumentBuilder docBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
@@ -70,12 +70,12 @@ public class LS454Run extends RunImpl {
     }
     ERASubmissionFactory.generateFullRunSubmissionXML(submissionDocument, this);
     */
-  }
+    }
 
-  /**
-   * Method buildReport ...
-   */
-  public void buildReport() {
+    /**
+     * Method buildReport ...
+     */
+    public void buildReport() {
 
-  }
+    }
 }

@@ -13,6 +13,6 @@ import java.util.Collection;
  * @since version
  */
 public interface EntityNamingSchemeResolverService {
-  MisoNamingScheme<?> getNamingScheme(String schemeName);
-  Collection<MisoNamingScheme<?>> getNamingSchemes();
+    MisoNamingScheme<?> getNamingScheme(String schemeName);
+    Collection<MisoNamingScheme<?>> getNamingSchemes();
 }

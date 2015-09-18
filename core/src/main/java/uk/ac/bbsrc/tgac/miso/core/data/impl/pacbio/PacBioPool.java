@@ -39,16 +39,16 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
  */
 @Deprecated
 public class PacBioPool extends PoolImpl<LibraryDilution> {
-  public static final String PREFIX = "PPO";
-  private final String units = "nM";
+    public static final String PREFIX = "PPO";
+    private final String units = "nM";
 
-  public PacBioPool() {
-    setSecurityProfile(new SecurityProfile());
-    setPlatformType(PlatformType.PACBIO);
-  }
+    public PacBioPool() {
+        setSecurityProfile(new SecurityProfile());
+        setPlatformType(PlatformType.PACBIO);
+    }
 
-  public PacBioPool(User user) {
-    setSecurityProfile(new SecurityProfile(user));
-    setPlatformType(PlatformType.PACBIO);
-  }
+    public PacBioPool(User user) {
+        setSecurityProfile(new SecurityProfile(user));
+        setPlatformType(PlatformType.PACBIO);
+    }
 }

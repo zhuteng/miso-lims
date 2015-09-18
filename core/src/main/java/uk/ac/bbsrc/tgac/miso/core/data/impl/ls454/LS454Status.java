@@ -35,18 +35,18 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
  * @since 0.1.4
  */
 public class LS454Status extends StatusImpl {
-  String runLog = null;
+    String runLog = null;
 
-  public LS454Status() {
-    setHealth(HealthType.Unknown);
-  }
+    public LS454Status() {
+        setHealth(HealthType.Unknown);
+    }
 
-  public LS454Status(String runLog) {
-    this.runLog = runLog;
-    parseGsProcessorLog(runLog);
-  }
+    public LS454Status(String runLog) {
+        this.runLog = runLog;
+        parseGsProcessorLog(runLog);
+    }
 
-  public void parseGsProcessorLog(String runLog) {
+    public void parseGsProcessorLog(String runLog) {
     /*
     try {
 
@@ -69,16 +69,16 @@ public class LS454Status extends StatusImpl {
       e.printStackTrace();
     }
     */
-  }
-
-  @Override
-  public String toString() {
-    StringBuffer sb = new StringBuffer();
-    sb.append(super.toString());
-    if (runLog != null) {
-      sb.append(" : ");
-      sb.append(runLog);
     }
-    return sb.toString();
-  }
+
+    @Override
+    public String toString() {
+        StringBuffer sb = new StringBuffer();
+        sb.append(super.toString());
+        if (runLog != null) {
+            sb.append(" : ");
+            sb.append(runLog);
+        }
+        return sb.toString();
+    }
 }

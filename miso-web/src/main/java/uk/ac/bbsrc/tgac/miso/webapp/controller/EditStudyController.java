@@ -56,168 +56,157 @@ import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 @RequestMapping("/study")
 @SessionAttributes("study")
 public class EditStudyController {
-  protected static final Logger log = LoggerFactory.getLogger(EditStudyController.class);
+    protected static final Logger log = LoggerFactory.getLogger(EditStudyController.class);
 
-  @Autowired
-  private SecurityManager securityManager;
+    @Autowired
+    private SecurityManager securityManager;
 
-  @Autowired
-  private RequestManager requestManager;
+    @Autowired
+    private RequestManager requestManager;
 
-  @Autowired
-  private DataObjectFactory dataObjectFactory;
+    @Autowired
+    private DataObjectFactory dataObjectFactory;
 
-  @Autowired
-  private JdbcTemplate interfaceTemplate;
+    @Autowired
+    private JdbcTemplate interfaceTemplate;
 
-  public void setInterfaceTemplate(JdbcTemplate interfaceTemplate) {
-    this.interfaceTemplate = interfaceTemplate;
-  }
-  
-  public void setDataObjectFactory(DataObjectFactory dataObjectFactory) {
-    this.dataObjectFactory = dataObjectFactory;
-  }
-
-  public void setRequestManager(RequestManager requestManager) {
-    this.requestManager = requestManager;
-  }
-
-  public void setSecurityManager(SecurityManager securityManager) {
-    this.securityManager = securityManager;
-  }
-
-  public Project populateProject(@PathVariable Long projectId) throws IOException {
-    try {
-      return requestManager.getProjectById(projectId);
+    public void setInterfaceTemplate(JdbcTemplate interfaceTemplate) {
+        this.interfaceTemplate = interfaceTemplate;
     }
-    catch (IOException ex) {
-      if (log.isDebugEnabled()) {
-        log.debug("Failed to get parent project", ex);
-      }
-      throw ex;
+
+    public void setDataObjectFactory(DataObjectFactory dataObjectFactory) {
+        this.dataObjectFactory = dataObjectFactory;
     }
-  }
 
-  @ModelAttribute("maxLengths")
-  public Map<String, Integer> maxLengths() throws IOException {
-    return DbUtils.getColumnSizes(interfaceTemplate, "Study");
-  }
+    public void setRequestManager(RequestManager requestManager) {
+        this.requestManager = requestManager;
+    }
 
-  @ModelAttribute("studyTypes")
-  public Collection<String> populateStudyTypes() throws IOException {
-    return requestManager.listAllStudyTypes();
-  }
+    public void setSecurityManager(SecurityManager securityManager) {
+        this.securityManager = securityManager;
+    }
 
-  @RequestMapping(value = "/new/{projectId}", method = RequestMethod.GET)
-  public ModelAndView newAssignedProject(@PathVariable Long projectId,
-                                ModelMap model) throws IOException {
-    return setupForm(AbstractStudy.UNSAVED_ID, projectId, model);
-  }
-
-
-  @RequestMapping(value = "/rest/{studyId}", method = RequestMethod.GET)
-  public @ResponseBody Study jsonRest(@PathVariable Long studyId) throws IOException {
-      return requestManager.getStudyById(studyId);
-  }
-
-  @RequestMapping(value = "/{studyId}", method = RequestMethod.GET)
-  public ModelAndView setupForm(@PathVariable Long studyId,
-                                ModelMap model) throws IOException {
-    try {
-      User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-      Study study = requestManager.getStudyById(studyId);
-      Project project;
-      if (study != null) {
-        if (!study.userCanRead(user)) {
-          throw new SecurityException("Permission denied.");
+    public Project populateProject(@PathVariable Long projectId) throws IOException {
+        try {
+            return requestManager.getProjectById(projectId);
+        } catch (IOException ex) {
+            if (log.isDebugEnabled()) {
+                log.debug("Failed to get parent project", ex);
+            }
+            throw ex;
         }
-        project = study.getProject();
-        model.put("formObj", study);
-        model.put("project", project);
-        model.put("study", study);
-        model.put("title", "Study "+studyId);
-      }
-      else {
-        throw new SecurityException("No such Study");
-      }
-      model.put("owners", LimsSecurityUtils.getPotentialOwners(user, study, securityManager.listAllUsers()));
-      model.put("accessibleUsers", LimsSecurityUtils.getAccessibleUsers(user, study, securityManager.listAllUsers()));
-      model.put("accessibleGroups", LimsSecurityUtils.getAccessibleGroups(user, study, securityManager.listAllGroups()));
-      return new ModelAndView("/pages/editStudy.jsp", model);
     }
-    catch (IOException ex) {
-      if (log.isDebugEnabled()) {
-        log.debug("Failed to show Study", ex);
-      }
-      throw ex;
+
+    @ModelAttribute("maxLengths")
+    public Map<String, Integer> maxLengths() throws IOException {
+        return DbUtils.getColumnSizes(interfaceTemplate, "Study");
     }
-  }
 
-  @RequestMapping(value = "/{studyId}/project/{projectId}", method = RequestMethod.GET)
-  public ModelAndView setupForm(@PathVariable Long studyId,
-                                @PathVariable Long projectId,
-                                ModelMap model) throws IOException {
-    try {
-      User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-      Study study = null;
-      if (studyId == AbstractStudy.UNSAVED_ID) {
-        study = dataObjectFactory.getStudy(user);
-        model.put("title", "New Study");
-      }
-      else {
-        study = requestManager.getStudyById(studyId);
-        model.put("title", "Study "+studyId);
-      }
+    @ModelAttribute("studyTypes")
+    public Collection<String> populateStudyTypes() throws IOException {
+        return requestManager.listAllStudyTypes();
+    }
 
-      Project project = requestManager.getProjectById(projectId);
-        model.addAttribute("project", project);
-        study.setProject(project);
-        if (Arrays.asList(user.getRoles()).contains("ROLE_TECH")) {
-          SecurityProfile sp = new SecurityProfile(user);
-          LimsUtils.inheritUsersAndGroups(study, project.getSecurityProfile());
-          sp.setOwner(user);
-          study.setSecurityProfile(sp);
-        } else {
-          study.inheritPermissions(project);
+    @RequestMapping(value = "/new/{projectId}", method = RequestMethod.GET)
+    public ModelAndView newAssignedProject(@PathVariable Long projectId, ModelMap model) throws IOException {
+        return setupForm(AbstractStudy.UNSAVED_ID, projectId, model);
+    }
+
+    @RequestMapping(value = "/rest/{studyId}", method = RequestMethod.GET)
+    public
+    @ResponseBody
+    Study jsonRest(@PathVariable Long studyId) throws IOException {
+        return requestManager.getStudyById(studyId);
+    }
+
+    @RequestMapping(value = "/{studyId}", method = RequestMethod.GET)
+    public ModelAndView setupForm(@PathVariable Long studyId, ModelMap model) throws IOException {
+        try {
+            User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
+            Study study = requestManager.getStudyById(studyId);
+            Project project;
+            if (study != null) {
+                if (!study.userCanRead(user)) {
+                    throw new SecurityException("Permission denied.");
+                }
+                project = study.getProject();
+                model.put("formObj", study);
+                model.put("project", project);
+                model.put("study", study);
+                model.put("title", "Study " + studyId);
+            } else {
+                throw new SecurityException("No such Study");
+            }
+            model.put("owners", LimsSecurityUtils.getPotentialOwners(user, study, securityManager.listAllUsers()));
+            model.put("accessibleUsers", LimsSecurityUtils.getAccessibleUsers(user, study, securityManager.listAllUsers()));
+            model.put("accessibleGroups", LimsSecurityUtils.getAccessibleGroups(user, study, securityManager.listAllGroups()));
+            return new ModelAndView("/pages/editStudy.jsp", model);
+        } catch (IOException ex) {
+            if (log.isDebugEnabled()) {
+                log.debug("Failed to show Study", ex);
+            }
+            throw ex;
         }
+    }
 
-        if (!study.userCanWrite(user)) {
-        throw new SecurityException("Permission denied.");
-      }
-      model.put("formObj", study);
-      model.put("study", study);
-      model.put("owners", LimsSecurityUtils.getPotentialOwners(user, study, securityManager.listAllUsers()));
-      model.put("accessibleUsers", LimsSecurityUtils.getAccessibleUsers(user, study, securityManager.listAllUsers()));
-      model.put("accessibleGroups", LimsSecurityUtils.getAccessibleGroups(user, study, securityManager.listAllGroups()));
-      return new ModelAndView("/pages/editStudy.jsp", model);
-    }
-    catch (IOException ex) {
-      if (log.isDebugEnabled()) {
-        log.debug("Failed to show Study", ex);
-      }
-      throw ex;
-    }
-  }
+    @RequestMapping(value = "/{studyId}/project/{projectId}", method = RequestMethod.GET)
+    public ModelAndView setupForm(@PathVariable Long studyId, @PathVariable Long projectId, ModelMap model) throws IOException {
+        try {
+            User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
+            Study study = null;
+            if (studyId == AbstractStudy.UNSAVED_ID) {
+                study = dataObjectFactory.getStudy(user);
+                model.put("title", "New Study");
+            } else {
+                study = requestManager.getStudyById(studyId);
+                model.put("title", "Study " + studyId);
+            }
 
-  @RequestMapping(method = RequestMethod.POST)
-  public String processSubmit(@ModelAttribute("study") Study study,
-                              ModelMap model,
-                              SessionStatus session) throws IOException {
-    try {
-      User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-      if (!study.userCanWrite(user)) {
-        throw new SecurityException("Permission denied.");
-      }
-      requestManager.saveStudy(study);
-      session.setComplete();
-      model.clear();
-      return "redirect:/miso/study/"+study.getId();
+            Project project = requestManager.getProjectById(projectId);
+            model.addAttribute("project", project);
+            study.setProject(project);
+            if (Arrays.asList(user.getRoles()).contains("ROLE_TECH")) {
+                SecurityProfile sp = new SecurityProfile(user);
+                LimsUtils.inheritUsersAndGroups(study, project.getSecurityProfile());
+                sp.setOwner(user);
+                study.setSecurityProfile(sp);
+            } else {
+                study.inheritPermissions(project);
+            }
+
+            if (!study.userCanWrite(user)) {
+                throw new SecurityException("Permission denied.");
+            }
+            model.put("formObj", study);
+            model.put("study", study);
+            model.put("owners", LimsSecurityUtils.getPotentialOwners(user, study, securityManager.listAllUsers()));
+            model.put("accessibleUsers", LimsSecurityUtils.getAccessibleUsers(user, study, securityManager.listAllUsers()));
+            model.put("accessibleGroups", LimsSecurityUtils.getAccessibleGroups(user, study, securityManager.listAllGroups()));
+            return new ModelAndView("/pages/editStudy.jsp", model);
+        } catch (IOException ex) {
+            if (log.isDebugEnabled()) {
+                log.debug("Failed to show Study", ex);
+            }
+            throw ex;
+        }
     }
-    catch (IOException ex) {
-      if (log.isDebugEnabled()) {
-        log.debug("Failed to save Study", ex);
-      }
-      throw ex;
+
+    @RequestMapping(method = RequestMethod.POST)
+    public String processSubmit(@ModelAttribute("study") Study study, ModelMap model, SessionStatus session) throws IOException {
+        try {
+            User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
+            if (!study.userCanWrite(user)) {
+                throw new SecurityException("Permission denied.");
+            }
+            requestManager.saveStudy(study);
+            session.setComplete();
+            model.clear();
+            return "redirect:/miso/study/" + study.getId();
+        } catch (IOException ex) {
+            if (log.isDebugEnabled()) {
+                log.debug("Failed to save Study", ex);
+            }
+            throw ex;
+        }
     }
-  }
 }

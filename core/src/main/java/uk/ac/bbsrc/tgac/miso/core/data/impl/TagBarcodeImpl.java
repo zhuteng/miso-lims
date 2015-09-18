@@ -42,125 +42,128 @@ import java.io.Serializable;
  */
 public class TagBarcodeImpl implements TagBarcode, Serializable {
 
-  public static final Long UNSAVED_ID = 0L;
+    public static final Long UNSAVED_ID = 0L;
 
-  @Id
-  @GeneratedValue(strategy = GenerationType.AUTO)
-  private long tagBarcodeId = UNSAVED_ID;
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private long tagBarcodeId = UNSAVED_ID;
 
-  private static final long serialVersionUID = 1L;
-  private String name;
-  private String sequence;
-  private PlatformType platformType;
-  private String strategyName;
+    private static final long serialVersionUID = 1L;
+    private String name;
+    private String sequence;
+    private PlatformType platformType;
+    private String strategyName;
 
-  @Override
-  @Deprecated
-  public Long getTagBarcodeId() {
-    return tagBarcodeId;
-  }
-
-  @Override
-  @Deprecated
-  public void setTagBarcodeId(Long tagBarcodeId) {
-    this.tagBarcodeId = tagBarcodeId;
-  }
-
-  @Override
-  public long getId() {
-    return tagBarcodeId;
-  }
-
-  public void setId(long id) {
-    this.tagBarcodeId = id;
-  }
-
-  @Override
-  public String getName() {
-    return name;
-  }
-
-  @Override
-  public void setName(String name) {
-    this.name = name;
-  }
-
-  @Override
-  public String getSequence() {
-    return sequence;
-  }
-
-  @Override
-  public void setSequence(String sequence) {
-    this.sequence = sequence;
-  }
-
-  @Override
-  public PlatformType getPlatformType() {
-    return platformType;
-  }
-
-  @Override
-  public void setPlatformType(PlatformType platformType) {
-    this.platformType = platformType;
-  }
-
-  @Override
-  public String getStrategyName() {
-    return strategyName;
-  }
-
-  @Override
-  public void setStrategyName(String strategyName) {
-    this.strategyName = strategyName;
-  }
-
-  /**
-   * Equivalency is based on getProjectId() if set, otherwise on name,
-   * description and creation date.
-   */
-  @Override
-  public boolean equals(Object obj) {
-    if (obj == null)
-      return false;
-    if (obj == this)
-      return true;
-    if (!(obj instanceof TagBarcode))
-      return false;
-    TagBarcode them = (TagBarcode) obj;
-    // If not saved, then compare resolved actual objects. Otherwise
-    // just compare IDs.
-    if (getId() == UNSAVED_ID
-        || them.getId() == UNSAVED_ID) {
-      return getName().equals(them.getName()) &&
-             getSequence().equals(them.getSequence()) &&
-             getPlatformType().equals(them.getPlatformType()) &&
-             getStrategyName().equals(them.getStrategyName());
+    @Override
+    @Deprecated
+    public Long getTagBarcodeId() {
+        return tagBarcodeId;
     }
-    else {
-      return getId() == them.getId();
-    }
-  }
 
-  @Override
-  public int hashCode() {
-    if (getId() != UNSAVED_ID) {
-      return (int)getId();
+    @Override
+    @Deprecated
+    public void setTagBarcodeId(Long tagBarcodeId) {
+        this.tagBarcodeId = tagBarcodeId;
     }
-    else {
-      int hashcode = -1;
-      if (getName() != null) hashcode = 37 * hashcode + getName().hashCode();
-      if (getSequence() != null) hashcode = 37 * hashcode + getSequence().hashCode();
-      if (getPlatformType() != null) hashcode = 37 * hashcode + getPlatformType().hashCode();
-      if (getStrategyName() != null) hashcode = 37 * hashcode + getStrategyName().hashCode();
-      return hashcode;
-    }
-  }
 
-  public int compareTo(Object o) {
-    TagBarcode t = (TagBarcode)o;
-    if (getId() < t.getId()) return -1;
-    if (getId() > t.getId()) return 1;
-    return 0;
-  }
+    @Override
+    public long getId() {
+        return tagBarcodeId;
+    }
+
+    public void setId(long id) {
+        this.tagBarcodeId = id;
+    }
+
+    @Override
+    public String getName() {
+        return name;
+    }
+
+    @Override
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    @Override
+    public String getSequence() {
+        return sequence;
+    }
+
+    @Override
+    public void setSequence(String sequence) {
+        this.sequence = sequence;
+    }
+
+    @Override
+    public PlatformType getPlatformType() {
+        return platformType;
+    }
+
+    @Override
+    public void setPlatformType(PlatformType platformType) {
+        this.platformType = platformType;
+    }
+
+    @Override
+    public String getStrategyName() {
+        return strategyName;
+    }
+
+    @Override
+    public void setStrategyName(String strategyName) {
+        this.strategyName = strategyName;
+    }
+
+    /**
+     * Equivalency is based on getProjectId() if set, otherwise on name,
+     * description and creation date.
+     */
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null)
+            return false;
+        if (obj == this)
+            return true;
+        if (!(obj instanceof TagBarcode))
+            return false;
+        TagBarcode them = (TagBarcode) obj;
+        // If not saved, then compare resolved actual objects. Otherwise
+        // just compare IDs.
+        if (getId() == UNSAVED_ID || them.getId() == UNSAVED_ID) {
+            return getName().equals(them.getName()) &&
+                   getSequence().equals(them.getSequence()) &&
+                   getPlatformType().equals(them.getPlatformType()) &&
+                   getStrategyName().equals(them.getStrategyName());
+        } else {
+            return getId() == them.getId();
+        }
+    }
+
+    @Override
+    public int hashCode() {
+        if (getId() != UNSAVED_ID) {
+            return (int) getId();
+        } else {
+            int hashcode = -1;
+            if (getName() != null)
+                hashcode = 37 * hashcode + getName().hashCode();
+            if (getSequence() != null)
+                hashcode = 37 * hashcode + getSequence().hashCode();
+            if (getPlatformType() != null)
+                hashcode = 37 * hashcode + getPlatformType().hashCode();
+            if (getStrategyName() != null)
+                hashcode = 37 * hashcode + getStrategyName().hashCode();
+            return hashcode;
+        }
+    }
+
+    public int compareTo(Object o) {
+        TagBarcode t = (TagBarcode) o;
+        if (getId() < t.getId())
+            return -1;
+        if (getId() > t.getId())
+            return 1;
+        return 0;
+    }
 }

@@ -12,9 +12,9 @@ import uk.ac.bbsrc.tgac.miso.core.factory.barcode.BarcodeLabelFactory;
  */
 @Spi
 public interface BarcodableSchema<S, T> {
-  Class<T> isStateFor();
-  public String getRawState(T t);
-  public S getPrintableLabel(T t);
-  String getName();
-  public BarcodeLabelFactory<S, T, BarcodableSchema<S, T>> getBarcodeLabelFactory();
+    Class<T> isStateFor();
+    public String getRawState(T t);
+    public S getPrintableLabel(T t);
+    String getName();
+    public BarcodeLabelFactory<S, T, BarcodableSchema<S, T>> getBarcodeLabelFactory();
 }

@@ -39,187 +39,189 @@ import java.io.Serializable;
 @Entity
 public class KitDescriptor implements Serializable {
 
-  /** Field UNSAVED_ID  */
-  public static final Long UNSAVED_ID = 0L;
+    /**
+     * Field UNSAVED_ID
+     */
+    public static final Long UNSAVED_ID = 0L;
 
-  @Id
-  @GeneratedValue(strategy = GenerationType.AUTO)
-  private long kitDescriptorId = KitDescriptor.UNSAVED_ID;
-  private String name = "";
-  private Double version = 0.0D;
-  private String manufacturer = "";
-  private String partNumber = "";
-  private Integer stockLevel = 0;
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private long kitDescriptorId = KitDescriptor.UNSAVED_ID;
+    private String name = "";
+    private Double version = 0.0D;
+    private String manufacturer = "";
+    private String partNumber = "";
+    private Integer stockLevel = 0;
 
-  @Enumerated(EnumType.STRING)
-  private KitType kitType;
-  
-  @Enumerated(EnumType.STRING)
-  private PlatformType platformType;
+    @Enumerated(EnumType.STRING)
+    private KitType kitType;
 
-  /**
-   * Returns the kitDescriptorId of this KitDescriptor object.
-   *
-   * @return Long kitDescriptorId.
-   */
-  public Long getKitDescriptorId() {
-    return kitDescriptorId;
-  }
+    @Enumerated(EnumType.STRING)
+    private PlatformType platformType;
 
-  /**
-   * Sets the kitDescriptorId of this KitDescriptor object.
-   *
-   * @param kitDescriptorId kitDescriptorId.
-   */
-  public void setKitDescriptorId(Long kitDescriptorId) {
-    this.kitDescriptorId = kitDescriptorId;
-  }
+    /**
+     * Returns the kitDescriptorId of this KitDescriptor object.
+     *
+     * @return Long kitDescriptorId.
+     */
+    public Long getKitDescriptorId() {
+        return kitDescriptorId;
+    }
 
-  /**
-   * Returns the name of this KitDescriptor object.
-   *
-   * @return String name.
-   */
-  public String getName() {
-    return name;
-  }
+    /**
+     * Sets the kitDescriptorId of this KitDescriptor object.
+     *
+     * @param kitDescriptorId kitDescriptorId.
+     */
+    public void setKitDescriptorId(Long kitDescriptorId) {
+        this.kitDescriptorId = kitDescriptorId;
+    }
 
-  /**
-   * Sets the name of this KitDescriptor object.
-   *
-   * @param name name.
-   */
-  public void setName(String name) {
-    this.name = name;
-  }
+    /**
+     * Returns the name of this KitDescriptor object.
+     *
+     * @return String name.
+     */
+    public String getName() {
+        return name;
+    }
 
-  /**
-   * Returns the version of this KitDescriptor object.
-   *
-   * @return Double version.
-   */
-  public Double getVersion() {
-    return version;
-  }
+    /**
+     * Sets the name of this KitDescriptor object.
+     *
+     * @param name name.
+     */
+    public void setName(String name) {
+        this.name = name;
+    }
 
-  /**
-   * Sets the version of this KitDescriptor object.
-   *
-   * @param version version.
-   */
-  public void setVersion(Double version) {
-    this.version = version;
-  }
+    /**
+     * Returns the version of this KitDescriptor object.
+     *
+     * @return Double version.
+     */
+    public Double getVersion() {
+        return version;
+    }
 
-  /**
-   * Returns the manufacturer of this KitDescriptor object.
-   *
-   * @return String manufacturer.
-   */
-  public String getManufacturer() {
-    return manufacturer;
-  }
+    /**
+     * Sets the version of this KitDescriptor object.
+     *
+     * @param version version.
+     */
+    public void setVersion(Double version) {
+        this.version = version;
+    }
 
-  /**
-   * Sets the manufacturer of this KitDescriptor object.
-   *
-   * @param manufacturer manufacturer.
-   */
-  public void setManufacturer(String manufacturer) {
-    this.manufacturer = manufacturer;
-  }
+    /**
+     * Returns the manufacturer of this KitDescriptor object.
+     *
+     * @return String manufacturer.
+     */
+    public String getManufacturer() {
+        return manufacturer;
+    }
 
-  /**
-   * Returns the partNumber of this KitDescriptor object.
-   *
-   * @return String partNumber.
-   */
-  public String getPartNumber() {
-    return partNumber;
-  }
+    /**
+     * Sets the manufacturer of this KitDescriptor object.
+     *
+     * @param manufacturer manufacturer.
+     */
+    public void setManufacturer(String manufacturer) {
+        this.manufacturer = manufacturer;
+    }
 
-  /**
-   * Sets the partNumber of this KitDescriptor object.
-   *
-   * @param partNumber partNumber.
-   */
-  public void setPartNumber(String partNumber) {
-    this.partNumber = partNumber;
-  }
+    /**
+     * Returns the partNumber of this KitDescriptor object.
+     *
+     * @return String partNumber.
+     */
+    public String getPartNumber() {
+        return partNumber;
+    }
 
-  /**
-   * Returns the stockLevel of this KitDescriptor object.
-   *
-   * @return Integer stockLevel.
-   */
-  public Integer getStockLevel() {
-    return stockLevel;
-  }
+    /**
+     * Sets the partNumber of this KitDescriptor object.
+     *
+     * @param partNumber partNumber.
+     */
+    public void setPartNumber(String partNumber) {
+        this.partNumber = partNumber;
+    }
 
-  /**
-   * Sets the stockLevel of this KitDescriptor object.
-   *
-   * @param stockLevel stockLevel.
-   */
-  public void setStockLevel(Integer stockLevel) {
-    this.stockLevel = stockLevel;
-  }
+    /**
+     * Returns the stockLevel of this KitDescriptor object.
+     *
+     * @return Integer stockLevel.
+     */
+    public Integer getStockLevel() {
+        return stockLevel;
+    }
 
-  /**
-   * Returns the kitType of this KitDescriptor object.
-   *
-   * @return KitType kitType.
-   */
-  public KitType getKitType() {
-    return kitType;
-  }
+    /**
+     * Sets the stockLevel of this KitDescriptor object.
+     *
+     * @param stockLevel stockLevel.
+     */
+    public void setStockLevel(Integer stockLevel) {
+        this.stockLevel = stockLevel;
+    }
 
-  /**
-   * Sets the kitType of this KitDescriptor object.
-   *
-   * @param kitType kitType.
-   *
-   */
-  public void setKitType(KitType kitType) {
-    this.kitType = kitType;
-  }
+    /**
+     * Returns the kitType of this KitDescriptor object.
+     *
+     * @return KitType kitType.
+     */
+    public KitType getKitType() {
+        return kitType;
+    }
 
-  /**
-   * Returns the platformType of this KitDescriptor object.
-   *
-   * @return PlatformType platformType.
-   */
-  public PlatformType getPlatformType() {
-    return platformType;
-  }
+    /**
+     * Sets the kitType of this KitDescriptor object.
+     *
+     * @param kitType kitType.
+     */
+    public void setKitType(KitType kitType) {
+        this.kitType = kitType;
+    }
 
-  /**
-   * Sets the platformType of this KitDescriptor object.
-   *
-   * @param platformType platformType.
-   */
-  public void setPlatformType(PlatformType platformType) {
-    this.platformType = platformType;
-  }
+    /**
+     * Returns the platformType of this KitDescriptor object.
+     *
+     * @return PlatformType platformType.
+     */
+    public PlatformType getPlatformType() {
+        return platformType;
+    }
 
-  /**
-   * Method toString ...
-   * @return String
-   */
-  @Override
-  public String toString() {
-    StringBuffer sb = new StringBuffer();
-    sb.append(getKitDescriptorId());
-    sb.append(" : ");
-    sb.append(getName());
-    sb.append(" : ");
-    sb.append(getPartNumber());
-    sb.append(" : ");
-    sb.append(getKitType());
-    sb.append(" : ");
-    sb.append(getPlatformType());    
-    sb.append(" : ");
-    sb.append(getStockLevel());    
-    return sb.toString();
-  }
+    /**
+     * Sets the platformType of this KitDescriptor object.
+     *
+     * @param platformType platformType.
+     */
+    public void setPlatformType(PlatformType platformType) {
+        this.platformType = platformType;
+    }
+
+    /**
+     * Method toString ...
+     *
+     * @return String
+     */
+    @Override
+    public String toString() {
+        StringBuffer sb = new StringBuffer();
+        sb.append(getKitDescriptorId());
+        sb.append(" : ");
+        sb.append(getName());
+        sb.append(" : ");
+        sb.append(getPartNumber());
+        sb.append(" : ");
+        sb.append(getKitType());
+        sb.append(" : ");
+        sb.append(getPlatformType());
+        sb.append(" : ");
+        sb.append(getStockLevel());
+        return sb.toString();
+    }
 }

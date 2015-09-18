@@ -46,28 +46,28 @@ import java.util.Set;
  */
 @Deprecated
 public class DefaultProjectOverviewListener implements MisoListener {
-  protected static final Logger log = LoggerFactory.getLogger(DefaultProjectOverviewListener.class);
-  private Collection<? extends ResponderService> responderServices = new HashSet<ResponderService>();
+    protected static final Logger log = LoggerFactory.getLogger(DefaultProjectOverviewListener.class);
+    private Collection<? extends ResponderService> responderServices = new HashSet<ResponderService>();
 
-  @Override
-  public Collection<? extends ResponderService> getResponderServices() {
-    return responderServices;
-  }
-
-  public void setResponderServices(Collection<? extends ResponderService> responderServices) {
-    this.responderServices = responderServices;
-  }
-
-  @Override
-  public void setBaseURL(String baseURL) {
-  }
-
-  @Override
-  public void stateChanged(Event poe) {
-    for (ResponderService responder : getResponderServices()) {
-      if (responder.respondsTo(poe)) {
-        responder.generateResponse(poe);
-      }
+    @Override
+    public Collection<? extends ResponderService> getResponderServices() {
+        return responderServices;
     }
-  }
+
+    public void setResponderServices(Collection<? extends ResponderService> responderServices) {
+        this.responderServices = responderServices;
+    }
+
+    @Override
+    public void setBaseURL(String baseURL) {
+    }
+
+    @Override
+    public void stateChanged(Event poe) {
+        for (ResponderService responder : getResponderServices()) {
+            if (responder.respondsTo(poe)) {
+                responder.generateResponse(poe);
+            }
+        }
+    }
 }

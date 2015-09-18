@@ -42,55 +42,51 @@ import uk.ac.ebi.fgpt.conan.service.exception.SubmissionException;
  * @since 0.1.3
  */
 public class AnalysisRequestService {
-  protected static final Logger log = LoggerFactory.getLogger(AnalysisRequestService.class);
+    protected static final Logger log = LoggerFactory.getLogger(AnalysisRequestService.class);
 
-  @Autowired
-  AnalysisRequestManager analysisRequestManager;
+    @Autowired
+    AnalysisRequestManager analysisRequestManager;
 
-  public void setAnalysisRequestManager(AnalysisRequestManager analysisRequestManager) {
-    this.analysisRequestManager = analysisRequestManager;
-  }
-
-  public String processRequest(Object request) {
-    if (request instanceof TaskSubmissionRequest) {
-      return submitAnalysisTask((TaskSubmissionRequest)request);
+    public void setAnalysisRequestManager(AnalysisRequestManager analysisRequestManager) {
+        this.analysisRequestManager = analysisRequestManager;
     }
-    else if (request instanceof PipelineRequest) {
-      return submitAnalysisPipeline((PipelineRequest) request);
-    }
-    else if (request instanceof JSONObject) {
-      JSONObject j = (JSONObject)request;
-      if (j.getString("query").toLowerCase().contains("task")) {
-        return queryTasks(j);
-      }
-      else if (j.getString("query").toLowerCase().contains("pipeline")) {
-        return queryPipelines(j);
-      }
-    }
-    return "{'error':'Unsupported operation'}";
-  }
 
-  private String submitAnalysisTask(TaskSubmissionRequest request) {
-    try {
-      analysisRequestManager.generateAndSubmitTask(request);
-      return "{'response':'Task submitted: " + request.getPipelineName()+"'}";
+    public String processRequest(Object request) {
+        if (request instanceof TaskSubmissionRequest) {
+            return submitAnalysisTask((TaskSubmissionRequest) request);
+        } else if (request instanceof PipelineRequest) {
+            return submitAnalysisPipeline((PipelineRequest) request);
+        } else if (request instanceof JSONObject) {
+            JSONObject j = (JSONObject) request;
+            if (j.getString("query").toLowerCase().contains("task")) {
+                return queryTasks(j);
+            } else if (j.getString("query").toLowerCase().contains("pipeline")) {
+                return queryPipelines(j);
+            }
+        }
+        return "{'error':'Unsupported operation'}";
     }
-    catch (SubmissionException e) {
-      e.printStackTrace();
-      return "{'error':'Task not submitted: " + e.getMessage()+"'}";
+
+    private String submitAnalysisTask(TaskSubmissionRequest request) {
+        try {
+            analysisRequestManager.generateAndSubmitTask(request);
+            return "{'response':'Task submitted: " + request.getPipelineName() + "'}";
+        } catch (SubmissionException e) {
+            e.printStackTrace();
+            return "{'error':'Task not submitted: " + e.getMessage() + "'}";
+        }
     }
-  }
 
-  private String submitAnalysisPipeline(PipelineRequest request) {
-    analysisRequestManager.generateAndAddPipeline(request);
-    return "{'response':'Pipeline  submitted: " + request.getName()+"'}";
-  }
+    private String submitAnalysisPipeline(PipelineRequest request) {
+        analysisRequestManager.generateAndAddPipeline(request);
+        return "{'response':'Pipeline  submitted: " + request.getName() + "'}";
+    }
 
-  private String queryTasks(JSONObject request) {
-    return analysisRequestManager.queryTasks(request);
-  }
+    private String queryTasks(JSONObject request) {
+        return analysisRequestManager.queryTasks(request);
+    }
 
-  private String queryPipelines(JSONObject request) {
-    return analysisRequestManager.queryPipelines(request);
-  }
+    private String queryPipelines(JSONObject request) {
+        return analysisRequestManager.queryPipelines(request);
+    }
 }

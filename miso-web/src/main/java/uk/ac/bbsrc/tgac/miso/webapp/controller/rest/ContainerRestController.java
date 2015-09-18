@@ -46,81 +46,80 @@ import java.util.Collection;
 @RequestMapping("/rest/container")
 @SessionAttributes("container")
 public class ContainerRestController {
-  protected static final Logger log = LoggerFactory.getLogger(ContainerRestController.class);
+    protected static final Logger log = LoggerFactory.getLogger(ContainerRestController.class);
 
-  @Autowired
-  private RequestManager requestManager;
+    @Autowired
+    private RequestManager requestManager;
 
-  public void setRequestManager(RequestManager requestManager) {
-    this.requestManager = requestManager;
-  }
-
-  @RequestMapping(value = "{containerBarcode}", method = RequestMethod.GET)
-  public
-  @ResponseBody
-  String jsonRest(@PathVariable String containerBarcode) throws IOException {
-    StringBuilder sb = new StringBuilder();
-    Collection<SequencerPartitionContainer<SequencerPoolPartition>> sequencerPartitionContainerCollection = requestManager.listSequencerPartitionContainersByBarcode(containerBarcode);
-    int i = 0;
-    for (SequencerPartitionContainer<SequencerPoolPartition> sequencerPartitionContainer : sequencerPartitionContainerCollection) {
-      i++;
-      sb.append("{");
-      sb.append("\"containerId\":\"" + sequencerPartitionContainer.getId() + "\",");
-      sb.append("\"identificationBarcode\":\"" + sequencerPartitionContainer.getIdentificationBarcode() + "\",");
-      sb.append("\"platform\":\"" + sequencerPartitionContainer.getPlatform().getNameAndModel() + "\",");
-      sb.append("\"partitions\":[");
-      int ip = 0;
-      for (SequencerPoolPartition partition : sequencerPartitionContainer.getPartitions()) {
-        ip++;
-        sb.append("{");
-        sb.append("\"partition\":\"" + partition.getId() + "\",");
-        sb.append("\"pool\":");
-        if (partition.getPool() != null) {
-          sb.append("{");
-          sb.append("\"poolName\":\"" + partition.getPool().getName() + "\",");
-          sb.append("\"poolDate\":\"" + partition.getPool().getCreationDate() + "\",");
-          //experiments
-          sb.append("\"experiments\":[");
-          int ie = 0;
-          for (Experiment experiment : partition.getPool().getExperiments()) {
-            ie++;
-            ObjectMapper mappere = new ObjectMapper();
-            sb.append(mappere.writeValueAsString(experiment));
-            if (ie < partition.getPool().getExperiments().size()) {
-              sb.append(",");
-            }
-          }
-          sb.append("],");
-
-          //dilutions
-          sb.append("\"poolableElements\":[");
-          int id = 0;
-          for (Poolable poolable : partition.getPool().getPoolableElements()) {
-            id++;
-            ObjectMapper mapperd = new ObjectMapper();
-            sb.append(mapperd.writeValueAsString(poolable));
-            if (id < partition.getPool().getDilutions().size()) {
-              sb.append(",");
-            }
-
-          }
-          sb.append("]");
-          sb.append("}");
-        }
-        else {
-          sb.append("\"\"");
-        }
-        sb.append("}");
-        if (ip < sequencerPartitionContainer.getPartitions().size()) {
-          sb.append(",");
-        }
-      }
-      sb.append("]");
-      sb.append("}");
+    public void setRequestManager(RequestManager requestManager) {
+        this.requestManager = requestManager;
     }
-    if (i < sequencerPartitionContainerCollection.size()) {
-      sb.append(",");
+
+    @RequestMapping(value = "{containerBarcode}", method = RequestMethod.GET)
+    @ResponseBody
+    public String jsonRest(@PathVariable String containerBarcode) throws IOException {
+        StringBuilder sb = new StringBuilder();
+        Collection<SequencerPartitionContainer<SequencerPoolPartition>> sequencerPartitionContainerCollection = requestManager
+            .listSequencerPartitionContainersByBarcode(containerBarcode);
+        int i = 0;
+        for (SequencerPartitionContainer<SequencerPoolPartition> sequencerPartitionContainer : sequencerPartitionContainerCollection) {
+            i++;
+            sb.append("{");
+            sb.append("\"containerId\":\"" + sequencerPartitionContainer.getId() + "\",");
+            sb.append("\"identificationBarcode\":\"" + sequencerPartitionContainer.getIdentificationBarcode() + "\",");
+            sb.append("\"platform\":\"" + sequencerPartitionContainer.getPlatform().getNameAndModel() + "\",");
+            sb.append("\"partitions\":[");
+            int ip = 0;
+            for (SequencerPoolPartition partition : sequencerPartitionContainer.getPartitions()) {
+                ip++;
+                sb.append("{");
+                sb.append("\"partition\":\"" + partition.getId() + "\",");
+                sb.append("\"pool\":");
+                if (partition.getPool() != null) {
+                    sb.append("{");
+                    sb.append("\"poolName\":\"" + partition.getPool().getName() + "\",");
+                    sb.append("\"poolDate\":\"" + partition.getPool().getCreationDate() + "\",");
+                    //experiments
+                    sb.append("\"experiments\":[");
+                    int ie = 0;
+                    for (Experiment experiment : partition.getPool().getExperiments()) {
+                        ie++;
+                        ObjectMapper mappere = new ObjectMapper();
+                        sb.append(mappere.writeValueAsString(experiment));
+                        if (ie < partition.getPool().getExperiments().size()) {
+                            sb.append(",");
+                        }
+                    }
+                    sb.append("],");
+
+                    //dilutions
+                    sb.append("\"poolableElements\":[");
+                    int id = 0;
+                    for (Poolable poolable : partition.getPool().getPoolableElements()) {
+                        id++;
+                        ObjectMapper mapperd = new ObjectMapper();
+                        sb.append(mapperd.writeValueAsString(poolable));
+                        if (id < partition.getPool().getDilutions().size()) {
+                            sb.append(",");
+                        }
+
+                    }
+                    sb.append("]");
+                    sb.append("}");
+                } else {
+                    sb.append("\"\"");
+                }
+                sb.append("}");
+                if (ip < sequencerPartitionContainer.getPartitions().size()) {
+                    sb.append(",");
+                }
+            }
+            sb.append("]");
+            sb.append("}");
+        }
+        if (i < sequencerPartitionContainerCollection.size()) {
+            sb.append(",");
+        }
+        return "[" + sb.toString() + "]";
     }
-    return "[" + sb.toString() + "]";
-  }
 }

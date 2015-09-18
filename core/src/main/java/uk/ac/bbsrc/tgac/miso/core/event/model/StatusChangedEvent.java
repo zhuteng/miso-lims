@@ -38,39 +38,39 @@ import uk.ac.bbsrc.tgac.miso.core.event.type.MisoEventType;
  * @since 0.1.2
  */
 public class StatusChangedEvent<T> implements Event {
-  private T o;
-  private Status currentStatus;
-  private JSONObject eventContext = new JSONObject();
+    private T o;
+    private Status currentStatus;
+    private JSONObject eventContext = new JSONObject();
 
-  public StatusChangedEvent(T o, Status s) {
-    this.o = o;
-    this.currentStatus = s;
-  }
+    public StatusChangedEvent(T o, Status s) {
+        this.o = o;
+        this.currentStatus = s;
+    }
 
-  public T getEventObject() {
-    return o;
-  }
+    public T getEventObject() {
+        return o;
+    }
 
-  public Status getStatus() {
-    return currentStatus;
-  }
+    public Status getStatus() {
+        return currentStatus;
+    }
 
-  @Override
-  public String getEventMessage() {
-    return "Status changed: " + currentStatus.getHealth();
-  }
+    @Override
+    public String getEventMessage() {
+        return "Status changed: " + currentStatus.getHealth();
+    }
 
-  @Override
-  public MisoEventType getEventType() {
-    return MisoEventType.STATUS_CHANGED_EVENT;
-  }
+    @Override
+    public MisoEventType getEventType() {
+        return MisoEventType.STATUS_CHANGED_EVENT;
+    }
 
-  @Override
-  public JSONObject getEventContext() {
-    return eventContext;
-  }
+    @Override
+    public JSONObject getEventContext() {
+        return eventContext;
+    }
 
-  public void setEventContext(JSONObject eventContext) {
-    this.eventContext = eventContext;
-  }
+    public void setEventContext(JSONObject eventContext) {
+        this.eventContext = eventContext;
+    }
 }

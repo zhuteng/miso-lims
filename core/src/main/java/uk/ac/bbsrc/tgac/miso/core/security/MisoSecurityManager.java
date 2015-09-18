@@ -13,5 +13,5 @@ import com.eaglegenomics.simlims.core.manager.LocalSecurityManager;
  * @since version
  */
 public interface MisoSecurityManager extends com.eaglegenomics.simlims.core.manager.SecurityManager {
-  void changePassword(final String oldPass, final String newPass);
+    void changePassword(final String oldPass, final String newPass);
 }

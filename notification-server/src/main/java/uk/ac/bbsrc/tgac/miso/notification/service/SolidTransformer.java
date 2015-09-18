@@ -57,174 +57,166 @@ import java.util.regex.Pattern;
  * @since 0.0.3
  */
 public class SolidTransformer implements FileSetTransformer<String, String, File> {
-  protected static final Logger log = LoggerFactory.getLogger(SolidTransformer.class);
+    protected static final Logger log = LoggerFactory.getLogger(SolidTransformer.class);
 
-  public Map<String, String> transform(Message<Set<File>> message) {
-    return transform(message.getPayload());
-  }
+    public Map<String, String> transform(Message<Set<File>> message) {
+        return transform(message.getPayload());
+    }
 
-  public Map<String, String> transform(Set<File> files) {
-    log.info("Processing "+files.size()+" SOLiD run directories...");
+    public Map<String, String> transform(Set<File> files) {
+        log.info("Processing " + files.size() + " SOLiD run directories...");
 
-    HashMap<String, JSONArray> map = new HashMap<String, JSONArray>();
-    map.put("Running", new JSONArray());
-    map.put("Completed", new JSONArray());
-    map.put("Unknown", new JSONArray());
+        HashMap<String, JSONArray> map = new HashMap<String, JSONArray>();
+        map.put("Running", new JSONArray());
+        map.put("Completed", new JSONArray());
+        map.put("Unknown", new JSONArray());
 
-    for (File rootFile : files) {
-      if (rootFile.isDirectory()) {
-        JSONObject run = new JSONObject();
-        String runName = rootFile.getName();
+        for (File rootFile : files) {
+            if (rootFile.isDirectory()) {
+                JSONObject run = new JSONObject();
+                String runName = rootFile.getName();
 
-        File statusFile = new File(rootFile, "/"+runName+".xml");
+                File statusFile = new File(rootFile, "/" + runName + ".xml");
 
-        log.debug("SOLID: Processing " + runName);
-        String runDirRegex = "([A-z0-9]+)_([0-9]{8})_(.*)";
-        Matcher m = Pattern.compile(runDirRegex).matcher(runName);
-        if (m.matches()) {
-          String machineName = m.group(1);
-          String startDate = m.group(2);
-          try {
-            SolidServiceWrapper solidServiceWrapper = ApplicationContextProvider.getApplicationContext().getBean(machineName, SolidServiceWrapper.class);
+                log.debug("SOLID: Processing " + runName);
+                String runDirRegex = "([A-z0-9]+)_([0-9]{8})_(.*)";
+                Matcher m = Pattern.compile(runDirRegex).matcher(runName);
+                if (m.matches()) {
+                    String machineName = m.group(1);
+                    String startDate = m.group(2);
+                    try {
+                        SolidServiceWrapper solidServiceWrapper = ApplicationContextProvider.getApplicationContext().getBean(machineName,
+                                                                                                                             SolidServiceWrapper.class);
 
-            SolidService solidService = solidServiceWrapper.getSolidService();
-            RunArray ra = solidService.getSolidPort().getRun(runName, machineName);
-            if (ra != null && !ra.getItem().isEmpty()) {
-              try {
-                String statusXml = ra.getItem().get(0).getXml();
-                Document statusDoc = SubmissionUtils.emptyDocument();
-                SubmissionUtils.transform(new UnicodeReader(statusXml), statusDoc);
+                        SolidService solidService = solidServiceWrapper.getSolidService();
+                        RunArray ra = solidService.getSolidPort().getRun(runName, machineName);
+                        if (ra != null && !ra.getItem().isEmpty()) {
+                            try {
+                                String statusXml = ra.getItem().get(0).getXml();
+                                Document statusDoc = SubmissionUtils.emptyDocument();
+                                SubmissionUtils.transform(new UnicodeReader(statusXml), statusDoc);
 
-                run.put("runName", runName);
-                run.put("fullPath", rootFile.getAbsolutePath());
-                run.put("status", statusXml);
+                                run.put("runName", runName);
+                                run.put("fullPath", rootFile.getAbsolutePath());
+                                run.put("status", statusXml);
 
-                //run.put("sequencerName", statusDoc.getElementsByTagName("instrumentName").item(0).getTextContent());
-                run.put("sequencerName", machineName);
+                                //run.put("sequencerName", statusDoc.getElementsByTagName("instrumentName").item(0).getTextContent());
+                                run.put("sequencerName", machineName);
 
-                if (statusDoc.getElementsByTagName("flowcellNum").getLength() != 0 &&
-                    statusDoc.getElementsByTagName("description").getLength() != 0) {
-                  String id = statusDoc.getElementsByTagName("description").item(0).getTextContent() +
-                              "-" +
-                              statusDoc.getElementsByTagName("flowcellNum").item(0).getTextContent();
-                  run.put("containerId", id);
+                                if (statusDoc.getElementsByTagName("flowcellNum").getLength() != 0 &&
+                                    statusDoc.getElementsByTagName("description").getLength() != 0) {
+                                    String id = statusDoc.getElementsByTagName("description").item(0).getTextContent() +
+                                                "-" +
+                                                statusDoc.getElementsByTagName("flowcellNum").item(0).getTextContent();
+                                    run.put("containerId", id);
+                                }
+
+                                String dateStarted = statusDoc.getElementsByTagName("dateStarted").item(0).getTextContent();
+                                String dateCompleted = statusDoc.getElementsByTagName("dateCompleted").item(0).getTextContent();
+
+                                log.debug(runName + " :: Started -> " + dateStarted);
+                                run.put("startDate", dateStarted);
+
+                                if (!"".equals(dateStarted) && "".equals(dateCompleted)) {
+                                    log.debug(runName + " :: Running");
+                                    map.get("Running").add(run);
+                                } else if (!"".equals(dateStarted) && !"".equals(dateCompleted)) {
+                                    log.debug(runName + " :: Completed -> " + dateCompleted);
+                                    run.put("completionDate", dateCompleted);
+                                    map.get("Completed").add(run);
+                                } else {
+                                    log.debug(runName + " :: Unknown");
+                                    map.get("Unknown").add(run);
+                                }
+                            } catch (ParserConfigurationException e) {
+                                //e.printStackTrace();
+                                log.error("Error configuring parser: " + e.getMessage());
+                            } catch (TransformerException e) {
+                                //e.printStackTrace();
+                                log.error("Error transforming XML: " + e.getMessage());
+                            }
+                        }
+                    } catch (Exception e) {
+                        log.error(
+                            "Error contacting SOLiD machine. Attempting to parse " + statusFile.getAbsolutePath() + ": " + e.getMessage());
+                        run.put("runName", runName);
+
+                        if (statusFile.exists()) {
+                            if (statusFile.canRead()) {
+                                try {
+                                    Document statusDoc = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
+                                    SubmissionUtils.transform(statusFile, statusDoc);
+
+                                    run.put("fullPath", rootFile.getAbsolutePath());
+                                    run.put("sequencerName", machineName);
+
+                                    if (statusDoc.getElementsByTagName("flowcellNum").getLength() != 0 &&
+                                        statusDoc.getElementsByTagName("description").getLength() != 0) {
+                                        String id = statusDoc.getElementsByTagName("description").item(0).getTextContent() +
+                                                    "-" +
+                                                    statusDoc.getElementsByTagName("flowcellNum").item(0).getTextContent();
+                                        run.put("containerId", id);
+                                    }
+
+                                    String dateStarted = statusDoc.getElementsByTagName("dateStarted").item(0).getTextContent();
+                                    String dateCompleted = statusDoc.getElementsByTagName("dateCompleted").item(0).getTextContent();
+
+                                    log.debug(runName + " :: Started -> " + dateStarted);
+                                    run.put("startDate", dateStarted);
+
+                                    run.put("status", SubmissionUtils.transform(statusFile));
+
+                                    if (!"".equals(dateStarted) && "".equals(dateCompleted)) {
+                                        log.debug(runName + " :: Running");
+                                        map.get("Running").add(run);
+                                    } else if (!"".equals(dateStarted) && !"".equals(dateCompleted)) {
+                                        log.debug(runName + " :: Completed -> " + dateCompleted);
+                                        run.put("completionDate", dateCompleted);
+                                        map.get("Completed").add(run);
+                                    } else {
+                                        log.debug(runName + " :: Unknown");
+                                        run.put("completionDate", "null");
+                                        map.get("Unknown").add(run);
+                                    }
+                                } catch (ParserConfigurationException ee) {
+                                    log.error("Error configuring parser: " + ee.getMessage());
+                                } catch (TransformerException ee) {
+                                    log.error("Error transforming XML: " + ee.getMessage());
+                                } catch (IOException ee) {
+                                    log.error("Error with file IO: " + ee.getMessage());
+                                }
+                            } else {
+                                log.debug(runName + " :: Cannot read status file. Minimal run information only.");
+                                run.put("fullPath", rootFile.getAbsolutePath());
+                                run.put("status", "<error><RunName>" + runName +
+                                                  "</RunName><ErrorMessage>Cannot read status file</ErrorMessage></error>");
+                                run.put("sequencerName", machineName);
+                                run.put("startDate", startDate);
+                                run.put("completionDate", "null");
+
+                                map.get("Unknown").add(run);
+                            }
+                        } else {
+                            log.debug(runName + " :: Status file doesn't exist. Minimal run information only.");
+                            run.put("fullPath", rootFile.getAbsolutePath());
+                            run.put("status", "<error><RunName>" + runName +
+                                              "</RunName><ErrorMessage>Error contacting SOLiD machine and status xml file doesn't exist</ErrorMessage></error>");
+                            run.put("sequencerName", machineName);
+                            run.put("startDate", startDate);
+                            run.put("completionDate", "null");
+
+                            map.get("Unknown").add(run);
+                        }
+                    }
                 }
-
-                String dateStarted = statusDoc.getElementsByTagName("dateStarted").item(0).getTextContent();
-                String dateCompleted = statusDoc.getElementsByTagName("dateCompleted").item(0).getTextContent();
-
-                log.debug(runName + " :: Started -> " + dateStarted);
-                run.put("startDate", dateStarted);
-
-                if (!"".equals(dateStarted) && "".equals(dateCompleted)) {
-                  log.debug(runName + " :: Running");
-                  map.get("Running").add(run);
-                }
-                else if (!"".equals(dateStarted) && !"".equals(dateCompleted)) {
-                  log.debug(runName + " :: Completed -> " + dateCompleted);
-                  run.put("completionDate", dateCompleted);
-                  map.get("Completed").add(run);
-                }
-                else {
-                  log.debug(runName + " :: Unknown");
-                  map.get("Unknown").add(run);
-                }
-              }
-              catch (ParserConfigurationException e) {
-                //e.printStackTrace();
-                log.error("Error configuring parser: " + e.getMessage());
-              }
-              catch (TransformerException e) {
-                //e.printStackTrace();
-                log.error("Error transforming XML: " + e.getMessage());
-              }
             }
-          }
-          catch(Exception e) {
-            log.error("Error contacting SOLiD machine. Attempting to parse "+statusFile.getAbsolutePath()+": " + e.getMessage());
-            run.put("runName", runName);
-
-            if (statusFile.exists()) {
-              if (statusFile.canRead()) {
-                try {
-                  Document statusDoc = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
-                  SubmissionUtils.transform(statusFile, statusDoc);
-
-                  run.put("fullPath", rootFile.getAbsolutePath());
-                  run.put("sequencerName", machineName);
-
-                  if (statusDoc.getElementsByTagName("flowcellNum").getLength() != 0 &&
-                      statusDoc.getElementsByTagName("description").getLength() != 0) {
-                    String id = statusDoc.getElementsByTagName("description").item(0).getTextContent() +
-                                "-" +
-                                statusDoc.getElementsByTagName("flowcellNum").item(0).getTextContent();
-                    run.put("containerId", id);
-                  }
-
-                  String dateStarted = statusDoc.getElementsByTagName("dateStarted").item(0).getTextContent();
-                  String dateCompleted = statusDoc.getElementsByTagName("dateCompleted").item(0).getTextContent();
-
-                  log.debug(runName + " :: Started -> " + dateStarted);
-                  run.put("startDate", dateStarted);
-
-                  run.put("status", SubmissionUtils.transform(statusFile));
-
-                  if (!"".equals(dateStarted) && "".equals(dateCompleted)) {
-                    log.debug(runName + " :: Running");
-                    map.get("Running").add(run);
-                  }
-                  else if (!"".equals(dateStarted) && !"".equals(dateCompleted)) {
-                    log.debug(runName + " :: Completed -> " + dateCompleted);
-                    run.put("completionDate", dateCompleted);
-                    map.get("Completed").add(run);
-                  }
-                  else {
-                    log.debug(runName + " :: Unknown");
-                    run.put("completionDate", "null");
-                    map.get("Unknown").add(run);
-                  }
-                }
-                catch (ParserConfigurationException ee) {
-                  log.error("Error configuring parser: " + ee.getMessage());
-                }
-                catch (TransformerException ee) {
-                  log.error("Error transforming XML: " + ee.getMessage());
-                }
-                catch (IOException ee) {
-                  log.error("Error with file IO: " + ee.getMessage());
-                }
-              }
-              else {
-                log.debug(runName + " :: Cannot read status file. Minimal run information only.");
-                run.put("fullPath", rootFile.getAbsolutePath());
-                run.put("status", "<error><RunName>"+runName+"</RunName><ErrorMessage>Cannot read status file</ErrorMessage></error>");
-                run.put("sequencerName", machineName);
-                run.put("startDate", startDate);
-                run.put("completionDate", "null");
-
-                map.get("Unknown").add(run);
-              }
-            }
-            else {
-              log.debug(runName + " :: Status file doesn't exist. Minimal run information only.");
-              run.put("fullPath", rootFile.getAbsolutePath());
-              run.put("status", "<error><RunName>"+runName+"</RunName><ErrorMessage>Error contacting SOLiD machine and status xml file doesn't exist</ErrorMessage></error>");
-              run.put("sequencerName", machineName);
-              run.put("startDate", startDate);
-              run.put("completionDate", "null");
-
-              map.get("Unknown").add(run);
-            }
-          }
         }
-      }
-    }
 
-    HashMap<String, String> smap = new HashMap<String, String>();
-    for (String key : map.keySet()) {
-      smap.put(key, map.get(key).toString());
-    }
+        HashMap<String, String> smap = new HashMap<String, String>();
+        for (String key : map.keySet()) {
+            smap.put(key, map.get(key).toString());
+        }
 
-    return smap;
-  }
+        return smap;
+    }
 }

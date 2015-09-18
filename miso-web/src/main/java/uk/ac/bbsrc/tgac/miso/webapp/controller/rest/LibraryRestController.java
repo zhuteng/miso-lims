@@ -53,40 +53,42 @@ import java.util.Collection;
 @RequestMapping("/rest/library")
 @SessionAttributes("library")
 public class LibraryRestController {
-  protected static final Logger log = LoggerFactory.getLogger(LibraryRestController.class);
+    protected static final Logger log = LoggerFactory.getLogger(LibraryRestController.class);
 
-  @Autowired
-  private RequestManager requestManager;
+    @Autowired
+    private RequestManager requestManager;
 
-  public void setRequestManager(RequestManager requestManager) {
-    this.requestManager = requestManager;
-  }
+    public void setRequestManager(RequestManager requestManager) {
+        this.requestManager = requestManager;
+    }
 
-  @RequestMapping(value = "{libraryId}", method = RequestMethod.GET)
-  public @ResponseBody String getLibraryById(@PathVariable Long libraryId) throws IOException {
-    ObjectMapper mapper = new ObjectMapper();
-    try {
-      Library l = requestManager.getLibraryById(libraryId);
-      if (l != null) {
+    @RequestMapping(value = "{libraryId}", method = RequestMethod.GET)
+    @ResponseBody
+    public String getLibraryById(@PathVariable Long libraryId) throws IOException {
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            Library l = requestManager.getLibraryById(libraryId);
+            if (l != null) {
+                mapper.getSerializationConfig().addMixInAnnotations(Project.class, ProjectSampleRecursionAvoidanceMixin.class);
+                mapper.getSerializationConfig().addMixInAnnotations(Sample.class, SampleRecursionAvoidanceMixin.class);
+                mapper.getSerializationConfig().addMixInAnnotations(User.class, UserInfoMixin.class);
+                return mapper.writeValueAsString(l);
+            }
+            return mapper.writeValueAsString(RestUtils.error("No such library with that ID.", "libraryId", libraryId.toString()));
+        } catch (IOException ioe) {
+            return mapper
+                .writeValueAsString(RestUtils.error("Cannot retrieve library: " + ioe.getMessage(), "libraryId", libraryId.toString()));
+        }
+    }
+
+    @RequestMapping(method = RequestMethod.GET)
+    @ResponseBody
+    public String listAllLibraries() throws IOException {
+        Collection<Library> libraries = requestManager.listAllLibraries();
+        ObjectMapper mapper = new ObjectMapper();
         mapper.getSerializationConfig().addMixInAnnotations(Project.class, ProjectSampleRecursionAvoidanceMixin.class);
         mapper.getSerializationConfig().addMixInAnnotations(Sample.class, SampleRecursionAvoidanceMixin.class);
         mapper.getSerializationConfig().addMixInAnnotations(User.class, UserInfoMixin.class);
-        return mapper.writeValueAsString(l);
-      }
-      return mapper.writeValueAsString(RestUtils.error("No such library with that ID.", "libraryId", libraryId.toString()));
+        return mapper.writeValueAsString(libraries);
     }
-    catch (IOException ioe) {
-      return mapper.writeValueAsString(RestUtils.error("Cannot retrieve library: " + ioe.getMessage(), "libraryId", libraryId.toString()));
-    }
-  }
-
-  @RequestMapping(method = RequestMethod.GET)
-  public @ResponseBody String listAllLibraries() throws IOException {
-    Collection<Library> libraries = requestManager.listAllLibraries();
-    ObjectMapper mapper = new ObjectMapper();
-    mapper.getSerializationConfig().addMixInAnnotations(Project.class, ProjectSampleRecursionAvoidanceMixin.class);
-    mapper.getSerializationConfig().addMixInAnnotations(Sample.class, SampleRecursionAvoidanceMixin.class);
-    mapper.getSerializationConfig().addMixInAnnotations(User.class, UserInfoMixin.class);
-    return mapper.writeValueAsString(libraries);
-  }
 }

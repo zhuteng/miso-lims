@@ -33,7 +33,9 @@ import uk.ac.bbsrc.tgac.miso.core.data.AbstractExperiment;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
 
 import java.io.IOException;
-import java.lang.Object;import java.lang.SuppressWarnings;import java.util.Collection;
+import java.lang.Object;
+import java.lang.SuppressWarnings;
+import java.util.Collection;
 
 /**
  * com.eaglegenomics.miso.hibernatestore
@@ -45,25 +47,25 @@ import java.lang.Object;import java.lang.SuppressWarnings;import java.util.Colle
  */
 @Deprecated
 public class HibernateExperimentStore extends HibernateDaoSupport implements Store<Experiment> {
-  @Transactional(readOnly = false)
-  public long save(Experiment experiment) throws IOException {
-    getHibernateTemplate().merge(experiment);
-    return experiment.getExperimentId();
-  }
+    @Transactional(readOnly = false)
+    public long save(Experiment experiment) throws IOException {
+        getHibernateTemplate().merge(experiment);
+        return experiment.getExperimentId();
+    }
 
-  @Transactional(readOnly = true)
-  public Experiment get(long experimentId) throws IOException {
-    return (Experiment) getHibernateTemplate().get(AbstractExperiment.class, experimentId);
-  }
+    @Transactional(readOnly = true)
+    public Experiment get(long experimentId) throws IOException {
+        return (Experiment) getHibernateTemplate().get(AbstractExperiment.class, experimentId);
+    }
 
-  @Override
-  public Experiment lazyGet(long id) throws IOException {
-    return get(id);
-  }
+    @Override
+    public Experiment lazyGet(long id) throws IOException {
+        return get(id);
+    }
 
-  @Transactional(readOnly = true)
-  @SuppressWarnings("unchecked")
-  public Collection<Experiment> listAll() throws IOException {
+    @Transactional(readOnly = true)
+    @SuppressWarnings("unchecked")
+    public Collection<Experiment> listAll() throws IOException {
 /*    return (Collection<Experiment>) getHibernateTemplate().execute(
             new HibernateCallback() {
               public Object doInHibernate(Session session)
@@ -72,11 +74,11 @@ public class HibernateExperimentStore extends HibernateDaoSupport implements Sto
               }
             });
             */
-    return null;
-  }
+        return null;
+    }
 
-  @Override
-  public int count() throws IOException {
-    return 0;
-  }
+    @Override
+    public int count() throws IOException {
+        return 0;
+    }
 }

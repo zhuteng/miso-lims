@@ -33,7 +33,7 @@ package uk.ac.bbsrc.tgac.miso.tools.run.util;
  * @since 0.1.4
  */
 public class ByteToStringTransformer {
-  public String transform(byte[] bytes) {
-    return new String(bytes);
-  }
+    public String transform(byte[] bytes) {
+        return new String(bytes);
+    }
 }

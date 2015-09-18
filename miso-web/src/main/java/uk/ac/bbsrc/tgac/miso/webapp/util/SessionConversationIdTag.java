@@ -48,12 +48,11 @@ import org.springframework.web.servlet.tags.form.TagWriter;
 public class SessionConversationIdTag extends AbstractHtmlElementTag {
 
     /**
-	 *
-	 */
-	private static final long serialVersionUID = -421868972235483510L;
-	private String attributeName;
+     *
+     */
+    private static final long serialVersionUID = -421868972235483510L;
+    private String attributeName;
     private boolean createHiddenInput = true;
-
 
     /* (non-Javadoc)
      * @see org.springframework.web.servlet.tags.form.AbstractFormTag#writeTagContent(org.springframework.web.servlet.tags.form.TagWriter)
@@ -62,7 +61,7 @@ public class SessionConversationIdTag extends AbstractHtmlElementTag {
     protected int writeTagContent(TagWriter tagWriter) throws JspException {
 
         // first try to pull value from request attribute.
-        String conversationId = (String)pageContext.getRequest().getAttribute(attributeName + "_cId");
+        String conversationId = (String) pageContext.getRequest().getAttribute(attributeName + "_cId");
 
         // if no value was found then try to pull value as request parameter.
         if (conversationId == null || conversationId.trim().length() == 0) {
@@ -88,14 +87,12 @@ public class SessionConversationIdTag extends AbstractHtmlElementTag {
         return EVAL_PAGE;
     }
 
-
     /**
      * @return the attributeName
      */
     public String getAttributeName() {
         return attributeName;
     }
-
 
     /**
      * @param attributeName the attributeName to set
@@ -104,14 +101,12 @@ public class SessionConversationIdTag extends AbstractHtmlElementTag {
         this.attributeName = attributeName;
     }
 
-
     /**
      * @return the createHiddenInput
      */
     public boolean isCreateHiddenInput() {
         return createHiddenInput;
     }
-
 
     /**
      * @param createHiddenInput the createHiddenInput to set

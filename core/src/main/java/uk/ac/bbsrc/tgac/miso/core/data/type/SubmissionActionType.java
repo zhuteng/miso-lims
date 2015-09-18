@@ -30,69 +30,73 @@ import java.util.Map;
 
 /**
  * Enum representing all potential submission action types. These types should match the SRA submission schema for
- * submission actions. 
+ * submission actions.
  *
  * @author Rob Davey
  * @since 0.0.2
  */
 public enum SubmissionActionType {
-  ADD("ADD"),
-  MODIFY("MODIFY"),
-  SUPPRESS("SUPPRESS"),
-  HOLD("HOLD"),
-  RELEASE("RELEASE"),
-  CLOSE("CLOSE"),
-  PROTECT("PROTECT"),
-  VALIDATE("VALIDATE");
+    ADD("ADD"),
+    MODIFY("MODIFY"),
+    SUPPRESS("SUPPRESS"),
+    HOLD("HOLD"),
+    RELEASE("RELEASE"),
+    CLOSE("CLOSE"),
+    PROTECT("PROTECT"),
+    VALIDATE("VALIDATE");
 
-    /** Field key  */
-  private String key;
-  /** Field lookup  */
-  private static final Map<String, SubmissionActionType> lookup = new HashMap<String, SubmissionActionType>();
+    /**
+     * Field key
+     */
+    private String key;
+    /**
+     * Field lookup
+     */
+    private static final Map<String, SubmissionActionType> lookup = new HashMap<String, SubmissionActionType>();
 
-  static {
-    for (SubmissionActionType s : EnumSet.allOf(SubmissionActionType.class))
-      lookup.put(s.getKey(), s);
-  }
-
-  /**
-   * Constructs a SubmissionActionType based on a given key
-   *
-   * @param key of type String
-   */
-  SubmissionActionType(String key) {
-    this.key = key;
-  }
-
-  /**
-   * Returns a SubmissionActionType given an enum key
-   *
-   * @param key of type String
-   * @return SubmissionActionType
-   */
-  public static SubmissionActionType get(String key) {
-    return lookup.get(key);
-  }
-
-  /**
-   * Returns the key of this SubmissionActionType object.
-   *
-   * @return String key.
-   */
-  public String getKey() {
-    return key;
-  }
-
-  /**
-   * Returns the keys of this SubmissionActionType object.
-   *
-   * @return ArrayList<String> keys.
-   */
-  public static ArrayList<String> getKeys() {
-    ArrayList<String> keys = new ArrayList<String>();
-    for (SubmissionActionType h : SubmissionActionType.values()) {
-      keys.add(h.getKey());
+    static {
+        for (SubmissionActionType s : EnumSet.allOf(SubmissionActionType.class))
+            lookup.put(s.getKey(), s);
     }
-    return keys;
-  }
+
+    /**
+     * Constructs a SubmissionActionType based on a given key
+     *
+     * @param key of type String
+     */
+    SubmissionActionType(String key) {
+        this.key = key;
+    }
+
+    /**
+     * Returns a SubmissionActionType given an enum key
+     *
+     * @param key of type String
+     * @return SubmissionActionType
+     */
+    public static SubmissionActionType get(String key) {
+        return lookup.get(key);
+    }
+
+    /**
+     * Returns the key of this SubmissionActionType object.
+     *
+     * @return String key.
+     */
+    public String getKey() {
+        return key;
+    }
+
+    /**
+     * Returns the keys of this SubmissionActionType object.
+     *
+     * @return ArrayList<String> keys.
+     */
+    public static ArrayList<String> getKeys() {
+        ArrayList<String> keys = new ArrayList<String>();
+        for (SubmissionActionType h : SubmissionActionType.values()) {
+            keys.add(h.getKey());
+        }
+        return keys;
+    }
 }

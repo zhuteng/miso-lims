@@ -45,88 +45,84 @@ import java.util.*;
  * @date 05-Dec-2012
  * @since 0.1.9
  */
-@JsonIgnoreProperties({"securityProfile","internalPoolableElements","size","elementType"})
+@JsonIgnoreProperties({ "securityProfile", "internalPoolableElements", "size", "elementType" })
 public class Simple384WellPlate extends PlateImpl<Library> implements Serializable {
-  public static final int MAX_ELEMENTS = 384;
+    public static final int MAX_ELEMENTS = 384;
 
-  public Simple384WellPlate() {
-    super();
+    public Simple384WellPlate() {
+        super();
 
-  }
-
-  public Simple384WellPlate(User user) {
-    super(MAX_ELEMENTS, user);
-  }
-
-  @Override
-  public int getSize() {
-    return MAX_ELEMENTS;
-  }
-
-  @Override
-  //@JsonManagedReference
-  public LinkedList<Library> getElements() {
-    return elements;
-  }
-
-  @Override
-  public void setElements(LinkedList<Library> elements) {
-    if (elements != null && elements.size() == MAX_ELEMENTS) {
-      this.elements = elements;
     }
-  }
 
-  @Override
-  public void addElement(Library library) throws IllegalStateException {
-    if (elements != null && elements.size() < MAX_ELEMENTS) {
-      elements.add(library);
+    public Simple384WellPlate(User user) {
+        super(MAX_ELEMENTS, user);
     }
-    else {
-      throw new IllegalStateException("This 384 well plate already has 384 libraries");
-    }
-  }
 
-  @Override
-  public Class getElementType() {
-    return Library.class;
-  }
+    @Override
+    public int getSize() {
+        return MAX_ELEMENTS;
+    }
 
-  public void setElement(int pos, Library library) throws IllegalArgumentException {
-    if (elements != null && pos > 0 && pos <= MAX_ELEMENTS) {
-      elements.set(pos, library);
+    @Override
+    //@JsonManagedReference
+    public LinkedList<Library> getElements() {
+        return elements;
     }
-    else {
-      throw new IllegalArgumentException("Element position must be between 1 and " + MAX_ELEMENTS);
-    }
-  }
 
-  public void setElement(String pos, Library library) {
-    _384WellPlatePosition pp = _384WellPlatePosition.valueOf(pos);
-    if (pp != null) {
-      elements.set(_384WellPlatePosition.getPositionMap().get(pp), library);
+    @Override
+    public void setElements(LinkedList<Library> elements) {
+        if (elements != null && elements.size() == MAX_ELEMENTS) {
+            this.elements = elements;
+        }
     }
-    else {
-      throw new IllegalArgumentException("Element position must be between A-P and 1-24");
-    }
-  }
 
-  public String toString() {
-    StringBuilder sb = new StringBuilder();
-    sb.append("PLATE ").append(this.getName()).append("\n");
-    int splitcount = 1;
-    for (Library l : elements) {
-      if (splitcount == 1) {
-        sb.append("|");
-      }
-      sb.append(l.getAlias());
-      if (splitcount == elements.size()) {
-        sb.append("|\n");
-      }
-      else {
-        sb.append(",");
-      }
-      splitcount++;
+    @Override
+    public void addElement(Library library) throws IllegalStateException {
+        if (elements != null && elements.size() < MAX_ELEMENTS) {
+            elements.add(library);
+        } else {
+            throw new IllegalStateException("This 384 well plate already has 384 libraries");
+        }
     }
-    return sb.toString();
-  }
+
+    @Override
+    public Class getElementType() {
+        return Library.class;
+    }
+
+    public void setElement(int pos, Library library) throws IllegalArgumentException {
+        if (elements != null && pos > 0 && pos <= MAX_ELEMENTS) {
+            elements.set(pos, library);
+        } else {
+            throw new IllegalArgumentException("Element position must be between 1 and " + MAX_ELEMENTS);
+        }
+    }
+
+    public void setElement(String pos, Library library) {
+        _384WellPlatePosition pp = _384WellPlatePosition.valueOf(pos);
+        if (pp != null) {
+            elements.set(_384WellPlatePosition.getPositionMap().get(pp), library);
+        } else {
+            throw new IllegalArgumentException("Element position must be between A-P and 1-24");
+        }
+    }
+
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("PLATE ").append(this.getName()).append("\n");
+        int splitcount = 1;
+        for (Library l : elements) {
+            if (splitcount == 1) {
+                sb.append("|");
+            }
+            sb.append(l.getAlias());
+            if (splitcount == elements.size()) {
+                sb.append("|\n");
+            } else {
+                sb.append(",");
+            }
+            splitcount++;
+        }
+        return sb.toString();
+    }
 }

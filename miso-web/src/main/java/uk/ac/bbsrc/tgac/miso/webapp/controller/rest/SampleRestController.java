@@ -52,30 +52,31 @@ import java.io.IOException;
 @RequestMapping("/rest/sample")
 @SessionAttributes("sample")
 public class SampleRestController {
-  protected static final Logger log = LoggerFactory.getLogger(SampleRestController.class);
+    protected static final Logger log = LoggerFactory.getLogger(SampleRestController.class);
 
-  @Autowired
-  private RequestManager requestManager;
+    @Autowired
+    private RequestManager requestManager;
 
-  public void setRequestManager(RequestManager requestManager) {
-    this.requestManager = requestManager;
-  }
-
-  @RequestMapping(value = "{sampleId}", method = RequestMethod.GET)
-  public @ResponseBody String getSampleById(@PathVariable Long sampleId) throws IOException {
-    ObjectMapper mapper = new ObjectMapper();
-    mapper.getSerializationConfig().addMixInAnnotations(Project.class, ProjectSampleRecursionAvoidanceMixin.class);
-    mapper.getSerializationConfig().addMixInAnnotations(Library.class, LibraryRecursionAvoidanceMixin.class);
-    mapper.getSerializationConfig().addMixInAnnotations(User.class, UserInfoMixin.class);
-    try {
-      Sample s = requestManager.getSampleById(sampleId);
-      if (s != null) {
-        return mapper.writeValueAsString(s);
-      }
-      return mapper.writeValueAsString(RestUtils.error("No such sample with that ID.", "sampleId", sampleId.toString()));
+    public void setRequestManager(RequestManager requestManager) {
+        this.requestManager = requestManager;
     }
-    catch (IOException ioe) {
-      return mapper.writeValueAsString(RestUtils.error("Cannot retrieve sample: " + ioe.getMessage(), "sampleId", sampleId.toString()));
+
+    @RequestMapping(value = "{sampleId}", method = RequestMethod.GET)
+    @ResponseBody
+    public String getSampleById(@PathVariable Long sampleId) throws IOException {
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.getSerializationConfig().addMixInAnnotations(Project.class, ProjectSampleRecursionAvoidanceMixin.class);
+        mapper.getSerializationConfig().addMixInAnnotations(Library.class, LibraryRecursionAvoidanceMixin.class);
+        mapper.getSerializationConfig().addMixInAnnotations(User.class, UserInfoMixin.class);
+        try {
+            Sample s = requestManager.getSampleById(sampleId);
+            if (s != null) {
+                return mapper.writeValueAsString(s);
+            }
+            return mapper.writeValueAsString(RestUtils.error("No such sample with that ID.", "sampleId", sampleId.toString()));
+        } catch (IOException ioe) {
+            return mapper
+                .writeValueAsString(RestUtils.error("Cannot retrieve sample: " + ioe.getMessage(), "sampleId", sampleId.toString()));
+        }
     }
-  }
 }

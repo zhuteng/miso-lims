@@ -36,72 +36,71 @@ import javax.persistence.*;
 @Entity
 @Table(name = "`Platform`")
 public abstract class AbstractPlatform implements Platform {
-  public static final Long UNSAVED_ID = 0L;
+    public static final Long UNSAVED_ID = 0L;
 
-  private PlatformType platformType;
-  private String description;
-  private String instrumentModel;
-  private Integer numContainers;
+    private PlatformType platformType;
+    private String description;
+    private String instrumentModel;
+    private Integer numContainers;
 
-  @Id
-  @GeneratedValue(strategy = GenerationType.AUTO)
-  private long platformId = AbstractPlatform.UNSAVED_ID;
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private long platformId = AbstractPlatform.UNSAVED_ID;
 
-  @OneToOne(targetEntity = AbstractRun.class, mappedBy = "platform")
-  private Run run;
+    @OneToOne(targetEntity = AbstractRun.class, mappedBy = "platform")
+    private Run run;
 
+    public Run getRun() {
+        return run;
+    }
 
-  public Run getRun() {
-    return run;
-  }
+    public void setRun(Run run) {
+        this.run = run;
+    }
 
-  public void setRun(Run run) {
-    this.run = run;
-  }
+    public Long getPlatformId() {
+        return platformId;
+    }
 
-  public Long getPlatformId() {
-    return platformId;
-  }
+    public void setPlatformId(Long platformId) {
+        this.platformId = platformId;
+    }
 
-  public void setPlatformId(Long platformId) {
-    this.platformId = platformId;
-  }
+    public PlatformType getPlatformType() {
+        return platformType;
+    }
 
-  public PlatformType getPlatformType() {
-    return platformType;
-  }
+    public void setPlatformType(PlatformType platformType) {
+        this.platformType = platformType;
+    }
 
-  public void setPlatformType(PlatformType platformType) {
-    this.platformType = platformType;
-  }
+    public String getDescription() {
+        return description;
+    }
 
-  public String getDescription() {
-    return description;
-  }
+    public void setDescription(String description) {
+        this.description = description;
+    }
 
-  public void setDescription(String description) {
-    this.description = description;
-  }
+    public String getInstrumentModel() {
+        return instrumentModel;
+    }
 
-  public String getInstrumentModel() {
-    return instrumentModel;
-  }
+    public void setInstrumentModel(String instrumentModel) {
+        this.instrumentModel = instrumentModel;
+    }
 
-  public void setInstrumentModel(String instrumentModel) {
-    this.instrumentModel = instrumentModel;
-  }
+    public String getNameAndModel() {
+        return platformType.getKey() + " - " + instrumentModel;
+    }
 
-  public String getNameAndModel() {
-    return platformType.getKey() + " - " + instrumentModel;
-  }
+    public Integer getNumContainers() {
+        return numContainers;
+    }
 
-  public Integer getNumContainers() {
-    return numContainers;
-  }
-
-  public void setNumContainers(Integer numContainers) {
-    this.numContainers = numContainers;
-  }
+    public void setNumContainers(Integer numContainers) {
+        this.numContainers = numContainers;
+    }
 
 /*  public Integer getSequenceLength() {
     return sequenceLength;
@@ -112,50 +111,50 @@ public abstract class AbstractPlatform implements Platform {
   }
 */
 
-  /**
-   * Equivalency is based on getProjectId() if set, otherwise on name,
-   * description and creation date.
-   */
-  @Override
-  public boolean equals(Object obj) {
-    if (obj == null)
-      return false;
-    if (obj == this)
-      return true;
-    if (!(obj instanceof Platform))
-      return false;
-    Platform them = (Platform) obj;
-    // If not saved, then compare resolved actual objects. Otherwise
-    // just compare IDs.
-    if (getPlatformId() == AbstractPlatform.UNSAVED_ID
-        || them.getPlatformId() == AbstractPlatform.UNSAVED_ID) {
-      return getPlatformType().equals(them.getPlatformType())
-             && getDescription().equals(them.getDescription());
+    /**
+     * Equivalency is based on getProjectId() if set, otherwise on name,
+     * description and creation date.
+     */
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null)
+            return false;
+        if (obj == this)
+            return true;
+        if (!(obj instanceof Platform))
+            return false;
+        Platform them = (Platform) obj;
+        // If not saved, then compare resolved actual objects. Otherwise
+        // just compare IDs.
+        if (getPlatformId() == AbstractPlatform.UNSAVED_ID || them.getPlatformId() == AbstractPlatform.UNSAVED_ID) {
+            return getPlatformType().equals(them.getPlatformType()) && getDescription().equals(them.getDescription());
+        } else {
+            return getPlatformId().longValue() == them.getPlatformId().longValue();
+        }
     }
-    else {
-      return getPlatformId().longValue() == them.getPlatformId().longValue();
-    }
-  }
 
-  @Override
-  public int hashCode() {
-    if (getPlatformId() != AbstractPlatform.UNSAVED_ID) {
-      return getPlatformId().intValue();
+    @Override
+    public int hashCode() {
+        if (getPlatformId() != AbstractPlatform.UNSAVED_ID) {
+            return getPlatformId().intValue();
+        } else {
+            final int PRIME = 37;
+            int hashcode = -1;
+            if (getPlatformType() != null)
+                hashcode = PRIME * hashcode + getPlatformType().hashCode();
+            if (getDescription() != null)
+                hashcode = PRIME * hashcode + getDescription().hashCode();
+            return hashcode;
+        }
     }
-    else {
-      final int PRIME = 37;
-      int hashcode = -1;
-      if (getPlatformType() != null) hashcode = PRIME * hashcode + getPlatformType().hashCode();
-      if (getDescription() != null) hashcode = PRIME * hashcode + getDescription().hashCode();
-      return hashcode;
-    }
-  }
 
-  @Override
-  public int compareTo(Object o) {
-    Platform t = (Platform)o;
-    if (getPlatformId() < t.getPlatformId()) return -1;
-    if (getPlatformId() > t.getPlatformId()) return 1;
-    return 0;
-  }
+    @Override
+    public int compareTo(Object o) {
+        Platform t = (Platform) o;
+        if (getPlatformId() < t.getPlatformId())
+            return -1;
+        if (getPlatformId() > t.getPlatformId())
+            return 1;
+        return 0;
+    }
 }

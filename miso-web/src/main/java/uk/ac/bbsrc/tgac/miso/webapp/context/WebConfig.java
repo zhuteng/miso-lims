@@ -21,26 +21,26 @@ import uk.ac.bbsrc.tgac.miso.webapp.util.SessionConversationAttributeStore;
  */
 @Configuration
 public class WebConfig extends WebMvcConfigurationSupport {
-  @Bean
-  public WebBindingInitializer bindingInitializer() {
-    ConfigurableWebBindingInitializer initializer = new LimsBindingInitializer();
-    initializer.setConversionService(mvcConversionService());
-    initializer.setValidator(mvcValidator());
-    return initializer;
-  }
+    @Bean
+    public WebBindingInitializer bindingInitializer() {
+        ConfigurableWebBindingInitializer initializer = new LimsBindingInitializer();
+        initializer.setConversionService(mvcConversionService());
+        initializer.setValidator(mvcValidator());
+        return initializer;
+    }
 
-  @Bean
-  public SessionAttributeStore sessionAttributeStore() {
-    SessionConversationAttributeStore sessionAttributeStore = new SessionConversationAttributeStore();
-    sessionAttributeStore.setNumConversationsToKeep(1000);
-    return sessionAttributeStore;
-  }
+    @Bean
+    public SessionAttributeStore sessionAttributeStore() {
+        SessionConversationAttributeStore sessionAttributeStore = new SessionConversationAttributeStore();
+        sessionAttributeStore.setNumConversationsToKeep(1000);
+        return sessionAttributeStore;
+    }
 
-  @Bean
-  public RequestMappingHandlerAdapter requestMappingHandlerAdapter() {
-    RequestMappingHandlerAdapter adapter = super.requestMappingHandlerAdapter();
-    adapter.setWebBindingInitializer(bindingInitializer());
-    adapter.setSessionAttributeStore(sessionAttributeStore());
-    return adapter;
-  }
+    @Bean
+    public RequestMappingHandlerAdapter requestMappingHandlerAdapter() {
+        RequestMappingHandlerAdapter adapter = super.requestMappingHandlerAdapter();
+        adapter.setWebBindingInitializer(bindingInitializer());
+        adapter.setSessionAttributeStore(sessionAttributeStore());
+        return adapter;
+    }
 }

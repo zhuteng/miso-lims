@@ -45,41 +45,41 @@ import java.util.Date;
  */
 @JsonSerialize(typing = JsonSerialize.Typing.STATIC, include = JsonSerialize.Inclusion.NON_NULL)
 //@JsonIdentityInfo(generator = ObjectIdGenerators.IntSequenceGenerator.class, property = "@id")
-@JsonTypeInfo(use=JsonTypeInfo.Id.CLASS, include= JsonTypeInfo.As.PROPERTY, property="@class")
+@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
 public interface Alert extends Comparable, Deletable {
-  /**
-   * Returns the alertId of this Alert object.
-   *
-   * @return Long alertId.
-   */
-  public Long getAlertId();
+    /**
+     * Returns the alertId of this Alert object.
+     *
+     * @return Long alertId.
+     */
+    public Long getAlertId();
 
-  /**
-   * Sets the alertId of this Alert object.
-   *
-   * @param alertId Long.
-   */
-  public void setAlertId(Long alertId);
+    /**
+     * Sets the alertId of this Alert object.
+     *
+     * @param alertId Long.
+     */
+    public void setAlertId(Long alertId);
 
-  public String getAlertTitle();
+    public String getAlertTitle();
 
-  public void setAlertTitle(String title);
+    public void setAlertTitle(String title);
 
-  public String getAlertText();
+    public String getAlertText();
 
-  public void setAlertText(String alert);
+    public void setAlertText(String alert);
 
-  public User getAlertUser();
+    public User getAlertUser();
 
-  public Date getAlertDate();
+    public Date getAlertDate();
 
-  public void setAlertDate(Date date);
+    public void setAlertDate(Date date);
 
-  public boolean getAlertRead();
+    public boolean getAlertRead();
 
-  public void setAlertRead(boolean alertRead);
+    public void setAlertRead(boolean alertRead);
 
-  public AlertLevel getAlertLevel();
+    public AlertLevel getAlertLevel();
 
-  public void setAlertLevel(AlertLevel alertLevel);
+    public void setAlertLevel(AlertLevel alertLevel);
 }

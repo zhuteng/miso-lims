@@ -62,7 +62,7 @@ public class EditKitDescriptorController {
     public Collection<PlatformType> populatePlatformTypes() {
         return Arrays.asList(PlatformType.values());
     }
-    
+
     public void setDataObjectFactory(DataObjectFactory dataObjectFactory) {
         this.dataObjectFactory = dataObjectFactory;
     }
@@ -78,8 +78,7 @@ public class EditKitDescriptorController {
     }
 
     @RequestMapping(value = "/{kitDescriptorId}", method = RequestMethod.GET)
-    public ModelAndView setupForm(@PathVariable Long kitDescriptorId,
-                                  ModelMap model) throws IOException {
+    public ModelAndView setupForm(@PathVariable Long kitDescriptorId, ModelMap model) throws IOException {
         try {
             KitDescriptor kitDescriptor = null;
             if (kitDescriptorId == kitDescriptor.UNSAVED_ID) {
@@ -97,8 +96,7 @@ public class EditKitDescriptorController {
             model.put("formObj", kitDescriptor);
             model.put("kitDescriptor", kitDescriptor);
             return new ModelAndView("/pages/editKitDescriptor.jsp", model);
-        }
-        catch (IOException ex) {
+        } catch (IOException ex) {
             if (log.isDebugEnabled()) {
                 log.debug("Failed to show Kit Descriptor", ex);
             }
@@ -107,15 +105,14 @@ public class EditKitDescriptorController {
     }
 
     @RequestMapping(method = RequestMethod.POST)
-    public String processSubmit(@ModelAttribute("kitDescriptor") KitDescriptor kitDescriptor,
-                                ModelMap model, SessionStatus session) throws IOException {
+    public String processSubmit(@ModelAttribute("kitDescriptor") KitDescriptor kitDescriptor, ModelMap model, SessionStatus session)
+        throws IOException {
         try {
             requestManager.saveKitDescriptor(kitDescriptor);
             session.setComplete();
             model.clear();
             return "redirect:/miso/kitdescriptor/" + kitDescriptor.getKitDescriptorId();
-        }
-        catch (IOException ex) {
+        } catch (IOException ex) {
             if (log.isDebugEnabled()) {
                 log.debug("Failed to save Kit Descriptor", ex);
             }

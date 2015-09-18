@@ -34,7 +34,7 @@ import java.lang.annotation.Target;
  * @author Rob Davey
  * @since 0.0.2
  */
-@Target({ElementType.METHOD})
+@Target({ ElementType.METHOD })
 @Retention(RetentionPolicy.RUNTIME)
 public @interface LoggedAction {
 }

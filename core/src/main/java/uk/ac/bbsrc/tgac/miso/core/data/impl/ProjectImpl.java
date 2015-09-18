@@ -26,6 +26,7 @@ import javax.persistence.*;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 import org.slf4j.Logger;
@@ -37,29 +38,29 @@ import java.io.Serializable;
 
 /**
  * Concrete implementation of a Project, inheriting from the simlims core Project
- * 
+ *
  * @author Rob Davey
  * @since 0.0.2
  */
 @Entity
 public class ProjectImpl extends AbstractProject implements Serializable {
-  /**
-   * Construct a new Project with a default empty SecurityProfile
-   */
-  public ProjectImpl() {
-    setSecurityProfile(new SecurityProfile());
-  }
+    /**
+     * Construct a new Project with a default empty SecurityProfile
+     */
+    public ProjectImpl() {
+        setSecurityProfile(new SecurityProfile());
+    }
 
-  /**
-   * Construct a new Project with a SecurityProfile owned by the given User
-   *
-   * @param user of type User
-   */
-  public ProjectImpl(User user) {
-    setSecurityProfile(new SecurityProfile(user));
-  }
+    /**
+     * Construct a new Project with a SecurityProfile owned by the given User
+     *
+     * @param user of type User
+     */
+    public ProjectImpl(User user) {
+        setSecurityProfile(new SecurityProfile(user));
+    }
 
-  public void buildSubmission() {
+    public void buildSubmission() {
     /*
     try {
       DocumentBuilder docBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
@@ -70,12 +71,12 @@ public class ProjectImpl extends AbstractProject implements Serializable {
     }
     ERASubmissionFactory.generateProjectSubmissionXML(submissionDocument, this);
     */
-  }
+    }
 
-  /**
-   * Method buildReport ...
-   */
-  public void buildReport() {
+    /**
+     * Method buildReport ...
+     */
+    public void buildReport() {
 
-  }
+    }
 }

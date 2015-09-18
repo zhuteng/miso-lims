@@ -32,21 +32,21 @@ package uk.ac.bbsrc.tgac.miso.spring.ajax;
  * @since 0.0.2
  */
 public class jQueryDialogFactory {
-  public static String okDialog(String title, String message) {
-    StringBuilder sb = new StringBuilder();
-    sb.append("<div id='dialog-message' title='"+title+"'>");
-	  sb.append("<p><span class='ui-icon ui-icon-circle-check' style='float:left; margin:0 7px 50px 0;'></span>");
-    sb.append(message);
-	  sb.append("</p></div>");
-    return sb.toString();
-  }
+    public static String okDialog(String title, String message) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("<div id='dialog-message' title='" + title + "'>");
+        sb.append("<p><span class='ui-icon ui-icon-circle-check' style='float:left; margin:0 7px 50px 0;'></span>");
+        sb.append(message);
+        sb.append("</p></div>");
+        return sb.toString();
+    }
 
-  public static String errorDialog(String title, String message) {
-    StringBuilder sb = new StringBuilder();
-    sb.append("<div id='dialog-message' title='"+title+"'>");
-	  sb.append("<p><span class='ui-icon ui-icon-alert' style='float:left; margin:0 7px 50px 0;'></span>");
-    sb.append(message);
-	  sb.append("</p></div>");
-    return sb.toString();
-  }
+    public static String errorDialog(String title, String message) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("<div id='dialog-message' title='" + title + "'>");
+        sb.append("<p><span class='ui-icon ui-icon-alert' style='float:left; margin:0 7px 50px 0;'></span>");
+        sb.append(message);
+        sb.append("</p></div>");
+        return sb.toString();
+    }
 }

@@ -45,98 +45,97 @@ import java.util.List;
  * @since 0.1.6
  */
 public class SequencerPartitionContainerImpl extends AbstractSequencerPartitionContainer<SequencerPoolPartition> implements Serializable {
-  protected static final Logger log = LoggerFactory.getLogger(SequencerPartitionContainerImpl.class);
+    protected static final Logger log = LoggerFactory.getLogger(SequencerPartitionContainerImpl.class);
 
-  private List<SequencerPoolPartition> partitions = new AutoPopulatingList<SequencerPoolPartition>(PartitionImpl.class);
+    private List<SequencerPoolPartition> partitions = new AutoPopulatingList<SequencerPoolPartition>(PartitionImpl.class);
 
-  private int partitionLimit = 8;
+    private int partitionLimit = 8;
 
-  /**
-   * Construct a new SequencerPartitionContainer with a default empty SecurityProfile
-   */
-  public SequencerPartitionContainerImpl() {
-    setSecurityProfile(new SecurityProfile());
-  }
-
-  /**
-   * Construct a new SequencerPartitionContainer with a SecurityProfile owned by the given User
-   *
-   * @param user of type User
-   */
-  public SequencerPartitionContainerImpl(User user) {
-    setSecurityProfile(new SecurityProfile(user));
-  }
-
-  @Override
-  public List<SequencerPoolPartition> getPartitions() {
-    return partitions;
-  }
-
-  @Override
-  public void setPartitions(List<SequencerPoolPartition> partitions) {
-    this.partitions = partitions;
-  }
-
-  @Override
-  public SequencerPoolPartition getPartitionAt(int partitionNumber) throws IndexOutOfBoundsException {
-    return partitions.get(partitionNumber-1);
-  }
-
-  public void setPartitionLimit(int partitionLimit) {
-    this.partitionLimit = partitionLimit;
-  }
-
-  public void initEmptyPartitions() {
-    getPartitions().clear();
-    for (int i = 0; i < partitionLimit; i++) {
-      addNewPartition();
+    /**
+     * Construct a new SequencerPartitionContainer with a default empty SecurityProfile
+     */
+    public SequencerPartitionContainerImpl() {
+        setSecurityProfile(new SecurityProfile());
     }
-  }
 
-  @Override
-  public void addNewPartition() {
-    if (getPartitions().size() < partitionLimit) {
-      PartitionImpl partition = new PartitionImpl();
-      partition.setSequencerPartitionContainer(this);
-      partition.setPartitionNumber(getPartitions().size() + 1);
-      partition.setSecurityProfile(getSecurityProfile());
-      getPartitions().add(partition);
+    /**
+     * Construct a new SequencerPartitionContainer with a SecurityProfile owned by the given User
+     *
+     * @param user of type User
+     */
+    public SequencerPartitionContainerImpl(User user) {
+        setSecurityProfile(new SecurityProfile(user));
     }
-    else {
-      log.warn("This partition container is limited to "+partitionLimit+" partitions");
-    }
-  }
 
-  public void addPartition(SequencerPoolPartition partition) {
-    if (getPartitions().size() < partitionLimit) {
-      if (!getPartitions().contains(partition)) {
-        if (partition.getSequencerPartitionContainer() == null) partition.setSequencerPartitionContainer(this);
-        if (partition.getPartitionNumber() == null ) partition.setPartitionNumber(getPartitions().size() + 1);
-        if (partition.getSecurityProfile() == null ) partition.setSecurityProfile(getSecurityProfile());
-        getPartitions().add(partition);
-      }
-      else {
-        log.warn("This partition container already contains that partition");
-      }
+    @Override
+    public List<SequencerPoolPartition> getPartitions() {
+        return partitions;
     }
-    else {
-      log.warn("This partition container is limited to "+partitionLimit+" partitions");
-    }
-  }
 
-  @Override
-  public String toString() {
-    StringBuilder sb = new StringBuilder();
-    sb.append(super.toString());
-    if (getPartitions() != null) {
-      sb.append(" : [");
-      sb.append(LimsUtils.join(getPartitions(), ","));
-      sb.append("]");
+    @Override
+    public void setPartitions(List<SequencerPoolPartition> partitions) {
+        this.partitions = partitions;
     }
-    else {
-      sb.append(" : ");
-      sb.append("!!!!! NULL PARTITIONS !!!!!");
+
+    @Override
+    public SequencerPoolPartition getPartitionAt(int partitionNumber) throws IndexOutOfBoundsException {
+        return partitions.get(partitionNumber - 1);
     }
-    return sb.toString();
-  }
+
+    public void setPartitionLimit(int partitionLimit) {
+        this.partitionLimit = partitionLimit;
+    }
+
+    public void initEmptyPartitions() {
+        getPartitions().clear();
+        for (int i = 0; i < partitionLimit; i++) {
+            addNewPartition();
+        }
+    }
+
+    @Override
+    public void addNewPartition() {
+        if (getPartitions().size() < partitionLimit) {
+            PartitionImpl partition = new PartitionImpl();
+            partition.setSequencerPartitionContainer(this);
+            partition.setPartitionNumber(getPartitions().size() + 1);
+            partition.setSecurityProfile(getSecurityProfile());
+            getPartitions().add(partition);
+        } else {
+            log.warn("This partition container is limited to " + partitionLimit + " partitions");
+        }
+    }
+
+    public void addPartition(SequencerPoolPartition partition) {
+        if (getPartitions().size() < partitionLimit) {
+            if (!getPartitions().contains(partition)) {
+                if (partition.getSequencerPartitionContainer() == null)
+                    partition.setSequencerPartitionContainer(this);
+                if (partition.getPartitionNumber() == null)
+                    partition.setPartitionNumber(getPartitions().size() + 1);
+                if (partition.getSecurityProfile() == null)
+                    partition.setSecurityProfile(getSecurityProfile());
+                getPartitions().add(partition);
+            } else {
+                log.warn("This partition container already contains that partition");
+            }
+        } else {
+            log.warn("This partition container is limited to " + partitionLimit + " partitions");
+        }
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(super.toString());
+        if (getPartitions() != null) {
+            sb.append(" : [");
+            sb.append(LimsUtils.join(getPartitions(), ","));
+            sb.append("]");
+        } else {
+            sb.append(" : ");
+            sb.append("!!!!! NULL PARTITIONS !!!!!");
+        }
+        return sb.toString();
+    }
 }

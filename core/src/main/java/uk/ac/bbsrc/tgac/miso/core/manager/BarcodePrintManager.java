@@ -48,62 +48,57 @@ import java.util.Queue;
  * @since 0.0.3
  */
 public class BarcodePrintManager extends AbstractPrintManager<Queue<File>> {
-  protected static final Logger log = LoggerFactory.getLogger(BarcodePrintManager.class);
+    protected static final Logger log = LoggerFactory.getLogger(BarcodePrintManager.class);
 
-  public BarcodePrintManager(PrintContextResolverService pcrs) {
-    setPrintContextResolverService(pcrs);
-  }
+    public BarcodePrintManager(PrintContextResolverService pcrs) {
+        setPrintContextResolverService(pcrs);
+    }
 
-  @Override
-  public PrintJob print(Queue<File> barcodesToPrint, String printServiceName, User user) throws MisoPrintException {
-    try {
-      MisoPrintService mps = getPrintService(printServiceName);
-      if (mps != null) {
-        MisoPrintJob job = new MisoPrintJob();
-        job.setPrintDate(new Date());
-        job.setPrintService(mps);
-        job.setPrintUser(user);
-        job.setQueuedElements(barcodesToPrint);
-        job.setStatus("QUEUED");
+    @Override
+    public PrintJob print(Queue<File> barcodesToPrint, String printServiceName, User user) throws MisoPrintException {
         try {
-          long jobId = storePrintJob(job);
-          job.setJobId(jobId);
-        }
-        catch (IOException e) {
-          e.printStackTrace();
-          log.debug("Could not store print job");
-        }
+            MisoPrintService mps = getPrintService(printServiceName);
+            if (mps != null) {
+                MisoPrintJob job = new MisoPrintJob();
+                job.setPrintDate(new Date());
+                job.setPrintService(mps);
+                job.setPrintUser(user);
+                job.setQueuedElements(barcodesToPrint);
+                job.setStatus("QUEUED");
+                try {
+                    long jobId = storePrintJob(job);
+                    job.setJobId(jobId);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    log.debug("Could not store print job");
+                }
 
-        try {
-          boolean jobOK = true;
-          for (File barcodeFile : barcodesToPrint) {
-            if (!mps.print(barcodeFile)) {
-              jobOK = false;
+                try {
+                    boolean jobOK = true;
+                    for (File barcodeFile : barcodesToPrint) {
+                        if (!mps.print(barcodeFile)) {
+                            jobOK = false;
+                        }
+                    }
+
+                    if (jobOK) {
+                        job.setStatus("OK");
+                    } else {
+                        job.setStatus("FAIL");
+                    }
+
+                    storePrintJob(job);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    throw new MisoPrintException("Could not print barcodes to " + printServiceName + ": " + e.getMessage(), e);
+                }
+                return job;
+            } else {
+                throw new MisoPrintException("No such PrintService: " + printServiceName);
             }
-          }
-
-          if (jobOK) {
-            job.setStatus("OK");
-          }
-          else {
-            job.setStatus("FAIL");
-          }
-
-          storePrintJob(job);
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new MisoPrintException("Cannot retrieve PrintService: " + printServiceName);
         }
-        catch (IOException e) {
-          e.printStackTrace();
-          throw new MisoPrintException("Could not print barcodes to " + printServiceName + ": " + e.getMessage(), e);
-        }
-        return job;
-      }
-      else {
-        throw new MisoPrintException("No such PrintService: " + printServiceName);
-      }
     }
-    catch (IOException e) {
-      e.printStackTrace();
-      throw new MisoPrintException("Cannot retrieve PrintService: " + printServiceName);
-    }
-  }
 }

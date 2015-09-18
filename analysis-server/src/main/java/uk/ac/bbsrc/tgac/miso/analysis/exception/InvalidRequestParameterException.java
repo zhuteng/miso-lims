@@ -33,14 +33,14 @@ package uk.ac.bbsrc.tgac.miso.analysis.exception;
  * @since 0.1.3
  */
 public class InvalidRequestParameterException extends Exception {
-  public InvalidRequestParameterException(String s) {
-    super(s);
-  }
-
-  public InvalidRequestParameterException(String s, Throwable cause) {
-    super(s);
-    if (cause != null) {
-        initCause(cause);
+    public InvalidRequestParameterException(String s) {
+        super(s);
     }
-  }
+
+    public InvalidRequestParameterException(String s, Throwable cause) {
+        super(s);
+        if (cause != null) {
+            initCause(cause);
+        }
+    }
 }

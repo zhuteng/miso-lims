@@ -48,139 +48,109 @@ import java.util.Map;
  */
 public class MySqlConanTaskDAO extends DatabaseConanTaskDAO {
 
-  private long getAutoIncrement(String tableName) throws IOException {
-    final String q = "SHOW TABLE STATUS LIKE '" + tableName + "'";
-    Map<String, Object> rs = getJdbcTemplate().queryForMap(q);
-    Object ai = rs.get("Auto_increment");
-    if (ai != null) {
-      return new Long(ai.toString());
-    }
-    else {
-      throw new IOException("Cannot resolve Auto_increment value from DBMS metadata tables");
-    }
-  }
-
-  private Timestamp javaDateToSQLDate(Date date) {
-    if (date == null) {
-      return null;
-    }
-    return new Timestamp(date.getTime());
-  }
-
-  @Override
-  public <P extends ConanPipeline> ConanTask<P> saveTask(ConanTask<P> conanTask) {
-    Assert.notNull(getJdbcTemplate(), getClass().getSimpleName() + " must have a valid JdbcTemplate set");
-    if (conanTask.getSubmitter().getId() == null) {
-      getUserDAO().saveUser(conanTask.getSubmitter());
-    }
-
-    int currentExecutedIndex = conanTask.getPipeline().getProcesses().indexOf(conanTask.getLastProcess());
-    if (currentExecutedIndex == -1) {
-      currentExecutedIndex = 0;
-    }
-    int firstExecutedIndex = conanTask.getPipeline().getProcesses().indexOf(conanTask.getFirstProcess());
-    if (firstExecutedIndex == -1) {
-      firstExecutedIndex = 0;
-    }
-    try {
-      if (conanTask.getId() == null) {
-        int taskID = (int) getAutoIncrement("CONAN_TASKS");
-        getJdbcTemplate().update(TASK_INSERT,
-                                 taskID,
-                                 conanTask.getName(),
-                                 javaDateToSQLDate(conanTask.getStartDate()),
-                                 javaDateToSQLDate(conanTask.getCompletionDate()),
-                                 conanTask.getSubmitter().getId(),
-                                 conanTask.getPipeline().getName(),
-                                 conanTask.getPriority().toString(),
-                                 firstExecutedIndex,
-                                 conanTask.getCurrentState().toString(),
-                                 conanTask.getStatusMessage(),
-                                 currentExecutedIndex,
-                                 javaDateToSQLDate(conanTask.getCreationDate()));
-        conanTask.setId(Integer.toString(taskID));
-        //save parameters
-        Map<ConanParameter, String> params = conanTask.getParameterValues();
-        for (ConanParameter conanParameter : params.keySet()) {
-          //don't save transient (non-required, non-persistent, e.g. temporary) parameters
-          if (!(conanParameter instanceof Transientable) || !((Transientable) conanParameter).isTransient()) {
-            if (!(conanParameter instanceof Optionable) || ((Optionable)conanParameter).isOptional() && params.get(conanParameter)!=null) {
-              getLog().info("Adding parameter to DB: " + conanParameter.getName());
-              getJdbcTemplate().update(PARAMETER_INSERT,
-                                       conanParameter.getName(),
-                                       params.get(conanParameter),
-                                       taskID);
-            }
-          }
+    private long getAutoIncrement(String tableName) throws IOException {
+        final String q = "SHOW TABLE STATUS LIKE '" + tableName + "'";
+        Map<String, Object> rs = getJdbcTemplate().queryForMap(q);
+        Object ai = rs.get("Auto_increment");
+        if (ai != null) {
+            return new Long(ai.toString());
+        } else {
+            throw new IOException("Cannot resolve Auto_increment value from DBMS metadata tables");
         }
-      }
-      else {
-        getJdbcTemplate().update(TASK_UPDATE,
-                                 conanTask.getName(),
-                                 javaDateToSQLDate(conanTask.getStartDate()),
-                                 javaDateToSQLDate(conanTask.getCompletionDate()),
-                                 conanTask.getSubmitter().getId(),
-                                 conanTask.getPipeline().getName(),
-                                 conanTask.getPriority().toString(),
-                                 firstExecutedIndex,
-                                 conanTask.getCurrentState().toString(),
-                                 conanTask.getStatusMessage(),
-                                 currentExecutedIndex,
-                                 javaDateToSQLDate(conanTask.getCreationDate()),
-                                 conanTask.getId());
-        //delete and save parameters
-        getJdbcTemplate().update(PARAMETER_DELETE,
-                                 conanTask.getId());
-        Map<ConanParameter, String> params = conanTask.getParameterValues();
-        for (ConanParameter conanParameter : params.keySet()) {
-          //don't save transient (non-required, non-persistent, e.g. temporary) parameters
-          if (!(conanParameter instanceof Transientable) || !((Transientable) conanParameter).isTransient()) {
-            if (!(conanParameter instanceof Optionable) || ((Optionable)conanParameter).isOptional() && params.get(conanParameter)!=null) {
-              getLog().info("Adding parameter to DB: " + conanParameter.getName());
-              getJdbcTemplate().update(PARAMETER_INSERT,
-                                       conanParameter.getName(),
-                                       params.get(conanParameter),
-                                       conanTask.getId());
-            }
-          }
+    }
+
+    private Timestamp javaDateToSQLDate(Date date) {
+        if (date == null) {
+            return null;
         }
-      }
+        return new Timestamp(date.getTime());
     }
-    catch (IOException e) {
-      e.printStackTrace();
+
+    @Override
+    public <P extends ConanPipeline> ConanTask<P> saveTask(ConanTask<P> conanTask) {
+        Assert.notNull(getJdbcTemplate(), getClass().getSimpleName() + " must have a valid JdbcTemplate set");
+        if (conanTask.getSubmitter().getId() == null) {
+            getUserDAO().saveUser(conanTask.getSubmitter());
+        }
+
+        int currentExecutedIndex = conanTask.getPipeline().getProcesses().indexOf(conanTask.getLastProcess());
+        if (currentExecutedIndex == -1) {
+            currentExecutedIndex = 0;
+        }
+        int firstExecutedIndex = conanTask.getPipeline().getProcesses().indexOf(conanTask.getFirstProcess());
+        if (firstExecutedIndex == -1) {
+            firstExecutedIndex = 0;
+        }
+        try {
+            if (conanTask.getId() == null) {
+                int taskID = (int) getAutoIncrement("CONAN_TASKS");
+                getJdbcTemplate().update(TASK_INSERT, taskID, conanTask.getName(), javaDateToSQLDate(conanTask.getStartDate()),
+                                         javaDateToSQLDate(conanTask.getCompletionDate()), conanTask.getSubmitter().getId(),
+                                         conanTask.getPipeline().getName(), conanTask.getPriority().toString(), firstExecutedIndex,
+                                         conanTask.getCurrentState().toString(), conanTask.getStatusMessage(), currentExecutedIndex,
+                                         javaDateToSQLDate(conanTask.getCreationDate()));
+                conanTask.setId(Integer.toString(taskID));
+                //save parameters
+                Map<ConanParameter, String> params = conanTask.getParameterValues();
+                for (ConanParameter conanParameter : params.keySet()) {
+                    //don't save transient (non-required, non-persistent, e.g. temporary) parameters
+                    if (!(conanParameter instanceof Transientable) || !((Transientable) conanParameter).isTransient()) {
+                        if (!(conanParameter instanceof Optionable) ||
+                            ((Optionable) conanParameter).isOptional() && params.get(conanParameter) != null) {
+                            getLog().info("Adding parameter to DB: " + conanParameter.getName());
+                            getJdbcTemplate().update(PARAMETER_INSERT, conanParameter.getName(), params.get(conanParameter), taskID);
+                        }
+                    }
+                }
+            } else {
+                getJdbcTemplate().update(TASK_UPDATE, conanTask.getName(), javaDateToSQLDate(conanTask.getStartDate()),
+                                         javaDateToSQLDate(conanTask.getCompletionDate()), conanTask.getSubmitter().getId(),
+                                         conanTask.getPipeline().getName(), conanTask.getPriority().toString(), firstExecutedIndex,
+                                         conanTask.getCurrentState().toString(), conanTask.getStatusMessage(), currentExecutedIndex,
+                                         javaDateToSQLDate(conanTask.getCreationDate()), conanTask.getId());
+                //delete and save parameters
+                getJdbcTemplate().update(PARAMETER_DELETE, conanTask.getId());
+                Map<ConanParameter, String> params = conanTask.getParameterValues();
+                for (ConanParameter conanParameter : params.keySet()) {
+                    //don't save transient (non-required, non-persistent, e.g. temporary) parameters
+                    if (!(conanParameter instanceof Transientable) || !((Transientable) conanParameter).isTransient()) {
+                        if (!(conanParameter instanceof Optionable) ||
+                            ((Optionable) conanParameter).isOptional() && params.get(conanParameter) != null) {
+                            getLog().info("Adding parameter to DB: " + conanParameter.getName());
+                            getJdbcTemplate()
+                                .update(PARAMETER_INSERT, conanParameter.getName(), params.get(conanParameter), conanTask.getId());
+                        }
+                    }
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return conanTask;
     }
-    return conanTask;
-  }
 
-  @Override
-  public <P extends ConanPipeline> ConanTask<P> saveProcessRun(
-          String conanTaskID, ConanProcessRun conanProcessRun)
-          throws IllegalArgumentException {
-    try {
-      Assert.notNull(getJdbcTemplate(), getClass().getSimpleName() + " must have a valid JdbcTemplate set");
+    @Override
+    public <P extends ConanPipeline> ConanTask<P> saveProcessRun(String conanTaskID, ConanProcessRun conanProcessRun)
+        throws IllegalArgumentException {
+        try {
+            Assert.notNull(getJdbcTemplate(), getClass().getSimpleName() + " must have a valid JdbcTemplate set");
 
-      ConanTask taskDB = getTask(conanTaskID);
-      if (conanProcessRun.getUser().getId() == null) {
-        getUserDAO().saveUser(conanProcessRun.getUser());
-      }
+            ConanTask taskDB = getTask(conanTaskID);
+            if (conanProcessRun.getUser().getId() == null) {
+                getUserDAO().saveUser(conanProcessRun.getUser());
+            }
 
-      if (conanProcessRun.getId() == null) {
-        int processRunID = (int) getAutoIncrement("CONAN_PROCESSES");
-        getJdbcTemplate().update(PROCESS_INSERT,
-                                 processRunID,
-                                 conanProcessRun.getProcessName(),
-                                 javaDateToSQLDate(conanProcessRun.getStartDate()),
-                                 javaDateToSQLDate(conanProcessRun.getEndDate()),
-                                 conanProcessRun.getUser().getId(),
-                                 conanProcessRun.getExitValue(),
-                                 conanTaskID);
+            if (conanProcessRun.getId() == null) {
+                int processRunID = (int) getAutoIncrement("CONAN_PROCESSES");
+                getJdbcTemplate().update(PROCESS_INSERT, processRunID, conanProcessRun.getProcessName(),
+                                         javaDateToSQLDate(conanProcessRun.getStartDate()), javaDateToSQLDate(conanProcessRun.getEndDate()),
+                                         conanProcessRun.getUser().getId(), conanProcessRun.getExitValue(), conanTaskID);
 
-        conanProcessRun.setId(Integer.toString(processRunID));
-      }
+                conanProcessRun.setId(Integer.toString(processRunID));
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return super.saveProcessRun(conanTaskID, conanProcessRun);
     }
-    catch (IOException e) {
-      e.printStackTrace();
-    }
-    return super.saveProcessRun(conanTaskID, conanProcessRun);
-  }
 }

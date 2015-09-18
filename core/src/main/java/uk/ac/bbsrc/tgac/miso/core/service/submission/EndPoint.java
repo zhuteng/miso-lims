@@ -32,12 +32,12 @@ import java.net.URI;
  * @since 0.0.2
  */
 public interface EndPoint<T extends URI> {
-  /**
-   * Accepts sequence Datafiles
-   *
-   * @param destination  String
-   */
-  public void setDestination(T destination);
+    /**
+     * Accepts sequence Datafiles
+     *
+     * @param destination String
+     */
+    public void setDestination(T destination);
 
-  public T getDestination();
+    public T getDestination();
 }

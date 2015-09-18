@@ -35,96 +35,98 @@ import java.security.SignatureException;
 
 /**
  * A service class that encodes plaintext passwords into their hashed Base64-encoded counterparts
- * using a specified Spring Security PasswordEncoder 
+ * using a specified Spring Security PasswordEncoder
  *
  * @author Rob Davey
  * @since 0.0.2
  */
 public final class ShaPasswordCodecService implements PasswordCodecService {
-  /** Field log  */
-  protected static final Logger log = LoggerFactory.getLogger(ShaPasswordCodecService.class);
+    /**
+     * Field log
+     */
+    protected static final Logger log = LoggerFactory.getLogger(ShaPasswordCodecService.class);
 
-  /** Field instance  */
-  private static ShaPasswordCodecService instance;
-  private PasswordEncoder encoder;
+    /**
+     * Field instance
+     */
+    private static ShaPasswordCodecService instance;
+    private PasswordEncoder encoder;
 
-  public PasswordEncoder getEncoder() {
-    return encoder;
-  }
-
-  public void setEncoder(PasswordEncoder encoder) {
-    this.encoder = encoder;
-  }
-
-  /**
-   * Constructor PasswordCodecService creates a new PasswordCodecService instance with a SHA
-   * password encoder as default
-   */
-  private ShaPasswordCodecService() {
-    encoder = new ShaPasswordEncoder();
-  }
-
-  /**
-   * Encrypt a plaintext String using a PasswordEncoder strategy, with a null salt.
-   *
-   * @param plaintext of type String
-   * @return String the encrypted String of the given plaintext String
-   */
-  public synchronized String encrypt(String plaintext) {
-    return encrypt(plaintext, null);
-  }
-
-  /**
-   * Encrypt a plaintext String using a PasswordEncoder strategy, with a given salt.
-   *
-   * @param plaintext of type String
-   * @return String the encrypted String of the given plaintext String
-   */
-  public synchronized String encrypt(String plaintext, byte[] salt) {
-    return encoder.encodePassword(plaintext, salt);
-  }
-
-  /**
-   * Encrypt a plaintext String using a hmac_sha1 salt
-   *
-   * @param key of type String
-   * @param plaintext of type String
-   * @return String the encrypted String of the given plaintext String
-   * @throws java.security.SignatureException when the HMAC is unable to be generated
-   */
-  public synchronized String encryptHMACSHA1(String key, String plaintext) throws SignatureException
-  {
-    String result;
-    try {
-      // get an hmac_sha1 key from the raw key bytes
-      SecretKeySpec signingKey = new SecretKeySpec(key.getBytes(), "HmacSHA1");
-
-      // get an hmac_sha1 Mac instance and initialize with the signing key
-      Mac mac = Mac.getInstance("HmacSHA1");
-      mac.init(signingKey);
-
-      // compute the hmac on input data bytes
-      byte[] rawHmac = mac.doFinal(plaintext.getBytes());
-
-      // base64-encode the hmac
-      //result = new BASE64Encoder().encode(rawHmac);
-      result = new Base64().encodeToString(rawHmac);
+    public PasswordEncoder getEncoder() {
+        return encoder;
     }
-    catch (Exception e) {
-      throw new SignatureException("Failed to generate HMAC : " + e.getMessage());
-    }
-    return result;
-  }
 
-  /**
-   * Returns a singleton (as far as singletons are actually singletons!) instance of a PasswordCodecService object.
-   *
-   * @return PasswordCodecService instance.
-   */
-  public static synchronized ShaPasswordCodecService getInstance() {
-    if(instance == null) {
-       instance = new ShaPasswordCodecService();
+    public void setEncoder(PasswordEncoder encoder) {
+        this.encoder = encoder;
     }
-    return instance;
-  }
+
+    /**
+     * Constructor PasswordCodecService creates a new PasswordCodecService instance with a SHA
+     * password encoder as default
+     */
+    private ShaPasswordCodecService() {
+        encoder = new ShaPasswordEncoder();
+    }
+
+    /**
+     * Encrypt a plaintext String using a PasswordEncoder strategy, with a null salt.
+     *
+     * @param plaintext of type String
+     * @return String the encrypted String of the given plaintext String
+     */
+    public synchronized String encrypt(String plaintext) {
+        return encrypt(plaintext, null);
+    }
+
+    /**
+     * Encrypt a plaintext String using a PasswordEncoder strategy, with a given salt.
+     *
+     * @param plaintext of type String
+     * @return String the encrypted String of the given plaintext String
+     */
+    public synchronized String encrypt(String plaintext, byte[] salt) {
+        return encoder.encodePassword(plaintext, salt);
+    }
+
+    /**
+     * Encrypt a plaintext String using a hmac_sha1 salt
+     *
+     * @param key       of type String
+     * @param plaintext of type String
+     * @return String the encrypted String of the given plaintext String
+     * @throws java.security.SignatureException when the HMAC is unable to be generated
+     */
+    public synchronized String encryptHMACSHA1(String key, String plaintext) throws SignatureException {
+        String result;
+        try {
+            // get an hmac_sha1 key from the raw key bytes
+            SecretKeySpec signingKey = new SecretKeySpec(key.getBytes(), "HmacSHA1");
+
+            // get an hmac_sha1 Mac instance and initialize with the signing key
+            Mac mac = Mac.getInstance("HmacSHA1");
+            mac.init(signingKey);
+
+            // compute the hmac on input data bytes
+            byte[] rawHmac = mac.doFinal(plaintext.getBytes());
+
+            // base64-encode the hmac
+            //result = new BASE64Encoder().encode(rawHmac);
+            result = new Base64().encodeToString(rawHmac);
+        } catch (Exception e) {
+            throw new SignatureException("Failed to generate HMAC : " + e.getMessage());
+        }
+        return result;
+    }
+
+    /**
+     * Returns a singleton (as far as singletons are actually singletons!) instance of a PasswordCodecService object.
+     *
+     * @return PasswordCodecService instance.
+     */
+    public static synchronized ShaPasswordCodecService getInstance() {
+        if (instance == null) {
+            instance = new ShaPasswordCodecService();
+        }
+        return instance;
+    }
 }

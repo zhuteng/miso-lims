@@ -36,33 +36,33 @@ import java.util.Collection;
  * @since 0.0.2
  */
 public interface EmPCRStore extends Store<emPCR>, Remover<emPCR>, NamingSchemeAware<emPCR> {
-  /**
-   * Retrieve an EmPCR from an underlying data store given an EmPCR ID
-   * <p/>
-   * This method intends to retrieve objects in an 'ignorant' fashion, i.e. will not populate
-   * parent or child objects that could lead to a circular dependency
-   *
-   * @param emPcrId of type long
-   * @return emPCR
-   * @throws IOException when
-   */
-  //emPCR lazyGet(long emPcrId) throws IOException;
+    /**
+     * Retrieve an EmPCR from an underlying data store given an EmPCR ID
+     * <p/>
+     * This method intends to retrieve objects in an 'ignorant' fashion, i.e. will not populate
+     * parent or child objects that could lead to a circular dependency
+     *
+     * @param emPcrId of type long
+     * @return emPCR
+     * @throws IOException when
+     */
+    //emPCR lazyGet(long emPcrId) throws IOException;
 
-  /**
-  * List all EmPCRs by a parent {@link uk.ac.bbsrc.tgac.miso.core.data.Dilution} ID
-   *
-   * @param dilutionId of type Long
-   * @return Collection<emPCR>
-   * @throws IOException when
-   */
-  public Collection<emPCR> listAllByDilutionId(long dilutionId) throws IOException;
+    /**
+     * List all EmPCRs by a parent {@link uk.ac.bbsrc.tgac.miso.core.data.Dilution} ID
+     *
+     * @param dilutionId of type Long
+     * @return Collection<emPCR>
+     * @throws IOException when
+     */
+    public Collection<emPCR> listAllByDilutionId(long dilutionId) throws IOException;
 
-  /**
-  * List all EmPCRs by a parent {@link uk.ac.bbsrc.tgac.miso.core.data.Project} ID
-   *
-   * @param projectId of type Long
-   * @return Collection<emPCR>
-   * @throws IOException when
-   */
-  public Collection<emPCR> listAllByProjectId(long projectId) throws IOException;
+    /**
+     * List all EmPCRs by a parent {@link uk.ac.bbsrc.tgac.miso.core.data.Project} ID
+     *
+     * @param projectId of type Long
+     * @return Collection<emPCR>
+     * @throws IOException when
+     */
+    public Collection<emPCR> listAllByProjectId(long projectId) throws IOException;
 }

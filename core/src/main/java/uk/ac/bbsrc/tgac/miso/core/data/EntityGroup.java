@@ -12,11 +12,11 @@ import java.util.Set;
  * @since 0.2.1-SNAPSHOT
  */
 public interface EntityGroup<T, S> extends Nameable, Deletable {
-  public void setId(long groupId);
-  public T getParent();
-  public void setParent(T overview);
+    public void setId(long groupId);
+    public T getParent();
+    public void setParent(T overview);
 
-  public Set<S> getEntities();
-  public void setEntities(Set<S> entities);
-  public void addEntity(S entity);
+    public Set<S> getEntities();
+    public void setEntities(Set<S> entities);
+    public void addEntity(S entity);
 }

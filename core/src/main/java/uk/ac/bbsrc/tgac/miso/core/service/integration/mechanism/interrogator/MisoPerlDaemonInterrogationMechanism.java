@@ -37,17 +37,18 @@ import uk.ac.bbsrc.tgac.miso.core.service.integration.mechanism.InterrogationMec
  * @date 07-Oct-2010
  * @since 0.0.2
  */
-public class MisoPerlDaemonInterrogationMechanism implements InterrogationMechanism<MisoPerlDaemonQuery, SequencerReference, MisoPerlDaemonResult> {
-  /**
-   * Push a MisoPerlDaemonQuery to a queryable SequencerReference and return a MisoPerlDaemonResult
-   *
-   * @param sr of type SequencerReference
-   * @param query of type MisoPerlDaemonQuery
-   * @return MisoPerlDaemonResult
-   * @throws InterrogationException when the SequencerReference cannot be interrogated
-   */
-  public MisoPerlDaemonResult doQuery(SequencerReference sr, MisoPerlDaemonQuery query) throws InterrogationException {
-    String resultString = SequencerInterrogationUtils.querySocket(SequencerInterrogationUtils.prepareSocket(sr), query.generateQuery());
-    return new MisoPerlDaemonResult(resultString);
-  }
+public class MisoPerlDaemonInterrogationMechanism
+    implements InterrogationMechanism<MisoPerlDaemonQuery, SequencerReference, MisoPerlDaemonResult> {
+    /**
+     * Push a MisoPerlDaemonQuery to a queryable SequencerReference and return a MisoPerlDaemonResult
+     *
+     * @param sr    of type SequencerReference
+     * @param query of type MisoPerlDaemonQuery
+     * @return MisoPerlDaemonResult
+     * @throws InterrogationException when the SequencerReference cannot be interrogated
+     */
+    public MisoPerlDaemonResult doQuery(SequencerReference sr, MisoPerlDaemonQuery query) throws InterrogationException {
+        String resultString = SequencerInterrogationUtils.querySocket(SequencerInterrogationUtils.prepareSocket(sr), query.generateQuery());
+        return new MisoPerlDaemonResult(resultString);
+    }
 }

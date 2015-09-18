@@ -32,64 +32,59 @@ import uk.ac.bbsrc.tgac.miso.core.exception.MalformedPoolException;
  * @since 0.1.9
  */
 public abstract class AbstractPoolQC extends AbstractQC implements PoolQC {
-  public static final String UNITS = "nM";
+    public static final String UNITS = "nM";
 
-  private Double results;
-  private Pool pool;
+    private Double results;
+    private Pool pool;
 
-  public Pool getPool() {
-    return pool;
-  }
-
-  public void setPool(Pool pool) throws MalformedPoolException {
-    this.pool = pool;
-  }
-
-  public Double getResults() {
-    return results;
-  }
-
-  public void setResults(Double results) {
-    this.results = results;
-  }
-
-  /**
-   * Equivalency is based on getQcId() if set, otherwise on name
-   */
-  @Override
-  public boolean equals(Object obj) {
-    if (obj == null)
-      return false;
-    if (obj == this)
-      return true;
-    if (!(obj instanceof AbstractPoolQC))
-      return false;
-    PoolQC them = (PoolQC) obj;
-    // If not saved, then compare resolved actual objects. Otherwise
-    // just compare IDs.
-    if (this.getId() == AbstractPoolQC.UNSAVED_ID
-        || them.getId() == AbstractPoolQC.UNSAVED_ID) {
-      return this.getQcCreator().equals(them.getQcCreator())
-             && this.getQcDate().equals(them.getQcDate())
-             && this.getQcType().equals(them.getQcType())
-             && this.getResults().equals(them.getResults());
+    public Pool getPool() {
+        return pool;
     }
-    else {
-      return this.getId() == them.getId();
-    }
-  }
 
-  @Override
-  public int hashCode() {
-    if (getId() != AbstractPoolQC.UNSAVED_ID) {
-      return (int)getId();
+    public void setPool(Pool pool) throws MalformedPoolException {
+        this.pool = pool;
     }
-    else {
-      int hashcode = getQcCreator().hashCode();
-      hashcode = 37 * hashcode + getQcDate().hashCode();
-      hashcode = 37 * hashcode + getQcType().hashCode();
-      hashcode = 37 * hashcode + getResults().hashCode();
-      return hashcode;
+
+    public Double getResults() {
+        return results;
     }
-  }
+
+    public void setResults(Double results) {
+        this.results = results;
+    }
+
+    /**
+     * Equivalency is based on getQcId() if set, otherwise on name
+     */
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null)
+            return false;
+        if (obj == this)
+            return true;
+        if (!(obj instanceof AbstractPoolQC))
+            return false;
+        PoolQC them = (PoolQC) obj;
+        // If not saved, then compare resolved actual objects. Otherwise
+        // just compare IDs.
+        if (this.getId() == AbstractPoolQC.UNSAVED_ID || them.getId() == AbstractPoolQC.UNSAVED_ID) {
+            return this.getQcCreator().equals(them.getQcCreator()) && this.getQcDate().equals(them.getQcDate()) &&
+                   this.getQcType().equals(them.getQcType()) && this.getResults().equals(them.getResults());
+        } else {
+            return this.getId() == them.getId();
+        }
+    }
+
+    @Override
+    public int hashCode() {
+        if (getId() != AbstractPoolQC.UNSAVED_ID) {
+            return (int) getId();
+        } else {
+            int hashcode = getQcCreator().hashCode();
+            hashcode = 37 * hashcode + getQcDate().hashCode();
+            hashcode = 37 * hashcode + getQcType().hashCode();
+            hashcode = 37 * hashcode + getResults().hashCode();
+            return hashcode;
+        }
+    }
 }

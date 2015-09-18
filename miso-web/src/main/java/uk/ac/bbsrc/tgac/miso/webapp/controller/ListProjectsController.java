@@ -42,24 +42,24 @@ import uk.ac.bbsrc.tgac.miso.core.util.AliasComparator;
 
 @Controller
 public class ListProjectsController {
-  protected static final Logger log = LoggerFactory.getLogger(ListProjectsController.class);
+    protected static final Logger log = LoggerFactory.getLogger(ListProjectsController.class);
 
-  @Autowired
-  private SecurityManager securityManager;
+    @Autowired
+    private SecurityManager securityManager;
 
-  public void setSecurityManager(SecurityManager securityManager) {
-    this.securityManager = securityManager;
-  }
+    public void setSecurityManager(SecurityManager securityManager) {
+        this.securityManager = securityManager;
+    }
 
-  @Autowired
-  private RequestManager requestManager;
+    @Autowired
+    private RequestManager requestManager;
 
-  public void setRequestManager(RequestManager requestManager) {
-    this.requestManager = requestManager;
-  }
+    public void setRequestManager(RequestManager requestManager) {
+        this.requestManager = requestManager;
+    }
 
-  @RequestMapping("/projects")
-  public ModelAndView listProjects() throws Exception {
-    return new ModelAndView("/pages/listProjects.jsp");
-  }
+    @RequestMapping("/projects")
+    public ModelAndView listProjects() throws Exception {
+        return new ModelAndView("/pages/listProjects.jsp");
+    }
 }

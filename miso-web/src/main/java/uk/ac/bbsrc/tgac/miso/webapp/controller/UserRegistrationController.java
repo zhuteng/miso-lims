@@ -47,50 +47,47 @@ import java.io.IOException;
 @Controller
 @RequestMapping("/registerUser")
 public class UserRegistrationController {
-  protected static final Logger log = LoggerFactory.getLogger(UserRegistrationController.class);
+    protected static final Logger log = LoggerFactory.getLogger(UserRegistrationController.class);
 
-  @Autowired
-  private SecurityManager securityManager;
+    @Autowired
+    private SecurityManager securityManager;
 
-  public void setSecurityManager(SecurityManager securityManager) {
-    this.securityManager = securityManager;
-  }
-
-  @Autowired
-  private PasswordCodecService passwordCodecService;
-
-  public void setPasswordCodecService(PasswordCodecService passwordCodecService) {
-    this.passwordCodecService = passwordCodecService;
-  }
-
-  @RequestMapping(method = RequestMethod.GET)
-  public ModelAndView setupForm(ModelMap model) throws IOException {
-    model.put("user", new UserImpl());
-    return new ModelAndView("/pages/registerUser.jsp", model);
-  }
-
-  @RequestMapping(method = RequestMethod.POST)
-  public String processSubmit(@ModelAttribute("user") User user,
-                              ModelMap model, SessionStatus session) throws IOException {
-    try {
-      //encode the password as set by the passwordCodecService
-      if (passwordCodecService != null) {
-        user.setPassword(passwordCodecService.getEncoder().encodePassword(user.getPassword(), null));
-      }
-      else {
-        log.warn("No passwordCodecService set! Passwords will be stored in plaintext!");
-      }
-
-      securityManager.saveUser(user);
-      session.setComplete();
-      model.clear();
-      return "redirect:/miso/mainMenu";
+    public void setSecurityManager(SecurityManager securityManager) {
+        this.securityManager = securityManager;
     }
-    catch (IOException ex) {
-      if (log.isDebugEnabled()) {
-        log.debug("Failed to register user", ex);
-      }
-      throw ex;
+
+    @Autowired
+    private PasswordCodecService passwordCodecService;
+
+    public void setPasswordCodecService(PasswordCodecService passwordCodecService) {
+        this.passwordCodecService = passwordCodecService;
     }
-  }
+
+    @RequestMapping(method = RequestMethod.GET)
+    public ModelAndView setupForm(ModelMap model) throws IOException {
+        model.put("user", new UserImpl());
+        return new ModelAndView("/pages/registerUser.jsp", model);
+    }
+
+    @RequestMapping(method = RequestMethod.POST)
+    public String processSubmit(@ModelAttribute("user") User user, ModelMap model, SessionStatus session) throws IOException {
+        try {
+            //encode the password as set by the passwordCodecService
+            if (passwordCodecService != null) {
+                user.setPassword(passwordCodecService.getEncoder().encodePassword(user.getPassword(), null));
+            } else {
+                log.warn("No passwordCodecService set! Passwords will be stored in plaintext!");
+            }
+
+            securityManager.saveUser(user);
+            session.setComplete();
+            model.clear();
+            return "redirect:/miso/mainMenu";
+        } catch (IOException ex) {
+            if (log.isDebugEnabled()) {
+                log.debug("Failed to register user", ex);
+            }
+            throw ex;
+        }
+    }
 }

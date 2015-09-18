@@ -33,14 +33,14 @@ package uk.ac.bbsrc.tgac.miso.runstats.client;
  * @since 0.1.5
  */
 public class RunStatsException extends Exception {
-  public RunStatsException(String s) {
-    super(s);
-  }
-
-  public RunStatsException(String s, Throwable cause) {
-    super(s);
-    if (cause != null) {
-        initCause(cause);
+    public RunStatsException(String s) {
+        super(s);
     }
-  }
+
+    public RunStatsException(String s, Throwable cause) {
+        super(s);
+        if (cause != null) {
+            initCause(cause);
+        }
+    }
 }

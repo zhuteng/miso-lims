@@ -36,47 +36,50 @@ import java.util.Collection;
  * @since 0.0.2
  */
 public interface LibraryQcStore extends Store<LibraryQC>, Remover<LibraryQC> {
-  /**
-   * Retrieve a LibraryQC from an underlying data store given a LibraryQC ID
-   * <p/>
-   * This method intends to retrieve objects in an 'ignorant' fashion, i.e.  will not populate
-   * parent or child objects that could lead to a circular dependency
-   *
-   * @param qcId of type long
-   * @return LibraryQC
-   * @throws IOException when
-   */
-  //LibraryQC lazyGet(long qcId) throws IOException;
+    /**
+     * Retrieve a LibraryQC from an underlying data store given a LibraryQC ID
+     * <p/>
+     * This method intends to retrieve objects in an 'ignorant' fashion, i.e.  will not populate
+     * parent or child objects that could lead to a circular dependency
+     *
+     * @param qcId of type long
+     * @return LibraryQC
+     * @throws IOException when
+     */
+    //LibraryQC lazyGet(long qcId) throws IOException;
 
-  /**
-   * List all LibraryQCs performed on a Library given a parent Library ID
-   *
-   * @param libraryId of type long
-   * @return Collection<LibraryQC>
-   * @throws IOException when
-   */
-  Collection<LibraryQC> listByLibraryId(long libraryId) throws IOException;
+    /**
+     * List all LibraryQCs performed on a Library given a parent Library ID
+     *
+     * @param libraryId of type long
+     * @return Collection<LibraryQC>
+     * @throws IOException when
+     */
+    Collection<LibraryQC> listByLibraryId(long libraryId) throws IOException;
 
-  /**
-   * Get the QcType descriptor for a given type ID
-   * @param qcTypeId
-   * @return the QcType with the given ID, or null if none exists
-   * @throws IOException
-   */
-  QcType getLibraryQcTypeById(long qcTypeId) throws IOException;
+    /**
+     * Get the QcType descriptor for a given type ID
+     *
+     * @param qcTypeId
+     * @return the QcType with the given ID, or null if none exists
+     * @throws IOException
+     */
+    QcType getLibraryQcTypeById(long qcTypeId) throws IOException;
 
-  /**
-   * Get the QcType descriptor for a given type name
-   * @param qcName
-   * @return the QcType with the given name, or null if none exists
-   * @throws IOException
-   */
-  QcType getLibraryQcTypeByName(String qcName) throws IOException;
+    /**
+     * Get the QcType descriptor for a given type name
+     *
+     * @param qcName
+     * @return the QcType with the given name, or null if none exists
+     * @throws IOException
+     */
+    QcType getLibraryQcTypeByName(String qcName) throws IOException;
 
-  /**
-   * Get all QcType descriptors for {@link uk.ac.bbsrc.tgac.miso.core.data.Library} objects
-   * @return Collection<QcType>
-   * @throws IOException
-   */
-  Collection<QcType> listAllLibraryQcTypes() throws IOException;
+    /**
+     * Get all QcType descriptors for {@link uk.ac.bbsrc.tgac.miso.core.data.Library} objects
+     *
+     * @return Collection<QcType>
+     * @throws IOException
+     */
+    Collection<QcType> listAllLibraryQcTypes() throws IOException;
 }

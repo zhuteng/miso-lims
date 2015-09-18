@@ -50,116 +50,113 @@ import java.io.IOException;
  * @since 0.0.2
  */
 public class MisoLdapAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
-  private static final String POST = "POST";
+    private static final String POST = "POST";
 
-  private SessionAuthenticationStrategy strategy;
+    private SessionAuthenticationStrategy strategy;
 
-  @Autowired
-  private com.eaglegenomics.simlims.core.manager.SecurityManager securityManager;
+    @Autowired
+    private com.eaglegenomics.simlims.core.manager.SecurityManager securityManager;
 
-  /**
-   * Sets the securityManager of this MisoLdapAuthenticationFilter object.
-   *
-   * @param securityManager securityManager.
-   */
-  public void setSecurityManager(SecurityManager securityManager) {
-    this.securityManager = securityManager;
-  }
-
-  /**
-   * Creates a new MisoLdapAuthenticationFilter instance.
-   */
-  public MisoLdapAuthenticationFilter() {
-    super();
-  }
-
-  @Override
-  public void setSessionAuthenticationStrategy(SessionAuthenticationStrategy strategy) {
-    //forcing this filter to expose the super session auth strategy to this class' doFilter
-    //the parent sessionStrategy is private! :(
-    this.strategy = strategy;
-    super.setSessionAuthenticationStrategy(strategy);
-  }
-
-  /**
-   * Does the filtering at the given point in the filter chain.
-   *
-   * @param req   of type ServletRequest
-   * @param res   of type ServletResponse
-   * @param chain of type FilterChain
-   * @throws IOException      when
-   * @throws ServletException when
-   */
-  @Override
-  public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) throws IOException, ServletException {
-    final HttpServletRequest request = (HttpServletRequest) req;
-    final HttpServletResponse response = (HttpServletResponse) res;
-
-    if (request.getMethod().equals(POST)) {
-      if (!requiresAuthentication(request, response)) {
-        chain.doFilter(request, response);
-        return;
-      }
-
-      if (logger.isDebugEnabled()) {
-        logger.debug("Request is to process authentication");
-      }
-
-      Authentication authResult;
-
-      try {
-        authResult = attemptAuthentication(request, response);
-        if (authResult == null) {
-          // return immediately as subclass has indicated that it hasn't completed authentication
-          return;
-        }
-        strategy.onAuthentication(authResult, request, response);
-      }
-      catch (AuthenticationException failed) {
-        // Authentication failed
-        unsuccessfulAuthentication(request, response, failed);
-        return;
-      }
-
-      successfulAuthentication(request, response, chain, authResult);
-
-      // this will verify that the LDAP user is mirrored into the LIMS DB
-//      Object p = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-//      if (p instanceof InetOrgPerson) {
-//        User u = LimsSecurityUtils.fromLdapUser((InetOrgPerson) p);
-//        User dbu = securityManager.getUserByLoginName(u.getLoginName());
-//        if (dbu != null && !dbu.equals(u)) {
-//          long userId = securityManager.saveUser(u);
-//        }
-//      }
-      Object p = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-      if (p instanceof InetOrgPerson) {
-        //map the LDAP user details to a MISO User
-        User u = LimsSecurityUtils.fromLdapUser((InetOrgPerson) p);
-        //check if a user exists in the database with this username
-        User dbu = securityManager.getUserByLoginName(u.getLoginName());
-        if (dbu == null || (dbu != null && !dbu.equals(u))) {
-          long userId = securityManager.saveUser(u);
-        }
-        else if (dbu != null) {
-          // check if the user is same with the ldap user (skipped the password field)
-          dbu.setPassword(u.getPassword());
-          if (dbu.equals(u)) {
-            // save the user with ldap password, this is for when ldap password changed.
-            securityManager.saveUser(dbu);
-          }
-        }
-      }
+    /**
+     * Sets the securityManager of this MisoLdapAuthenticationFilter object.
+     *
+     * @param securityManager securityManager.
+     */
+    public void setSecurityManager(SecurityManager securityManager) {
+        this.securityManager = securityManager;
     }
-    else {
-      // If it's a GET, we ignore this request and send it
-      // to the next filter in the chain.  In this case, that
-      // pretty much means the request will hit the /login
-      // controller which will process the request to show the
-      // login page.
-      logger.debug("Chaining: " + chain.toString());
-      chain.doFilter(request, response);
-      return;
+
+    /**
+     * Creates a new MisoLdapAuthenticationFilter instance.
+     */
+    public MisoLdapAuthenticationFilter() {
+        super();
     }
-  }
+
+    @Override
+    public void setSessionAuthenticationStrategy(SessionAuthenticationStrategy strategy) {
+        //forcing this filter to expose the super session auth strategy to this class' doFilter
+        //the parent sessionStrategy is private! :(
+        this.strategy = strategy;
+        super.setSessionAuthenticationStrategy(strategy);
+    }
+
+    /**
+     * Does the filtering at the given point in the filter chain.
+     *
+     * @param req   of type ServletRequest
+     * @param res   of type ServletResponse
+     * @param chain of type FilterChain
+     * @throws IOException      when
+     * @throws ServletException when
+     */
+    @Override
+    public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) throws IOException, ServletException {
+        final HttpServletRequest request = (HttpServletRequest) req;
+        final HttpServletResponse response = (HttpServletResponse) res;
+
+        if (request.getMethod().equals(POST)) {
+            if (!requiresAuthentication(request, response)) {
+                chain.doFilter(request, response);
+                return;
+            }
+
+            if (logger.isDebugEnabled()) {
+                logger.debug("Request is to process authentication");
+            }
+
+            Authentication authResult;
+
+            try {
+                authResult = attemptAuthentication(request, response);
+                if (authResult == null) {
+                    // return immediately as subclass has indicated that it hasn't completed authentication
+                    return;
+                }
+                strategy.onAuthentication(authResult, request, response);
+            } catch (AuthenticationException failed) {
+                // Authentication failed
+                unsuccessfulAuthentication(request, response, failed);
+                return;
+            }
+
+            successfulAuthentication(request, response, chain, authResult);
+
+            // this will verify that the LDAP user is mirrored into the LIMS DB
+            //      Object p = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            //      if (p instanceof InetOrgPerson) {
+            //        User u = LimsSecurityUtils.fromLdapUser((InetOrgPerson) p);
+            //        User dbu = securityManager.getUserByLoginName(u.getLoginName());
+            //        if (dbu != null && !dbu.equals(u)) {
+            //          long userId = securityManager.saveUser(u);
+            //        }
+            //      }
+            Object p = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            if (p instanceof InetOrgPerson) {
+                //map the LDAP user details to a MISO User
+                User u = LimsSecurityUtils.fromLdapUser((InetOrgPerson) p);
+                //check if a user exists in the database with this username
+                User dbu = securityManager.getUserByLoginName(u.getLoginName());
+                if (dbu == null || (dbu != null && !dbu.equals(u))) {
+                    long userId = securityManager.saveUser(u);
+                } else if (dbu != null) {
+                    // check if the user is same with the ldap user (skipped the password field)
+                    dbu.setPassword(u.getPassword());
+                    if (dbu.equals(u)) {
+                        // save the user with ldap password, this is for when ldap password changed.
+                        securityManager.saveUser(dbu);
+                    }
+                }
+            }
+        } else {
+            // If it's a GET, we ignore this request and send it
+            // to the next filter in the chain.  In this case, that
+            // pretty much means the request will hit the /login
+            // controller which will process the request to show the
+            // login page.
+            logger.debug("Chaining: " + chain.toString());
+            chain.doFilter(request, response);
+            return;
+        }
+    }
 }

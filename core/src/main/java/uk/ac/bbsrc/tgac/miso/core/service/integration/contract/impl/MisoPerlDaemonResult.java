@@ -33,23 +33,23 @@ import uk.ac.bbsrc.tgac.miso.core.service.integration.contract.InterrogationResu
  * @since 0.0.2
  */
 public class MisoPerlDaemonResult implements InterrogationResult<String> {
-  private String resultString;
+    private String resultString;
 
-  /**
-   * Creates a new MisoPerlDaemonResult instance.
-   *
-   * @param resultString of type String
-   */
-  public MisoPerlDaemonResult(String resultString) {
-    this.resultString = resultString;
-  }
+    /**
+     * Creates a new MisoPerlDaemonResult instance.
+     *
+     * @param resultString of type String
+     */
+    public MisoPerlDaemonResult(String resultString) {
+        this.resultString = resultString;
+    }
 
-  /**
-   * Parses the response given on construction and returns a result in the form of a simple String
-   *
-   * @return String the parsed response
-   */
-  public String parseResult() {
-    return resultString;
-  }
+    /**
+     * Parses the response given on construction and returns a result in the form of a simple String
+     *
+     * @return String the parsed response
+     */
+    public String parseResult() {
+        return resultString;
+    }
 }

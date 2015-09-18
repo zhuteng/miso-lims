@@ -38,48 +38,47 @@ import java.util.*;
  * @since 0.1.5
  */
 public class MisoNotificationConsumerService implements NotificationConsumerService {
-  protected static final Logger log = LoggerFactory.getLogger(MisoNotificationConsumerService.class);
-  private Map<String, NotificationConsumerStrategy> strategyMap;
+    protected static final Logger log = LoggerFactory.getLogger(MisoNotificationConsumerService.class);
+    private Map<String, NotificationConsumerStrategy> strategyMap;
 
-  @Override
-  public NotificationConsumerStrategy getConsumerStrategy(String strategyName) {
-    for (NotificationConsumerStrategy strategy : getConsumerStrategies()) {
-      if (strategy.getName().equals(strategyName)) {
-        log.debug("Got strategy: " + strategy.getName());
-        return strategy;
-      }
-    }
-    log.warn("No strategy called '" + strategyName + "' was available on the classpath");
-    return null;
-  }
-
-  @Override
-  public Collection<NotificationConsumerStrategy> getConsumerStrategies() {
-    //lazily load available strategies
-    log.debug("Grabbing strategies...");
-    if (strategyMap == null) {
-      ServiceLoader<NotificationConsumerStrategy> consumerLoader = ServiceLoader.load(NotificationConsumerStrategy.class);
-      Iterator<NotificationConsumerStrategy> consumerIterator = consumerLoader.iterator();
-
-      strategyMap = new HashMap<String, NotificationConsumerStrategy>();
-      while (consumerIterator.hasNext()) {
-        NotificationConsumerStrategy p = consumerIterator.next();
-
-        if (!strategyMap.containsKey(p.getName())) {
-          strategyMap.put(p.getName(), p);
+    @Override
+    public NotificationConsumerStrategy getConsumerStrategy(String strategyName) {
+        for (NotificationConsumerStrategy strategy : getConsumerStrategies()) {
+            if (strategy.getName().equals(strategyName)) {
+                log.debug("Got strategy: " + strategy.getName());
+                return strategy;
+            }
         }
-        else {
-          if (strategyMap.get(p.getName()) != p) {
-            String msg = "Multiple different NotificationConsumerStrategies with the same strategy name " +
-                         "('" + p.getName() + "') are present on the classpath. Strategy names must be unique.";
-            log.error(msg);
-            throw new ServiceConfigurationError(msg);
-          }
-        }
-      }
-      log.info("Loaded " + strategyMap.values().size() + " known strategies");
+        log.warn("No strategy called '" + strategyName + "' was available on the classpath");
+        return null;
     }
 
-    return strategyMap.values();
-  }
+    @Override
+    public Collection<NotificationConsumerStrategy> getConsumerStrategies() {
+        //lazily load available strategies
+        log.debug("Grabbing strategies...");
+        if (strategyMap == null) {
+            ServiceLoader<NotificationConsumerStrategy> consumerLoader = ServiceLoader.load(NotificationConsumerStrategy.class);
+            Iterator<NotificationConsumerStrategy> consumerIterator = consumerLoader.iterator();
+
+            strategyMap = new HashMap<String, NotificationConsumerStrategy>();
+            while (consumerIterator.hasNext()) {
+                NotificationConsumerStrategy p = consumerIterator.next();
+
+                if (!strategyMap.containsKey(p.getName())) {
+                    strategyMap.put(p.getName(), p);
+                } else {
+                    if (strategyMap.get(p.getName()) != p) {
+                        String msg = "Multiple different NotificationConsumerStrategies with the same strategy name " +
+                                     "('" + p.getName() + "') are present on the classpath. Strategy names must be unique.";
+                        log.error(msg);
+                        throw new ServiceConfigurationError(msg);
+                    }
+                }
+            }
+            log.info("Loaded " + strategyMap.values().size() + " known strategies");
+        }
+
+        return strategyMap.values();
+    }
 }

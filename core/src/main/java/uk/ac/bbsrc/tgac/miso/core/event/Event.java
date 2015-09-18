@@ -35,8 +35,8 @@ import uk.ac.bbsrc.tgac.miso.core.event.type.MisoEventType;
  * @since 0.1.2
  */
 public interface Event<T> {
-  String getEventMessage();
-  MisoEventType getEventType();
-  T getEventObject();
-  JSONObject getEventContext();
+    String getEventMessage();
+    MisoEventType getEventType();
+    T getEventObject();
+    JSONObject getEventContext();
 }

@@ -25,6 +25,7 @@ package uk.ac.bbsrc.tgac.miso.core.data;
 
 //import com.fasterxml.jackson.annotation.*;
 //import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+
 import org.codehaus.jackson.annotate.JsonBackReference;
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 import org.codehaus.jackson.annotate.JsonTypeInfo;
@@ -38,35 +39,35 @@ import uk.ac.bbsrc.tgac.miso.core.exception.MalformedPoolException;
  * @since 0.1.9
  */
 @JsonSerialize(typing = JsonSerialize.Typing.STATIC)
-@JsonTypeInfo(use=JsonTypeInfo.Id.CLASS, include= JsonTypeInfo.As.PROPERTY, property="@class")
+@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
 public interface PoolQC extends QC {
-  /**
-   * Returns the pool of this PoolQC object.
-   *
-   * @return Pool pool.
-   */
-  @JsonBackReference(value = "qcpool")
-  public Pool getPool();
+    /**
+     * Returns the pool of this PoolQC object.
+     *
+     * @return Pool pool.
+     */
+    @JsonBackReference(value = "qcpool")
+    public Pool getPool();
 
-  /**
-   * Sets the pool of this PoolQC object.
-   *
-   * @param pool Pool.
-   * @throws uk.ac.bbsrc.tgac.miso.core.exception.MalformedPoolException when the Pool being set is not valid
-   */
-  public void setPool(Pool pool) throws MalformedPoolException;
+    /**
+     * Sets the pool of this PoolQC object.
+     *
+     * @param pool Pool.
+     * @throws uk.ac.bbsrc.tgac.miso.core.exception.MalformedPoolException when the Pool being set is not valid
+     */
+    public void setPool(Pool pool) throws MalformedPoolException;
 
-  /**
-   * Returns the results of this QC object.
-   *
-   * @return Double results.
-   */
-  public Double getResults();
+    /**
+     * Returns the results of this QC object.
+     *
+     * @return Double results.
+     */
+    public Double getResults();
 
-  /**
-   * Sets the results of this QC object.
-   *
-   * @param results results.
-   */
-  public void setResults(Double results);  
+    /**
+     * Sets the results of this QC object.
+     *
+     * @param results results.
+     */
+    public void setResults(Double results);
 }

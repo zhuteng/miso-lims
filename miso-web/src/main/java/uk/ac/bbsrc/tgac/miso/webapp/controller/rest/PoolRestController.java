@@ -49,7 +49,7 @@ import java.util.List;
 
 /**
  * A controller to handle all REST requests for Pools
- *
+ * <p/>
  * Created by IntelliJ IDEA.
  * User: bianx
  * Date: 17-Aug-2011
@@ -59,64 +59,66 @@ import java.util.List;
 @RequestMapping("/rest/pool")
 @SessionAttributes("pool")
 public class PoolRestController {
-  protected static final Logger log = LoggerFactory.getLogger(LibraryRestController.class);
+    protected static final Logger log = LoggerFactory.getLogger(LibraryRestController.class);
 
-  @Autowired
-  private RequestManager requestManager;
+    @Autowired
+    private RequestManager requestManager;
 
-  public void setRequestManager(RequestManager requestManager) {
-    this.requestManager = requestManager;
-  }
-
-  @RequestMapping(value = "{poolId}", method = RequestMethod.GET)
-  public @ResponseBody String getPoolById(@PathVariable Long poolId) throws IOException {
-    ObjectMapper mapper = new ObjectMapper();
-    try {
-      Pool p = requestManager.getPoolById(poolId);
-      if (p != null) {
-        mapper.getSerializationConfig().addMixInAnnotations(User.class, UserInfoMixin.class);
-        return mapper.writeValueAsString(p);
-      }
-      return mapper.writeValueAsString(RestUtils.error("No such pool with that ID.", "poolId", poolId.toString()));
-    }
-    catch (IOException ioe) {
-      return mapper.writeValueAsString(RestUtils.error("Cannot retrieve pool: " + ioe.getMessage(), "poolId", poolId.toString()));
-    }
-  }
-
-  @RequestMapping(value = "/wizard/librarydilutions", method = RequestMethod.GET)
-  public @ResponseBody JSONObject ldRest() throws IOException {
-    Collection<LibraryDilution> lds = requestManager.listAllLibraryDilutions();
-
-    List<String> types = new ArrayList<String>(requestManager.listDistinctPlatformNames());
-    Collections.sort(types);
-
-    JSONArray platformTypeArray = new JSONArray();
-    for (String type : types) {
-      platformTypeArray.add(type);
+    public void setRequestManager(RequestManager requestManager) {
+        this.requestManager = requestManager;
     }
 
-    JSONObject ldJSON = new JSONObject();
-    JSONArray tableArray = new JSONArray();
-    for (LibraryDilution ld : lds) {
-      JSONArray rowArray = new JSONArray();
-      rowArray.add("");
-      rowArray.add(ld.getName());
-      rowArray.add("");
-      tableArray.add(rowArray);
+    @RequestMapping(value = "{poolId}", method = RequestMethod.GET)
+    @ResponseBody
+    public String getPoolById(@PathVariable Long poolId) throws IOException {
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            Pool p = requestManager.getPoolById(poolId);
+            if (p != null) {
+                mapper.getSerializationConfig().addMixInAnnotations(User.class, UserInfoMixin.class);
+                return mapper.writeValueAsString(p);
+            }
+            return mapper.writeValueAsString(RestUtils.error("No such pool with that ID.", "poolId", poolId.toString()));
+        } catch (IOException ioe) {
+            return mapper.writeValueAsString(RestUtils.error("Cannot retrieve pool: " + ioe.getMessage(), "poolId", poolId.toString()));
+        }
     }
 
-    ldJSON.put("aaData", tableArray);
-    return ldJSON;
-  }
+    @RequestMapping(value = "/wizard/librarydilutions", method = RequestMethod.GET)
+    @ResponseBody
+    public JSONObject ldRest() throws IOException {
+        Collection<LibraryDilution> lds = requestManager.listAllLibraryDilutions();
 
-  @RequestMapping(value = "/wizard/platformtypes", method = RequestMethod.GET)
-  public @ResponseBody String platformTypesRest() throws IOException {
-    List<String> names = new ArrayList<String>();
-    List<String> types = new ArrayList<String>(requestManager.listDistinctPlatformNames());
-    for (String name : types) {
-      names.add("\"" + name + "\"");
+        List<String> types = new ArrayList<String>(requestManager.listDistinctPlatformNames());
+        Collections.sort(types);
+
+        JSONArray platformTypeArray = new JSONArray();
+        for (String type : types) {
+            platformTypeArray.add(type);
+        }
+
+        JSONObject ldJSON = new JSONObject();
+        JSONArray tableArray = new JSONArray();
+        for (LibraryDilution ld : lds) {
+            JSONArray rowArray = new JSONArray();
+            rowArray.add("");
+            rowArray.add(ld.getName());
+            rowArray.add("");
+            tableArray.add(rowArray);
+        }
+
+        ldJSON.put("aaData", tableArray);
+        return ldJSON;
     }
-    return "{"+LimsUtils.join(names, ",")+"}";
-  }
+
+    @RequestMapping(value = "/wizard/platformtypes", method = RequestMethod.GET)
+    @ResponseBody
+    public String platformTypesRest() throws IOException {
+        List<String> names = new ArrayList<String>();
+        List<String> types = new ArrayList<String>(requestManager.listDistinctPlatformNames());
+        for (String name : types) {
+            names.add("\"" + name + "\"");
+        }
+        return "{" + LimsUtils.join(names, ",") + "}";
+    }
 }

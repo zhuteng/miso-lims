@@ -61,251 +61,236 @@ import java.util.*;
 @SessionAttributes("pool")
 @Deprecated
 public class EditSolidPoolController {
-  protected static final Logger log = LoggerFactory.getLogger(EditSolidPoolController.class);
+    protected static final Logger log = LoggerFactory.getLogger(EditSolidPoolController.class);
 
-  @Autowired
-  private SecurityManager securityManager;
+    @Autowired
+    private SecurityManager securityManager;
 
-  @Autowired
-  private RequestManager requestManager;
+    @Autowired
+    private RequestManager requestManager;
 
-  @Autowired
-  private DataObjectFactory dataObjectFactory;
+    @Autowired
+    private DataObjectFactory dataObjectFactory;
 
-  public void setDataObjectFactory(DataObjectFactory dataObjectFactory) {
-    this.dataObjectFactory = dataObjectFactory;
-  }
-
-  public void setRequestManager(RequestManager requestManager) {
-    this.requestManager = requestManager;
-  }
-
-  public void setSecurityManager(SecurityManager securityManager) {
-    this.securityManager = securityManager;
-  }
-
-  private List<? extends Dilution> populateAvailableDilutions(User user, Pool pool) throws IOException {
-    ArrayList<emPCRDilution> libs = new ArrayList<emPCRDilution>();
-    //for (Dilution l : requestManager.listAllDilutionsByPlatform(PlatformType.Solid)) {
-    for (emPCRDilution l : requestManager.listAllEmPcrDilutions()) {
-      if (l.getEmPCR().getLibraryDilution().getLibrary().getPlatformName().equals(PlatformType.SOLID.getKey())) {
-        if (!pool.getDilutions().contains(l)) {
-          if (l.userCanRead(user)) {
-            libs.add(l);
-          }
-        }
-      }
+    public void setDataObjectFactory(DataObjectFactory dataObjectFactory) {
+        this.dataObjectFactory = dataObjectFactory;
     }
-    Collections.sort(libs);
-    return libs;
-  }
 
-  public Collection<Experiment> populateExperiments(@RequestParam(value = "experimentId", required = false) Long experimentId, Pool p) throws IOException {
-    try {
-      User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-      Collection<Experiment> es = new ArrayList<Experiment>();
-      for (Experiment e : requestManager.listAllExperiments()) {
-        if (e.getPlatform().getPlatformType().equals(p.getPlatformType())) {
-          if (experimentId != null) {
-            if (e.getId() != experimentId) {
-              es.add(e);
+    public void setRequestManager(RequestManager requestManager) {
+        this.requestManager = requestManager;
+    }
+
+    public void setSecurityManager(SecurityManager securityManager) {
+        this.securityManager = securityManager;
+    }
+
+    private List<? extends Dilution> populateAvailableDilutions(User user, Pool pool) throws IOException {
+        ArrayList<emPCRDilution> libs = new ArrayList<emPCRDilution>();
+        //for (Dilution l : requestManager.listAllDilutionsByPlatform(PlatformType.Solid)) {
+        for (emPCRDilution l : requestManager.listAllEmPcrDilutions()) {
+            if (l.getEmPCR().getLibraryDilution().getLibrary().getPlatformName().equals(PlatformType.SOLID.getKey())) {
+                if (!pool.getDilutions().contains(l)) {
+                    if (l.userCanRead(user)) {
+                        libs.add(l);
+                    }
+                }
             }
-          }
-          else {
-            es.add(e);
-          }
         }
-      }
-      return es;
+        Collections.sort(libs);
+        return libs;
     }
-    catch (IOException ex) {
-      if (log.isDebugEnabled()) {
-        log.debug("Failed to list experiments", ex);
-      }
-      throw ex;
-    }
-  }
 
-  @RequestMapping(value = "/new", method = RequestMethod.GET)
-  public ModelAndView newSolidPool(ModelMap model) throws IOException {
-    return setupForm(AbstractPool.UNSAVED_ID, model);
-  }
-
-  @RequestMapping(value = "/new/{experimentId}", method = RequestMethod.GET)
-  public ModelAndView newAssignedSolidPool(@PathVariable Long experimentId, ModelMap model) throws IOException {
-    return setupFormWithExperiment(AbstractPool.UNSAVED_ID, experimentId, model);
-  }
-
-  @RequestMapping(value = "/{poolId}", method = RequestMethod.GET)
-  public ModelAndView setupForm(@PathVariable Long poolId,
-                                ModelMap model) throws IOException {
-    try {
-      User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-      Pool pool = null;
-      if (poolId == AbstractPool.UNSAVED_ID) {
-        pool = dataObjectFactory.getSolidPool(user);
-        model.put("title", "New SOLiD Pool");
-      }
-      else {
-        pool = requestManager.getPoolById(poolId);
-        model.put("title", "SOLiD Pool "+poolId);
-      }
-
-      if (pool == null) {
-        throw new SecurityException("No such Solid pool");
-      }
-      if (!pool.userCanRead(user)) {
-        throw new SecurityException("Permission denied.");
-      }
-      model.put("formObj", pool);
-      model.put("pool", pool);
-      model.put("availableDilutions", populateAvailableDilutions(user, pool));
-      model.put("accessibleExperiments", populateExperiments(null, pool));
-      model.put("owners", LimsSecurityUtils.getPotentialOwners(user, pool, securityManager.listAllUsers()));
-      model.put("accessibleUsers", LimsSecurityUtils.getAccessibleUsers(user, pool, securityManager.listAllUsers()));
-      model.put("accessibleGroups", LimsSecurityUtils.getAccessibleGroups(user, pool, securityManager.listAllGroups()));
-      return new ModelAndView("/pages/editSolidPool.jsp", model);
-    }
-    catch (IOException ex) {
-      if (log.isDebugEnabled()) {
-        log.debug("Failed to show Solid pool", ex);
-      }
-      throw ex;
-    }
-  }
-
-
-  @RequestMapping(value = "/{poolId}/experiment/{experimentId}", method = RequestMethod.GET)
-  public ModelAndView setupFormWithExperiment(@PathVariable Long poolId,
-                                @PathVariable Long experimentId,
-                                ModelMap model) throws IOException {
-    try {
-      User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-      Pool pool = null;
-      if (poolId == AbstractPool.UNSAVED_ID) {
-        pool = dataObjectFactory.getSolidPool(user);
-        model.put("title", "New Solid Pool");
-      }
-      else {
-        pool = requestManager.getPoolById(poolId);
-        model.put("title", "Solid Pool "+poolId);
-      }
-
-      if (pool == null) {
-        throw new SecurityException("No such Solid Pool");
-      }
-      if (!pool.userCanRead(user)) {
-        throw new SecurityException("Permission denied.");
-      }
-
-      if (experimentId != null) {
-        model.put("accessibleExperiments", populateExperiments(experimentId, pool));
-      }
-      else {
-        model.put("accessibleExperiments", populateExperiments(null, pool));
-      }
-
-      model.put("formObj", pool);
-      model.put("pool", pool);
-      model.put("availableDilutions", populateAvailableDilutions(user, pool));
-
-      model.put("owners", LimsSecurityUtils.getPotentialOwners(user, pool, securityManager.listAllUsers()));
-      model.put("accessibleUsers", LimsSecurityUtils.getAccessibleUsers(user, pool, securityManager.listAllUsers()));
-      model.put("accessibleGroups", LimsSecurityUtils.getAccessibleGroups(user, pool, securityManager.listAllGroups()));
-      return new ModelAndView("/pages/editSolidPool.jsp", model);
-    }
-    catch (IOException ex) {
-      if (log.isDebugEnabled()) {
-        log.debug("Failed to show Solid pool", ex);
-      }
-      throw ex;
-    }
-//      catch (MalformedExperimentException e) {
-//        e.printStackTrace();
-//        throw new IOException(e);
-//      }
-  }
-
-  @RequestMapping(value = "/new/dilution/{dilutionId}", method = RequestMethod.GET)
-  public ModelAndView setupFormWithDilution(@PathVariable Long dilutionId,
-                                ModelMap model) throws IOException {
-    try {
-      User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-      SolidPool pool = dataObjectFactory.getSolidPool(user);
-      model.put("title", "New Solid Pool");
-
-      if (!pool.userCanRead(user)) {
-        throw new SecurityException("Permission denied.");
-      }
-
-      if (dilutionId != null) {
-          emPCRDilution ed = requestManager.getEmPcrDilutionById(dilutionId);
-        if (ed != null) {
-          pool.addPoolableElement(ed);
-        }
-      }
-
-      model.put("formObj", pool);
-      model.put("pool", pool);
-      model.put("availableDilutions", populateAvailableDilutions(user, pool));
-      model.put("accessibleExperiments", populateExperiments(null, pool));
-      model.put("owners", LimsSecurityUtils.getPotentialOwners(user, pool, securityManager.listAllUsers()));
-      model.put("accessibleUsers", LimsSecurityUtils.getAccessibleUsers(user, pool, securityManager.listAllUsers()));
-      model.put("accessibleGroups", LimsSecurityUtils.getAccessibleGroups(user, pool, securityManager.listAllGroups()));
-      return new ModelAndView("/pages/editSolidPool.jsp", model);
-    }
-    catch (IOException ex) {
-      if (log.isDebugEnabled()) {
-        log.debug("Failed to show Illumina pool", ex);
-      }
-      throw ex;
-    }
-    catch (MalformedDilutionException e) {
-      e.printStackTrace();
-      throw new IOException(e);
-    }
-  }
-
-  @RequestMapping(value = "/import", method = RequestMethod.POST)
-  public String importEmPCRDilutionsToPool(HttpServletRequest request, ModelMap model) throws IOException {
-    SolidPool p = (SolidPool)model.get("pool");
-    String[] dils = request.getParameterValues("importdilslist");
-    for (String s : dils) {
-      emPCRDilution ld = requestManager.getEmPcrDilutionByBarcode(s);
-      if (ld != null) {
+    public Collection<Experiment> populateExperiments(@RequestParam(value = "experimentId", required = false) Long experimentId, Pool p)
+        throws IOException {
         try {
-          p.addPoolableElement(ld);
+            User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
+            Collection<Experiment> es = new ArrayList<Experiment>();
+            for (Experiment e : requestManager.listAllExperiments()) {
+                if (e.getPlatform().getPlatformType().equals(p.getPlatformType())) {
+                    if (experimentId != null) {
+                        if (e.getId() != experimentId) {
+                            es.add(e);
+                        }
+                    } else {
+                        es.add(e);
+                    }
+                }
+            }
+            return es;
+        } catch (IOException ex) {
+            if (log.isDebugEnabled()) {
+                log.debug("Failed to list experiments", ex);
+            }
+            throw ex;
         }
-        catch (MalformedDilutionException e) {
-          log.debug("Cannot add emPCR dilution "+s+" to pool " + p.getName());
-          e.printStackTrace();
-        }
-      }
     }
 
-    requestManager.savePool(p);
-    return "redirect:/miso/pool/solid/" + p.getId();
-  }
+    @RequestMapping(value = "/new", method = RequestMethod.GET)
+    public ModelAndView newSolidPool(ModelMap model) throws IOException {
+        return setupForm(AbstractPool.UNSAVED_ID, model);
+    }
 
-  @RequestMapping(method = RequestMethod.POST)
-  public String processSubmit(@ModelAttribute("pool") Pool pool,
-                              ModelMap model,
-                              SessionStatus session) throws IOException, MalformedLibraryException {
-    try {
-      User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-      if (!pool.userCanWrite(user)) {
-        throw new SecurityException("Permission denied.");
-      }
-      requestManager.savePool(pool);
-      session.setComplete();
-      model.clear();
-      return "redirect:/miso/pool/solid/" + pool.getId();
+    @RequestMapping(value = "/new/{experimentId}", method = RequestMethod.GET)
+    public ModelAndView newAssignedSolidPool(@PathVariable Long experimentId, ModelMap model) throws IOException {
+        return setupFormWithExperiment(AbstractPool.UNSAVED_ID, experimentId, model);
     }
-    catch (IOException ex) {
-      if (log.isDebugEnabled()) {
-        log.debug("Failed to save Solid pool", ex);
-      }
-      throw ex;
+
+    @RequestMapping(value = "/{poolId}", method = RequestMethod.GET)
+    public ModelAndView setupForm(@PathVariable Long poolId, ModelMap model) throws IOException {
+        try {
+            User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
+            Pool pool = null;
+            if (poolId == AbstractPool.UNSAVED_ID) {
+                pool = dataObjectFactory.getSolidPool(user);
+                model.put("title", "New SOLiD Pool");
+            } else {
+                pool = requestManager.getPoolById(poolId);
+                model.put("title", "SOLiD Pool " + poolId);
+            }
+
+            if (pool == null) {
+                throw new SecurityException("No such Solid pool");
+            }
+            if (!pool.userCanRead(user)) {
+                throw new SecurityException("Permission denied.");
+            }
+            model.put("formObj", pool);
+            model.put("pool", pool);
+            model.put("availableDilutions", populateAvailableDilutions(user, pool));
+            model.put("accessibleExperiments", populateExperiments(null, pool));
+            model.put("owners", LimsSecurityUtils.getPotentialOwners(user, pool, securityManager.listAllUsers()));
+            model.put("accessibleUsers", LimsSecurityUtils.getAccessibleUsers(user, pool, securityManager.listAllUsers()));
+            model.put("accessibleGroups", LimsSecurityUtils.getAccessibleGroups(user, pool, securityManager.listAllGroups()));
+            return new ModelAndView("/pages/editSolidPool.jsp", model);
+        } catch (IOException ex) {
+            if (log.isDebugEnabled()) {
+                log.debug("Failed to show Solid pool", ex);
+            }
+            throw ex;
+        }
     }
-  }
+
+    @RequestMapping(value = "/{poolId}/experiment/{experimentId}", method = RequestMethod.GET)
+    public ModelAndView setupFormWithExperiment(@PathVariable Long poolId, @PathVariable Long experimentId, ModelMap model)
+        throws IOException {
+        try {
+            User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
+            Pool pool = null;
+            if (poolId == AbstractPool.UNSAVED_ID) {
+                pool = dataObjectFactory.getSolidPool(user);
+                model.put("title", "New Solid Pool");
+            } else {
+                pool = requestManager.getPoolById(poolId);
+                model.put("title", "Solid Pool " + poolId);
+            }
+
+            if (pool == null) {
+                throw new SecurityException("No such Solid Pool");
+            }
+            if (!pool.userCanRead(user)) {
+                throw new SecurityException("Permission denied.");
+            }
+
+            if (experimentId != null) {
+                model.put("accessibleExperiments", populateExperiments(experimentId, pool));
+            } else {
+                model.put("accessibleExperiments", populateExperiments(null, pool));
+            }
+
+            model.put("formObj", pool);
+            model.put("pool", pool);
+            model.put("availableDilutions", populateAvailableDilutions(user, pool));
+
+            model.put("owners", LimsSecurityUtils.getPotentialOwners(user, pool, securityManager.listAllUsers()));
+            model.put("accessibleUsers", LimsSecurityUtils.getAccessibleUsers(user, pool, securityManager.listAllUsers()));
+            model.put("accessibleGroups", LimsSecurityUtils.getAccessibleGroups(user, pool, securityManager.listAllGroups()));
+            return new ModelAndView("/pages/editSolidPool.jsp", model);
+        } catch (IOException ex) {
+            if (log.isDebugEnabled()) {
+                log.debug("Failed to show Solid pool", ex);
+            }
+            throw ex;
+        }
+        //      catch (MalformedExperimentException e) {
+        //        e.printStackTrace();
+        //        throw new IOException(e);
+        //      }
+    }
+
+    @RequestMapping(value = "/new/dilution/{dilutionId}", method = RequestMethod.GET)
+    public ModelAndView setupFormWithDilution(@PathVariable Long dilutionId, ModelMap model) throws IOException {
+        try {
+            User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
+            SolidPool pool = dataObjectFactory.getSolidPool(user);
+            model.put("title", "New Solid Pool");
+
+            if (!pool.userCanRead(user)) {
+                throw new SecurityException("Permission denied.");
+            }
+
+            if (dilutionId != null) {
+                emPCRDilution ed = requestManager.getEmPcrDilutionById(dilutionId);
+                if (ed != null) {
+                    pool.addPoolableElement(ed);
+                }
+            }
+
+            model.put("formObj", pool);
+            model.put("pool", pool);
+            model.put("availableDilutions", populateAvailableDilutions(user, pool));
+            model.put("accessibleExperiments", populateExperiments(null, pool));
+            model.put("owners", LimsSecurityUtils.getPotentialOwners(user, pool, securityManager.listAllUsers()));
+            model.put("accessibleUsers", LimsSecurityUtils.getAccessibleUsers(user, pool, securityManager.listAllUsers()));
+            model.put("accessibleGroups", LimsSecurityUtils.getAccessibleGroups(user, pool, securityManager.listAllGroups()));
+            return new ModelAndView("/pages/editSolidPool.jsp", model);
+        } catch (IOException ex) {
+            if (log.isDebugEnabled()) {
+                log.debug("Failed to show Illumina pool", ex);
+            }
+            throw ex;
+        } catch (MalformedDilutionException e) {
+            e.printStackTrace();
+            throw new IOException(e);
+        }
+    }
+
+    @RequestMapping(value = "/import", method = RequestMethod.POST)
+    public String importEmPCRDilutionsToPool(HttpServletRequest request, ModelMap model) throws IOException {
+        SolidPool p = (SolidPool) model.get("pool");
+        String[] dils = request.getParameterValues("importdilslist");
+        for (String s : dils) {
+            emPCRDilution ld = requestManager.getEmPcrDilutionByBarcode(s);
+            if (ld != null) {
+                try {
+                    p.addPoolableElement(ld);
+                } catch (MalformedDilutionException e) {
+                    log.debug("Cannot add emPCR dilution " + s + " to pool " + p.getName());
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        requestManager.savePool(p);
+        return "redirect:/miso/pool/solid/" + p.getId();
+    }
+
+    @RequestMapping(method = RequestMethod.POST)
+    public String processSubmit(@ModelAttribute("pool") Pool pool, ModelMap model, SessionStatus session)
+        throws IOException, MalformedLibraryException {
+        try {
+            User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
+            if (!pool.userCanWrite(user)) {
+                throw new SecurityException("Permission denied.");
+            }
+            requestManager.savePool(pool);
+            session.setComplete();
+            model.clear();
+            return "redirect:/miso/pool/solid/" + pool.getId();
+        } catch (IOException ex) {
+            if (log.isDebugEnabled()) {
+                log.debug("Failed to save Solid pool", ex);
+            }
+            throw ex;
+        }
+    }
 }

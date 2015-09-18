@@ -45,62 +45,62 @@ import java.util.Map;
  */
 @ServiceProvider
 public class TestLsfTask extends AbstractLSFProcess {
-  private final Collection<ConanParameter> parameters;
+    private final Collection<ConanParameter> parameters;
 
-  private Logger log = LoggerFactory.getLogger(getClass());
+    private Logger log = LoggerFactory.getLogger(getClass());
 
-  public TestLsfTask() {
-    parameters = new ArrayList<ConanParameter>();
-    parameters.add(new ConanParameter() {
-      @Override
-      public String getName() {
-        return "foo";
-      }
+    public TestLsfTask() {
+        parameters = new ArrayList<ConanParameter>();
+        parameters.add(new ConanParameter() {
+            @Override
+            public String getName() {
+                return "foo";
+            }
 
-      @Override
-      public String getDescription() {
-        return "bar";
-      }
+            @Override
+            public String getDescription() {
+                return "bar";
+            }
 
-      @Override
-      public boolean isBoolean() {
-        return false;
-      }
+            @Override
+            public boolean isBoolean() {
+                return false;
+            }
 
-      @Override
-      public boolean validateParameterValue(String s) {
-        return s != null;
-      }
-    });
-  }
+            @Override
+            public boolean validateParameterValue(String s) {
+                return s != null;
+            }
+        });
+    }
 
-  protected Logger getLog() {
-    return log;
-  }
+    protected Logger getLog() {
+        return log;
+    }
 
-  public String getName() {
-    return "Test";
-  }
+    public String getName() {
+        return "Test";
+    }
 
-  public Collection<ConanParameter> getParameters() {
-    return parameters;
-  }
+    public Collection<ConanParameter> getParameters() {
+        return parameters;
+    }
 
-  protected String getComponentName() {
-    return "TestComponent";
-  }
+    protected String getComponentName() {
+        return "TestComponent";
+    }
 
-  protected String getCommand(Map<ConanParameter, String> parameters) {
-    getLog().debug("Executing " + getName() + " with the following parameters: " + parameters.toString());
-    return "grep -c \"#\" /etc/profile";
-  }
+    protected String getCommand(Map<ConanParameter, String> parameters) {
+        getLog().debug("Executing " + getName() + " with the following parameters: " + parameters.toString());
+        return "grep -c \"#\" /etc/profile";
+    }
 
-  protected String getLSFOutputFilePath(Map<ConanParameter, String> parameters) {
-    // files to write output to
-    final File outputDir = new File("/tmp", ".miso");
+    protected String getLSFOutputFilePath(Map<ConanParameter, String> parameters) {
+        // files to write output to
+        final File outputDir = new File("/tmp", ".miso");
 
-    // lsf output file
-    return new File(outputDir, "test.lsfoutput.txt").getAbsolutePath();
-  }
+        // lsf output file
+        return new File(outputDir, "test.lsfoutput.txt").getAbsolutePath();
+    }
 }
 

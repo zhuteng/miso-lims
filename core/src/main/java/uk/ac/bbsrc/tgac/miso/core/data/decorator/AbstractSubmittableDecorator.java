@@ -36,12 +36,12 @@ import java.util.Properties;
  * @since 0.0.2
  */
 public abstract class AbstractSubmittableDecorator<O> implements Submittable<O> {
-  protected final Properties submissionProperties;
-  protected final Submittable submittable;
-  protected O submission;
+    protected final Properties submissionProperties;
+    protected final Submittable submittable;
+    protected O submission;
 
-  public AbstractSubmittableDecorator(Submittable submittable, Properties submissionProperties) {
-    this.submittable = submittable;
-    this.submissionProperties = submissionProperties;
-  }
+    public AbstractSubmittableDecorator(Submittable submittable, Properties submissionProperties) {
+        this.submittable = submittable;
+        this.submissionProperties = submissionProperties;
+    }
 }

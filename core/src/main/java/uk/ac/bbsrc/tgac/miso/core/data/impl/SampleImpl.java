@@ -50,40 +50,39 @@ import java.util.Set;
  */
 @Entity
 public class SampleImpl extends AbstractSample implements Serializable {
-  /**
-   * Construct a new Sample with a default empty SecurityProfile
-   */
-  public SampleImpl() {
-    setSecurityProfile(new SecurityProfile());
-  }
-
-  /**
-  * Construct a new Sample with a SecurityProfile owned by the given User
-   *
-   * @param user of type User
-   */
-  public SampleImpl(User user) {
-    setSecurityProfile(new SecurityProfile(user));
-  }
-
-  /**
-   * If the given User can read the parent Project, construct a new Sample with a SecurityProfile inherited from the parent Project.
-   * If not, construct a new Sample with a SecurityProfile owned by the given User
-   *
-   * @param project of type Project
-   * @param user of type User
-   */
-  public SampleImpl(Project project, User user) {
-    if (project.userCanRead(user)) {
-      setProject(project);
-      setSecurityProfile(project.getSecurityProfile());
+    /**
+     * Construct a new Sample with a default empty SecurityProfile
+     */
+    public SampleImpl() {
+        setSecurityProfile(new SecurityProfile());
     }
-    else {
-      setSecurityProfile(new SecurityProfile(user));
-    }
-  }
 
-  public void buildSubmission() {
+    /**
+     * Construct a new Sample with a SecurityProfile owned by the given User
+     *
+     * @param user of type User
+     */
+    public SampleImpl(User user) {
+        setSecurityProfile(new SecurityProfile(user));
+    }
+
+    /**
+     * If the given User can read the parent Project, construct a new Sample with a SecurityProfile inherited from the parent Project.
+     * If not, construct a new Sample with a SecurityProfile owned by the given User
+     *
+     * @param project of type Project
+     * @param user    of type User
+     */
+    public SampleImpl(Project project, User user) {
+        if (project.userCanRead(user)) {
+            setProject(project);
+            setSecurityProfile(project.getSecurityProfile());
+        } else {
+            setSecurityProfile(new SecurityProfile(user));
+        }
+    }
+
+    public void buildSubmission() {
     /*
     try {
       DocumentBuilder docBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
@@ -94,12 +93,12 @@ public class SampleImpl extends AbstractSample implements Serializable {
     }
     ERASubmissionFactory.generateSampleSubmissionXML(submissionDocument, this);
     */
-  }
-  
-  /**
-   * Method buildReport ...
-   */
-  public void buildReport() {
+    }
 
-  }
+    /**
+     * Method buildReport ...
+     */
+    public void buildReport() {
+
+    }
 }

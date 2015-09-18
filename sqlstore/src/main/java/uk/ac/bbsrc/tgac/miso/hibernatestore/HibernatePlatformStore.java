@@ -43,26 +43,26 @@ import java.util.Collection;
  * @since 0.0.2
  */
 @Deprecated
-public class HibernatePlatformStore  extends HibernateDaoSupport implements Store<Platform> {
-  @Transactional(readOnly = false)
-  public long save(Platform platform) throws IOException {
-    getHibernateTemplate().saveOrUpdate(platform);
-    return platform.getPlatformId();
-  }
+public class HibernatePlatformStore extends HibernateDaoSupport implements Store<Platform> {
+    @Transactional(readOnly = false)
+    public long save(Platform platform) throws IOException {
+        getHibernateTemplate().saveOrUpdate(platform);
+        return platform.getPlatformId();
+    }
 
-  @Transactional(readOnly = true)
-  public Platform get(long platformId) throws IOException {
-    return (Platform) getHibernateTemplate().load(PlatformImpl.class, platformId);
-  }
+    @Transactional(readOnly = true)
+    public Platform get(long platformId) throws IOException {
+        return (Platform) getHibernateTemplate().load(PlatformImpl.class, platformId);
+    }
 
-  @Override
-  public Platform lazyGet(long id) throws IOException {
-    return get(id);
-  }
+    @Override
+    public Platform lazyGet(long id) throws IOException {
+        return get(id);
+    }
 
-  @Transactional(readOnly = true)
-  @SuppressWarnings("unchecked")
-  public Collection<Platform> listAll() throws IOException {
+    @Transactional(readOnly = true)
+    @SuppressWarnings("unchecked")
+    public Collection<Platform> listAll() throws IOException {
 /*    return (Collection<Platform>) getHibernateTemplate().execute(
             new HibernateCallback() {
               public Object doInHibernate(Session session)
@@ -71,11 +71,11 @@ public class HibernatePlatformStore  extends HibernateDaoSupport implements Stor
               }
             });
             */
-    return null;
-  }
+        return null;
+    }
 
-  @Override
-  public int count() throws IOException {
-    return 0;
-  }
+    @Override
+    public int count() throws IOException {
+        return 0;
+    }
 }

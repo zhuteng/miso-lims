@@ -40,43 +40,42 @@ import java.util.Set;
  * @since 0.1.1
  */
 public class _96WellPlate extends PlateImpl<Library> implements Plateable, Serializable {
-  public static final int MAX_ELEMENTS = 96;
+    public static final int MAX_ELEMENTS = 96;
 
-  public _96WellPlate() {
-    super();
-  }
-
-  public _96WellPlate(User user) {
-    super(MAX_ELEMENTS, user);
-  }
-
-  @Override
-  public int getSize() {
-    return MAX_ELEMENTS;
-  }
-
-  @Override
-  public LinkedList<Library> getElements() {
-    return elements;
-  }
-
-  @Override
-  public void addElement(Library library) throws IllegalStateException {
-    if (elements.size() < MAX_ELEMENTS) {
-      elements.add(library);
+    public _96WellPlate() {
+        super();
     }
-    else {
-      throw new IllegalStateException("This 96 well plate already has 96 libraries");
+
+    public _96WellPlate(User user) {
+        super(MAX_ELEMENTS, user);
     }
-  }
 
-  @Override
-  public Class getElementType() {
-    return Library.class;
-  }
+    @Override
+    public int getSize() {
+        return MAX_ELEMENTS;
+    }
 
-  @Override
-  public <T> Set<Plate<LinkedList<T>, T>> getPlates() throws Exception {
-    throw new Exception("96-well plates have no internal plate structure");
-  }
+    @Override
+    public LinkedList<Library> getElements() {
+        return elements;
+    }
+
+    @Override
+    public void addElement(Library library) throws IllegalStateException {
+        if (elements.size() < MAX_ELEMENTS) {
+            elements.add(library);
+        } else {
+            throw new IllegalStateException("This 96 well plate already has 96 libraries");
+        }
+    }
+
+    @Override
+    public Class getElementType() {
+        return Library.class;
+    }
+
+    @Override
+    public <T> Set<Plate<LinkedList<T>, T>> getPlates() throws Exception {
+        throw new Exception("96-well plates have no internal plate structure");
+    }
 }

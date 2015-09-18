@@ -48,114 +48,111 @@ import java.io.IOException;
  */
 @ServiceProvider
 public class DefaultPrintService implements MisoPrintService<File, Barcodable, PrintContext<File>> {
-  protected static final Logger log = LoggerFactory.getLogger(DefaultPrintService.class);
-  private String name;
-  private boolean enabled = true;
-  private PrintContext<File> pc;
-  private Class<? extends Barcodable> printServiceFor;
-  private BarcodableSchema<File, Barcodable> barcodableSchema;
+    protected static final Logger log = LoggerFactory.getLogger(DefaultPrintService.class);
+    private String name;
+    private boolean enabled = true;
+    private PrintContext<File> pc;
+    private Class<? extends Barcodable> printServiceFor;
+    private BarcodableSchema<File, Barcodable> barcodableSchema;
 
-  @Id
-  @GeneratedValue(strategy = GenerationType.AUTO)
-  private long serviceId = -1L;
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private long serviceId = -1L;
 
-  @Override
-  public long getServiceId() {
-    return serviceId;
-  }
-
-  @Override
-  public void setServiceId(long serviceId) {
-    this.serviceId = serviceId;
-  }
-
-  @Override
-  public String getName() {
-    return name;
-  }
-
-  @Override
-  public void setName(String name) {
-    this.name = name;
-  }
-
-  @Override
-  public boolean isEnabled() {
-    return enabled;
-  }
-
-  @Override
-  public void setEnabled(boolean enabled) {
-    this.enabled = enabled;
-  }
-
-  @Override
-  public PrintContext<File> getPrintContext() {
-    return pc;
-  }
-
-  @Override
-  public void setPrintContext(PrintContext<File> pc) {
-    this.pc = pc;
-  }
-
-  @Override
-  public BarcodableSchema<File, Barcodable> getBarcodableSchema(){
-    return barcodableSchema;
-  }
-
-  @Override
-  public void setBarcodableSchema(BarcodableSchema<File, Barcodable> barcodableSchema){
-    this.barcodableSchema = barcodableSchema;
-  }
-
-  @Override
-  public boolean print(File content) throws IOException {
-    if (pc != null) {
-      if (isEnabled()) {
-        return pc.print(content);
-      }
-      else {
-        throw new IOException("Printer " + getName() + " is not enabled.");
-      }
+    @Override
+    public long getServiceId() {
+        return serviceId;
     }
-    else {
-      throw new IOException("No PrintContext specified");
+
+    @Override
+    public void setServiceId(long serviceId) {
+        this.serviceId = serviceId;
     }
-  }
 
-  @Override
-  public void setPrintServiceFor(Class<? extends Barcodable> c) {
-    this.printServiceFor = c;
-  }
-
-  @Override
-  public Class<? extends Barcodable> getPrintServiceFor() {
-    return printServiceFor;
-  }
-
-  @Override
-  public File getLabelFor(Barcodable b) throws MisoPrintException {
-    if (getPrintServiceFor().isAssignableFrom(b.getClass())) {
-      BarcodableSchema<File, Barcodable> bs = getBarcodableSchema();
-      if (bs != null) {
-        return bs.getPrintableLabel(b);
-      }
-      else {
-        throw new MisoPrintException("No barcodable schema set for '"+getName()+"' service. Make sure a schema is set in the " +
-                                     "printer administration page");
-      }
+    @Override
+    public String getName() {
+        return name;
     }
-    return null;
-  }
 
-  @Override
-  public String toString() {
-    StringBuilder sb = new StringBuilder();
-    sb.append(this.getName()).append(" : ");
-    sb.append(this.getPrintServiceFor().getName()).append(" : ");
-    sb.append(this.getPrintContext().getName()).append(" : ");
-    sb.append(this.isEnabled());
-    return sb.toString();
-  }
+    @Override
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    @Override
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
+    }
+
+    @Override
+    public PrintContext<File> getPrintContext() {
+        return pc;
+    }
+
+    @Override
+    public void setPrintContext(PrintContext<File> pc) {
+        this.pc = pc;
+    }
+
+    @Override
+    public BarcodableSchema<File, Barcodable> getBarcodableSchema() {
+        return barcodableSchema;
+    }
+
+    @Override
+    public void setBarcodableSchema(BarcodableSchema<File, Barcodable> barcodableSchema) {
+        this.barcodableSchema = barcodableSchema;
+    }
+
+    @Override
+    public boolean print(File content) throws IOException {
+        if (pc != null) {
+            if (isEnabled()) {
+                return pc.print(content);
+            } else {
+                throw new IOException("Printer " + getName() + " is not enabled.");
+            }
+        } else {
+            throw new IOException("No PrintContext specified");
+        }
+    }
+
+    @Override
+    public void setPrintServiceFor(Class<? extends Barcodable> c) {
+        this.printServiceFor = c;
+    }
+
+    @Override
+    public Class<? extends Barcodable> getPrintServiceFor() {
+        return printServiceFor;
+    }
+
+    @Override
+    public File getLabelFor(Barcodable b) throws MisoPrintException {
+        if (getPrintServiceFor().isAssignableFrom(b.getClass())) {
+            BarcodableSchema<File, Barcodable> bs = getBarcodableSchema();
+            if (bs != null) {
+                return bs.getPrintableLabel(b);
+            } else {
+                throw new MisoPrintException("No barcodable schema set for '" + getName() + "' service. Make sure a schema is set in the " +
+                                             "printer administration page");
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(this.getName()).append(" : ");
+        sb.append(this.getPrintServiceFor().getName()).append(" : ");
+        sb.append(this.getPrintContext().getName()).append(" : ");
+        sb.append(this.isEnabled());
+        return sb.toString();
+    }
 }

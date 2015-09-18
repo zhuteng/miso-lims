@@ -25,6 +25,7 @@ package uk.ac.bbsrc.tgac.miso.core.data;
 
 //import com.fasterxml.jackson.annotation.*;
 //import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+
 import org.codehaus.jackson.annotate.JsonBackReference;
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 import org.codehaus.jackson.annotate.JsonTypeInfo;
@@ -39,36 +40,36 @@ import uk.ac.bbsrc.tgac.miso.core.exception.MalformedSampleException;
  */
 @JsonSerialize(typing = JsonSerialize.Typing.STATIC, include = JsonSerialize.Inclusion.NON_NULL)
 //@JsonIdentityInfo(generator = ObjectIdGenerators.IntSequenceGenerator.class, property = "@id")
-@JsonTypeInfo(use=JsonTypeInfo.Id.CLASS, include= JsonTypeInfo.As.PROPERTY, property="@class")
+@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
 //@JsonIgnoreProperties({"deletable"})
 public interface SampleQC extends QC {
-  /**
-   * Returns the sample of this SampleQC object.
-   *
-   * @return Sample sample.
-   */
-  @JsonBackReference(value="qcsample")
-  public Sample getSample();
+    /**
+     * Returns the sample of this SampleQC object.
+     *
+     * @return Sample sample.
+     */
+    @JsonBackReference(value = "qcsample")
+    public Sample getSample();
 
-  /**
-   * Sets the sample of this SampleQC object.
-   *
-   * @param sample sample.
-   * @throws MalformedSampleException when the Sample being set is not valid  
-   */
-  public void setSample(Sample sample) throws MalformedSampleException;
+    /**
+     * Sets the sample of this SampleQC object.
+     *
+     * @param sample sample.
+     * @throws MalformedSampleException when the Sample being set is not valid
+     */
+    public void setSample(Sample sample) throws MalformedSampleException;
 
-  /**
-   * Returns the results of this QC object.
-   *
-   * @return Double results.
-   */
-  public Double getResults();
+    /**
+     * Returns the results of this QC object.
+     *
+     * @return Double results.
+     */
+    public Double getResults();
 
-  /**
-   * Sets the results of this QC object.
-   *
-   * @param results results.
-   */
-  public void setResults(Double results);  
+    /**
+     * Sets the results of this QC object.
+     *
+     * @param results results.
+     */
+    public void setResults(Double results);
 }

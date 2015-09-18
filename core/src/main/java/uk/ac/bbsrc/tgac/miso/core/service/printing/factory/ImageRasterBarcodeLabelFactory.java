@@ -44,35 +44,35 @@ import java.io.IOException;
  * @since 0.1.6
  */
 @ServiceProvider
-public class ImageRasterBarcodeLabelFactory<T> implements BarcodeLabelFactory<File,T, BarcodableSchema<File, T>> {
-  private com.eaglegenomics.simlims.core.manager.SecurityManager securityManager;
-  private MisoFilesManager misoFileManager;
+public class ImageRasterBarcodeLabelFactory<T> implements BarcodeLabelFactory<File, T, BarcodableSchema<File, T>> {
+    private com.eaglegenomics.simlims.core.manager.SecurityManager securityManager;
+    private MisoFilesManager misoFileManager;
 
-  @Override
-  public void setSecurityManager(com.eaglegenomics.simlims.core.manager.SecurityManager securityManager) {
-    this.securityManager = securityManager;
-  }
-
-  @Override
-  public void setFilesManager(MisoFilesManager misoFileManager) {
-    this.misoFileManager = misoFileManager;
-  }
-
-  @Override
-  public File getLabel(BarcodableSchema<File, T> s,T b) {
-    try {
-      User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-
-      String rasterString = s.getRawState(b);
-
-      File f = misoFileManager.generateTemporaryFile(user.getLoginName() + "_"+b.getClass().getSimpleName().toLowerCase()+"-", ".printjob");
-      FileUtils.write(f, rasterString);
-
-      return f;
+    @Override
+    public void setSecurityManager(com.eaglegenomics.simlims.core.manager.SecurityManager securityManager) {
+        this.securityManager = securityManager;
     }
-    catch (IOException e) {
-      e.printStackTrace();
+
+    @Override
+    public void setFilesManager(MisoFilesManager misoFileManager) {
+        this.misoFileManager = misoFileManager;
     }
-    return null;
-  }
+
+    @Override
+    public File getLabel(BarcodableSchema<File, T> s, T b) {
+        try {
+            User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
+
+            String rasterString = s.getRawState(b);
+
+            File f = misoFileManager
+                .generateTemporaryFile(user.getLoginName() + "_" + b.getClass().getSimpleName().toLowerCase() + "-", ".printjob");
+            FileUtils.write(f, rasterString);
+
+            return f;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 }

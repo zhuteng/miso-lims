@@ -25,8 +25,10 @@ package uk.ac.bbsrc.tgac.miso.core.data;
 
 //import com.fasterxml.jackson.annotation.*;
 //import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+
 import org.codehaus.jackson.annotate.*;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
+
 import java.util.Collection;
 import java.util.Set;
 
@@ -40,10 +42,10 @@ import java.util.Set;
  */
 @JsonSerialize(typing = JsonSerialize.Typing.STATIC, include = JsonSerialize.Inclusion.NON_NULL)
 //@JsonIdentityInfo(generator = ObjectIdGenerators.IntSequenceGenerator.class, property = "@id")
-@JsonTypeInfo(use=JsonTypeInfo.Id.CLASS, include= JsonTypeInfo.As.PROPERTY, property="@class")
+@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
 public interface Poolable<T extends Poolable<T, S>, S> extends Nameable, Comparable {
-  @JsonIgnore
-  <S> Collection<S> getInternalPoolableElements();
-  @JsonIgnore
-  Set<Pool<T>> getPools();
+    @JsonIgnore
+    <S> Collection<S> getInternalPoolableElements();
+    @JsonIgnore
+    Set<Pool<T>> getPools();
 }

@@ -45,23 +45,25 @@ import java.util.Collection;
  */
 @Controller
 public class ListLibrariesController {
-  protected static final Logger log = LoggerFactory.getLogger(ListLibrariesController.class);
+    protected static final Logger log = LoggerFactory.getLogger(ListLibrariesController.class);
 
-  @Autowired
-  private RequestManager requestManager;
+    @Autowired
+    private RequestManager requestManager;
 
-  public void setRequestManager(RequestManager requestManager) {
-    this.requestManager = requestManager;
-  }
+    public void setRequestManager(RequestManager requestManager) {
+        this.requestManager = requestManager;
+    }
 
-  @Deprecated
-  @RequestMapping(value = "/libraries/rest/", method = RequestMethod.GET)
-  public @ResponseBody Collection<Library> jsonRest() throws IOException {
-    return requestManager.listAllLibraries();
-  }
+    @Deprecated
+    @RequestMapping(value = "/libraries/rest/", method = RequestMethod.GET)
+    public
+    @ResponseBody
+    Collection<Library> jsonRest() throws IOException {
+        return requestManager.listAllLibraries();
+    }
 
-  @RequestMapping("/libraries")
-  public ModelAndView listLibraries() throws Exception {
-    return new ModelAndView("/pages/listLibraries.jsp");
-  }
+    @RequestMapping("/libraries")
+    public ModelAndView listLibraries() throws Exception {
+        return new ModelAndView("/pages/listLibraries.jsp");
+    }
 }

@@ -12,6 +12,6 @@ import java.util.Collection;
  * @since 0.1.8
  */
 public interface NameGeneratorResolverService {
-  NameGenerator<?> getNameGenerator(String generatorName);
-  Collection<NameGenerator<?>> getNameGenerators();
+    NameGenerator<?> getNameGenerator(String generatorName);
+    Collection<NameGenerator<?>> getNameGenerators();
 }

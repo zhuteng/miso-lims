@@ -40,28 +40,28 @@ import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
  * To change this template use File | Settings | File Templates.
  */
 @Controller
-public class ExternalSectionController  {
-  @Autowired
-  private com.eaglegenomics.simlims.core.manager.SecurityManager securityManager;
-  @Autowired
-  private uk.ac.bbsrc.tgac.miso.core.manager.RequestManager requestManager;
-  @Autowired
-  private DataObjectFactory dataObjectFactory;
+public class ExternalSectionController {
+    @Autowired
+    private com.eaglegenomics.simlims.core.manager.SecurityManager securityManager;
+    @Autowired
+    private uk.ac.bbsrc.tgac.miso.core.manager.RequestManager requestManager;
+    @Autowired
+    private DataObjectFactory dataObjectFactory;
 
-  public void setDataObjectFactory(DataObjectFactory dataObjectFactory) {
-    this.dataObjectFactory = dataObjectFactory;
-  }
+    public void setDataObjectFactory(DataObjectFactory dataObjectFactory) {
+        this.dataObjectFactory = dataObjectFactory;
+    }
 
-  public void setSecurityManager(SecurityManager securityManager) {
-    this.securityManager = securityManager;
-  }
+    public void setSecurityManager(SecurityManager securityManager) {
+        this.securityManager = securityManager;
+    }
 
-  public void setRequestManager(RequestManager requestManager) {
-    this.requestManager = requestManager;
-  }
+    public void setRequestManager(RequestManager requestManager) {
+        this.requestManager = requestManager;
+    }
 
-  @RequestMapping("/external")
-  public ModelAndView external(ModelMap model) {
-    return new ModelAndView("/pages/external/externalMain.jsp", model);
-  }
+    @RequestMapping("/external")
+    public ModelAndView external(ModelMap model) {
+        return new ModelAndView("/pages/external/externalMain.jsp", model);
+    }
 }

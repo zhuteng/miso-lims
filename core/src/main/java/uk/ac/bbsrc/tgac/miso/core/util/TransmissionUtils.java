@@ -48,184 +48,168 @@ import static org.apache.commons.net.io.Util.*;
  * @since 0.0.3
  */
 public class TransmissionUtils {
-  protected static final Logger log = LoggerFactory.getLogger(TransmissionUtils.class);
+    protected static final Logger log = LoggerFactory.getLogger(TransmissionUtils.class);
 
-  public static FTPClient ftpConnect(String host, String username, String password) throws IOException {
-    FTPClient ftp = new FTPClient();
-    try {
+    public static FTPClient ftpConnect(String host, String username, String password) throws IOException {
+        FTPClient ftp = new FTPClient();
+        try {
 
-      ftp.connect(host);
-      log.debug("Trying " + host);
-      log.debug(ftp.getReplyString());
-      int reply = ftp.getReplyCode();
-      if(!FTPReply.isPositiveCompletion(reply)) {
-        ftp.disconnect();
-        throw new IOException("FTP server refused connection: " + reply);
-      }
-      else {
-        log.info("Connected");
-      }
+            ftp.connect(host);
+            log.debug("Trying " + host);
+            log.debug(ftp.getReplyString());
+            int reply = ftp.getReplyCode();
+            if (!FTPReply.isPositiveCompletion(reply)) {
+                ftp.disconnect();
+                throw new IOException("FTP server refused connection: " + reply);
+            } else {
+                log.info("Connected");
+            }
 
-      ftp.login(username, password);
-      ftp.setFileType(FTP.BINARY_FILE_TYPE);
-      ftp.enterLocalPassiveMode();
+            ftp.login(username, password);
+            ftp.setFileType(FTP.BINARY_FILE_TYPE);
+            ftp.enterLocalPassiveMode();
+        } catch (NoRouteToHostException e) {
+            throw new IOException("Couldn't connect to printer: " + e.getMessage(), e);
+        } catch (UnknownHostException e) {
+            throw new IOException("Couldn't connect to printer: " + e.getMessage(), e);
+        }
+        return ftp;
     }
-    catch (NoRouteToHostException e) {
-      throw new IOException("Couldn't connect to printer: " + e.getMessage(), e);
+
+    public static FTPClient ftpConnect(String host, int port, String username, String password) throws IOException {
+        FTPClient ftp = new FTPClient();
+        try {
+            ftp.connect(host, port);
+            log.debug("Trying " + host + ":" + port);
+            log.debug(ftp.getReplyString());
+            int reply = ftp.getReplyCode();
+            if (!FTPReply.isPositiveCompletion(reply)) {
+                ftp.disconnect();
+                throw new IOException("FTP server refused connection: " + reply);
+            } else {
+                log.debug("Connected");
+            }
+
+            ftp.login(username, password);
+            ftp.setFileType(FTP.BINARY_FILE_TYPE);
+            ftp.enterLocalPassiveMode();
+        } catch (NoRouteToHostException e) {
+            throw new IOException("Couldn't connect to printer: " + e.getMessage(), e);
+        } catch (UnknownHostException e) {
+            throw new IOException("Couldn't connect to printer: " + e.getMessage(), e);
+        }
+        return ftp;
     }
-    catch (UnknownHostException e) {
-      throw new IOException("Couldn't connect to printer: " + e.getMessage(), e);
+
+    public static boolean ftpPut(FTPClient ftp, List<File> files, boolean autoLogout) throws IOException {
+        return ftpPut(ftp, null, files, autoLogout, false);
     }
-    return ftp;
-  }
 
-  public static FTPClient ftpConnect(String host, int port, String username, String password) throws IOException {
-    FTPClient ftp = new FTPClient();
-    try {
-      ftp.connect(host, port);
-      log.debug("Trying " + host + ":" + port);
-      log.debug(ftp.getReplyString());
-      int reply = ftp.getReplyCode();
-      if(!FTPReply.isPositiveCompletion(reply)) {
-        ftp.disconnect();
-        throw new IOException("FTP server refused connection: " + reply);
-      }
-      else {
-        log.debug("Connected");
-      }
+    public static boolean ftpPut(FTPClient ftp, String path, List<File> files, boolean autoLogout, boolean autoMkdir) throws IOException {
+        boolean error = false;
+        FileInputStream fis = null;
 
-      ftp.login(username, password);
-      ftp.setFileType(FTP.BINARY_FILE_TYPE);
-      ftp.enterLocalPassiveMode();
-    }
-    catch (NoRouteToHostException e) {
-      throw new IOException("Couldn't connect to printer: " + e.getMessage(), e);
-    }
-    catch (UnknownHostException e) {
-      throw new IOException("Couldn't connect to printer: " + e.getMessage(), e);
-    }    
-    return ftp;
-  }
+        try {
+            if (ftp == null || !ftp.isConnected()) {
+                error = true;
+                throw new IOException("FTP client isn't connected. Please supply a client that has connected to the host.");
+            }
 
-  public static boolean ftpPut(FTPClient ftp, List<File> files, boolean autoLogout) throws IOException {
-    return ftpPut(ftp, null, files, autoLogout, false);
-  }
+            if (path != null) {
+                if (autoMkdir) {
+                    if (!ftp.makeDirectory(path)) {
+                        error = true;
+                        throw new IOException("Cannot create desired path on the server.");
+                    }
+                }
 
-  public static boolean ftpPut(FTPClient ftp, String path, List<File> files, boolean autoLogout, boolean autoMkdir) throws IOException {
-    boolean error = false;
-    FileInputStream fis = null;
+                if (!ftp.changeWorkingDirectory(path)) {
+                    error = true;
+                    throw new IOException("Desired path does not exist on the server");
+                }
+            }
 
-    try {
-      if (ftp == null || !ftp.isConnected()) {
-        error = true;
-        throw new IOException("FTP client isn't connected. Please supply a client that has connected to the host.");
-      }
+            log.info("All OK - transmitting " + files.size() + " file(s)");
 
-      if (path != null) {
-        if (autoMkdir) {
-          if (!ftp.makeDirectory(path)) {
+            for (File f : files) {
+                fis = new FileInputStream(f);
+                if (!ftp.storeFile(f.getName(), fis)) {
+                    error = true;
+                    log.error("Error storing file: " + f.getName());
+                }
+
+                boolean success = FTPReply.isPositiveCompletion(ftp.getReplyCode());
+                if (!success) {
+                    error = true;
+                    log.error("Error storing file: " + f.getName() + " (" + success + ")");
+                }
+            }
+
+            if (autoLogout) {
+                ftp.logout();
+            }
+        } catch (IOException e) {
             error = true;
-            throw new IOException("Cannot create desired path on the server.");
-          }
+            e.printStackTrace();
+        } finally {
+            try {
+                if (fis != null) {
+                    fis.close();
+                }
+
+                if (autoLogout) {
+                    if (ftp != null && ftp.isConnected()) {
+                        ftp.disconnect();
+                    }
+                }
+            } catch (IOException ioe) {
+                ioe.printStackTrace();
+            }
         }
 
-        if (!ftp.changeWorkingDirectory(path)) {
-          error = true;
-          throw new IOException("Desired path does not exist on the server");
-        }
-      }
-
-      log.info("All OK - transmitting "+files.size()+" file(s)");
-
-      for (File f : files) {
-        fis = new FileInputStream(f);
-        if (!ftp.storeFile(f.getName(), fis)) {
-          error = true;
-          log.error("Error storing file: " + f.getName());
-        }
-
-        boolean success = FTPReply.isPositiveCompletion(ftp.getReplyCode());
-        if (!success) {
-          error = true;
-          log.error("Error storing file: " + f.getName() + " (" +success+ ")");
-        }
-      }
-
-      if (autoLogout) {
-        ftp.logout();
-      }
-    }
-    catch(IOException e) {
-      error = true;
-      e.printStackTrace();
-    }
-    finally {
-      try {
-        if (fis != null) {
-          fis.close();
-        }
-
-        if (autoLogout) {
-          if(ftp != null && ftp.isConnected()) {
-            ftp.disconnect();
-          }
-        }
-      }
-      catch(IOException ioe) {
-        ioe.printStackTrace();
-      }
+        //return inverse error boolean, just to make downstream conditionals easier
+        return !error;
     }
 
-    //return inverse error boolean, just to make downstream conditionals easier
-    return !error;
-  }
+    public static boolean ftpPutListen(FTPClient ftp, String path, File file, boolean autoLogout, boolean autoMkdir,
+                                       CopyStreamListener listener) throws IOException {
+        boolean error = false;
+        FileInputStream fis = null;
 
+        log.info("ftpPutListen has been called for file:" + file.getName());
+        try {
+            if (ftp == null || !ftp.isConnected()) {
+                error = true;
+                throw new IOException("FTP client isn't connected. Please supply a client that has connected to the host.");
+            }
 
+            if (path != null) {
+                if (autoMkdir) {
+                    if (!ftp.makeDirectory(path)) {
+                        error = true;
+                        throw new IOException("Cannot create desired path on the server.");
+                    }
+                }
+                log.info("Working dir =" + ftp.printWorkingDirectory());
+                if (!ftp.changeWorkingDirectory(path)) {
+                    error = true;
+                    throw new IOException("Desired path does not exist on the server");
+                }
+            }
 
+            fis = new FileInputStream(file);
 
-    public static boolean ftpPutListen(FTPClient ftp, String path, File file, boolean autoLogout, boolean autoMkdir, CopyStreamListener listener) throws IOException {
-    boolean error = false;
-    FileInputStream fis = null;
+            OutputStream ops = new BufferedOutputStream(ftp.storeFileStream(file.getName()), ftp.getBufferSize());
 
-    log.info("ftpPutListen has been called for file:" + file.getName());
-    try {
-      if (ftp == null || !ftp.isConnected()) {
-        error = true;
-        throw new IOException("FTP client isn't connected. Please supply a client that has connected to the host.");
-      }
+            log.info("TransmissionUtils putListen: FTP server responded: " + ftp.getReplyString());
 
-      if (path != null) {
-        if (autoMkdir) {
-          if (!ftp.makeDirectory(path)) {
-            error = true;
-            throw new IOException("Cannot create desired path on the server.");
-          }
-        }
-        log.info("Working dir =" +ftp.printWorkingDirectory());
-        if (!ftp.changeWorkingDirectory(path)) {
-          error = true;
-          throw new IOException("Desired path does not exist on the server");
-        }
-      }
+            copyStream(fis, ops, ftp.getBufferSize(), file.length(), listener);
 
-
-        fis = new FileInputStream(file);
-
-        OutputStream ops=new BufferedOutputStream(ftp.storeFileStream(file.getName()),ftp.getBufferSize());
-
-        log.info("TransmissionUtils putListen: FTP server responded: " + ftp.getReplyString());
-
-
-         copyStream(fis, ops, ftp.getBufferSize(),
-                file.length(),
-                listener
-        );
-
-        //ftp.completePendingCommand();
-        ops.close();
-        //bis.close();
-        fis.close();
-        log.info("TransmissionUtils putListen: FTP server responded: " + ftp.getReplyString());
+            //ftp.completePendingCommand();
+            ops.close();
+            //bis.close();
+            fis.close();
+            log.info("TransmissionUtils putListen: FTP server responded: " + ftp.getReplyString());
 
        /* commented out as I think it's causing a false error by checking too soon- file upload will not have completed yet...
         boolean success = FTPReply.isPositiveIntermediate(ftp.getReplyCode());
@@ -235,39 +219,35 @@ public class TransmissionUtils {
         }
         */
 
+            if (autoLogout) {
+                ftp.logout();
+            }
+            //return(true);
+        } catch (IOException e) {
+            error = true;
+            e.printStackTrace();
+            // return(false);
+        } finally {
+            try {
+                log.info("TransmissionUtils putListen:finally: " + ftp.getReplyString());
+                if (fis != null) {
+                    fis.close();
+                }
 
-      if (autoLogout) {
-        ftp.logout();
-      }
-       //return(true);
-    }
-    catch(IOException e) {
-      error = true;
-      e.printStackTrace();
-       // return(false);
-    }
-    finally {
-      try {
-          log.info("TransmissionUtils putListen:finally: "+ftp.getReplyString());
-        if (fis != null) {
-          fis.close();
+                if (autoLogout) {
+                    if (ftp != null && ftp.isConnected()) {
+                        ftp.disconnect();
+                    }
+                }
+            } catch (IOException ioe) {
+                ioe.printStackTrace();
+            }
         }
 
-        if (autoLogout) {
-          if(ftp != null && ftp.isConnected()) {
-            ftp.disconnect();
-          }
-        }
-      }
-      catch(IOException ioe) {
-        ioe.printStackTrace();
-      }
+        //return inverse error boolean, just to make downstream conditionals easier
+        log.info("result of transmissionutils.putListen:", !error);
+        return !error;
+
     }
-
-    //return inverse error boolean, just to make downstream conditionals easier
-    log.info("result of transmissionutils.putListen:",!error);
-    return !error;
-
-  }
 }
 

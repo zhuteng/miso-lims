@@ -32,5 +32,5 @@ import uk.ac.bbsrc.tgac.miso.core.exception.ReportingException;
  * @since 0.0.2
  */
 public interface Reportable<O> {
-  public void buildReport() throws ReportingException;
+    public void buildReport() throws ReportingException;
 }

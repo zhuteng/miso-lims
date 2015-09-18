@@ -37,10 +37,10 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
  * @since 0.1.2
  */
 public class RunstatsServer {
-  protected static final Logger log = LoggerFactory.getLogger(RunstatsServer.class);
+    protected static final Logger log = LoggerFactory.getLogger(RunstatsServer.class);
 
-  public static void main(String[] args) {
-    log.info("Starting runstats-server...");
-    new ClassPathXmlApplicationContext("/runstats-server.xml");
-  }
+    public static void main(String[] args) {
+        log.info("Starting runstats-server...");
+        new ClassPathXmlApplicationContext("/runstats-server.xml");
+    }
 }

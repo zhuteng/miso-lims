@@ -54,31 +54,31 @@ import java.util.List;
  */
 @Controller
 public class ListSamplesController {
-  protected static final Logger log = LoggerFactory.getLogger(ListSamplesController.class);
+    protected static final Logger log = LoggerFactory.getLogger(ListSamplesController.class);
 
-  @Autowired
-  private SecurityManager securityManager;
+    @Autowired
+    private SecurityManager securityManager;
 
-  public void setSecurityManager(SecurityManager securityManager) {
-    this.securityManager = securityManager;
-  }
+    public void setSecurityManager(SecurityManager securityManager) {
+        this.securityManager = securityManager;
+    }
 
-  @Autowired
-  private RequestManager requestManager;
+    @Autowired
+    private RequestManager requestManager;
 
-  public void setRequestManager(RequestManager requestManager) {
-    this.requestManager = requestManager;
-  }
+    public void setRequestManager(RequestManager requestManager) {
+        this.requestManager = requestManager;
+    }
 
-  @RequestMapping(value = "/samples/rest/", method = RequestMethod.GET)
-  public
-  @ResponseBody
-  Collection<Sample> jsonRest() throws IOException {
-    return requestManager.listAllSamples();
-  }
+    @RequestMapping(value = "/samples/rest/", method = RequestMethod.GET)
+    public
+    @ResponseBody
+    Collection<Sample> jsonRest() throws IOException {
+        return requestManager.listAllSamples();
+    }
 
-  @RequestMapping("/samples")
-  public ModelAndView listSamples() throws Exception {
-    return new ModelAndView("/pages/listSamples.jsp");
-  }
+    @RequestMapping("/samples")
+    public ModelAndView listSamples() throws Exception {
+        return new ModelAndView("/pages/listSamples.jsp");
+    }
 }

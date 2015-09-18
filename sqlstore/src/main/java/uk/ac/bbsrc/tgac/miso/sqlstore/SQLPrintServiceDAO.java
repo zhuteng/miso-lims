@@ -61,178 +61,162 @@ import java.util.List;
  * @since 0.1.6
  */
 public class SQLPrintServiceDAO implements PrintServiceStore {
-  private static final String TABLE_NAME = "PrintService";
+    private static final String TABLE_NAME = "PrintService";
 
-  public static final String PRINT_SERVICE_SELECT =
-      "SELECT serviceId, serviceName, contextName, contextFields, enabled, printServiceFor, printSchema " +
-      "FROM " + TABLE_NAME;
+    public static final String PRINT_SERVICE_SELECT =
+        "SELECT serviceId, serviceName, contextName, contextFields, enabled, printServiceFor, printSchema " +
+        "FROM " + TABLE_NAME;
 
-  public static final String PRINT_SERVICE_SELECT_BY_SERVICE_ID =
-      PRINT_SERVICE_SELECT + " WHERE serviceId = ?";
+    public static final String PRINT_SERVICE_SELECT_BY_SERVICE_ID = PRINT_SERVICE_SELECT + " WHERE serviceId = ?";
 
-  public static final String PRINT_SERVICE_SELECT_BY_SERVICE_NAME =
-      PRINT_SERVICE_SELECT + " WHERE serviceName = ?";
+    public static final String PRINT_SERVICE_SELECT_BY_SERVICE_NAME = PRINT_SERVICE_SELECT + " WHERE serviceName = ?";
 
-  public static final String PRINT_SERVICES_SELECT_BY_CONTEXT_NAME =
-      PRINT_SERVICE_SELECT + " WHERE contextName = ?";
+    public static final String PRINT_SERVICES_SELECT_BY_CONTEXT_NAME = PRINT_SERVICE_SELECT + " WHERE contextName = ?";
 
-  public static final String PRINT_SERVICES_SELECT_BY_CLASS =
-      PRINT_SERVICE_SELECT + " WHERE printServiceFor = ?";
+    public static final String PRINT_SERVICES_SELECT_BY_CLASS = PRINT_SERVICE_SELECT + " WHERE printServiceFor = ?";
 
-  public static final String PRINT_SERVICE_UPDATE =
-      "UPDATE " + TABLE_NAME + " " +
-      "SET contextName=:contextName, contextFields=:contextFields, enabled=:enabled, printServiceFor=:printServiceFor, printSchema=:printSchema " +
-      "WHERE serviceName=:serviceName";
+    public static final String PRINT_SERVICE_UPDATE = "UPDATE " + TABLE_NAME + " " +
+                                                      "SET contextName=:contextName, contextFields=:contextFields, enabled=:enabled, printServiceFor=:printServiceFor, printSchema=:printSchema " +
+                                                      "WHERE serviceName=:serviceName";
 
-  protected static final Logger log = LoggerFactory.getLogger(SQLPrintServiceDAO.class);
-  private JdbcTemplate template;
+    protected static final Logger log = LoggerFactory.getLogger(SQLPrintServiceDAO.class);
+    private JdbcTemplate template;
 
-  @Autowired
-  private PrintManager<MisoPrintService, ?> printManager;
+    @Autowired
+    private PrintManager<MisoPrintService, ?> printManager;
 
-  public void setPrintManager(PrintManager<MisoPrintService, ?> printManager) {
-    this.printManager = printManager;
-  }
-
-  @Autowired
-  private MisoFilesManager misoFilesManager;
-
-  public void setMisoFilesManager(MisoFilesManager misoFilesManager) {
-    this.misoFilesManager = misoFilesManager;
-  }
-
-  @Autowired
-  private SecurityManager securityManager;
-
-  public void setSecurityManager(SecurityManager securityManager) {
-    this.securityManager = securityManager;
-  }
-
-  public JdbcTemplate getJdbcTemplate() {
-    return template;
-  }
-
-  public void setJdbcTemplate(JdbcTemplate template) {
-    this.template = template;
-  }
-
-  @Override
-  public long save(MisoPrintService printService) throws IOException {
-    MapSqlParameterSource params = new MapSqlParameterSource();
-    params.addValue("serviceName", printService.getName())
-        .addValue("contextName", printService.getPrintContext().getName())
-        .addValue("enabled", printService.isEnabled())
-        .addValue("printServiceFor", printService.getPrintServiceFor().getName())
-        .addValue("printSchema", printService.getBarcodableSchema().getName());
-    try {
-      JSONObject contextFields = PrintServiceUtils.mapContextFieldsToJSON(printService.getPrintContext());
-      String contextFieldJSON = contextFields.toString();
-      params.addValue("contextFields", contextFieldJSON);
-    }
-    catch (IllegalAccessException e) {
-      e.printStackTrace();
+    public void setPrintManager(PrintManager<MisoPrintService, ?> printManager) {
+        this.printManager = printManager;
     }
 
-    if (printService.getServiceId() == -1) {
-      SimpleJdbcInsert insert = new SimpleJdbcInsert(template)
-          .withTableName(TABLE_NAME)
-          .usingGeneratedKeyColumns("serviceId");
-      Number newId = insert.executeAndReturnKey(params);
-      printService.setServiceId(newId.longValue());
+    @Autowired
+    private MisoFilesManager misoFilesManager;
+
+    public void setMisoFilesManager(MisoFilesManager misoFilesManager) {
+        this.misoFilesManager = misoFilesManager;
     }
-    else {
-      params.addValue("serviceId", printService.getServiceId());
-      NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
-      namedTemplate.update(PRINT_SERVICE_UPDATE, params);
+
+    @Autowired
+    private SecurityManager securityManager;
+
+    public void setSecurityManager(SecurityManager securityManager) {
+        this.securityManager = securityManager;
     }
-    return printService.getServiceId();
-  }
 
-  public MisoPrintService get(long serviceId) throws IOException {
-    List eResults = template.query(PRINT_SERVICE_SELECT_BY_SERVICE_ID, new Object[]{serviceId}, new MisoPrintServiceMapper());
-    MisoPrintService e = eResults.size() > 0 ? (MisoPrintService) eResults.get(0) : null;
-    return e;
-  }
+    public JdbcTemplate getJdbcTemplate() {
+        return template;
+    }
 
-  @Override
-  public MisoPrintService lazyGet(long id) throws IOException {
-    return get(id);
-  }
+    public void setJdbcTemplate(JdbcTemplate template) {
+        this.template = template;
+    }
 
-  public MisoPrintService getByName(String serviceName) throws IOException {
-    List eResults = template.query(PRINT_SERVICE_SELECT_BY_SERVICE_NAME, new Object[]{serviceName}, new MisoPrintServiceMapper());
-    MisoPrintService e = eResults.size() > 0 ? (MisoPrintService) eResults.get(0) : null;
-    return e;
-  }
-
-  public Collection<MisoPrintService> listAll() throws IOException {
-    return template.query(PRINT_SERVICE_SELECT, new MisoPrintServiceMapper());
-  }
-
-  @Override
-  public int count() throws IOException {
-    return template.queryForInt("SELECT count(*) FROM " + TABLE_NAME);
-  }
-
-  @Override
-  public List<MisoPrintService> listByContext(String contextName) throws IOException {
-    return template.query(PRINT_SERVICES_SELECT_BY_CONTEXT_NAME, new Object[]{contextName}, new MisoPrintServiceMapper());
-  }
-
-  public class MisoPrintServiceMapper implements RowMapper<MisoPrintService> {
-    public MisoPrintService mapRow(ResultSet rs, int rowNum) throws SQLException {
-      try {
-        MisoPrintService printService;
-
-        PrintContext pc = printManager.getPrintContext(rs.getString("contextName"));
-        BarcodableSchema barcodableSchema = printManager.getBarcodableSchema(rs.getString("printSchema"));
-        if (barcodableSchema !=null){
-        barcodableSchema.getBarcodeLabelFactory().setFilesManager(misoFilesManager);
-        barcodableSchema.getBarcodeLabelFactory().setSecurityManager(securityManager);
+    @Override
+    public long save(MisoPrintService printService) throws IOException {
+        MapSqlParameterSource params = new MapSqlParameterSource();
+        params.addValue("serviceName", printService.getName()).addValue("contextName", printService.getPrintContext().getName())
+              .addValue("enabled", printService.isEnabled()).addValue("printServiceFor", printService.getPrintServiceFor().getName())
+              .addValue("printSchema", printService.getBarcodableSchema().getName());
+        try {
+            JSONObject contextFields = PrintServiceUtils.mapContextFieldsToJSON(printService.getPrintContext());
+            String contextFieldJSON = contextFields.toString();
+            params.addValue("contextFields", contextFieldJSON);
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
         }
 
-        if ("net.sf.json.JSONObject".equals(rs.getString("printServiceFor"))) {
-          printService = new CustomPrintService();
-          printService.setBarcodableSchema(barcodableSchema);
-
-          printService.setServiceId(rs.getLong("serviceId"));
-          printService.setName(rs.getString("serviceName"));
-          printService.setEnabled(rs.getBoolean("enabled"));
-          printService.setPrintServiceFor(JSONObject.class);
-
-          JSONObject contextFields = JSONObject.fromObject(rs.getString("contextFields"));
-          PrintServiceUtils.mapJSONToContextFields(contextFields, pc);
+        if (printService.getServiceId() == -1) {
+            SimpleJdbcInsert insert = new SimpleJdbcInsert(template).withTableName(TABLE_NAME).usingGeneratedKeyColumns("serviceId");
+            Number newId = insert.executeAndReturnKey(params);
+            printService.setServiceId(newId.longValue());
+        } else {
+            params.addValue("serviceId", printService.getServiceId());
+            NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
+            namedTemplate.update(PRINT_SERVICE_UPDATE, params);
         }
-        else {
-          printService = new DefaultPrintService();
-          printService.setBarcodableSchema(barcodableSchema);
-
-          printService.setServiceId(rs.getLong("serviceId"));
-          printService.setName(rs.getString("serviceName"));
-          printService.setEnabled(rs.getBoolean("enabled"));
-          printService.setPrintServiceFor(Class.forName(rs.getString("printServiceFor")).asSubclass(Barcodable.class));
-
-          JSONObject contextFields = JSONObject.fromObject(rs.getString("contextFields"));
-          PrintServiceUtils.mapJSONToContextFields(contextFields, pc);
-        }
-
-        printService.setPrintContext(pc);
-
-        return printService;
-      }
-      catch (ClassNotFoundException e) {
-        e.printStackTrace();
-      }
-      catch (IllegalAccessException e) {
-        e.printStackTrace();
-      }
-      catch (JSONException e) {
-        e.printStackTrace();
-      }
-      catch (IOException e) {
-        e.printStackTrace();
-      }
-      return null;
+        return printService.getServiceId();
     }
-  }
+
+    public MisoPrintService get(long serviceId) throws IOException {
+        List eResults = template.query(PRINT_SERVICE_SELECT_BY_SERVICE_ID, new Object[] { serviceId }, new MisoPrintServiceMapper());
+        MisoPrintService e = eResults.size() > 0 ? (MisoPrintService) eResults.get(0) : null;
+        return e;
+    }
+
+    @Override
+    public MisoPrintService lazyGet(long id) throws IOException {
+        return get(id);
+    }
+
+    public MisoPrintService getByName(String serviceName) throws IOException {
+        List eResults = template.query(PRINT_SERVICE_SELECT_BY_SERVICE_NAME, new Object[] { serviceName }, new MisoPrintServiceMapper());
+        MisoPrintService e = eResults.size() > 0 ? (MisoPrintService) eResults.get(0) : null;
+        return e;
+    }
+
+    public Collection<MisoPrintService> listAll() throws IOException {
+        return template.query(PRINT_SERVICE_SELECT, new MisoPrintServiceMapper());
+    }
+
+    @Override
+    public int count() throws IOException {
+        return template.queryForInt("SELECT count(*) FROM " + TABLE_NAME);
+    }
+
+    @Override
+    public List<MisoPrintService> listByContext(String contextName) throws IOException {
+        return template.query(PRINT_SERVICES_SELECT_BY_CONTEXT_NAME, new Object[] { contextName }, new MisoPrintServiceMapper());
+    }
+
+    public class MisoPrintServiceMapper implements RowMapper<MisoPrintService> {
+        public MisoPrintService mapRow(ResultSet rs, int rowNum) throws SQLException {
+            try {
+                MisoPrintService printService;
+
+                PrintContext pc = printManager.getPrintContext(rs.getString("contextName"));
+                BarcodableSchema barcodableSchema = printManager.getBarcodableSchema(rs.getString("printSchema"));
+                if (barcodableSchema != null) {
+                    barcodableSchema.getBarcodeLabelFactory().setFilesManager(misoFilesManager);
+                    barcodableSchema.getBarcodeLabelFactory().setSecurityManager(securityManager);
+                }
+
+                if ("net.sf.json.JSONObject".equals(rs.getString("printServiceFor"))) {
+                    printService = new CustomPrintService();
+                    printService.setBarcodableSchema(barcodableSchema);
+
+                    printService.setServiceId(rs.getLong("serviceId"));
+                    printService.setName(rs.getString("serviceName"));
+                    printService.setEnabled(rs.getBoolean("enabled"));
+                    printService.setPrintServiceFor(JSONObject.class);
+
+                    JSONObject contextFields = JSONObject.fromObject(rs.getString("contextFields"));
+                    PrintServiceUtils.mapJSONToContextFields(contextFields, pc);
+                } else {
+                    printService = new DefaultPrintService();
+                    printService.setBarcodableSchema(barcodableSchema);
+
+                    printService.setServiceId(rs.getLong("serviceId"));
+                    printService.setName(rs.getString("serviceName"));
+                    printService.setEnabled(rs.getBoolean("enabled"));
+                    printService.setPrintServiceFor(Class.forName(rs.getString("printServiceFor")).asSubclass(Barcodable.class));
+
+                    JSONObject contextFields = JSONObject.fromObject(rs.getString("contextFields"));
+                    PrintServiceUtils.mapJSONToContextFields(contextFields, pc);
+                }
+
+                printService.setPrintContext(pc);
+
+                return printService;
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            } catch (JSONException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+    }
 }

@@ -19,58 +19,57 @@ import java.io.UnsupportedEncodingException;
  */
 @ServiceProvider
 public class BradyPlateBarcodeLabelSchema implements BarcodableSchema<File, Barcodable> {
-  private BarcodeLabelFactory<File, Barcodable, BarcodableSchema<File, Barcodable>> barcodeLabelFactory = new FileGeneratingBarcodeLabelFactory<Barcodable>();
+    private BarcodeLabelFactory<File, Barcodable, BarcodableSchema<File, Barcodable>> barcodeLabelFactory = new FileGeneratingBarcodeLabelFactory<Barcodable>();
 
-  public String getName(){
-    return  "bradyPlateBarcodeLabelSchema";
-  }
-
-  private Barcodable barcodable;
-
-  @Override
-  public Class<Barcodable> isStateFor() {
-    return Barcodable.class;  //To change body of implemented methods use File | Settings | File Templates.
-  }
-
-  @Override
-  public File getPrintableLabel(Barcodable barcodable) {
-    return barcodeLabelFactory.getLabel(this, barcodable);
-  }
-
-  @Override
-  public BarcodeLabelFactory getBarcodeLabelFactory() {
-    return barcodeLabelFactory;
-  }
-
-  @Override
-  public String getRawState(Barcodable barcodable) {
-    StringBuilder sb = new StringBuilder();
-
-    try {
-      String barcode = new String(Base64.encodeBase64(barcodable.getIdentificationBarcode().getBytes("UTF-8")));
-      String tagBarcode = barcodable.getLabelText();
-      String name = barcodable.getName();
-
-      sb.append("m m").append("\n");
-      sb.append("J").append("\n");
-      sb.append("S l1;0,0,12,15,38").append("\n");
-      sb.append("B 3,2,0,DATAMATRIX,0.2;").append(barcode).append("\n");
-      sb.append("B 17,1,0,DATAMATRIX+RECT,0.25;").append(barcode).append("\n");
-      sb.append("T 29,2,0,5,pt4;[DATE]").append("\n");
-
-      //shorten alias to fit on label if too long
-      if (tagBarcode.length() >= 17) {
-        tagBarcode = tagBarcode.substring(0, 15) + "...";
-      }
-
-      sb.append("T 17,8,0,5,pt6;").append(tagBarcode).append("\n");
-      sb.append("T 17,11,0,5,pt6;").append(name).append("\n");
-      sb.append("A 1").append("\n");
+    public String getName() {
+        return "bradyPlateBarcodeLabelSchema";
     }
-    catch (UnsupportedEncodingException e) {
-      e.printStackTrace();
+
+    private Barcodable barcodable;
+
+    @Override
+    public Class<Barcodable> isStateFor() {
+        return Barcodable.class;  //To change body of implemented methods use File | Settings | File Templates.
     }
-    return sb.toString();
-  }
+
+    @Override
+    public File getPrintableLabel(Barcodable barcodable) {
+        return barcodeLabelFactory.getLabel(this, barcodable);
+    }
+
+    @Override
+    public BarcodeLabelFactory getBarcodeLabelFactory() {
+        return barcodeLabelFactory;
+    }
+
+    @Override
+    public String getRawState(Barcodable barcodable) {
+        StringBuilder sb = new StringBuilder();
+
+        try {
+            String barcode = new String(Base64.encodeBase64(barcodable.getIdentificationBarcode().getBytes("UTF-8")));
+            String tagBarcode = barcodable.getLabelText();
+            String name = barcodable.getName();
+
+            sb.append("m m").append("\n");
+            sb.append("J").append("\n");
+            sb.append("S l1;0,0,12,15,38").append("\n");
+            sb.append("B 3,2,0,DATAMATRIX,0.2;").append(barcode).append("\n");
+            sb.append("B 17,1,0,DATAMATRIX+RECT,0.25;").append(barcode).append("\n");
+            sb.append("T 29,2,0,5,pt4;[DATE]").append("\n");
+
+            //shorten alias to fit on label if too long
+            if (tagBarcode.length() >= 17) {
+                tagBarcode = tagBarcode.substring(0, 15) + "...";
+            }
+
+            sb.append("T 17,8,0,5,pt6;").append(tagBarcode).append("\n");
+            sb.append("T 17,11,0,5,pt6;").append(name).append("\n");
+            sb.append("A 1").append("\n");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        return sb.toString();
+    }
 
 }

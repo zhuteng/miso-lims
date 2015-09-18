@@ -41,25 +41,25 @@ import org.codehaus.jackson.map.annotate.JsonSerialize;
  * @since 0.0.2
  */
 public interface SecurableByProfile extends Securable {
-  /**
-   * Returns the securityProfile of this SecurableByProfile object.
-   *
-   * @return SecurityProfile securityProfile.
-   */
-  public SecurityProfile getSecurityProfile();
+    /**
+     * Returns the securityProfile of this SecurableByProfile object.
+     *
+     * @return SecurityProfile securityProfile.
+     */
+    public SecurityProfile getSecurityProfile();
 
-  /**
-   * Sets the securityProfile of this SecurableByProfile object.
-   *
-   * @param profile securityProfile.
-   */
-  public void setSecurityProfile(SecurityProfile profile);
+    /**
+     * Sets the securityProfile of this SecurableByProfile object.
+     *
+     * @param profile securityProfile.
+     */
+    public void setSecurityProfile(SecurityProfile profile);
 
-  /**
-   * Inherit the SecurityProfile of the given parent SecurableByProfile
-   *
-   * @param parent of type SecurableByProfile
-   * @throws SecurityException when the parent SecurityProfile could not be inherited 
-   */
-  void inheritPermissions(SecurableByProfile parent) throws SecurityException;
+    /**
+     * Inherit the SecurityProfile of the given parent SecurableByProfile
+     *
+     * @param parent of type SecurableByProfile
+     * @throws SecurityException when the parent SecurityProfile could not be inherited
+     */
+    void inheritPermissions(SecurableByProfile parent) throws SecurityException;
 }

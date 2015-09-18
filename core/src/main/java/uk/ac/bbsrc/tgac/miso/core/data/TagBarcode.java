@@ -25,6 +25,7 @@ package uk.ac.bbsrc.tgac.miso.core.data;
 
 //import com.fasterxml.jackson.annotation.*;
 //import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 import org.codehaus.jackson.annotate.JsonTypeInfo;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
@@ -40,67 +41,77 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
  */
 @JsonSerialize(typing = JsonSerialize.Typing.STATIC, include = JsonSerialize.Inclusion.NON_NULL)
 //@JsonIdentityInfo(generator = ObjectIdGenerators.IntSequenceGenerator.class, property = "@id")
-@JsonTypeInfo(use=JsonTypeInfo.Id.CLASS, include= JsonTypeInfo.As.PROPERTY, property="@class")
+@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
 public interface TagBarcode extends Comparable, Nameable {
-  /**
-   * Returns the tagId of this TagBarcode object.
-   * @return Long tagId
-   */
-  @Deprecated
-  public Long getTagBarcodeId();
+    /**
+     * Returns the tagId of this TagBarcode object.
+     *
+     * @return Long tagId
+     */
+    @Deprecated
+    public Long getTagBarcodeId();
 
-  /**
-   * Sets the tagBarcodeId of this TagBarcode object.
-   * @param tagId Long
-   */
-  @Deprecated
-  public void setTagBarcodeId(Long tagId);
+    /**
+     * Sets the tagBarcodeId of this TagBarcode object.
+     *
+     * @param tagId Long
+     */
+    @Deprecated
+    public void setTagBarcodeId(Long tagId);
 
-  /**
-   * Sets the ID of this TagBarcode object.
-   * @param id long
-   */
-  public void setId(long id);
+    /**
+     * Sets the ID of this TagBarcode object.
+     *
+     * @param id long
+     */
+    public void setId(long id);
 
-  /**
-   * Sets the name of this TagBarcode object.
-   * @param name
-   */
-  public void setName(String name);
+    /**
+     * Sets the name of this TagBarcode object.
+     *
+     * @param name
+     */
+    public void setName(String name);
 
-  /**
-   * Returns the DNA sequence of this TagBarcode object.
-   * @return
-   */
-  public String getSequence();
+    /**
+     * Returns the DNA sequence of this TagBarcode object.
+     *
+     * @return
+     */
+    public String getSequence();
 
-  /**
-   * Sets the DNA sequence of this TagBarcode object.
-   * @param sequence
-   */
-  public void setSequence(String sequence);
+    /**
+     * Sets the DNA sequence of this TagBarcode object.
+     *
+     * @param sequence
+     */
+    public void setSequence(String sequence);
 
-  /**
-   * Returns the {@link PlatformType} of this TagBarcode object.
-   * @return
-   */
-  public PlatformType getPlatformType();
+    /**
+     * Returns the {@link PlatformType} of this TagBarcode object.
+     *
+     * @return
+     */
+    public PlatformType getPlatformType();
 
-  /**
-   * Sets the {@link PlatformType} of this TagBarcode object.
-   * @param platformType
-   */
-  public void setPlatformType(PlatformType platformType);
+    /**
+     * Sets the {@link PlatformType} of this TagBarcode object.
+     *
+     * @param platformType
+     */
+    public void setPlatformType(PlatformType platformType);
 
-  /**
-   * Returns the strategy name to which this TagBarcode belongs.
-   * @return String strategyName
-   */
-  public String getStrategyName();
+    /**
+     * Returns the strategy name to which this TagBarcode belongs.
+     *
+     * @return String strategyName
+     */
+    public String getStrategyName();
 
-  /**
-   * Sets the strategy name to which this TagBarcode belongs.
-   * @param strategyName String
-   */
-  public void setStrategyName(String strategyName);
+    /**
+     * Sets the strategy name to which this TagBarcode belongs.
+     *
+     * @param strategyName String
+     */
+    public void setStrategyName(String strategyName);
 }

@@ -37,7 +37,7 @@ import java.util.Collection;
  * @since 0.1.9
  */
 public interface FilePathGeneratorResolverService {
-  FilePathGenerator getFilePathGenerator(PlatformType platformType);
-  FilePathGenerator getFilePathGenerator(String generatorName);
-  Collection<FilePathGenerator> getFilePathGenerators();
+    FilePathGenerator getFilePathGenerator(PlatformType platformType);
+    FilePathGenerator getFilePathGenerator(String generatorName);
+    Collection<FilePathGenerator> getFilePathGenerators();
 }

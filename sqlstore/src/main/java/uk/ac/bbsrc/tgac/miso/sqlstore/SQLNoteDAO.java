@@ -60,248 +60,221 @@ import java.util.List;
  * @since 0.0.2
  */
 public class SQLNoteDAO implements NoteStore {
-  private static final String TABLE_NAME="Note";
+    private static final String TABLE_NAME = "Note";
 
-  public static final String NOTES_SELECT =
-          "SELECT noteId, creationDate, internalOnly, text, owner_userId " +
-          "FROM "+TABLE_NAME;
+    public static final String NOTES_SELECT = "SELECT noteId, creationDate, internalOnly, text, owner_userId " +
+                                              "FROM " + TABLE_NAME;
 
-  public static final String NOTE_SELECT_BY_ID =
-          NOTES_SELECT + " " + "WHERE noteId = ?";
+    public static final String NOTE_SELECT_BY_ID = NOTES_SELECT + " " + "WHERE noteId = ?";
 
-  public static final String NOTES_BY_RELATED_PROJECT_OVERVIEW =
-          "SELECT n.noteId, n.creationDate, n.internalOnly, n.text, n.owner_userId " +
-          "FROM "+TABLE_NAME+" n, ProjectOverview_Note pon " +
-          "WHERE n.noteId=pon.notes_noteId " +
-          "AND pon.overview_overviewId=?";
+    public static final String NOTES_BY_RELATED_PROJECT_OVERVIEW =
+        "SELECT n.noteId, n.creationDate, n.internalOnly, n.text, n.owner_userId " +
+        "FROM " + TABLE_NAME + " n, ProjectOverview_Note pon " +
+        "WHERE n.noteId=pon.notes_noteId " +
+        "AND pon.overview_overviewId=?";
 
-  public static final String NOTES_BY_RELATED_SAMPLE =
-          "SELECT n.noteId, n.creationDate, n.internalOnly, n.text, n.owner_userId " +
-          "FROM "+TABLE_NAME+" n, Sample_Note sn " +
-          "WHERE n.noteId=sn.notes_noteId " +
-          "AND sn.sample_sampleId=?";
+    public static final String NOTES_BY_RELATED_SAMPLE = "SELECT n.noteId, n.creationDate, n.internalOnly, n.text, n.owner_userId " +
+                                                         "FROM " + TABLE_NAME + " n, Sample_Note sn " +
+                                                         "WHERE n.noteId=sn.notes_noteId " +
+                                                         "AND sn.sample_sampleId=?";
 
-  public static final String NOTES_BY_RELATED_LIBRARY =
-          "SELECT n.noteId, n.creationDate, n.internalOnly, n.text, n.owner_userId " +
-          "FROM "+TABLE_NAME+" n, Library_Note ln " +
-          "WHERE n.noteId=ln.notes_noteId " +
-          "AND ln.library_libraryId=?";  
+    public static final String NOTES_BY_RELATED_LIBRARY = "SELECT n.noteId, n.creationDate, n.internalOnly, n.text, n.owner_userId " +
+                                                          "FROM " + TABLE_NAME + " n, Library_Note ln " +
+                                                          "WHERE n.noteId=ln.notes_noteId " +
+                                                          "AND ln.library_libraryId=?";
 
-  public static final String NOTES_BY_RELATED_KIT =
-          "SELECT n.noteId, n.creationDate, n.internalOnly, n.text, n.owner_userId " +
-          "FROM "+TABLE_NAME+" n, Kit_Note kn " +
-          "WHERE n.noteId=kn.notes_noteId " +
-          "AND kn.kit_kitId=?";
+    public static final String NOTES_BY_RELATED_KIT = "SELECT n.noteId, n.creationDate, n.internalOnly, n.text, n.owner_userId " +
+                                                      "FROM " + TABLE_NAME + " n, Kit_Note kn " +
+                                                      "WHERE n.noteId=kn.notes_noteId " +
+                                                      "AND kn.kit_kitId=?";
 
-  public static final String NOTES_BY_RELATED_RUN =
-          "SELECT n.noteId, n.creationDate, n.internalOnly, n.text, n.owner_userId " +
-          "FROM "+TABLE_NAME+" n, Run_Note rn " +
-          "WHERE n.noteId=rn.notes_noteId " +
-          "AND rn.run_runId=?";
+    public static final String NOTES_BY_RELATED_RUN = "SELECT n.noteId, n.creationDate, n.internalOnly, n.text, n.owner_userId " +
+                                                      "FROM " + TABLE_NAME + " n, Run_Note rn " +
+                                                      "WHERE n.noteId=rn.notes_noteId " +
+                                                      "AND rn.run_runId=?";
 
-  public static final String NOTE_DELETE =
-      "DELETE FROM " + TABLE_NAME + " WHERE noteId=:noteId";
+    public static final String NOTE_DELETE = "DELETE FROM " + TABLE_NAME + " WHERE noteId=:noteId";
 
-  protected static final Logger log = LoggerFactory.getLogger(SQLNoteDAO.class);
-  private SecurityStore securityDAO;
-  private JdbcTemplate template;
+    protected static final Logger log = LoggerFactory.getLogger(SQLNoteDAO.class);
+    private SecurityStore securityDAO;
+    private JdbcTemplate template;
 
-  @Autowired
-  private DataObjectFactory dataObjectFactory;
+    @Autowired
+    private DataObjectFactory dataObjectFactory;
 
-  public void setDataObjectFactory(DataObjectFactory dataObjectFactory) {
-    this.dataObjectFactory = dataObjectFactory;
-  }
-
-  public void setSecurityDAO(SecurityStore securityDAO) {
-    this.securityDAO = securityDAO;
-  }
-
-  public JdbcTemplate getJdbcTemplate() {
-    return template;
-  }
-
-  public void setJdbcTemplate(JdbcTemplate template) {
-    this.template = template;
-  }
-
-  public long save(Note note) throws IOException {
-    //make links clickable
-    String newNoteText = LimsUtils.findHyperlinks(note.getText());
-
-    MapSqlParameterSource params = new MapSqlParameterSource();
-    params.addValue("creationDate", note.getCreationDate())
-            .addValue("internalOnly", note.isInternalOnly())
-            .addValue("text", newNoteText);
-
-    if (note.getOwner() == null) {
-      log.warn("Note has no owner - check parent permissions.");
-    }
-    else {
-      params.addValue("owner_userId", note.getOwner().getUserId());
+    public void setDataObjectFactory(DataObjectFactory dataObjectFactory) {
+        this.dataObjectFactory = dataObjectFactory;
     }
 
-    if (note.getNoteId() == Note.UNSAVED_ID) {
-      SimpleJdbcInsert insert = new SimpleJdbcInsert(template)
-              .withTableName(TABLE_NAME)
-              .usingGeneratedKeyColumns("noteId");
-      Number newId = insert.executeAndReturnKey(params);
-      note.setNoteId(newId.longValue());
+    public void setSecurityDAO(SecurityStore securityDAO) {
+        this.securityDAO = securityDAO;
     }
-    return note.getNoteId();
-  }
 
-  public long saveProjectOverviewNote(ProjectOverview overview, Note note) throws IOException {
-    long noteId = save(note);
-    SimpleJdbcInsert pInsert = new SimpleJdbcInsert(template)
-            .withTableName("ProjectOverview_Note");
-
-    MapSqlParameterSource poParams = new MapSqlParameterSource();
-    poParams.addValue("overview_overviewId", overview.getOverviewId())
-            .addValue("notes_noteId", noteId);
-
-    try {
-      pInsert.execute(poParams);
+    public JdbcTemplate getJdbcTemplate() {
+        return template;
     }
-    catch(DuplicateKeyException se) {
-      //ignore
+
+    public void setJdbcTemplate(JdbcTemplate template) {
+        this.template = template;
     }
-    return note.getNoteId();
-  }
 
-  public long saveKitNote(Kit kit, Note note) throws IOException {
-    long noteId = save(note);
-    SimpleJdbcInsert pInsert = new SimpleJdbcInsert(template)
-            .withTableName("Kit_Note");
+    public long save(Note note) throws IOException {
+        //make links clickable
+        String newNoteText = LimsUtils.findHyperlinks(note.getText());
 
-    MapSqlParameterSource poParams = new MapSqlParameterSource();
-    poParams.addValue("kit_kitId", kit.getId())
-            .addValue("notes_noteId", noteId);
-    try {
-      pInsert.execute(poParams);
+        MapSqlParameterSource params = new MapSqlParameterSource();
+        params.addValue("creationDate", note.getCreationDate()).addValue("internalOnly", note.isInternalOnly())
+              .addValue("text", newNoteText);
+
+        if (note.getOwner() == null) {
+            log.warn("Note has no owner - check parent permissions.");
+        } else {
+            params.addValue("owner_userId", note.getOwner().getUserId());
+        }
+
+        if (note.getNoteId() == Note.UNSAVED_ID) {
+            SimpleJdbcInsert insert = new SimpleJdbcInsert(template).withTableName(TABLE_NAME).usingGeneratedKeyColumns("noteId");
+            Number newId = insert.executeAndReturnKey(params);
+            note.setNoteId(newId.longValue());
+        }
+        return note.getNoteId();
     }
-    catch(DuplicateKeyException se) {
-      //ignore
+
+    public long saveProjectOverviewNote(ProjectOverview overview, Note note) throws IOException {
+        long noteId = save(note);
+        SimpleJdbcInsert pInsert = new SimpleJdbcInsert(template).withTableName("ProjectOverview_Note");
+
+        MapSqlParameterSource poParams = new MapSqlParameterSource();
+        poParams.addValue("overview_overviewId", overview.getOverviewId()).addValue("notes_noteId", noteId);
+
+        try {
+            pInsert.execute(poParams);
+        } catch (DuplicateKeyException se) {
+            //ignore
+        }
+        return note.getNoteId();
     }
-    return note.getNoteId();
-  }
 
-  public long saveSampleNote(Sample sample, Note note) throws IOException {
-    long noteId = save(note);
-    SimpleJdbcInsert pInsert = new SimpleJdbcInsert(template)
-            .withTableName("Sample_Note");
+    public long saveKitNote(Kit kit, Note note) throws IOException {
+        long noteId = save(note);
+        SimpleJdbcInsert pInsert = new SimpleJdbcInsert(template).withTableName("Kit_Note");
 
-    MapSqlParameterSource poParams = new MapSqlParameterSource();
-    poParams.addValue("sample_sampleId", sample.getId())
-            .addValue("notes_noteId", noteId);
-
-    try {
-      pInsert.execute(poParams);
+        MapSqlParameterSource poParams = new MapSqlParameterSource();
+        poParams.addValue("kit_kitId", kit.getId()).addValue("notes_noteId", noteId);
+        try {
+            pInsert.execute(poParams);
+        } catch (DuplicateKeyException se) {
+            //ignore
+        }
+        return note.getNoteId();
     }
-    catch(DuplicateKeyException se) {
-      //ignore
+
+    public long saveSampleNote(Sample sample, Note note) throws IOException {
+        long noteId = save(note);
+        SimpleJdbcInsert pInsert = new SimpleJdbcInsert(template).withTableName("Sample_Note");
+
+        MapSqlParameterSource poParams = new MapSqlParameterSource();
+        poParams.addValue("sample_sampleId", sample.getId()).addValue("notes_noteId", noteId);
+
+        try {
+            pInsert.execute(poParams);
+        } catch (DuplicateKeyException se) {
+            //ignore
+        }
+        return note.getNoteId();
     }
-    return note.getNoteId();
-  }
 
-  public long saveLibraryNote(Library library, Note note) throws IOException {
-    long noteId = save(note);
-    SimpleJdbcInsert pInsert = new SimpleJdbcInsert(template)
-            .withTableName("Library_Note");
+    public long saveLibraryNote(Library library, Note note) throws IOException {
+        long noteId = save(note);
+        SimpleJdbcInsert pInsert = new SimpleJdbcInsert(template).withTableName("Library_Note");
 
-    MapSqlParameterSource poParams = new MapSqlParameterSource();
-    poParams.addValue("library_libraryId", library.getId())
-            .addValue("notes_noteId", noteId);
+        MapSqlParameterSource poParams = new MapSqlParameterSource();
+        poParams.addValue("library_libraryId", library.getId()).addValue("notes_noteId", noteId);
 
-    try {
-      pInsert.execute(poParams);
+        try {
+            pInsert.execute(poParams);
+        } catch (DuplicateKeyException se) {
+            //ignore
+        }
+        return note.getNoteId();
     }
-    catch(DuplicateKeyException se) {
-      //ignore
+
+    public long saveRunNote(Run run, Note note) throws IOException {
+        long noteId = save(note);
+        SimpleJdbcInsert pInsert = new SimpleJdbcInsert(template).withTableName("Run_Note");
+
+        MapSqlParameterSource poParams = new MapSqlParameterSource();
+        poParams.addValue("run_runId", run.getId()).addValue("notes_noteId", noteId);
+
+        try {
+            pInsert.execute(poParams);
+        } catch (DuplicateKeyException se) {
+            //ignore
+        }
+        return note.getNoteId();
     }
-    return note.getNoteId();
-  }
 
-  public long saveRunNote(Run run, Note note) throws IOException {
-    long noteId = save(note);
-    SimpleJdbcInsert pInsert = new SimpleJdbcInsert(template)
-            .withTableName("Run_Note");
-
-    MapSqlParameterSource poParams = new MapSqlParameterSource();
-    poParams.addValue("run_runId", run.getId())
-            .addValue("notes_noteId", noteId);
-
-    try {
-      pInsert.execute(poParams);
+    @Override
+    public boolean remove(Note note) throws IOException {
+        NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
+        return (namedTemplate.update(NOTE_DELETE, new MapSqlParameterSource().addValue("noteId", note.getNoteId())) == 1);
     }
-    catch(DuplicateKeyException se) {
-      //ignore
+
+    public Note get(long noteId) throws IOException {
+        List eResults = template.query(NOTE_SELECT_BY_ID, new Object[] { noteId }, new NoteMapper());
+        Note e = eResults.size() > 0 ? (Note) eResults.get(0) : null;
+        return e;
     }
-    return note.getNoteId();
-  }
 
-  @Override
-  public boolean remove(Note note) throws IOException {
-    NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
-    return (namedTemplate.update(NOTE_DELETE, new MapSqlParameterSource().addValue("noteId", note.getNoteId())) == 1);
-  }
-
-  public Note get(long noteId) throws IOException {
-    List eResults = template.query(NOTE_SELECT_BY_ID, new Object[]{noteId}, new NoteMapper());
-    Note e = eResults.size() > 0 ? (Note) eResults.get(0) : null;
-    return e;
-  }
-
-  @Override
-  public Note lazyGet(long id) throws IOException {
-    return get(id);
-  }
-
-  public Collection<Note> listAll() throws IOException {
-    return template.query(NOTES_SELECT, new NoteMapper());
-  }
-
-  @Override
-  public int count() throws IOException {
-    return template.queryForInt("SELECT count(*) FROM "+TABLE_NAME);
-  }
-
-  public List<Note> listByProjectOverview(Long overviewId) throws IOException {
-    return template.query(NOTES_BY_RELATED_PROJECT_OVERVIEW, new Object[]{overviewId}, new NoteMapper());
-  }
-
-  public List<Note> listByKit(Long kitId) throws IOException {
-    return template.query(NOTES_BY_RELATED_KIT, new Object[]{kitId}, new NoteMapper());
-  }
-
-  public List<Note> listBySample(Long sampleId) throws IOException {
-    return template.query(NOTES_BY_RELATED_SAMPLE, new Object[]{sampleId}, new NoteMapper());
-  }
-
-  public List<Note> listByLibrary(Long libraryId) throws IOException {
-    return template.query(NOTES_BY_RELATED_LIBRARY, new Object[]{libraryId}, new NoteMapper());
-  }
-
-  public List<Note> listByRun(Long runId) throws IOException {
-    return template.query(NOTES_BY_RELATED_RUN, new Object[]{runId}, new NoteMapper());
-  }
-
-  public class NoteMapper implements RowMapper<Note> {
-    public Note mapRow(ResultSet rs, int rowNum) throws SQLException {
-      Note note = new Note();
-      note.setNoteId(rs.getLong("noteId"));
-      note.setCreationDate(rs.getDate("creationDate"));
-      note.setInternalOnly(rs.getBoolean("internalOnly"));
-      note.setText(rs.getString("text"));
-
-      try {
-        note.setOwner(securityDAO.getUserById(rs.getLong("owner_userId")));
-      }
-      catch (IOException e) {
-        e.printStackTrace();
-      }
-
-      return note;
+    @Override
+    public Note lazyGet(long id) throws IOException {
+        return get(id);
     }
-  }
+
+    public Collection<Note> listAll() throws IOException {
+        return template.query(NOTES_SELECT, new NoteMapper());
+    }
+
+    @Override
+    public int count() throws IOException {
+        return template.queryForInt("SELECT count(*) FROM " + TABLE_NAME);
+    }
+
+    public List<Note> listByProjectOverview(Long overviewId) throws IOException {
+        return template.query(NOTES_BY_RELATED_PROJECT_OVERVIEW, new Object[] { overviewId }, new NoteMapper());
+    }
+
+    public List<Note> listByKit(Long kitId) throws IOException {
+        return template.query(NOTES_BY_RELATED_KIT, new Object[] { kitId }, new NoteMapper());
+    }
+
+    public List<Note> listBySample(Long sampleId) throws IOException {
+        return template.query(NOTES_BY_RELATED_SAMPLE, new Object[] { sampleId }, new NoteMapper());
+    }
+
+    public List<Note> listByLibrary(Long libraryId) throws IOException {
+        return template.query(NOTES_BY_RELATED_LIBRARY, new Object[] { libraryId }, new NoteMapper());
+    }
+
+    public List<Note> listByRun(Long runId) throws IOException {
+        return template.query(NOTES_BY_RELATED_RUN, new Object[] { runId }, new NoteMapper());
+    }
+
+    public class NoteMapper implements RowMapper<Note> {
+        public Note mapRow(ResultSet rs, int rowNum) throws SQLException {
+            Note note = new Note();
+            note.setNoteId(rs.getLong("noteId"));
+            note.setCreationDate(rs.getDate("creationDate"));
+            note.setInternalOnly(rs.getBoolean("internalOnly"));
+            note.setText(rs.getString("text"));
+
+            try {
+                note.setOwner(securityDAO.getUserById(rs.getLong("owner_userId")));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            return note;
+        }
+    }
 }

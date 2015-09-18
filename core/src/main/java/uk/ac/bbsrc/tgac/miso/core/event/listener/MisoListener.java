@@ -40,17 +40,17 @@ import java.util.Set;
  * @since 0.1.2
  */
 public interface MisoListener extends EventListener {
-  /**
-   * Called whenever a {@link Event} changes it's state, either because it has started
-   * or stopped running for some reason.
-   *
-   * @param event the event that was fired
-   */
-  public void stateChanged(Event event);
+    /**
+     * Called whenever a {@link Event} changes it's state, either because it has started
+     * or stopped running for some reason.
+     *
+     * @param event the event that was fired
+     */
+    public void stateChanged(Event event);
 
-  public Collection<? extends ResponderService> getResponderServices();
+    public Collection<? extends ResponderService> getResponderServices();
 
-  public void setResponderServices(Collection<? extends ResponderService> responderServices);
+    public void setResponderServices(Collection<? extends ResponderService> responderServices);
 
-  public void setBaseURL(String baseURL);
+    public void setBaseURL(String baseURL);
 }

@@ -34,54 +34,54 @@ import java.util.List;
  * @since 0.0.3
  */
 public abstract class AbstractRunQC extends AbstractQC implements RunQC {
-  private Run run;
-  private String information;
-  private List<Partition> partitionSelections;
-  private boolean doNotProcess;
+    private Run run;
+    private String information;
+    private List<Partition> partitionSelections;
+    private boolean doNotProcess;
 
-  @Override
-  public Run getRun() {
-    return run;
-  }
+    @Override
+    public Run getRun() {
+        return run;
+    }
 
-  @Override
-  public void setRun(Run run) throws MalformedRunException {
-    this.run = run;
-  }
+    @Override
+    public void setRun(Run run) throws MalformedRunException {
+        this.run = run;
+    }
 
-  @Override
-  public String getInformation() {
-    return information;
-  }
+    @Override
+    public String getInformation() {
+        return information;
+    }
 
-  @Override
-  public void setInformation(String information) {
-    this.information = information;
-  }
+    @Override
+    public void setInformation(String information) {
+        this.information = information;
+    }
 
-  @Override
-  public boolean getDoNotProcess() {
-    return doNotProcess;
-  }
+    @Override
+    public boolean getDoNotProcess() {
+        return doNotProcess;
+    }
 
-  @Override
-  public void setDoNotProcess(boolean doNotProcess) {
-    this.doNotProcess = doNotProcess;
-  }
+    @Override
+    public void setDoNotProcess(boolean doNotProcess) {
+        this.doNotProcess = doNotProcess;
+    }
 
-  @Override
-  public List<Partition> getPartitionSelections() {
-    return partitionSelections;
-  }
+    @Override
+    public List<Partition> getPartitionSelections() {
+        return partitionSelections;
+    }
 
-  @Override
-  public void setPartitionSelections(List<Partition> partitionSelections) {
-    this.partitionSelections = partitionSelections;
-  }
+    @Override
+    public void setPartitionSelections(List<Partition> partitionSelections) {
+        this.partitionSelections = partitionSelections;
+    }
 
-  /**
-   * Equivalency is based on getRunId() if set, otherwise on name
-   */
+    /**
+     * Equivalency is based on getRunId() if set, otherwise on name
+     */
   /*
   @Override
   public boolean equals(Object obj) {

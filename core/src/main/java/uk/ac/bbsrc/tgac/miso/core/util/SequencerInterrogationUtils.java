@@ -41,86 +41,84 @@ import java.net.UnknownHostException;
  * @since 0.0.2
  */
 public class SequencerInterrogationUtils {
-  /**
-   * Sets up the socket connection to a given SequencerReference 
-   *
-   * @param sr of type SequencerReference
-   * @return Socket
-   * @throws InterrogationException when the socket couldn't be created
-   */
-  public static Socket prepareSocket(SequencerReference sr) throws InterrogationException {
-    //TODO - don't hard code the port. should be stored in with the sequencer reference, i.e. sr.getPort()!
-    try {
-      return new Socket(sr.getIpAddress(), 7899);
+    /**
+     * Sets up the socket connection to a given SequencerReference
+     *
+     * @param sr of type SequencerReference
+     * @return Socket
+     * @throws InterrogationException when the socket couldn't be created
+     */
+    public static Socket prepareSocket(SequencerReference sr) throws InterrogationException {
+        //TODO - don't hard code the port. should be stored in with the sequencer reference, i.e. sr.getPort()!
+        try {
+            return new Socket(sr.getIpAddress(), 7899);
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new InterrogationException(e.getMessage());
+        }
     }
-    catch (IOException e) {
-      e.printStackTrace();
-      throw new InterrogationException(e.getMessage());
+
+    /**
+     * Query the daemon running on a given socket with a given JSON query. Queries should be in the following format:
+     * <p/>
+     * TODO - query examples
+     *
+     * @param socket    of type Socket
+     * @param jsonQuery of type String
+     * @return String
+     * @throws InterrogationException when the socket could not be interrogated
+     */
+    public static String querySocket(Socket socket, String jsonQuery) throws InterrogationException {
+        PrintWriter out = null;
+        BufferedReader in = null;
+
+        try {
+            out = new PrintWriter(socket.getOutputStream(), true);
+            in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            out.println(jsonQuery);
+
+            StringBuilder sb = new StringBuilder();
+            String line = null;
+            while ((line = in.readLine()) != null) {
+                System.out.println(line);
+                sb.append(line);
+            }
+
+            out.close();
+            in.close();
+            socket.close();
+            String dirty = sb.toString();
+
+            System.out.println(dirty);
+
+            StringBuilder response = new StringBuilder();                // Used to hold the output.
+            int codePoint;                                          // Used to reference the current character.
+            int i = 0;
+            while (i < dirty.length()) {
+                codePoint = dirty.codePointAt(i);                       // This is the unicode code of the character.
+                if ((codePoint == 0x9) ||                      // Consider testing larger ranges first to improve speed.
+                    (codePoint == 0xA) ||
+                    (codePoint == 0xD) ||
+                    ((codePoint >= 0x20) && (codePoint <= 0xD7FF)) ||
+                    ((codePoint >= 0xE000) && (codePoint <= 0xFFFD)) ||
+                    ((codePoint >= 0x10000) && (codePoint <= 0x10FFFF))) {
+                    response.append(Character.toChars(codePoint));
+                }
+                i += Character.charCount(
+                    codePoint);                 // Increment with the number of code units(java chars) needed to represent a Unicode char.
+            }
+
+            String clean = response.toString().replace("\\\n", "").replace("\\\t", "");
+
+            System.out.println(clean);
+
+            return clean;
+        } catch (UnknownHostException e) {
+            System.err.println("Cannot resolve host: " + socket.getInetAddress());
+            throw new InterrogationException(e.getMessage());
+        } catch (IOException e) {
+            System.err.println("Couldn't get I/O for the connection to: " + socket.getInetAddress());
+            throw new InterrogationException(e.getMessage());
+        }
     }
-  }
-
-  /**
-   * Query the daemon running on a given socket with a given JSON query. Queries should be in the following format:
-   * <p/>
-   * TODO - query examples 
-   *
-   * @param socket of type Socket
-   * @param jsonQuery of type String
-   * @return String
-   * @throws InterrogationException when the socket could not be interrogated
-   */
-  public static String querySocket(Socket socket, String jsonQuery) throws InterrogationException {
-    PrintWriter out = null;
-    BufferedReader in = null;
-
-    try {
-      out = new PrintWriter(socket.getOutputStream(), true);
-      in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-      out.println(jsonQuery);
-      
-      StringBuilder sb = new StringBuilder();
-      String line = null;
-      while ((line = in.readLine()) != null) {
-        System.out.println(line);
-        sb.append(line);
-      }
-
-      out.close();
-      in.close();
-      socket.close();
-      String dirty = sb.toString();
-
-      System.out.println(dirty);
-
-      StringBuilder response = new StringBuilder();                // Used to hold the output.
-      int codePoint;                                          // Used to reference the current character.
-      int i=0;
-      while(i<dirty.length()) {
-          codePoint = dirty.codePointAt(i);                       // This is the unicode code of the character.
-          if ((codePoint == 0x9) ||          				    // Consider testing larger ranges first to improve speed.
-              (codePoint == 0xA) ||
-              (codePoint == 0xD) ||
-              ((codePoint >= 0x20) && (codePoint <= 0xD7FF)) ||
-              ((codePoint >= 0xE000) && (codePoint <= 0xFFFD)) ||
-              ((codePoint >= 0x10000) && (codePoint <= 0x10FFFF))) {
-              response.append(Character.toChars(codePoint));
-          }
-          i+= Character.charCount(codePoint);                 // Increment with the number of code units(java chars) needed to represent a Unicode char.
-      }
-
-      String clean = response.toString().replace("\\\n", "").replace("\\\t", "");
-
-      System.out.println(clean);
-
-      return clean;
-    }
-    catch (UnknownHostException e) {
-      System.err.println("Cannot resolve host: " + socket.getInetAddress());
-      throw new InterrogationException(e.getMessage());
-    }
-    catch (IOException e) {
-      System.err.println("Couldn't get I/O for the connection to: " + socket.getInetAddress());
-      throw new InterrogationException(e.getMessage());
-    }
-  }
 }

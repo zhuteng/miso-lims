@@ -37,23 +37,23 @@ import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 @RequestMapping("/note")
 @SessionAttributes("user")
 public class CreateNoteController {
-	protected static final Logger log = LoggerFactory.getLogger(CreateNoteController.class);
+    protected static final Logger log = LoggerFactory.getLogger(CreateNoteController.class);
 
-	@Autowired
-	private SecurityManager securityManager;
+    @Autowired
+    private SecurityManager securityManager;
 
-	@Autowired
-	private RequestManager requestManager;
+    @Autowired
+    private RequestManager requestManager;
 
-	public void setSecurityManager(SecurityManager securityManager) {
-		this.securityManager = securityManager;
-	}
+    public void setSecurityManager(SecurityManager securityManager) {
+        this.securityManager = securityManager;
+    }
 
-	public void setRequestManager(RequestManager requestManager) {
-		this.requestManager = requestManager;
-	}
+    public void setRequestManager(RequestManager requestManager) {
+        this.requestManager = requestManager;
+    }
 /*
-	@RequestMapping(method = RequestMethod.POST)
+  @RequestMapping(method = RequestMethod.POST)
 	public String processSubmit(
 			@RequestParam(value = "requestId", required = true) long requestId,
 			@RequestParam(value = "text", required = true) String text,

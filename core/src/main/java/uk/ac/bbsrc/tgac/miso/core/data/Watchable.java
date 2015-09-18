@@ -37,36 +37,41 @@ import java.util.Set;
  * @since 0.1.3
  */
 public interface Watchable {
-  /**
-   * Returns the Set of {@link User}s watching this Watchable object
-   * @return the Set of watchers for this object
-   */
-  @JsonIgnore
-  Set<User> getWatchers();
+    /**
+     * Returns the Set of {@link User}s watching this Watchable object
+     *
+     * @return the Set of watchers for this object
+     */
+    @JsonIgnore
+    Set<User> getWatchers();
 
-  /**
-   * Sets the Set of {@link User}s watching this Watchable object
-   * @param watchers
-   */
-  void setWatchers(Set<User> watchers);
+    /**
+     * Sets the Set of {@link User}s watching this Watchable object
+     *
+     * @param watchers
+     */
+    void setWatchers(Set<User> watchers);
 
-  /**
-   * Adds a {@link User} to this Watchable object's watcher list
-   * @param user
-   */
-  void addWatcher(User user);
+    /**
+     * Adds a {@link User} to this Watchable object's watcher list
+     *
+     * @param user
+     */
+    void addWatcher(User user);
 
-  /**
-   * Removes a {@link User} from this Watchable object's watcher list
-   * @param user
-   */
-  void removeWatcher(User user);
+    /**
+     * Removes a {@link User} from this Watchable object's watcher list
+     *
+     * @param user
+     */
+    void removeWatcher(User user);
 
-  /**
-   * Returns the unique Watchable identifier for this Watchable object. This is usually a property from the object
-   * itself, such as a unique name or ID.
-   * @return a String representing the watchable identifier for this object
-   */
-  @JsonIgnore
-  String getWatchableIdentifier();
+    /**
+     * Returns the unique Watchable identifier for this Watchable object. This is usually a property from the object
+     * itself, such as a unique name or ID.
+     *
+     * @return a String representing the watchable identifier for this object
+     */
+    @JsonIgnore
+    String getWatchableIdentifier();
 }

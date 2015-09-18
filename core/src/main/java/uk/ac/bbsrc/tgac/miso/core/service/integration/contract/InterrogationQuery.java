@@ -31,9 +31,10 @@ package uk.ac.bbsrc.tgac.miso.core.service.integration.contract;
  * @since 0.0.2
  */
 public interface InterrogationQuery<O> {
-  /**
-   * Generate a typed interrogation query
-   * @return O
-   */
-  O generateQuery();
+    /**
+     * Generate a typed interrogation query
+     *
+     * @return O
+     */
+    O generateQuery();
 }

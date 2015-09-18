@@ -45,69 +45,69 @@ import java.util.List;
  * @since 0.1.0
  */
 public class RunImpl extends AbstractRun implements Serializable {
-  protected static final Logger log = LoggerFactory.getLogger(RunImpl.class);
+    protected static final Logger log = LoggerFactory.getLogger(RunImpl.class);
 
-  @OneToMany(cascade = CascadeType.ALL)
-  private List<SequencerPartitionContainer<SequencerPoolPartition>> containers = new AutoPopulatingList<SequencerPartitionContainer<SequencerPoolPartition>>(SequencerPartitionContainerImpl.class);
+    @OneToMany(cascade = CascadeType.ALL)
+    private List<SequencerPartitionContainer<SequencerPoolPartition>> containers = new AutoPopulatingList<SequencerPartitionContainer<SequencerPoolPartition>>(
+        SequencerPartitionContainerImpl.class);
 
-  /**
-   * Construct a new Run with a default empty SecurityProfile
-   */
-  public RunImpl() {
-    setSecurityProfile(new SecurityProfile());
-  }
-
-  /**
-   * Construct a new Run with a SecurityProfile owned by the given User
-   *
-   * @param user of type User
-   */
-  public RunImpl(User user) {
-    setSecurityProfile(new SecurityProfile(user));
-  }
-
-  public RunImpl(Experiment experiment, User user) {
-    if (experiment.userCanRead(user)) {
-      setSecurityProfile(experiment.getSecurityProfile());
+    /**
+     * Construct a new Run with a default empty SecurityProfile
+     */
+    public RunImpl() {
+        setSecurityProfile(new SecurityProfile());
     }
-    else {
-      setSecurityProfile(new SecurityProfile(user));
+
+    /**
+     * Construct a new Run with a SecurityProfile owned by the given User
+     *
+     * @param user of type User
+     */
+    public RunImpl(User user) {
+        setSecurityProfile(new SecurityProfile(user));
     }
-  }
 
-  @Override
-  public List<SequencerPartitionContainer<SequencerPoolPartition>> getSequencerPartitionContainers() {
-    if (this.containers != null) Collections.sort(this.containers);
-    return containers;
-  }
-
-  @Override
-  public void setSequencerPartitionContainers(List<SequencerPartitionContainer<SequencerPoolPartition>> containers) {
-    this.containers = containers;
-  }
-
-  @Override
-  public void addSequencerPartitionContainer(SequencerPartitionContainer<SequencerPoolPartition> f) {
-    f.setSecurityProfile(getSecurityProfile());
-    if (f.getId() == 0L && f.getIdentificationBarcode() == null) {
-      //can't validate it so add it anyway. this will only usually be the case for new run population.
-      this.containers.add(f);
+    public RunImpl(Experiment experiment, User user) {
+        if (experiment.userCanRead(user)) {
+            setSecurityProfile(experiment.getSecurityProfile());
+        } else {
+            setSecurityProfile(new SecurityProfile(user));
+        }
     }
-    else {
-      if (!this.containers.contains(f)) {
-        this.containers.add(f);
-      }
+
+    @Override
+    public List<SequencerPartitionContainer<SequencerPoolPartition>> getSequencerPartitionContainers() {
+        if (this.containers != null)
+            Collections.sort(this.containers);
+        return containers;
     }
-  }
 
-  public void buildSubmission() {
-  }
+    @Override
+    public void setSequencerPartitionContainers(List<SequencerPartitionContainer<SequencerPoolPartition>> containers) {
+        this.containers = containers;
+    }
 
-  /**
-   * Method buildReport ...
-   */
-  public void buildReport() {
-  }
+    @Override
+    public void addSequencerPartitionContainer(SequencerPartitionContainer<SequencerPoolPartition> f) {
+        f.setSecurityProfile(getSecurityProfile());
+        if (f.getId() == 0L && f.getIdentificationBarcode() == null) {
+            //can't validate it so add it anyway. this will only usually be the case for new run population.
+            this.containers.add(f);
+        } else {
+            if (!this.containers.contains(f)) {
+                this.containers.add(f);
+            }
+        }
+    }
+
+    public void buildSubmission() {
+    }
+
+    /**
+     * Method buildReport ...
+     */
+    public void buildReport() {
+    }
 }
 
 

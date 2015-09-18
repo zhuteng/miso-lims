@@ -38,6 +38,6 @@ import java.io.Serializable;
  */
 @Entity
 public class PlatformImpl extends AbstractPlatform implements Serializable {
-  public PlatformImpl() {
-  }
+    public PlatformImpl() {
+    }
 }

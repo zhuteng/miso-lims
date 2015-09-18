@@ -43,67 +43,67 @@ import java.util.*;
  * @since 0.1.1
  */
 public class PlateImpl<T extends Plateable> extends AbstractPlate<LinkedList<T>, T> implements Serializable {
-  public LinkedList<T> elements = new LinkedList<T>();
-  private Set<Pool<Plate<LinkedList<T>, T>>> pools = new HashSet<Pool<Plate<LinkedList<T>, T>>>();
+    public LinkedList<T> elements = new LinkedList<T>();
+    private Set<Pool<Plate<LinkedList<T>, T>>> pools = new HashSet<Pool<Plate<LinkedList<T>, T>>>();
 
-  private int size = 96;
+    private int size = 96;
 
-  public PlateImpl() {
-    setSecurityProfile(new SecurityProfile());
-  }
-
-  public PlateImpl(int size) {
-    setSecurityProfile(new SecurityProfile());
-    this.size = size;
-  }
-
-  public PlateImpl(int size, User user) {
-    setSecurityProfile(new SecurityProfile(user));
-    this.size = size;
-  }
-
-  @Override
-  public int getSize() {
-    if (elements.isEmpty()) {
-      return this.size;
+    public PlateImpl() {
+        setSecurityProfile(new SecurityProfile());
     }
-    return elements.size();
-  }
 
-  @Override
-  public void setSize(int size) throws Exception {
-    if (size != this.size) {
-      throw new Exception("Unable to set size of a plate once it has been constructed");
+    public PlateImpl(int size) {
+        setSecurityProfile(new SecurityProfile());
+        this.size = size;
     }
-  }
 
-  @Override
-  public LinkedList<T> getElements() {
-    return elements;
-  }
+    public PlateImpl(int size, User user) {
+        setSecurityProfile(new SecurityProfile(user));
+        this.size = size;
+    }
 
-  @Override
-  public void setElements(LinkedList<T> elements) {
-    this.elements = elements;
-  }
+    @Override
+    public int getSize() {
+        if (elements.isEmpty()) {
+            return this.size;
+        }
+        return elements.size();
+    }
 
-  @Override
-  public void addElement(T o) {
-    elements.add(o);
-  }
+    @Override
+    public void setSize(int size) throws Exception {
+        if (size != this.size) {
+            throw new Exception("Unable to set size of a plate once it has been constructed");
+        }
+    }
 
-  @Override
-  public Class getElementType() {
-    return Plateable.class;
-  }
+    @Override
+    public LinkedList<T> getElements() {
+        return elements;
+    }
 
-  @Override
-  public Collection<T> getInternalPoolableElements() {
-    return getElements();
-  }
+    @Override
+    public void setElements(LinkedList<T> elements) {
+        this.elements = elements;
+    }
 
-  @Override
-  public Set<Pool<Plate<LinkedList<T>, T>>> getPools() {
-    return pools;
-  }
+    @Override
+    public void addElement(T o) {
+        elements.add(o);
+    }
+
+    @Override
+    public Class getElementType() {
+        return Plateable.class;
+    }
+
+    @Override
+    public Collection<T> getInternalPoolableElements() {
+        return getElements();
+    }
+
+    @Override
+    public Set<Pool<Plate<LinkedList<T>, T>>> getPools() {
+        return pools;
+    }
 }

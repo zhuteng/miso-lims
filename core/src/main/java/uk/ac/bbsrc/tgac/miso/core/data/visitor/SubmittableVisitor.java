@@ -32,12 +32,12 @@ import uk.ac.bbsrc.tgac.miso.core.data.Submittable;
  * @since 0.0.2
  */
 public class SubmittableVisitor {
-  /**
-   * Visit a Submittable to generate submission data
-   *
-   * @param s of type Submittable
-   */
-  public void visit(Submittable s) {
-    s.buildSubmission();
-  }
+    /**
+     * Visit a Submittable to generate submission data
+     *
+     * @param s of type Submittable
+     */
+    public void visit(Submittable s) {
+        s.buildSubmission();
+    }
 }

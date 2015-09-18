@@ -49,171 +49,164 @@ import java.util.*;
  * @since 0.1.3
  */
 public class RunAlertManager {
-  protected static final Logger log = LoggerFactory.getLogger(RunAlertManager.class);
-  Map<Long, Run> runs = new HashMap<Long, Run>();
+    protected static final Logger log = LoggerFactory.getLogger(RunAlertManager.class);
+    Map<Long, Run> runs = new HashMap<Long, Run>();
 
-  private RequestManager misoRequestManager;
-  private Cloner cloner = new Cloner();
-  private boolean enabled = true;
+    private RequestManager misoRequestManager;
+    private Cloner cloner = new Cloner();
+    private boolean enabled = true;
 
-  @Autowired
-  private SecurityManager securityManager;
+    @Autowired
+    private SecurityManager securityManager;
 
-  private MisoListener runListener;
+    private MisoListener runListener;
 
-  public MisoListener getRunListener() {
-    return runListener;
-  }
+    public MisoListener getRunListener() {
+        return runListener;
+    }
 
-  public void setRunListener(MisoListener runListener) {
-    this.runListener = runListener;
-  }
+    public void setRunListener(MisoListener runListener) {
+        this.runListener = runListener;
+    }
 
-  public void applyListeners(Run run) {
-    run.addListener(getRunListener());
-  }
+    public void applyListeners(Run run) {
+        run.addListener(getRunListener());
+    }
 
-  public void removeListeners(Run run) {
-    run.removeListener(getRunListener());
-  }
+    public void removeListeners(Run run) {
+        run.removeListener(getRunListener());
+    }
 
-  public void setRequestManager(RequestManager misoRequestManager) {
-    this.misoRequestManager = misoRequestManager;
-  }
+    public void setRequestManager(RequestManager misoRequestManager) {
+        this.misoRequestManager = misoRequestManager;
+    }
 
-  public void setSecurityManager(SecurityManager securityManager) {
-    this.securityManager = securityManager;
-  }
+    public void setSecurityManager(SecurityManager securityManager) {
+        this.securityManager = securityManager;
+    }
 
-  public void setEnabled(boolean enabled) {
-    this.enabled = enabled;
-  }
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
+    }
 
-  public void push(Run run) {
-    if (enabled) {
-      if (run != null) {
-        Run clone = cloner.deepClone(run);
-        if (clone != null) {
-          applyListeners(clone);
-          if (runs.containsKey(run.getId())) {
-            if (clone.getStatus() != null) {
-              log.debug("Not replacing Run " + clone.getId() + ": " + clone.getStatus().getHealth().name());
+    public void push(Run run) {
+        if (enabled) {
+            if (run != null) {
+                Run clone = cloner.deepClone(run);
+                if (clone != null) {
+                    applyListeners(clone);
+                    if (runs.containsKey(run.getId())) {
+                        if (clone.getStatus() != null) {
+                            log.debug("Not replacing Run " + clone.getId() + ": " + clone.getStatus().getHealth().name());
+                        }
+                    } else {
+                        runs.put(run.getId(), clone);
+                        if (clone.getStatus() != null) {
+                            log.debug("Queued Run " + clone.getId() + ": " + clone.getStatus().getHealth().name());
+                        }
+                    }
+                }
             }
-          }
-          else {
-            runs.put(run.getId(), clone);
-            if (clone.getStatus() != null) {
-              log.debug("Queued Run " + clone.getId() + ": " + clone.getStatus().getHealth().name());
+        } else {
+            log.warn("Alerting system disabled.");
+        }
+    }
+
+    public void pop(Run run) {
+        if (enabled) {
+            if (run != null) {
+                Run clone = runs.get(run.getId());
+                if (clone != null) {
+                    removeListeners(clone);
+                    clone = null;
+                    runs.remove(run.getId());
+                    log.debug("Dequeued " + run.getId());
+                }
             }
-          }
+        } else {
+            log.warn("Alerting system disabled.");
         }
-      }
     }
-    else {
-      log.warn("Alerting system disabled.");
+
+    public void update(Long runId) throws IOException {
+        update(misoRequestManager.getRunById(runId));
     }
-  }
 
-  public void pop(Run run) {
-    if (enabled) {
-      if (run != null) {
-        Run clone = runs.get(run.getId());
-        if (clone != null) {
-          removeListeners(clone);
-          clone = null;
-          runs.remove(run.getId());
-          log.debug("Dequeued " + run.getId());
-        }
-      }
-    }
-    else {
-      log.warn("Alerting system disabled.");
-    }
-  }
+    private void update(Run r) throws IOException {
+        if (enabled) {
+            Run clone = runs.get(r.getId());
+            if (clone == null) {
+                log.debug("Update: no clone - pushing");
+                //new run - add all RunWatchers!
+                for (User u : securityManager.listUsersByGroupName("RunWatchers")) {
+                    r.addWatcher(u);
+                }
+                push(r);
+            } else {
+                log.debug("Update: got clone of " + clone.getId());
+                if (r.getStatus() != null) {
+                    clone.setStatus(r.getStatus());
+                }
 
-  public void update(Long runId) throws IOException {
-    update(misoRequestManager.getRunById(runId));
-  }
+                //run QC added
+                if (r.getRunQCs().size() > clone.getRunQCs().size()) {
+                    Set<RunQC> clonedQCs = new HashSet<RunQC>(clone.getRunQCs());
+                    for (RunQC qc : r.getRunQCs()) {
+                        if (!clonedQCs.contains(qc)) {
+                            try {
+                                clone.addQc(cloner.deepClone(qc));
+                            } catch (MalformedRunQcException e) {
+                                throw new IOException(e);
+                            }
+                        }
+                    }
+                }
 
-  private void update(Run r) throws IOException {
-    if (enabled) {
-      Run clone = runs.get(r.getId());
-      if (clone == null) {
-        log.debug("Update: no clone - pushing");
-        //new run - add all RunWatchers!
-        for (User u : securityManager.listUsersByGroupName("RunWatchers")) {
-          r.addWatcher(u);
-        }
-        push(r);
-      }
-      else {
-        log.debug("Update: got clone of " + clone.getId());
-        if (r.getStatus() != null) {
-          clone.setStatus(r.getStatus());
-        }
-
-        //run QC added
-        if (r.getRunQCs().size() > clone.getRunQCs().size()) {
-          Set<RunQC> clonedQCs = new HashSet<RunQC>(clone.getRunQCs());
-          for (RunQC qc : r.getRunQCs()) {
-            if (!clonedQCs.contains(qc)) {
-              try {
-                clone.addQc(cloner.deepClone(qc));
-              }
-              catch (MalformedRunQcException e) {
-                throw new IOException(e);
-              }
+                pop(clone);
+                push(r);
             }
-          }
         }
-
-        pop(clone);
-        push(r);
-      }
     }
-  }
 
-  public void addWatcher(Run run, Long userId) throws IOException {
-    User user = securityManager.getUserById(userId);
-    if (user != null) {
-      Run clone = runs.get(run.getId());
-      if (clone == null) {
-        run.addWatcher(user);
-        push(run);
-      }
-      else {
-        clone.addWatcher(user);
-      }
-    }
-  }
-
-  public void removeWatcher(Run run, Long userId) throws IOException {
-    User user = securityManager.getUserById(userId);
-    if (user != null) {
-      Run clone = runs.get(run.getId());
-      if (clone == null) {
-        run.removeWatcher(user);
-        push(run);
-      }
-      else {
-        clone.removeWatcher(user);
-      }
-    }
-  }
-
-  public void updateGroupWatcher(Long userId) throws IOException {
-    User user = securityManager.getUserById(userId);
-    if (user != null) {
-      for (Run r : runs.values()) {
-        if (user.getGroups() != null && user.getGroups().contains(securityManager.getGroupByName("RunWatchers"))) {
-          addWatcher(r, userId);
+    public void addWatcher(Run run, Long userId) throws IOException {
+        User user = securityManager.getUserById(userId);
+        if (user != null) {
+            Run clone = runs.get(run.getId());
+            if (clone == null) {
+                run.addWatcher(user);
+                push(run);
+            } else {
+                clone.addWatcher(user);
+            }
         }
-        else {
-          if (r.getSecurityProfile() != null && r.getSecurityProfile().getOwner() != null && !r.getSecurityProfile().getOwner().equals(user)) {
-            removeWatcher(r, userId);
-          }
-        }
-      }
     }
-  }
+
+    public void removeWatcher(Run run, Long userId) throws IOException {
+        User user = securityManager.getUserById(userId);
+        if (user != null) {
+            Run clone = runs.get(run.getId());
+            if (clone == null) {
+                run.removeWatcher(user);
+                push(run);
+            } else {
+                clone.removeWatcher(user);
+            }
+        }
+    }
+
+    public void updateGroupWatcher(Long userId) throws IOException {
+        User user = securityManager.getUserById(userId);
+        if (user != null) {
+            for (Run r : runs.values()) {
+                if (user.getGroups() != null && user.getGroups().contains(securityManager.getGroupByName("RunWatchers"))) {
+                    addWatcher(r, userId);
+                } else {
+                    if (r.getSecurityProfile() != null && r.getSecurityProfile().getOwner() != null &&
+                        !r.getSecurityProfile().getOwner().equals(user)) {
+                        removeWatcher(r, userId);
+                    }
+                }
+            }
+        }
+    }
 }

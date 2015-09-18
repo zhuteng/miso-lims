@@ -25,6 +25,7 @@ package uk.ac.bbsrc.tgac.miso.core.data;
 
 //import com.fasterxml.jackson.annotation.*;
 //import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 import org.codehaus.jackson.annotate.JsonManagedReference;
 import org.codehaus.jackson.annotate.JsonTypeInfo;
@@ -40,21 +41,21 @@ import org.w3c.dom.Document;
  */
 @JsonSerialize(typing = JsonSerialize.Typing.STATIC, include = JsonSerialize.Inclusion.NON_NULL)
 //@JsonIdentityInfo(generator = ObjectIdGenerators.IntSequenceGenerator.class, property = "@id")
-@JsonTypeInfo(use=JsonTypeInfo.Id.CLASS, include= JsonTypeInfo.As.PROPERTY, property="@class")
-@JsonIgnoreProperties({"securityProfile"})
+@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
+@JsonIgnoreProperties({ "securityProfile" })
 public interface SequencerPoolPartition extends Partition, Deletable, Submittable<Document> {
-  /**
-   * Returns the pool of this SequencerPoolPartition object.
-   *
-   * @return Pool pool.
-   */
-  @JsonManagedReference(value="pool")
-  public Pool<? extends Poolable> getPool();
+    /**
+     * Returns the pool of this SequencerPoolPartition object.
+     *
+     * @return Pool pool.
+     */
+    @JsonManagedReference(value = "pool")
+    public Pool<? extends Poolable> getPool();
 
-  /**
-   * Sets the pool of this SequencerPoolPartition object.
-   *
-   * @param pool pool.
-   */
-  public void setPool(Pool<? extends Poolable> pool);
+    /**
+     * Sets the pool of this SequencerPoolPartition object.
+     *
+     * @param pool pool.
+     */
+    public void setPool(Pool<? extends Poolable> pool);
 }

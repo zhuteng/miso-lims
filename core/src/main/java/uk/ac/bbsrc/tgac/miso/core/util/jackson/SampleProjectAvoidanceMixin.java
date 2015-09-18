@@ -14,11 +14,11 @@ import java.util.Collection;
  * @since 0.1.9
  */
 public abstract class SampleProjectAvoidanceMixin {
-  /**
-   * Ignore Sample.getProject() method by applying this mixin to a Jackson ObjectMapper
-   *
-   * @return Project
-   */
-  @JsonIgnore()
-  abstract Project getProject();
+    /**
+     * Ignore Sample.getProject() method by applying this mixin to a Jackson ObjectMapper
+     *
+     * @return Project
+     */
+    @JsonIgnore()
+    abstract Project getProject();
 }

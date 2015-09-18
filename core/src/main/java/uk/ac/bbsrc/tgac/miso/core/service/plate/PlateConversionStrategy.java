@@ -40,10 +40,11 @@ import java.util.List;
  */
 @Spi
 public interface PlateConversionStrategy<T extends Plate> {
-  /**
-   * Convert the List of {@link Plate} objects
-   * @param plates
-   * @return the converted list of Plates
-   */
-  List<T> convert(List<T> plates);
+    /**
+     * Convert the List of {@link Plate} objects
+     *
+     * @param plates
+     * @return the converted list of Plates
+     */
+    List<T> convert(List<T> plates);
 }

@@ -10,6 +10,6 @@ package uk.ac.bbsrc.tgac.miso.core.service.naming;
  * @since 0.1.8
  */
 public interface NamingSchemeAware<T> {
-  MisoNamingScheme<T> getNamingScheme();
-  void setNamingScheme(MisoNamingScheme<T> namingScheme);
+    MisoNamingScheme<T> getNamingScheme();
+    void setNamingScheme(MisoNamingScheme<T> namingScheme);
 }

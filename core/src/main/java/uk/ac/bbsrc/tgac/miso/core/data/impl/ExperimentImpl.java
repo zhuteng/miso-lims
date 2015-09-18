@@ -44,40 +44,39 @@ import java.io.Serializable;
  */
 @Entity
 public class ExperimentImpl extends AbstractExperiment implements Serializable {
-  /**
-   * Construct a new Experiment with a default empty SecurityProfile
-   */
-  public ExperimentImpl() {
-    setSecurityProfile(new SecurityProfile());
-  }
-
-  /**
-   * Construct a new Experiment with a SecurityProfile owned by the given User
-   *
-   * @param user of type User
-   */
-  public ExperimentImpl(User user) {
-    setSecurityProfile(new SecurityProfile(user));
-  }
-
-  /**
-   * If the given User can read the parent Study, construct a new Experiment with a SecurityProfile inherited from the parent Study.
-   * If not, construct a new Experiment with a SecurityProfile owned by the given User
-   *
-   * @param study of type Study
-   * @param user of type User
-   */
-  public ExperimentImpl(Study study, User user) {
-    if (study.userCanRead(user)) {
-      setStudy(study);
-      setSecurityProfile(study.getSecurityProfile());
+    /**
+     * Construct a new Experiment with a default empty SecurityProfile
+     */
+    public ExperimentImpl() {
+        setSecurityProfile(new SecurityProfile());
     }
-    else {
-      setSecurityProfile(new SecurityProfile(user));
-    }
-  }
 
-  public void buildSubmission() {
+    /**
+     * Construct a new Experiment with a SecurityProfile owned by the given User
+     *
+     * @param user of type User
+     */
+    public ExperimentImpl(User user) {
+        setSecurityProfile(new SecurityProfile(user));
+    }
+
+    /**
+     * If the given User can read the parent Study, construct a new Experiment with a SecurityProfile inherited from the parent Study.
+     * If not, construct a new Experiment with a SecurityProfile owned by the given User
+     *
+     * @param study of type Study
+     * @param user  of type User
+     */
+    public ExperimentImpl(Study study, User user) {
+        if (study.userCanRead(user)) {
+            setStudy(study);
+            setSecurityProfile(study.getSecurityProfile());
+        } else {
+            setSecurityProfile(new SecurityProfile(user));
+        }
+    }
+
+    public void buildSubmission() {
     /*
     try {
       DocumentBuilder docBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
@@ -88,5 +87,5 @@ public class ExperimentImpl extends AbstractExperiment implements Serializable {
     }
     ERASubmissionFactory.generateExperimentSubmissionXML(submissionDocument, this);
     */
-  }
+    }
 }

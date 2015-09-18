@@ -37,6 +37,6 @@ import java.util.Collection;
  * @since 0.1.6
  */
 public interface BarcodableSchemaResolverService {
-  BarcodableSchema getBarcodableSchema(String name);
-  Collection<BarcodableSchema> getBarcodableSchemas();
+    BarcodableSchema getBarcodableSchema(String name);
+    Collection<BarcodableSchema> getBarcodableSchemas();
 }

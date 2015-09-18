@@ -49,58 +49,56 @@ import java.util.regex.Pattern;
  */
 @Deprecated
 public class IlluminaNotificationService {
-  public JobLaunchRequest filesToJobRequest(Set<File> files) {
-    Map<String, String> params = new HashMap<String, String>();
-    String regex = ".*/([\\d]+_[A-z0-9]+_[\\d]+_[A-z0-9_]*)/.*";
-    Pattern p = Pattern.compile(regex);
-    for (File f :files) {
-      Matcher m = p.matcher(f.getAbsolutePath());
-      if (m.matches()) {
-        params.put(m.group(1), f.getAbsolutePath());
-      }        
-    }
-    return new JobLaunchRequest("job"+files.hashCode(), params);
-  }
-
-  public Set<Resource> filesToResources(Set<File> files) throws DuplicateJobException {
-    Set<Resource> resources = new HashSet<Resource>();
-    for (File f : files) {
-      System.out.println("Converting file " + f.getName() + " to resource...");
-      resources.add(new FileSystemResource(f));
+    public JobLaunchRequest filesToJobRequest(Set<File> files) {
+        Map<String, String> params = new HashMap<String, String>();
+        String regex = ".*/([\\d]+_[A-z0-9]+_[\\d]+_[A-z0-9_]*)/.*";
+        Pattern p = Pattern.compile(regex);
+        for (File f : files) {
+            Matcher m = p.matcher(f.getAbsolutePath());
+            if (m.matches()) {
+                params.put(m.group(1), f.getAbsolutePath());
+            }
+        }
+        return new JobLaunchRequest("job" + files.hashCode(), params);
     }
 
-    return resources;
-  }
+    public Set<Resource> filesToResources(Set<File> files) throws DuplicateJobException {
+        Set<Resource> resources = new HashSet<Resource>();
+        for (File f : files) {
+            System.out.println("Converting file " + f.getName() + " to resource...");
+            resources.add(new FileSystemResource(f));
+        }
 
-  public Message<Map<String, Object>> handleStatusXml(File xmlFile) {
-    Map<String, Object> hm = new HashMap<String, Object>();
-    try {
-      StringBuilder sb = new StringBuilder();
-      BufferedReader br = new BufferedReader(new FileReader(xmlFile));
-      String line = null;
-      while ((line = br.readLine()) != null) {
-        sb.append(line);
-      }
-      br.close();
-      hm.put("statusXml", sb.toString());
+        return resources;
     }
-    catch (FileNotFoundException e) {
-      e.printStackTrace();
-    }
-    catch (IOException e) {
-      e.printStackTrace();
-    }
-    return NotificationUtils.buildSimplePostMessage(hm);
-  }
 
-  public Message<Map<String, Object>> handleCompleted(File runCompleted) {
-    Map<String, Object> hm = new HashMap<String, Object>();
-    String regex = ".*/([\\d]+_[A-z0-9]+_[\\d]+_[A-z0-9_]*)/.*";
-    Pattern p = Pattern.compile(regex);
-    Matcher m = p.matcher(runCompleted.getAbsolutePath());
-    if (m.matches()) {
-      hm.put("runName", m.group(1));
+    public Message<Map<String, Object>> handleStatusXml(File xmlFile) {
+        Map<String, Object> hm = new HashMap<String, Object>();
+        try {
+            StringBuilder sb = new StringBuilder();
+            BufferedReader br = new BufferedReader(new FileReader(xmlFile));
+            String line = null;
+            while ((line = br.readLine()) != null) {
+                sb.append(line);
+            }
+            br.close();
+            hm.put("statusXml", sb.toString());
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return NotificationUtils.buildSimplePostMessage(hm);
     }
-    return NotificationUtils.buildSimplePostMessage(hm);
-  }
+
+    public Message<Map<String, Object>> handleCompleted(File runCompleted) {
+        Map<String, Object> hm = new HashMap<String, Object>();
+        String regex = ".*/([\\d]+_[A-z0-9]+_[\\d]+_[A-z0-9_]*)/.*";
+        Pattern p = Pattern.compile(regex);
+        Matcher m = p.matcher(runCompleted.getAbsolutePath());
+        if (m.matches()) {
+            hm.put("runName", m.group(1));
+        }
+        return NotificationUtils.buildSimplePostMessage(hm);
+    }
 }

@@ -32,14 +32,14 @@ package uk.ac.bbsrc.tgac.miso.core.exception;
  * @since 0.0.2
  */
 public class MalformedDilutionException extends Exception {
-  public MalformedDilutionException(String s) {
-    super(s);
-  }
-
-  public MalformedDilutionException(String s, Throwable cause) {
-    super(s);
-    if (cause != null) {
-        initCause(cause);
+    public MalformedDilutionException(String s) {
+        super(s);
     }
-  }
+
+    public MalformedDilutionException(String s, Throwable cause) {
+        super(s);
+        if (cause != null) {
+            initCause(cause);
+        }
+    }
 }

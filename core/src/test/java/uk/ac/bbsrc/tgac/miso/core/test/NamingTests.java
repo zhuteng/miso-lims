@@ -60,52 +60,52 @@ import java.util.Set;
  * @since 0.1.2
  */
 public class NamingTests {
-  protected static final Logger log = LoggerFactory.getLogger(NamingTests.class);
-  private DataObjectFactory dataObjectFactory;
-  private MisoNamingScheme<Sample> sampleNamingScheme;
-  private MisoNamingScheme<Library> libraryNamingScheme;
+    protected static final Logger log = LoggerFactory.getLogger(NamingTests.class);
+    private DataObjectFactory dataObjectFactory;
+    private MisoNamingScheme<Sample> sampleNamingScheme;
+    private MisoNamingScheme<Library> libraryNamingScheme;
 
-  @Before
-  public void setUp() {
-    dataObjectFactory = new TgacDataObjectFactory();
-    sampleNamingScheme = new DefaultSampleNamingScheme();
-    libraryNamingScheme = new DefaultLibraryNamingScheme();
-  }
+    @Before
+    public void setUp() {
+        dataObjectFactory = new TgacDataObjectFactory();
+        sampleNamingScheme = new DefaultSampleNamingScheme();
+        libraryNamingScheme = new DefaultLibraryNamingScheme();
+    }
 
-  @Test
-  public void testSampleNaming() throws MisoNamingException {
-    //DefaultEntityNamingScheme<Sample> entityNameValidationScheme = new DefaultEntityNamingScheme(Sample.class);
-    Sample s = dataObjectFactory.getSample();
-    s.setId(1L);
-    String name = sampleNamingScheme.generateNameFor("name", s);
-    s.setName(name);
-    Assert.assertTrue(sampleNamingScheme.validateField("name", s.getName()));
+    @Test
+    public void testSampleNaming() throws MisoNamingException {
+        //DefaultEntityNamingScheme<Sample> entityNameValidationScheme = new DefaultEntityNamingScheme(Sample.class);
+        Sample s = dataObjectFactory.getSample();
+        s.setId(1L);
+        String name = sampleNamingScheme.generateNameFor("name", s);
+        s.setName(name);
+        Assert.assertTrue(sampleNamingScheme.validateField("name", s.getName()));
 
-    s.setAlias("RD_S1_Foo.bar");
-    Assert.assertTrue(sampleNamingScheme.validateField("alias", s.getAlias()));
+        s.setAlias("RD_S1_Foo.bar");
+        Assert.assertTrue(sampleNamingScheme.validateField("alias", s.getAlias()));
 
-    log.info("Sample naming scheme valid");
-  }
+        log.info("Sample naming scheme valid");
+    }
 
-  @Test
-  public void testLibraryNaming() throws MisoNamingException {
-    //DefaultEntityNamingScheme<Library> entityNameValidationScheme = new DefaultEntityNamingScheme(Library.class);
-    Library l = dataObjectFactory.getLibrary();
-    l.setId(1L);
-    String name = libraryNamingScheme.generateNameFor("name", l);
-    l.setName(name);
-    Assert.assertTrue(libraryNamingScheme.validateField("name", l.getName()));
+    @Test
+    public void testLibraryNaming() throws MisoNamingException {
+        //DefaultEntityNamingScheme<Library> entityNameValidationScheme = new DefaultEntityNamingScheme(Library.class);
+        Library l = dataObjectFactory.getLibrary();
+        l.setId(1L);
+        String name = libraryNamingScheme.generateNameFor("name", l);
+        l.setName(name);
+        Assert.assertTrue(libraryNamingScheme.validateField("name", l.getName()));
 
-    l.setAlias("RD_L1-1_Foo.bar");
-    Assert.assertTrue(libraryNamingScheme.validateField("alias", l.getAlias()));
+        l.setAlias("RD_L1-1_Foo.bar");
+        Assert.assertTrue(libraryNamingScheme.validateField("alias", l.getAlias()));
 
-    log.info("Library naming scheme valid");
-  }
+        log.info("Library naming scheme valid");
+    }
 
-  @After
-  public void tearDown() {
-    dataObjectFactory = null;
-    sampleNamingScheme = null;
-    libraryNamingScheme = null;
-  }
+    @After
+    public void tearDown() {
+        dataObjectFactory = null;
+        sampleNamingScheme = null;
+        libraryNamingScheme = null;
+    }
 }

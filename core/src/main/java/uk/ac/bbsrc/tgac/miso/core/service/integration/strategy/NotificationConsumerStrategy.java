@@ -42,15 +42,15 @@ import java.util.Map;
  */
 @Spi
 public interface NotificationConsumerStrategy {
-  String getName();
+    String getName();
 
-  void consume(Message<Map<String, List<String>>> message) throws InterrogationException;
+    void consume(Message<Map<String, List<String>>> message) throws InterrogationException;
 
-  /**
-   * Return true if this strategy is able to consume information from a given PlatformType
-   *
-   * @param pt of type PlatformType
-   * @return boolean
-   */
-  boolean isStrategyFor(PlatformType pt);
+    /**
+     * Return true if this strategy is able to consume information from a given PlatformType
+     *
+     * @param pt of type PlatformType
+     * @return boolean
+     */
+    boolean isStrategyFor(PlatformType pt);
 }

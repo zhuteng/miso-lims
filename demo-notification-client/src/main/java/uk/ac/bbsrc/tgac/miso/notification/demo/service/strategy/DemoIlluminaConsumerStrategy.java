@@ -46,19 +46,19 @@ import java.util.Map;
  */
 @ServiceProvider
 public class DemoIlluminaConsumerStrategy implements NotificationConsumerStrategy {
-  protected static final Logger log = LoggerFactory.getLogger(DemoIlluminaConsumerStrategy.class);
+    protected static final Logger log = LoggerFactory.getLogger(DemoIlluminaConsumerStrategy.class);
 
-  public String getName() {
-    return "DemoIlluminaNotificationConsumer";
-  }
+    public String getName() {
+        return "DemoIlluminaNotificationConsumer";
+    }
 
-  @Override
-  public void consume(Message<Map<String, List<String>>> m) throws InterrogationException {
-    new DemoIlluminaConsumerMechanism().consume(m);
-  }
+    @Override
+    public void consume(Message<Map<String, List<String>>> m) throws InterrogationException {
+        new DemoIlluminaConsumerMechanism().consume(m);
+    }
 
-  @Override
-  public boolean isStrategyFor(PlatformType pt) {
-    return (pt.equals(PlatformType.ILLUMINA));
-  }
+    @Override
+    public boolean isStrategyFor(PlatformType pt) {
+        return (pt.equals(PlatformType.ILLUMINA));
+    }
 }

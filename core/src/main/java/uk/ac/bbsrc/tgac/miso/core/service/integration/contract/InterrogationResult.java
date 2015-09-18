@@ -31,9 +31,10 @@ package uk.ac.bbsrc.tgac.miso.core.service.integration.contract;
  * @since 0.0.2
  */
 public interface InterrogationResult<O> {
-  /**
-   * Parse the result of a query
-   * @return O
-   */
-  O parseResult();
+    /**
+     * Parse the result of a query
+     *
+     * @return O
+     */
+    O parseResult();
 }

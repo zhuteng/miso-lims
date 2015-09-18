@@ -43,43 +43,41 @@ import java.util.Map;
  * @since 0.1.6
  */
 public class NotificationMessageEnricher extends HeaderEnricher {
-  protected static final Logger log = LoggerFactory.getLogger(NotificationMessageEnricher.class);
+    protected static final Logger log = LoggerFactory.getLogger(NotificationMessageEnricher.class);
 
-  private final Map<String, ? extends HeaderValueMessageProcessor<?>> newHeadersToAdd;
+    private final Map<String, ? extends HeaderValueMessageProcessor<?>> newHeadersToAdd;
 
-  public NotificationMessageEnricher(Map<String, ? extends HeaderValueMessageProcessor<?>> headersToAdd) {
-    this.newHeadersToAdd = (headersToAdd != null) ? headersToAdd
-                                               : new HashMap<String, HeaderValueMessageProcessor<Object>>();
-  }
+    public NotificationMessageEnricher(Map<String, ? extends HeaderValueMessageProcessor<?>> headersToAdd) {
+        this.newHeadersToAdd = (headersToAdd != null) ? headersToAdd : new HashMap<String, HeaderValueMessageProcessor<Object>>();
+    }
 
-  @Override
-  public Message<?> transform(Message<?> message) {
-    try {
-      Map<String, Object> headerMap = new HashMap<String, Object>(message.getHeaders());
-      log.debug("CURRENT HEADERS: " + headerMap.toString());
-      for (Map.Entry<String, ? extends HeaderValueMessageProcessor<?>> entry : this.newHeadersToAdd.entrySet()) {
-        String key = entry.getKey();
-        HeaderValueMessageProcessor<?> valueProcessor = entry.getValue();
-        boolean headerDoesNotExist = headerMap.get(key) == null;
+    @Override
+    public Message<?> transform(Message<?> message) {
+        try {
+            Map<String, Object> headerMap = new HashMap<String, Object>(message.getHeaders());
+            log.debug("CURRENT HEADERS: " + headerMap.toString());
+            for (Map.Entry<String, ? extends HeaderValueMessageProcessor<?>> entry : this.newHeadersToAdd.entrySet()) {
+                String key = entry.getKey();
+                HeaderValueMessageProcessor<?> valueProcessor = entry.getValue();
+                boolean headerDoesNotExist = headerMap.get(key) == null;
 
-        /**
-         * Only evaluate value expression if necessary
-         */
-        if (headerDoesNotExist) {
-          Object value = valueProcessor.processMessage(message);
-          if (value != null) {
-            headerMap.put(key, value);
-          }
+                /**
+                 * Only evaluate value expression if necessary
+                 */
+                if (headerDoesNotExist) {
+                    Object value = valueProcessor.processMessage(message);
+                    if (value != null) {
+                        headerMap.put(key, value);
+                    }
+                }
+            }
+
+            Message newMessage = MessageBuilder.withPayload(message.getPayload()).copyHeaders(headerMap).build();
+            log.debug("NEW HEADERS: " + newMessage.getHeaders().toString());
+
+            return super.transform(newMessage);
+        } catch (Exception e) {
+            throw new MessagingException(message, "failed to transform message headers", e);
         }
-      }
-
-      Message newMessage = MessageBuilder.withPayload(message.getPayload()).copyHeaders(headerMap).build();
-      log.debug("NEW HEADERS: " + newMessage.getHeaders().toString());
-
-      return super.transform(newMessage);
     }
-    catch (Exception e) {
-      throw new MessagingException(message, "failed to transform message headers", e);
-    }
-  }
 }

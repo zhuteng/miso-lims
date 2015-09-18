@@ -33,14 +33,14 @@ package uk.ac.bbsrc.tgac.miso.core.exception;
  * @since 0.0.2
  */
 public class ReportingException extends Exception {
-  public ReportingException(String s) {
-    super(s);
-  }
-
-  public ReportingException(String s, Throwable cause) {
-    super(s);
-    if (cause != null) {
-      initCause(cause);
+    public ReportingException(String s) {
+        super(s);
     }
-  }
+
+    public ReportingException(String s, Throwable cause) {
+        super(s);
+        if (cause != null) {
+            initCause(cause);
+        }
+    }
 }

@@ -46,25 +46,23 @@ import java.util.List;
  * @since 0.0.3
  */
 public class BradyFtpPrintStrategy implements PrintStrategy<File, BradyFtpPrintContext> {
-  protected static final Logger log = LoggerFactory.getLogger(BradyFtpPrintStrategy.class);
+    protected static final Logger log = LoggerFactory.getLogger(BradyFtpPrintStrategy.class);
 
-  @Override
-  public boolean print(File content, BradyFtpPrintContext context) throws IOException {
-    if (context.getHost() != null && context.getUsername() != null && context.getPassword() != null) {
-      FTPClient ftp = TransmissionUtils.ftpConnect(context.getHost(), context.getUsername(), context.getPassword());
-      List<File> files = new ArrayList<File>();
-      files.add(content);
-      if (TransmissionUtils.ftpPut(ftp, "/execute", files, true, false)) {
-        log.info("Printing successful");
-        return true;
-      }
-      else {
-        log.error("Printing unsuccessful");
-      }
+    @Override
+    public boolean print(File content, BradyFtpPrintContext context) throws IOException {
+        if (context.getHost() != null && context.getUsername() != null && context.getPassword() != null) {
+            FTPClient ftp = TransmissionUtils.ftpConnect(context.getHost(), context.getUsername(), context.getPassword());
+            List<File> files = new ArrayList<File>();
+            files.add(content);
+            if (TransmissionUtils.ftpPut(ftp, "/execute", files, true, false)) {
+                log.info("Printing successful");
+                return true;
+            } else {
+                log.error("Printing unsuccessful");
+            }
+        } else {
+            throw new IOException("Invalid parameters supplied for FTP connection");
+        }
+        return false;
     }
-    else {
-      throw new IOException("Invalid parameters supplied for FTP connection");
-    }
-    return false;
-  }
 }

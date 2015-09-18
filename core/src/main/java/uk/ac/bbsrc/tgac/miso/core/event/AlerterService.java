@@ -33,5 +33,5 @@ import uk.ac.bbsrc.tgac.miso.core.exception.AlertingException;
  * @since 0.1.2
  */
 public interface AlerterService {
-  public void raiseAlert(Alert a) throws AlertingException;
+    public void raiseAlert(Alert a) throws AlertingException;
 }

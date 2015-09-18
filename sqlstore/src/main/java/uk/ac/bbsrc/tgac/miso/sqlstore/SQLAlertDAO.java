@@ -68,229 +68,199 @@ import java.util.List;
  * @since 0.1.2
  */
 public class SQLAlertDAO implements AlertStore {
-  private static final String TABLE_NAME = "Alert";
+    private static final String TABLE_NAME = "Alert";
 
-  private static final String ALERTS_SELECT =
-          "SELECT alertId, title, text, userId, date, isRead, level " +
-          "FROM " + TABLE_NAME;
+    private static final String ALERTS_SELECT = "SELECT alertId, title, text, userId, date, isRead, level " +
+                                                "FROM " + TABLE_NAME;
 
-  private static final String ALERT_SELECT_BY_ID =
-          ALERTS_SELECT + " " + "WHERE alertId = ?";
+    private static final String ALERT_SELECT_BY_ID = ALERTS_SELECT + " " + "WHERE alertId = ?";
 
-  private static final String ALERT_UPDATE =
-          "UPDATE " + TABLE_NAME +
-          " SET title=:title, text=:text, userId=:userId, date=:date, isRead=:isRead, level=:level " +
-          "WHERE alertId=:alertId";
+    private static final String ALERT_UPDATE = "UPDATE " + TABLE_NAME +
+                                               " SET title=:title, text=:text, userId=:userId, date=:date, isRead=:isRead, level=:level " +
+                                               "WHERE alertId=:alertId";
 
-  private static final String ALERT_DELETE =
-          "DELETE FROM "+TABLE_NAME+" WHERE alertId=:alertId";
+    private static final String ALERT_DELETE = "DELETE FROM " + TABLE_NAME + " WHERE alertId=:alertId";
 
-  private static final String ALERTS_BY_USER =
-          ALERTS_SELECT + " WHERE userId = ?";
+    private static final String ALERTS_BY_USER = ALERTS_SELECT + " WHERE userId = ?";
 
-  private static final String ALERTS_BY_USER_WITH_LIMIT =
-          ALERTS_BY_USER + " ORDER BY date DESC LIMIT ?";
+    private static final String ALERTS_BY_USER_WITH_LIMIT = ALERTS_BY_USER + " ORDER BY date DESC LIMIT ?";
 
-  private static final String ALERTS_BY_LEVEL =
-          ALERTS_SELECT + " WHERE level = ?";
+    private static final String ALERTS_BY_LEVEL = ALERTS_SELECT + " WHERE level = ?";
 
-  private static final String UNREAD_ALERTS_BY_USER =
-          ALERTS_SELECT + " WHERE userId = ? AND isRead = false";
+    private static final String UNREAD_ALERTS_BY_USER = ALERTS_SELECT + " WHERE userId = ? AND isRead = false";
 
-  private static final String UNREAD_ALERTS_BY_LEVEL =
-          ALERTS_SELECT + " WHERE level = ? AND isRead = false";
+    private static final String UNREAD_ALERTS_BY_LEVEL = ALERTS_SELECT + " WHERE level = ? AND isRead = false";
 
-  protected static final Logger log = LoggerFactory.getLogger(SQLAlertDAO.class);
+    protected static final Logger log = LoggerFactory.getLogger(SQLAlertDAO.class);
 
-  @Autowired
-  private CacheManager cacheManager;
+    @Autowired
+    private CacheManager cacheManager;
 
-  public void setCacheManager(CacheManager cacheManager) {
-    this.cacheManager = cacheManager;
-  }
-
-  @Autowired
-  private com.eaglegenomics.simlims.core.manager.SecurityManager securityManager;
-
-  private JdbcTemplate template;
-
-  public void setSecurityManager(SecurityManager securityManager) {
-    this.securityManager = securityManager;
-  }
-
-  public JdbcTemplate getJdbcTemplate() {
-    return template;
-  }
-
-  public void setJdbcTemplate(JdbcTemplate template) {
-    this.template = template;
-  }
-
-  @Override
-  @Transactional(readOnly = false, rollbackFor = IOException.class)
-  @TriggersRemove(
-    cacheName="alertCache",
-    keyGenerator = @KeyGenerator (
-      name = "HashCodeCacheKeyGenerator",
-      properties = {
-        @Property(name="includeMethod", value="false"),
-        @Property(name="includeParameterTypes", value="false")
-      }
-    )
-  )
-  public boolean remove(Alert alert) throws IOException {
-    return alert.isDeletable() && (template.update(ALERT_DELETE, alert.getAlertId()) == 1);
-  }
-
-  @Override
-  @Transactional(readOnly = false, rollbackFor = IOException.class)
-  @TriggersRemove(cacheName="alertCache",
-    keyGenerator = @KeyGenerator(
-      name = "HashCodeCacheKeyGenerator",
-      properties = {
-        @Property(name = "includeMethod", value = "false"),
-        @Property(name = "includeParameterTypes", value = "false")
-      }
-    )
-  )
-  public long save(Alert alert) throws IOException {
-    MapSqlParameterSource params = new MapSqlParameterSource();
-    params.addValue("title", alert.getAlertTitle())
-            .addValue("text", alert.getAlertText())
-            .addValue("date", alert.getAlertDate())
-            .addValue("isRead", alert.getAlertRead())
-            .addValue("level", alert.getAlertLevel().getKey());
-
-    if (alert.getAlertUser() != null) {
-      params.addValue("userId", alert.getAlertUser().getUserId());
+    public void setCacheManager(CacheManager cacheManager) {
+        this.cacheManager = cacheManager;
     }
 
-    if (alert.getAlertId() == DefaultAlert.UNSAVED_ID) {
-      SimpleJdbcInsert insert = new SimpleJdbcInsert(template)
-                            .withTableName(TABLE_NAME)
-                            .usingGeneratedKeyColumns("alertId");
-      Number newId = insert.executeAndReturnKey(params);
-      alert.setAlertId(newId.longValue());
-    }
-    else {
-      params.addValue("alertId", alert.getAlertId());
-      NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
-      namedTemplate.update(ALERT_UPDATE, params);
+    @Autowired
+    private com.eaglegenomics.simlims.core.manager.SecurityManager securityManager;
+
+    private JdbcTemplate template;
+
+    public void setSecurityManager(SecurityManager securityManager) {
+        this.securityManager = securityManager;
     }
 
-    return alert.getAlertId();
-  }
-
-  @Override
-  @Cacheable(cacheName="alertCache",
-    keyGenerator = @KeyGenerator(
-      name = "HashCodeCacheKeyGenerator",
-      properties = {
-        @Property(name = "includeMethod", value = "false"),
-        @Property(name = "includeParameterTypes", value = "false")
-      }
-    )
-  )
-  public Alert get(long alertId) throws IOException {
-    List<Alert> eResults = template.query(ALERT_SELECT_BY_ID, new Object[]{alertId}, new AlertMapper());
-    Alert e = eResults.size() > 0 ? eResults.get(0) : null;
-    return e;
-  }
-
-  @Override
-  public Alert lazyGet(long id) throws IOException {
-    return get(id);
-  }
-
-  @Override
-  public Collection<Alert> listAll() throws IOException {
-    return template.query(ALERTS_SELECT, new AlertMapper());
-  }
-
-  @Override
-  public int count() throws IOException {
-    return template.queryForInt("SELECT count(*) FROM "+TABLE_NAME);
-  }
-
-  @Override
-  public Collection<Alert> listByUserId(long userId) throws IOException {
-    return template.query(ALERTS_BY_USER, new Object[]{userId}, new AlertMapper());
-  }
-
-  @Override
-  public Collection<Alert> listByUserId(long userId, long limit) throws IOException {
-    return template.query(ALERTS_BY_USER_WITH_LIMIT, new Object[]{userId, limit}, new AlertMapper());
-  }
-
-  @Override
-  public Collection<Alert> listByAlertLevel(AlertLevel alertLevel) throws IOException {
-    return template.query(ALERTS_BY_LEVEL, new Object[]{alertLevel.getKey()}, new AlertMapper());
-  }
-
-  @Override
-  public Collection<Alert> listUnreadByUserId(long userId) throws IOException {
-    return template.query(UNREAD_ALERTS_BY_USER, new Object[]{userId}, new AlertMapper());
-  }
-
-  @Override
-  public Collection<Alert> listUnreadByAlertLevel(AlertLevel alertLevel) throws IOException {
-    return template.query(UNREAD_ALERTS_BY_LEVEL, new Object[]{alertLevel.getKey()}, new AlertMapper());
-  }
-
-  public class AlertMapper extends CacheAwareRowMapper<Alert> {
-    public AlertMapper() {
-      super(Alert.class);
+    public JdbcTemplate getJdbcTemplate() {
+        return template;
     }
 
-    public AlertMapper(boolean lazy) {
-      super(Alert.class, lazy);
+    public void setJdbcTemplate(JdbcTemplate template) {
+        this.template = template;
     }
 
     @Override
-    public Alert mapRow(ResultSet rs, int rowNum) throws SQLException {
-      long id = rs.getLong("alertId");
-      Alert a = null;
-
-      try {
-        if (isCacheEnabled() && lookupCache(cacheManager) != null) {
-          Element element;
-          if ((element = lookupCache(cacheManager).get(DbUtils.hashCodeCacheKeyFor(id))) != null) {
-            log.debug("Cache hit on map for Alert " + id);
-            return (Alert)element.getObjectValue();
-          }
-        }
-
-
-        try {
-          if (rs.getLong("userId") == LimsUtils.SYSTEM_USER_ID) {
-            a = new SystemAlert();
-          }
-          else {
-            User u = securityManager.getUserById(rs.getLong("userId"));
-            a = new DefaultAlert(u);
-          }
-          a.setAlertId(id);
-          a.setAlertTitle(rs.getString("title"));
-          a.setAlertText(rs.getString("text"));
-          a.setAlertRead(rs.getBoolean("isRead"));
-          a.setAlertLevel(AlertLevel.get(rs.getString("level")));
-          a.setAlertDate(rs.getDate("date"));
-        }
-        catch (IOException e1) {
-          e1.printStackTrace();
-        }
-
-        if (isCacheEnabled() && lookupCache(cacheManager) != null) {
-          lookupCache(cacheManager).put(new Element(DbUtils.hashCodeCacheKeyFor(id), a));
-        }
-      }
-      catch(CacheException ce) {
-        ce.printStackTrace();
-      }
-      catch(UnsupportedOperationException uoe) {
-        uoe.printStackTrace();
-      }
-      return a;
+    @Transactional(readOnly = false, rollbackFor = IOException.class)
+    @TriggersRemove(
+        cacheName = "alertCache",
+        keyGenerator = @KeyGenerator(
+            name = "HashCodeCacheKeyGenerator",
+            properties = { @Property(name = "includeMethod", value = "false"),
+                           @Property(name = "includeParameterTypes", value = "false") }))
+    public boolean remove(Alert alert) throws IOException {
+        return alert.isDeletable() && (template.update(ALERT_DELETE, alert.getAlertId()) == 1);
     }
-  }
+
+    @Override
+    @Transactional(readOnly = false, rollbackFor = IOException.class)
+    @TriggersRemove(cacheName = "alertCache",
+                    keyGenerator = @KeyGenerator(
+                        name = "HashCodeCacheKeyGenerator",
+                        properties = { @Property(name = "includeMethod",
+                                                 value = "false"), @Property(
+                            name = "includeParameterTypes",
+                            value = "false") }))
+    public long save(Alert alert) throws IOException {
+        MapSqlParameterSource params = new MapSqlParameterSource();
+        params.addValue("title", alert.getAlertTitle()).addValue("text", alert.getAlertText()).addValue("date", alert.getAlertDate())
+              .addValue("isRead", alert.getAlertRead()).addValue("level", alert.getAlertLevel().getKey());
+
+        if (alert.getAlertUser() != null) {
+            params.addValue("userId", alert.getAlertUser().getUserId());
+        }
+
+        if (alert.getAlertId() == DefaultAlert.UNSAVED_ID) {
+            SimpleJdbcInsert insert = new SimpleJdbcInsert(template).withTableName(TABLE_NAME).usingGeneratedKeyColumns("alertId");
+            Number newId = insert.executeAndReturnKey(params);
+            alert.setAlertId(newId.longValue());
+        } else {
+            params.addValue("alertId", alert.getAlertId());
+            NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
+            namedTemplate.update(ALERT_UPDATE, params);
+        }
+
+        return alert.getAlertId();
+    }
+
+    @Override
+    @Cacheable(cacheName = "alertCache",
+               keyGenerator = @KeyGenerator(
+                   name = "HashCodeCacheKeyGenerator",
+                   properties = { @Property(name = "includeMethod", value = "false"),
+                                  @Property(name = "includeParameterTypes", value = "false") }))
+    public Alert get(long alertId) throws IOException {
+        List<Alert> eResults = template.query(ALERT_SELECT_BY_ID, new Object[] { alertId }, new AlertMapper());
+        Alert e = eResults.size() > 0 ? eResults.get(0) : null;
+        return e;
+    }
+
+    @Override
+    public Alert lazyGet(long id) throws IOException {
+        return get(id);
+    }
+
+    @Override
+    public Collection<Alert> listAll() throws IOException {
+        return template.query(ALERTS_SELECT, new AlertMapper());
+    }
+
+    @Override
+    public int count() throws IOException {
+        return template.queryForInt("SELECT count(*) FROM " + TABLE_NAME);
+    }
+
+    @Override
+    public Collection<Alert> listByUserId(long userId) throws IOException {
+        return template.query(ALERTS_BY_USER, new Object[] { userId }, new AlertMapper());
+    }
+
+    @Override
+    public Collection<Alert> listByUserId(long userId, long limit) throws IOException {
+        return template.query(ALERTS_BY_USER_WITH_LIMIT, new Object[] { userId, limit }, new AlertMapper());
+    }
+
+    @Override
+    public Collection<Alert> listByAlertLevel(AlertLevel alertLevel) throws IOException {
+        return template.query(ALERTS_BY_LEVEL, new Object[] { alertLevel.getKey() }, new AlertMapper());
+    }
+
+    @Override
+    public Collection<Alert> listUnreadByUserId(long userId) throws IOException {
+        return template.query(UNREAD_ALERTS_BY_USER, new Object[] { userId }, new AlertMapper());
+    }
+
+    @Override
+    public Collection<Alert> listUnreadByAlertLevel(AlertLevel alertLevel) throws IOException {
+        return template.query(UNREAD_ALERTS_BY_LEVEL, new Object[] { alertLevel.getKey() }, new AlertMapper());
+    }
+
+    public class AlertMapper extends CacheAwareRowMapper<Alert> {
+        public AlertMapper() {
+            super(Alert.class);
+        }
+
+        public AlertMapper(boolean lazy) {
+            super(Alert.class, lazy);
+        }
+
+        @Override
+        public Alert mapRow(ResultSet rs, int rowNum) throws SQLException {
+            long id = rs.getLong("alertId");
+            Alert a = null;
+
+            try {
+                if (isCacheEnabled() && lookupCache(cacheManager) != null) {
+                    Element element;
+                    if ((element = lookupCache(cacheManager).get(DbUtils.hashCodeCacheKeyFor(id))) != null) {
+                        log.debug("Cache hit on map for Alert " + id);
+                        return (Alert) element.getObjectValue();
+                    }
+                }
+
+                try {
+                    if (rs.getLong("userId") == LimsUtils.SYSTEM_USER_ID) {
+                        a = new SystemAlert();
+                    } else {
+                        User u = securityManager.getUserById(rs.getLong("userId"));
+                        a = new DefaultAlert(u);
+                    }
+                    a.setAlertId(id);
+                    a.setAlertTitle(rs.getString("title"));
+                    a.setAlertText(rs.getString("text"));
+                    a.setAlertRead(rs.getBoolean("isRead"));
+                    a.setAlertLevel(AlertLevel.get(rs.getString("level")));
+                    a.setAlertDate(rs.getDate("date"));
+                } catch (IOException e1) {
+                    e1.printStackTrace();
+                }
+
+                if (isCacheEnabled() && lookupCache(cacheManager) != null) {
+                    lookupCache(cacheManager).put(new Element(DbUtils.hashCodeCacheKeyFor(id), a));
+                }
+            } catch (CacheException ce) {
+                ce.printStackTrace();
+            } catch (UnsupportedOperationException uoe) {
+                uoe.printStackTrace();
+            }
+            return a;
+        }
+    }
 }

@@ -33,14 +33,14 @@ package uk.ac.bbsrc.tgac.miso.core.exception;
  * @since 0.0.2
  */
 public class InputFormException extends Exception {
-  public InputFormException(String s) {
-    super(s);
-  }
-
-  public InputFormException(String s, Throwable cause) {
-    super(s);
-    if (cause != null) {
-        initCause(cause);
+    public InputFormException(String s) {
+        super(s);
     }
-  }
+
+    public InputFormException(String s, Throwable cause) {
+        super(s);
+        if (cause != null) {
+            initCause(cause);
+        }
+    }
 }

@@ -32,25 +32,26 @@ import java.util.ArrayList;
  * @since 0.0.2
  */
 public enum TgacSubmissionConstants {
-  CENTRE_NAME("TGAC"),
-  CENTRE_ACRONYM("TGAC"),
-  ACCOUNT_NUMBER("ERB000046"),
-  DROP_BOX("era-drop-46");
+    CENTRE_NAME("TGAC"),
+    CENTRE_ACRONYM("TGAC"),
+    ACCOUNT_NUMBER("ERB000046"),
+    DROP_BOX("era-drop-46");
 
-  private String key;
-  TgacSubmissionConstants(String key) {
-    this.key = key;
-  }
+    private String key;
 
-  public String getKey() {
-    return key;
-  }
-
-  public static ArrayList<String> getKeys() {
-    ArrayList<String> keys = new ArrayList<String>();
-    for (TgacSubmissionConstants cs : TgacSubmissionConstants.values()) {
-      keys.add(cs.getKey());
+    TgacSubmissionConstants(String key) {
+        this.key = key;
     }
-    return keys;
-  }
+
+    public String getKey() {
+        return key;
+    }
+
+    public static ArrayList<String> getKeys() {
+        ArrayList<String> keys = new ArrayList<String>();
+        for (TgacSubmissionConstants cs : TgacSubmissionConstants.values()) {
+            keys.add(cs.getKey());
+        }
+        return keys;
+    }
 }

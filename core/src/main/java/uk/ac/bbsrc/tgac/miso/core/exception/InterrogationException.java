@@ -33,14 +33,14 @@ package uk.ac.bbsrc.tgac.miso.core.exception;
  * @since 0.0.2
  */
 public class InterrogationException extends Exception {
-  public InterrogationException(String s) {
-    super(s);
-  }
-
-  public InterrogationException(String s, Throwable cause) {
-    super(s);
-    if (cause != null) {
-        initCause(cause);
+    public InterrogationException(String s) {
+        super(s);
     }
-  }
+
+    public InterrogationException(String s, Throwable cause) {
+        super(s);
+        if (cause != null) {
+            initCause(cause);
+        }
+    }
 }

@@ -33,56 +33,56 @@ import uk.ac.bbsrc.tgac.miso.core.service.integration.contract.InterrogationQuer
  * @since 0.0.2
  */
 public class MisoPerlDaemonQuery implements InterrogationQuery<String> {
-  String platform;
-  String type;
-  String runId;
+    String platform;
+    String type;
+    String runId;
 
-  /**
-   * Creates a new MisoPerlDaemonQuery instance with no run specified. This will produce lists of all runs that meet the query parameters.
-   *
-   * @param platform of type String
-   * @param type of type String
-   */
-  public MisoPerlDaemonQuery(String platform, String type) {
-    this.platform = platform;
-    this.type = type;
-  }
-
-  /**
-   * Creates a new MisoPerlDaemonQuery instance with a run specified. This will produce information about the given run that meets the query parameters.
-   *
-   * @param platform of type String
-   * @param runId of type String
-   * @param type of type String
-   */
-  public MisoPerlDaemonQuery(String platform, String runId, String type) {
-    this.platform = platform;
-    this.type = type;
-    this.runId = runId;
-  }
-
-  /**
-   * Returns the query String that this query object represents
-   * @return String
-   */
-  public String generateQuery() {
-    if (runId != null) {
-      return "{'query':" +
-            "{'run':" +
-            "[" +
-            "{'platform':'"+platform+"','type':'"+type+"','runId':'"+runId+"'}" +
-            "]" +
-            "}" +
-            "}\n";
+    /**
+     * Creates a new MisoPerlDaemonQuery instance with no run specified. This will produce lists of all runs that meet the query parameters.
+     *
+     * @param platform of type String
+     * @param type     of type String
+     */
+    public MisoPerlDaemonQuery(String platform, String type) {
+        this.platform = platform;
+        this.type = type;
     }
-    else {
-      return "{'query':" +
-            "{'run':" +
-            "[" +
-            "{'platform':'"+platform+"','type':'"+type+"'}" +
-            "]" +
-            "}" +
-            "}\n";
+
+    /**
+     * Creates a new MisoPerlDaemonQuery instance with a run specified. This will produce information about the given run that meets the query parameters.
+     *
+     * @param platform of type String
+     * @param runId    of type String
+     * @param type     of type String
+     */
+    public MisoPerlDaemonQuery(String platform, String runId, String type) {
+        this.platform = platform;
+        this.type = type;
+        this.runId = runId;
     }
-  }
+
+    /**
+     * Returns the query String that this query object represents
+     *
+     * @return String
+     */
+    public String generateQuery() {
+        if (runId != null) {
+            return "{'query':" +
+                   "{'run':" +
+                   "[" +
+                   "{'platform':'" + platform + "','type':'" + type + "','runId':'" + runId + "'}" +
+                   "]" +
+                   "}" +
+                   "}\n";
+        } else {
+            return "{'query':" +
+                   "{'run':" +
+                   "[" +
+                   "{'platform':'" + platform + "','type':'" + type + "'}" +
+                   "]" +
+                   "}" +
+                   "}\n";
+        }
+    }
 }

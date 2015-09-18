@@ -25,6 +25,7 @@ package uk.ac.bbsrc.tgac.miso.core.data;
 
 //import com.fasterxml.jackson.annotation.*;
 //import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+
 import org.codehaus.jackson.annotate.JsonBackReference;
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 import org.codehaus.jackson.annotate.JsonTypeInfo;
@@ -39,51 +40,50 @@ import uk.ac.bbsrc.tgac.miso.core.exception.MalformedLibraryException;
  */
 @JsonSerialize(typing = JsonSerialize.Typing.STATIC, include = JsonSerialize.Inclusion.NON_NULL)
 //@JsonIdentityInfo(generator = ObjectIdGenerators.IntSequenceGenerator.class, property = "@id")
-@JsonTypeInfo(use=JsonTypeInfo.Id.CLASS, include= JsonTypeInfo.As.PROPERTY, property="@class")
+@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
 //@JsonIgnoreProperties({"library","deletable"})
 public interface LibraryQC extends QC {
-  /**
-   * Returns the library of this LibraryQC object.
-   *
-   * @return Library library.
-   */
-  @JsonBackReference(value="qclibrary")
-  public Library getLibrary();
+    /**
+     * Returns the library of this LibraryQC object.
+     *
+     * @return Library library.
+     */
+    @JsonBackReference(value = "qclibrary")
+    public Library getLibrary();
 
-  /**
-   * Sets the library of this LibraryQC object.
-   *
-   * @param library library.
-   * @throws MalformedLibraryException when the Library being set is not valid  
-   */
-  public void setLibrary(Library library) throws MalformedLibraryException;
+    /**
+     * Sets the library of this LibraryQC object.
+     *
+     * @param library library.
+     * @throws MalformedLibraryException when the Library being set is not valid
+     */
+    public void setLibrary(Library library) throws MalformedLibraryException;
 
-  /**
-   * Returns the insertSize (in base pairs) of this LibraryQC object.
-   *
-   * @return Integer insertSize.
-   */
-  public Integer getInsertSize();
+    /**
+     * Returns the insertSize (in base pairs) of this LibraryQC object.
+     *
+     * @return Integer insertSize.
+     */
+    public Integer getInsertSize();
 
-  /**
-   * Sets the insertSize (in base pairs) of this LibraryQC object.
-   *
-   * @param insertSize insertSize.
-   *
-   */
-  public void setInsertSize(Integer insertSize);
+    /**
+     * Sets the insertSize (in base pairs) of this LibraryQC object.
+     *
+     * @param insertSize insertSize.
+     */
+    public void setInsertSize(Integer insertSize);
 
-  /**
-   * Returns the results of this QC object.
-   *
-   * @return Double results.
-   */
-  public Double getResults();
+    /**
+     * Returns the results of this QC object.
+     *
+     * @return Double results.
+     */
+    public Double getResults();
 
-  /**
-   * Sets the results of this QC object.
-   *
-   * @param results results.
-   */
-  public void setResults(Double results);  
+    /**
+     * Sets the results of this QC object.
+     *
+     * @param results results.
+     */
+    public void setResults(Double results);
 }

@@ -47,35 +47,34 @@ import java.io.IOException;
  */
 @Controller
 public class ListDilutionsController {
-  protected static final Logger log = LoggerFactory.getLogger(ListDilutionsController.class);
+    protected static final Logger log = LoggerFactory.getLogger(ListDilutionsController.class);
 
-  @Autowired
-  private SecurityManager securityManager;
+    @Autowired
+    private SecurityManager securityManager;
 
-  public void setSecurityManager(SecurityManager securityManager) {
-    this.securityManager = securityManager;
-  }
-
-  @Autowired
-  private RequestManager requestManager;
-
-  public void setRequestManager(RequestManager requestManager) {
-    this.requestManager = requestManager;
-  }
-
-  @RequestMapping("/dilutions")
-  public ModelAndView listDilutions(ModelMap model) throws IOException {
-    try {
-      User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-      model.addAttribute("libDilutions", requestManager.listAllLibraryDilutions());
-      model.addAttribute("pcrDilutions", requestManager.listAllEmPcrDilutions());
-      return new ModelAndView("/pages/listDilutions.jsp",model);
+    public void setSecurityManager(SecurityManager securityManager) {
+        this.securityManager = securityManager;
     }
-    catch (IOException ex) {
-      if (log.isDebugEnabled()) {
-        log.debug("Failed to list dilutions", ex);
-      }
-      throw ex;
+
+    @Autowired
+    private RequestManager requestManager;
+
+    public void setRequestManager(RequestManager requestManager) {
+        this.requestManager = requestManager;
     }
-  }
+
+    @RequestMapping("/dilutions")
+    public ModelAndView listDilutions(ModelMap model) throws IOException {
+        try {
+            User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
+            model.addAttribute("libDilutions", requestManager.listAllLibraryDilutions());
+            model.addAttribute("pcrDilutions", requestManager.listAllEmPcrDilutions());
+            return new ModelAndView("/pages/listDilutions.jsp", model);
+        } catch (IOException ex) {
+            if (log.isDebugEnabled()) {
+                log.debug("Failed to list dilutions", ex);
+            }
+            throw ex;
+        }
+    }
 }

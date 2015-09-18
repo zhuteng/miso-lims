@@ -52,62 +52,60 @@ import java.util.*;
 @Controller
 @SessionAttributes("printer")
 public class PrinterController {
-  protected static final Logger log = LoggerFactory.getLogger(PrinterController.class);
+    protected static final Logger log = LoggerFactory.getLogger(PrinterController.class);
 
-  @Autowired
-  private SecurityManager securityManager;
+    @Autowired
+    private SecurityManager securityManager;
 
-  public void setSecurityManager(SecurityManager securityManager) {
-    this.securityManager = securityManager;
-  }
-
-  @Autowired
-  private RequestManager requestManager;
-
-  public void setRequestManager(uk.ac.bbsrc.tgac.miso.core.manager.RequestManager requestManager) {
-    this.requestManager = requestManager;
-  }
-
-  @Autowired
-  private PrintManager<MisoPrintService, Queue<?>> printManager;
-
-  public void setPrintManager(PrintManager<MisoPrintService, Queue<?>> printManager) {
-    this.printManager = printManager;
-  }
-
-  @RequestMapping(value= "/admin/configuration/printers", method = RequestMethod.GET)
-  public ModelAndView view(ModelMap model) throws IOException {
-    model.put("barcodePrinters", printManager.listAllPrintServices());
-    return new ModelAndView("/pages/viewPrinters.jsp", model);
-  }
-
-  @RequestMapping(value = "/admin/configuration/printers/barcode/{printerId}", method = RequestMethod.GET)
-  public ModelAndView viewBarcodePrinter(@PathVariable(value = "printerId") String printerId, ModelMap model) throws IOException {
-    try {
-      MisoPrintService ps = printManager.getPrintService(printerId);
-      model.put("barcodePrinter", ps);
-
-      Collection<? extends PrintJob> jobs = printManager.listPrintJobsByPrintService(ps);
-      model.put("printJobs", jobs);
+    public void setSecurityManager(SecurityManager securityManager) {
+        this.securityManager = securityManager;
     }
-    catch (IOException e) {
-      e.printStackTrace();
-    }
-    return new ModelAndView("/pages/viewPrinters.jsp", model);
-  }
 
-  @RequestMapping(value = "/printjobs", method = RequestMethod.GET)
-  public ModelAndView myPrintJobs(ModelMap model) throws IOException {
-    try {
-      User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-      Collection<? extends PrintJob> jobs = printManager.listPrintJobsByUser(user);
-      model.put("userPrintJobs", jobs);
+    @Autowired
+    private RequestManager requestManager;
+
+    public void setRequestManager(uk.ac.bbsrc.tgac.miso.core.manager.RequestManager requestManager) {
+        this.requestManager = requestManager;
     }
-    catch (Exception e) {
-      e.printStackTrace();
+
+    @Autowired
+    private PrintManager<MisoPrintService, Queue<?>> printManager;
+
+    public void setPrintManager(PrintManager<MisoPrintService, Queue<?>> printManager) {
+        this.printManager = printManager;
     }
-    return new ModelAndView("/pages/viewPrinters.jsp", model);
-  }
+
+    @RequestMapping(value = "/admin/configuration/printers", method = RequestMethod.GET)
+    public ModelAndView view(ModelMap model) throws IOException {
+        model.put("barcodePrinters", printManager.listAllPrintServices());
+        return new ModelAndView("/pages/viewPrinters.jsp", model);
+    }
+
+    @RequestMapping(value = "/admin/configuration/printers/barcode/{printerId}", method = RequestMethod.GET)
+    public ModelAndView viewBarcodePrinter(@PathVariable(value = "printerId") String printerId, ModelMap model) throws IOException {
+        try {
+            MisoPrintService ps = printManager.getPrintService(printerId);
+            model.put("barcodePrinter", ps);
+
+            Collection<? extends PrintJob> jobs = printManager.listPrintJobsByPrintService(ps);
+            model.put("printJobs", jobs);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return new ModelAndView("/pages/viewPrinters.jsp", model);
+    }
+
+    @RequestMapping(value = "/printjobs", method = RequestMethod.GET)
+    public ModelAndView myPrintJobs(ModelMap model) throws IOException {
+        try {
+            User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
+            Collection<? extends PrintJob> jobs = printManager.listPrintJobsByUser(user);
+            model.put("userPrintJobs", jobs);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return new ModelAndView("/pages/viewPrinters.jsp", model);
+    }
 
   /*
   @RequestMapping(value = "/barcode/{printerId}", method = RequestMethod.POST)

@@ -38,24 +38,24 @@ import org.springframework.context.ApplicationContextAware;
  */
 
 public class ApplicationContextProvider implements ApplicationContextAware {
-  private static ApplicationContext ctx = null;
+    private static ApplicationContext ctx = null;
 
-  private String baseUrl = "";
+    private String baseUrl = "";
 
-  public String getBaseUrl() {
-    return baseUrl;
-  }
+    public String getBaseUrl() {
+        return baseUrl;
+    }
 
-  public void setBaseUrl(String baseUrl) {
-    this.baseUrl = baseUrl;
-  }
+    public void setBaseUrl(String baseUrl) {
+        this.baseUrl = baseUrl;
+    }
 
-  public static ApplicationContext getApplicationContext() {
-    return ctx;
-  }
+    public static ApplicationContext getApplicationContext() {
+        return ctx;
+    }
 
-  public void setApplicationContext(ApplicationContext ctx) throws BeansException {
-    this.ctx = ctx;
-  }
+    public void setApplicationContext(ApplicationContext ctx) throws BeansException {
+        this.ctx = ctx;
+    }
 }
 

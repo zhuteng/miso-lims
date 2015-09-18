@@ -32,6 +32,6 @@ import org.springframework.security.core.context.SecurityContext;
  * Time: 15:55:05
  */
 public interface SecurityContextFacade {
-  SecurityContext getContext();
-  void setContext(SecurityContext securityContext);
+    SecurityContext getContext();
+    void setContext(SecurityContext securityContext);
 }

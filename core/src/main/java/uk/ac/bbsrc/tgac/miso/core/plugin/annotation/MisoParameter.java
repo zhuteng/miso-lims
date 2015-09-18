@@ -27,7 +27,7 @@ import java.lang.annotation.*;
 
 /**
  * uk.ac.bbsrc.tgac.miso.core.plugin.annotation
- *
+ * <p/>
  * <p/>
  * An annotation used to describe method parameters taken by any method tagged
  * with an annotation. Any parameters present in
@@ -43,18 +43,18 @@ import java.lang.annotation.*;
 @Target(ElementType.PARAMETER)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface MisoParameter {
-  /**
-   * The name of the parameter to be supplied when executing an operation.  When
-   * using this annotation, you can legitimately supply any string.
-   *
-   * @return The name assigned to this parameter
-   */
-  String name();
+    /**
+     * The name of the parameter to be supplied when executing an operation.  When
+     * using this annotation, you can legitimately supply any string.
+     *
+     * @return The name assigned to this parameter
+     */
+    String name();
 
-  /**
-   * The parameter description.  This is optional.
-   *
-   * @return The description associated with the parameter
-   */
-  String description() default "";
+    /**
+     * The parameter description.  This is optional.
+     *
+     * @return The description associated with the parameter
+     */
+    String description() default "";
 }

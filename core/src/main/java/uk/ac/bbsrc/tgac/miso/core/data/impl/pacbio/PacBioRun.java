@@ -48,28 +48,28 @@ import javax.xml.parsers.ParserConfigurationException;
 @DiscriminatorValue("PACBIO")
 public class PacBioRun extends RunImpl {
 
-  public PacBioRun() {
-    setPlatformType(PlatformType.PACBIO);
-    setStatus(new PacBioStatus());
-  }
+    public PacBioRun() {
+        setPlatformType(PlatformType.PACBIO);
+        setStatus(new PacBioStatus());
+    }
 
-  public PacBioRun(String statusXml) {
-    this(statusXml, null);
-  }
+    public PacBioRun(String statusXml) {
+        this(statusXml, null);
+    }
 
-  public PacBioRun(User user) {
-    setPlatformType(PlatformType.PACBIO);
-    setStatus(new PacBioStatus());
-    setSecurityProfile(new SecurityProfile(user));
-  }
+    public PacBioRun(User user) {
+        setPlatformType(PlatformType.PACBIO);
+        setStatus(new PacBioStatus());
+        setSecurityProfile(new SecurityProfile(user));
+    }
 
-  public PacBioRun(String statusXml, User user) {
-    setPlatformType(PlatformType.PACBIO);
-    setStatus(new PacBioStatus(statusXml));
-    setSecurityProfile(new SecurityProfile(user));
-  }
+    public PacBioRun(String statusXml, User user) {
+        setPlatformType(PlatformType.PACBIO);
+        setStatus(new PacBioStatus(statusXml));
+        setSecurityProfile(new SecurityProfile(user));
+    }
 
-  public void buildSubmission() {
+    public void buildSubmission() {
     /*
     try {
       DocumentBuilder docBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
@@ -80,12 +80,12 @@ public class PacBioRun extends RunImpl {
     }
     ERASubmissionFactory.generateFullRunSubmissionXML(submissionDocument, this);
     */
-  }
+    }
 
-  /**
-   * Method buildReport ...
-   */
-  public void buildReport() {
+    /**
+     * Method buildReport ...
+     */
+    public void buildReport() {
 
-  }
+    }
 }

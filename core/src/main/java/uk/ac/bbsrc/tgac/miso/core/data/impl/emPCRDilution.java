@@ -39,41 +39,41 @@ import java.io.Serializable;
  * @since 0.0.2
  */
 public class emPCRDilution extends AbstractDilution implements Serializable {
-  private emPCR emPCR;
-  public static final String UNITS = "beads/&#181;l";
+    private emPCR emPCR;
+    public static final String UNITS = "beads/&#181;l";
 
-  /**
-   * Construct a new emPCRDilution with a default empty SecurityProfile
-   */
-  public emPCRDilution() {
-    setSecurityProfile(new SecurityProfile());
-  }
-
-  /**
-   * Construct a new emPCRDilution with a SecurityProfile owned by the given User
-   *
-   * @param user of type User
-   */
-  public emPCRDilution(User user) {
-    setSecurityProfile(new SecurityProfile(user));
-  }
-
-  public emPCR getEmPCR() {
-    return emPCR;
-  }
-
-  public void setEmPCR(emPCR emPCR) {
-    this.emPCR = emPCR;
-  }  
-
-  public Library getLibrary() {
-    if (emPCR != null) {
-      return emPCR.getLibraryDilution().getLibrary();
+    /**
+     * Construct a new emPCRDilution with a default empty SecurityProfile
+     */
+    public emPCRDilution() {
+        setSecurityProfile(new SecurityProfile());
     }
-    return null;
-  }
 
-  public String getUnits() {
-    return UNITS;
-  }
+    /**
+     * Construct a new emPCRDilution with a SecurityProfile owned by the given User
+     *
+     * @param user of type User
+     */
+    public emPCRDilution(User user) {
+        setSecurityProfile(new SecurityProfile(user));
+    }
+
+    public emPCR getEmPCR() {
+        return emPCR;
+    }
+
+    public void setEmPCR(emPCR emPCR) {
+        this.emPCR = emPCR;
+    }
+
+    public Library getLibrary() {
+        if (emPCR != null) {
+            return emPCR.getLibraryDilution().getLibrary();
+        }
+        return null;
+    }
+
+    public String getUnits() {
+        return UNITS;
+    }
 }

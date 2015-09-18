@@ -46,19 +46,19 @@ import java.util.Map;
  */
 @ServiceProvider
 public class PacBioNotificationConsumerStrategy implements NotificationConsumerStrategy {
-  protected static final Logger log = LoggerFactory.getLogger(PacBioNotificationConsumerStrategy.class);
+    protected static final Logger log = LoggerFactory.getLogger(PacBioNotificationConsumerStrategy.class);
 
-  public String getName() {
-    return "PacBioNotificationConsumer";
-  }
+    public String getName() {
+        return "PacBioNotificationConsumer";
+    }
 
-  @Override
-  public void consume(Message<Map<String, List<String>>> m) throws InterrogationException {
-    new PacBioNotificationMessageConsumerMechanism().consume(m);
-  }
+    @Override
+    public void consume(Message<Map<String, List<String>>> m) throws InterrogationException {
+        new PacBioNotificationMessageConsumerMechanism().consume(m);
+    }
 
-  @Override
-  public boolean isStrategyFor(PlatformType pt) {
-    return (pt.equals(PlatformType.PACBIO));
-  }
+    @Override
+    public boolean isStrategyFor(PlatformType pt) {
+        return (pt.equals(PlatformType.PACBIO));
+    }
 }

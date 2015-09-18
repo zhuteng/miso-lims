@@ -45,25 +45,25 @@ import java.util.Collection;
  */
 @Deprecated
 public class HibernateSampleStore extends HibernateDaoSupport implements Store<Sample> {
-  @Transactional(readOnly = false)
-  public long save(Sample sample) throws IOException {
-    getHibernateTemplate().saveOrUpdate(sample);
-    return sample.getSampleId();
-  }
+    @Transactional(readOnly = false)
+    public long save(Sample sample) throws IOException {
+        getHibernateTemplate().saveOrUpdate(sample);
+        return sample.getSampleId();
+    }
 
-  @Transactional(readOnly = true)
-  public Sample get(long sampleId) throws IOException {
-    return (Sample) getHibernateTemplate().get(AbstractSample.class, sampleId);
-  }
+    @Transactional(readOnly = true)
+    public Sample get(long sampleId) throws IOException {
+        return (Sample) getHibernateTemplate().get(AbstractSample.class, sampleId);
+    }
 
-  @Override
-  public Sample lazyGet(long id) throws IOException {
-    return get(id);
-  }
+    @Override
+    public Sample lazyGet(long id) throws IOException {
+        return get(id);
+    }
 
-  @Transactional(readOnly = true)
-  @SuppressWarnings("unchecked")
-  public Collection<Sample> listAll() throws IOException {
+    @Transactional(readOnly = true)
+    @SuppressWarnings("unchecked")
+    public Collection<Sample> listAll() throws IOException {
 /*    return (Collection<Sample>) getHibernateTemplate().execute(
             new HibernateCallback() {
               public Object doInHibernate(Session session)
@@ -72,11 +72,11 @@ public class HibernateSampleStore extends HibernateDaoSupport implements Store<S
               }
             });
             */
-    return null;
-  }
+        return null;
+    }
 
-  @Override
-  public int count() throws IOException {
-    return 0;
-  }
+    @Override
+    public int count() throws IOException {
+        return 0;
+    }
 }

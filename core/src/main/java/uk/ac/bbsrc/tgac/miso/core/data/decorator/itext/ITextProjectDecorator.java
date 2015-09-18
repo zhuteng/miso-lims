@@ -47,79 +47,76 @@ import java.util.ArrayList;
  */
 public class ITextProjectDecorator extends AbstractReportDecorator<Document> {
 
-  protected OutputStream stream;
+    protected OutputStream stream;
 
-  public ITextProjectDecorator(List<? extends Reportable> reportables, Document report, OutputStream stream) {
-    super(reportables);
-    this.stream = stream;
-    this.report = report;
-  }
+    public ITextProjectDecorator(List<? extends Reportable> reportables, Document report, OutputStream stream) {
+        super(reportables);
+        this.stream = stream;
+        this.report = report;
+    }
 
-  public void buildReport() throws ReportingException {
-    if (reportables.size() == 1) {
-      List reportableslist = new ArrayList<Reportable>(reportables);
-      Reportable reportable = (Reportable) reportableslist.get(0);
-      reportable.buildReport();
-      Project project = (Project) reportable;
-      try {
-        report = new Document();
-        PdfWriter writer = PdfWriter.getInstance(report, stream);
-        report.open();
-        report.add(new Paragraph("Project Summary"));
-        PdfContentByte cb = writer.getDirectContent();
-        cb.setLineWidth(2.0f);     // Make a bit thicker than 1.0 default
-        cb.setGrayStroke(0.9f); // 1 = black, 0 = white
-        float x = 72f;
-        float y = 200f;
-        cb.moveTo(x, y);
-        cb.lineTo(x + 72f * 6, y);
-        cb.stroke();
+    public void buildReport() throws ReportingException {
+        if (reportables.size() == 1) {
+            List reportableslist = new ArrayList<Reportable>(reportables);
+            Reportable reportable = (Reportable) reportableslist.get(0);
+            reportable.buildReport();
+            Project project = (Project) reportable;
+            try {
+                report = new Document();
+                PdfWriter writer = PdfWriter.getInstance(report, stream);
+                report.open();
+                report.add(new Paragraph("Project Summary"));
+                PdfContentByte cb = writer.getDirectContent();
+                cb.setLineWidth(2.0f);     // Make a bit thicker than 1.0 default
+                cb.setGrayStroke(0.9f); // 1 = black, 0 = white
+                float x = 72f;
+                float y = 200f;
+                cb.moveTo(x, y);
+                cb.lineTo(x + 72f * 6, y);
+                cb.stroke();
 
-        report.add(new Paragraph(project.getAlias()));
-        report.add(new Paragraph(project.getDescription()));
+                report.add(new Paragraph(project.getAlias()));
+                report.add(new Paragraph(project.getDescription()));
 
-        PdfPTable t = new PdfPTable(1);
-        t.setHorizontalAlignment(Element.ALIGN_CENTER);
-        t.setWidthPercentage(100f); // this would be the 100 from setHorizontalLine
-        t.setSpacingAfter(5f);
-        t.setSpacingBefore(0f);
-        t.getDefaultCell().setUseVariableBorders(true);
-        t.getDefaultCell().setVerticalAlignment(Element.ALIGN_MIDDLE);
-        t.getDefaultCell().setHorizontalAlignment(Element.ALIGN_CENTER);
-        t.getDefaultCell().setBorder(Image.BOTTOM); // This generates the line
-        t.getDefaultCell().setBorderWidth(1f); // this would be the 1 from setHorizontalLine
-        t.getDefaultCell().setPadding(0);
-        t.addCell("");
-        report.add(t);
+                PdfPTable t = new PdfPTable(1);
+                t.setHorizontalAlignment(Element.ALIGN_CENTER);
+                t.setWidthPercentage(100f); // this would be the 100 from setHorizontalLine
+                t.setSpacingAfter(5f);
+                t.setSpacingBefore(0f);
+                t.getDefaultCell().setUseVariableBorders(true);
+                t.getDefaultCell().setVerticalAlignment(Element.ALIGN_MIDDLE);
+                t.getDefaultCell().setHorizontalAlignment(Element.ALIGN_CENTER);
+                t.getDefaultCell().setBorder(Image.BOTTOM); // This generates the line
+                t.getDefaultCell().setBorderWidth(1f); // this would be the 1 from setHorizontalLine
+                t.getDefaultCell().setPadding(0);
+                t.addCell("");
+                report.add(t);
 
-        x = 72f;
-        y = 100f;
-        cb.moveTo(x, y);
-        cb.lineTo(x + 72f * 6, y);
-        cb.stroke();
+                x = 72f;
+                y = 100f;
+                cb.moveTo(x, y);
+                cb.lineTo(x + 72f * 6, y);
+                cb.stroke();
 
-        if (project.getSamples().size() > 0) {
-          report.add(new Paragraph("Samples"));
-          for (Sample sample : project.getSamples()) {
-            Paragraph sPara = new Paragraph(sample.getAlias(), FontFactory.getFont("Helvetica", 12, Font.BOLD));
-            sPara.setIndentationLeft(20);
-            report.add(sPara);
-            report.add(new Paragraph(sample.getDescription()));
-          }
+                if (project.getSamples().size() > 0) {
+                    report.add(new Paragraph("Samples"));
+                    for (Sample sample : project.getSamples()) {
+                        Paragraph sPara = new Paragraph(sample.getAlias(), FontFactory.getFont("Helvetica", 12, Font.BOLD));
+                        sPara.setIndentationLeft(20);
+                        report.add(sPara);
+                        report.add(new Paragraph(sample.getDescription()));
+                    }
+                }
+
+                report.close();
+            } catch (DocumentException e) {
+                e.printStackTrace();
+                throw new ReportingException(e.getMessage());
+            }
+        } else if (reportables.size() > 1) {
+        } else {
+
         }
-
-        report.close();
-      }
-      catch (DocumentException e) {
-        e.printStackTrace();
-        throw new ReportingException(e.getMessage());
-      }
     }
-    else if (reportables.size() > 1) {
-    }
-    else {
-
-    }
-  }
 
 }

@@ -33,15 +33,15 @@ import java.net.URI;
  * To change this template use File | Settings | File Templates.
  */
 public class ERAEndpoint implements EndPoint {
-  private URI destination;
+    private URI destination;
 
-  @Override
-  public void setDestination(URI d) {
-    destination = d;
-  }
+    @Override
+    public void setDestination(URI d) {
+        destination = d;
+    }
 
-  @Override
-  public URI getDestination() {
-    return destination;
-  }
+    @Override
+    public URI getDestination() {
+        return destination;
+    }
 }

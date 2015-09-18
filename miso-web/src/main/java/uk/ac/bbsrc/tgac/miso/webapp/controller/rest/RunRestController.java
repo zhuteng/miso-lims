@@ -55,73 +55,76 @@ import java.util.Collection;
 @RequestMapping("/rest/run")
 @SessionAttributes("run")
 public class RunRestController {
-  protected static final Logger log = LoggerFactory.getLogger(RunRestController.class);
-  @Autowired
-  private com.eaglegenomics.simlims.core.manager.SecurityManager securityManager;
-  @Autowired
-  private RequestManager requestManager;
+    protected static final Logger log = LoggerFactory.getLogger(RunRestController.class);
+    @Autowired
+    private com.eaglegenomics.simlims.core.manager.SecurityManager securityManager;
+    @Autowired
+    private RequestManager requestManager;
 
-  public void setSecurityManager(SecurityManager securityManager) {
-    this.securityManager = securityManager;
-  }
+    public void setSecurityManager(SecurityManager securityManager) {
+        this.securityManager = securityManager;
+    }
 
-  public void setRequestManager(RequestManager requestManager) {
-    this.requestManager = requestManager;
-  }
+    public void setRequestManager(RequestManager requestManager) {
+        this.requestManager = requestManager;
+    }
 
-  @RequestMapping(value = "{runId}", method = RequestMethod.GET)
-  public @ResponseBody String getRunById(@PathVariable Long runId) throws IOException {
-    ObjectMapper mapper = new ObjectMapper();
-    try {
-      Run r = requestManager.getRunById(runId);
-      if (r != null) {
+    @RequestMapping(value = "{runId}", method = RequestMethod.GET)
+    @ResponseBody
+    public String getRunById(@PathVariable Long runId) throws IOException {
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            Run r = requestManager.getRunById(runId);
+            if (r != null) {
+                mapper.getSerializationConfig()
+                      .addMixInAnnotations(SequencerPartitionContainer.class, ContainerRecursionAvoidanceMixin.class);
+                mapper.getSerializationConfig().addMixInAnnotations(User.class, UserInfoMixin.class);
+                return mapper.writeValueAsString(r);
+            }
+            return mapper.writeValueAsString(RestUtils.error("No such run with that ID.", "runId", runId.toString()));
+        } catch (IOException ioe) {
+            return mapper.writeValueAsString(RestUtils.error("Cannot retrieve run: " + ioe.getMessage(), "runId", runId.toString()));
+        }
+    }
+
+    @RequestMapping(value = "/alias/{runAlias}", method = RequestMethod.GET)
+    @ResponseBody
+    public String getRunByAlias(@PathVariable String runAlias) throws IOException {
+        ObjectMapper mapper = new ObjectMapper();
         mapper.getSerializationConfig().addMixInAnnotations(SequencerPartitionContainer.class, ContainerRecursionAvoidanceMixin.class);
         mapper.getSerializationConfig().addMixInAnnotations(User.class, UserInfoMixin.class);
-        return mapper.writeValueAsString(r);
-      }
-      return mapper.writeValueAsString(RestUtils.error("No such run with that ID.", "runId", runId.toString()));
+        try {
+            Run r = requestManager.getRunByAlias(runAlias);
+            if (r != null) {
+                return mapper.writeValueAsString(r);
+            }
+            return mapper.writeValueAsString(RestUtils.error("No such run with that alias.", "runAlias", runAlias.toString()));
+        } catch (IOException ioe) {
+            return mapper.writeValueAsString(RestUtils.error("Cannot retrieve run: " + ioe.getMessage(), "runAlias", runAlias));
+        }
     }
-    catch (IOException ioe) {
-      return mapper.writeValueAsString(RestUtils.error("Cannot retrieve run: " + ioe.getMessage(), "runId", runId.toString()));
-    }
-  }
 
-  @RequestMapping(value = "/alias/{runAlias}", method = RequestMethod.GET)
-  public @ResponseBody String getRunByAlias(@PathVariable String runAlias) throws IOException {
-    ObjectMapper mapper = new ObjectMapper();
-    mapper.getSerializationConfig().addMixInAnnotations(SequencerPartitionContainer.class, ContainerRecursionAvoidanceMixin.class);
-    mapper.getSerializationConfig().addMixInAnnotations(User.class, UserInfoMixin.class);
-    try {
-      Run r = requestManager.getRunByAlias(runAlias);
-      if (r != null) {
-        return mapper.writeValueAsString(r);
-      }
-      return mapper.writeValueAsString(RestUtils.error("No such run with that alias.", "runAlias", runAlias.toString()));
+    @RequestMapping(value = "{runAlias}/samplesheet", method = RequestMethod.GET)
+    @ResponseBody
+    public String getSampleSheetForRun(@PathVariable String runAlias) throws IOException {
+        Run r = requestManager.getRunByAlias(runAlias);
+        User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
+        if (r != null) {
+            Collection<SequencerPartitionContainer<SequencerPoolPartition>> conts = r.getSequencerPartitionContainers();
+            if (!conts.isEmpty() && conts.size() == 1) {
+                return RunProcessingUtils.buildIlluminaDemultiplexCSV(r, conts.iterator().next(), "1.8", user.getLoginName());
+            }
+        }
+        return RestUtils.error("No such run with that alias.", "runAlias", runAlias.toString()).toString();
     }
-    catch (IOException ioe) {
-      return mapper.writeValueAsString(RestUtils.error("Cannot retrieve run: " + ioe.getMessage(), "runAlias", runAlias));
-    }
-  }
 
-  @RequestMapping(value = "{runAlias}/samplesheet", method = RequestMethod.GET)
-  public @ResponseBody String getSampleSheetForRun(@PathVariable String runAlias) throws IOException {
-    Run r = requestManager.getRunByAlias(runAlias);
-    User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-    if (r != null) {
-      Collection<SequencerPartitionContainer<SequencerPoolPartition>> conts = r.getSequencerPartitionContainers();
-      if (!conts.isEmpty() && conts.size() == 1) {
-        return RunProcessingUtils.buildIlluminaDemultiplexCSV(r, conts.iterator().next(), "1.8", user.getLoginName());
-      }
+    @RequestMapping(method = RequestMethod.GET)
+    @ResponseBody
+    public String listAllRuns() throws IOException {
+        Collection<Run> lr = requestManager.listAllRuns();
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.getSerializationConfig().addMixInAnnotations(SequencerPartitionContainer.class, ContainerRecursionAvoidanceMixin.class);
+        mapper.getSerializationConfig().addMixInAnnotations(User.class, UserInfoMixin.class);
+        return mapper.writeValueAsString(lr);
     }
-    return RestUtils.error("No such run with that alias.", "runAlias", runAlias.toString()).toString();
-  }
-  
-  @RequestMapping(method = RequestMethod.GET)
-  public @ResponseBody String listAllRuns() throws IOException {
-    Collection<Run> lr = requestManager.listAllRuns();
-    ObjectMapper mapper = new ObjectMapper();
-    mapper.getSerializationConfig().addMixInAnnotations(SequencerPartitionContainer.class, ContainerRecursionAvoidanceMixin.class);
-    mapper.getSerializationConfig().addMixInAnnotations(User.class, UserInfoMixin.class);
-    return mapper.writeValueAsString(lr);
-  }
 }

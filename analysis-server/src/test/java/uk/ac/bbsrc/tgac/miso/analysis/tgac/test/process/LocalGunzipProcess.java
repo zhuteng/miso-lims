@@ -47,54 +47,53 @@ import java.util.Map;
  * @since 0.1.2
  */
 public class LocalGunzipProcess implements ConanProcess {
-  private Logger log = LoggerFactory.getLogger(getClass());
+    private Logger log = LoggerFactory.getLogger(getClass());
 
-  private final Collection<ConanParameter> parameters;
-  private final PathCreatingPathParameter fileParameter;
+    private final Collection<ConanParameter> parameters;
+    private final PathCreatingPathParameter fileParameter;
 
-  public LocalGunzipProcess() {
-    fileParameter = new PathCreatingPathParameter("file");
+    public LocalGunzipProcess() {
+        fileParameter = new PathCreatingPathParameter("file");
 
-    parameters = new ArrayList<ConanParameter>();
-    parameters.add(fileParameter);
-  }
-
-  protected Logger getLog() {
-    return log;
-  }
-
-  @Override
-  public boolean execute(Map<ConanParameter, String> parameters) throws ProcessExecutionException, IllegalArgumentException, InterruptedException {
-    getLog().info("Executing " + getName() + " with the following parameters: " + parameters.toString());
-    String command = "gunzip " + parameters.get(fileParameter);
-    try {
-      getLog().info("Issuing command: [" + command + "]");
-      ProcessRunner runner = new ProcessRunner();
-      runner.redirectStderr(true);
-      String[] output = runner.runCommmand(command);
-      if (output.length > 0) {
-          getLog().info("Response from command [" + command + "]: " +
-                                 output.length + " lines, first line was " + output[0]);
-      }
+        parameters = new ArrayList<ConanParameter>();
+        parameters.add(fileParameter);
     }
-    catch (IOException e) {
-      e.printStackTrace();
-      return false;
-    }
-    catch (CommandExecutionException e) {
-      e.printStackTrace();
-      return false;
-    }
-    return true;
-  }
 
-  @Override
-  public String getName() {
-    return "local_gunzip";
-  }
+    protected Logger getLog() {
+        return log;
+    }
 
-  @Override
-  public Collection<ConanParameter> getParameters() {
-    return parameters;
-  }
+    @Override
+    public boolean execute(Map<ConanParameter, String> parameters)
+        throws ProcessExecutionException, IllegalArgumentException, InterruptedException {
+        getLog().info("Executing " + getName() + " with the following parameters: " + parameters.toString());
+        String command = "gunzip " + parameters.get(fileParameter);
+        try {
+            getLog().info("Issuing command: [" + command + "]");
+            ProcessRunner runner = new ProcessRunner();
+            runner.redirectStderr(true);
+            String[] output = runner.runCommmand(command);
+            if (output.length > 0) {
+                getLog().info("Response from command [" + command + "]: " +
+                              output.length + " lines, first line was " + output[0]);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        } catch (CommandExecutionException e) {
+            e.printStackTrace();
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public String getName() {
+        return "local_gunzip";
+    }
+
+    @Override
+    public Collection<ConanParameter> getParameters() {
+        return parameters;
+    }
 }

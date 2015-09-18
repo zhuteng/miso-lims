@@ -32,14 +32,14 @@ package uk.ac.bbsrc.tgac.miso.core.exception;
  * @since 0.1.9
  */
 public class MalformedPoolException extends Exception {
-  public MalformedPoolException(String s) {
-    super(s);
-  }
-
-  public MalformedPoolException(String s, Throwable cause) {
-    super(s);
-    if (cause != null) {
-        initCause(cause);
+    public MalformedPoolException(String s) {
+        super(s);
     }
-  }
+
+    public MalformedPoolException(String s, Throwable cause) {
+        super(s);
+        if (cause != null) {
+            initCause(cause);
+        }
+    }
 }

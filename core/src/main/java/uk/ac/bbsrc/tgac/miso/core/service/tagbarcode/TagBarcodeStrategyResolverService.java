@@ -42,75 +42,73 @@ import java.util.*;
  * @since 0.1.6
  */
 public class TagBarcodeStrategyResolverService {
-  protected static final Logger log = LoggerFactory.getLogger(TagBarcodeStrategyResolverService.class);
-  private Map<String, TagBarcodeStrategy> strategyMap;
+    protected static final Logger log = LoggerFactory.getLogger(TagBarcodeStrategyResolverService.class);
+    private Map<String, TagBarcodeStrategy> strategyMap;
 
-  @Autowired
-  private RequestManager requestManager;
+    @Autowired
+    private RequestManager requestManager;
 
-  public void setRequestManager(RequestManager requestManager) {
-    this.requestManager = requestManager;
-  }
-
-  public TagBarcodeStrategy getTagBarcodeStrategy(String strategyName) {
-    for (TagBarcodeStrategy strategy : getTagBarcodeStrategies()) {
-      if (strategy.getName().equals(strategyName)) {
-        return strategy;
-      }
+    public void setRequestManager(RequestManager requestManager) {
+        this.requestManager = requestManager;
     }
-    log.warn("No strategy called '" + strategyName + "' was available on the classpath");
-    return null;
-  }
 
-  public Collection<TagBarcodeStrategy> getTagBarcodeStrategies() {
-    //lazily load available strategies
-    if (strategyMap == null) {
-      ServiceLoader<TagBarcodeStrategy> consumerLoader = ServiceLoader.load(TagBarcodeStrategy.class);
-      Iterator<TagBarcodeStrategy> consumerIterator = consumerLoader.iterator();
+    public TagBarcodeStrategy getTagBarcodeStrategy(String strategyName) {
+        for (TagBarcodeStrategy strategy : getTagBarcodeStrategies()) {
+            if (strategy.getName().equals(strategyName)) {
+                return strategy;
+            }
+        }
+        log.warn("No strategy called '" + strategyName + "' was available on the classpath");
+        return null;
+    }
 
-      strategyMap = new HashMap<String, TagBarcodeStrategy>();
-      while (consumerIterator.hasNext()) {
-        TagBarcodeStrategy p = consumerIterator.next();
+    public Collection<TagBarcodeStrategy> getTagBarcodeStrategies() {
+        //lazily load available strategies
+        if (strategyMap == null) {
+            ServiceLoader<TagBarcodeStrategy> consumerLoader = ServiceLoader.load(TagBarcodeStrategy.class);
+            Iterator<TagBarcodeStrategy> consumerIterator = consumerLoader.iterator();
 
-        if (p instanceof RequestManagerAware) {
-          if (requestManager != null && ((RequestManagerAware)p).getRequestManager() == null) {
-            ((RequestManagerAware)p).setRequestManager(requestManager);
-            p.reload();
-          }
-          else {
-            log.error("Ooops. No request manager available to register with RequestManagerAware services!");
-          }
+            strategyMap = new HashMap<String, TagBarcodeStrategy>();
+            while (consumerIterator.hasNext()) {
+                TagBarcodeStrategy p = consumerIterator.next();
+
+                if (p instanceof RequestManagerAware) {
+                    if (requestManager != null && ((RequestManagerAware) p).getRequestManager() == null) {
+                        ((RequestManagerAware) p).setRequestManager(requestManager);
+                        p.reload();
+                    } else {
+                        log.error("Ooops. No request manager available to register with RequestManagerAware services!");
+                    }
+                }
+
+                if (!strategyMap.containsKey(p.getName())) {
+                    strategyMap.put(p.getName(), p);
+                } else {
+                    if (strategyMap.get(p.getName()) != p) {
+                        String msg = "Multiple different TagBarcodeStrategies with the same strategy name " +
+                                     "('" + p.getName() + "') are present on the classpath. Strategy names must be unique.";
+                        log.error(msg);
+                        throw new ServiceConfigurationError(msg);
+                    }
+                }
+            }
+            log.info("Loaded " + strategyMap.values().size() + " known strategies");
         }
 
-        if (!strategyMap.containsKey(p.getName())) {
-          strategyMap.put(p.getName(), p);
+        return strategyMap.values();
+    }
+
+    public Collection<TagBarcodeStrategy> getTagBarcodeStrategiesByPlatform(PlatformType platformType) {
+        if (strategyMap == null) {
+            getTagBarcodeStrategies();
         }
-        else {
-          if (strategyMap.get(p.getName()) != p) {
-            String msg = "Multiple different TagBarcodeStrategies with the same strategy name " +
-                         "('" + p.getName() + "') are present on the classpath. Strategy names must be unique.";
-            log.error(msg);
-            throw new ServiceConfigurationError(msg);
-          }
+
+        Set<TagBarcodeStrategy> ts = new HashSet<TagBarcodeStrategy>();
+        for (TagBarcodeStrategy s : strategyMap.values()) {
+            if (s.getPlatformType().equals(platformType)) {
+                ts.add(s);
+            }
         }
-      }
-      log.info("Loaded " + strategyMap.values().size() + " known strategies");
+        return ts;
     }
-
-    return strategyMap.values();
-  }
-
-  public Collection<TagBarcodeStrategy> getTagBarcodeStrategiesByPlatform(PlatformType platformType) {
-    if (strategyMap == null) {
-      getTagBarcodeStrategies();
-    }
-
-    Set<TagBarcodeStrategy> ts = new HashSet<TagBarcodeStrategy>();
-    for (TagBarcodeStrategy s : strategyMap.values()) {
-      if (s.getPlatformType().equals(platformType)) {
-        ts.add(s);
-      }
-    }
-    return ts;
-  }
 }

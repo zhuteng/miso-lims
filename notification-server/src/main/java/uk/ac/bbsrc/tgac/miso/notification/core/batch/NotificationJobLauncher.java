@@ -49,42 +49,44 @@ import java.util.*;
  * @since version
  */
 public class NotificationJobLauncher implements JobLauncher, InitializingBean {
-  protected static final Logger log = LoggerFactory.getLogger(NotificationJobLauncher.class);
+    protected static final Logger log = LoggerFactory.getLogger(NotificationJobLauncher.class);
 
-  Map<String, String> resources;
+    Map<String, String> resources;
 
-  JobRepository repository;
-  TaskExecutor taskExecutor;
+    JobRepository repository;
+    TaskExecutor taskExecutor;
 
-  public NotificationJobLauncher() {
-    super();
-    this.resources = new HashMap<String, String>();
-  }
-
-  public void setJobRepository(JobRepository repository) {
-    this.repository = repository;
-  }
-
-  public void setTaskExecutor(TaskExecutor taskExecutor) {
-    this.taskExecutor = taskExecutor;
-  }
-
-  @Override
-  public JobExecution run(final Job job, final JobParameters jobParameters) throws JobExecutionAlreadyRunningException, JobRestartException, JobInstanceAlreadyCompleteException, JobParametersInvalidException {
-    Assert.notNull(job, "The Job must not be null.");
-    Assert.notNull(jobParameters, "The JobParameters must not be null.");
-
-    final JobExecution jobExecution;
-    JobExecution lastExecution = repository.getLastJobExecution(job.getName(), jobParameters);
-    if (lastExecution != null) {
-      if (!job.isRestartable()) {
-        throw new JobRestartException("JobInstance already exists and is not restartable");
-      }
+    public NotificationJobLauncher() {
+        super();
+        this.resources = new HashMap<String, String>();
     }
 
-    // Check the validity of the parameters before doing creating anything
-    // in the repository...
-    job.getJobParametersValidator().validate(jobParameters);
+    public void setJobRepository(JobRepository repository) {
+        this.repository = repository;
+    }
+
+    public void setTaskExecutor(TaskExecutor taskExecutor) {
+        this.taskExecutor = taskExecutor;
+    }
+
+    @Override
+    public JobExecution run(final Job job, final JobParameters jobParameters)
+        throws JobExecutionAlreadyRunningException, JobRestartException, JobInstanceAlreadyCompleteException,
+               JobParametersInvalidException {
+        Assert.notNull(job, "The Job must not be null.");
+        Assert.notNull(jobParameters, "The JobParameters must not be null.");
+
+        final JobExecution jobExecution;
+        JobExecution lastExecution = repository.getLastJobExecution(job.getName(), jobParameters);
+        if (lastExecution != null) {
+            if (!job.isRestartable()) {
+                throw new JobRestartException("JobInstance already exists and is not restartable");
+            }
+        }
+
+        // Check the validity of the parameters before doing creating anything
+        // in the repository...
+        job.getJobParametersValidator().validate(jobParameters);
 
     /*
      * There is a very small probability that a non-restartable job can be
@@ -92,69 +94,63 @@ public class NotificationJobLauncher implements JobLauncher, InitializingBean {
      * <i>and</i> fail a job execution for this instance between the last
      * assertion and the next method returning successfully.
      */
-    jobExecution = repository.createJobExecution(job.getName(), jobParameters);
+        jobExecution = repository.createJobExecution(job.getName(), jobParameters);
 
-    try {
-      for (String key : resources.keySet()) {
-        JobParameter param = new JobParameter(resources.get(key));
-        jobParameters.getParameters().put(key, param);
-        taskExecutor.execute(new NotificationRunnable(job, jobParameters, jobExecution));
-      }
-    }
-    catch (TaskRejectedException e) {
-      jobExecution.upgradeStatus(BatchStatus.FAILED);
-      if (jobExecution.getExitStatus().equals(ExitStatus.UNKNOWN)) {
-        jobExecution.setExitStatus(ExitStatus.FAILED.addExitDescription(e));
-      }
-      repository.update(jobExecution);
-    }
+        try {
+            for (String key : resources.keySet()) {
+                JobParameter param = new JobParameter(resources.get(key));
+                jobParameters.getParameters().put(key, param);
+                taskExecutor.execute(new NotificationRunnable(job, jobParameters, jobExecution));
+            }
+        } catch (TaskRejectedException e) {
+            jobExecution.upgradeStatus(BatchStatus.FAILED);
+            if (jobExecution.getExitStatus().equals(ExitStatus.UNKNOWN)) {
+                jobExecution.setExitStatus(ExitStatus.FAILED.addExitDescription(e));
+            }
+            repository.update(jobExecution);
+        }
 
-    return jobExecution;
-  }
-
-  public void afterPropertiesSet() throws Exception {
-    Assert.state(repository != null, "A JobRepository has not been set.");
-    if (taskExecutor == null) {
-      log.info("No TaskExecutor has been set, defaulting to synchronous executor.");
-      taskExecutor = new SyncTaskExecutor();
-    }
-  }
-
-  private class NotificationRunnable implements Runnable {
-    Job job;
-    JobParameters jobParameters;
-    JobExecution jobExecution;
-
-    public NotificationRunnable(Job job, JobParameters jobParameters, JobExecution jobExecution) {
-      this.job = job;
-      this.jobParameters = jobParameters;
-      this.jobExecution = jobExecution;
+        return jobExecution;
     }
 
-    public void run() {
-      try {
-        log.info("Job: [" + job + "] launched with the following parameters: [" + jobParameters
-                 + "]");
-        job.execute(jobExecution);
-        log.info("Job: [" + job + "] completed with the following parameters: [" + jobParameters
-                 + "] and the following status: [" + jobExecution.getStatus() + "]");
-      }
-      catch (Throwable t) {
-        log.info("Job: [" + job
-                 + "] failed unexpectedly and fatally with the following parameters: [" + jobParameters
-                 + "]", t);
-        rethrow(t);
-      }
+    public void afterPropertiesSet() throws Exception {
+        Assert.state(repository != null, "A JobRepository has not been set.");
+        if (taskExecutor == null) {
+            log.info("No TaskExecutor has been set, defaulting to synchronous executor.");
+            taskExecutor = new SyncTaskExecutor();
+        }
     }
 
-    private void rethrow(Throwable t) {
-      if (t instanceof RuntimeException) {
-        throw (RuntimeException) t;
-      }
-      else if (t instanceof Error) {
-        throw (Error) t;
-      }
-      throw new IllegalStateException(t);
+    private class NotificationRunnable implements Runnable {
+        Job job;
+        JobParameters jobParameters;
+        JobExecution jobExecution;
+
+        public NotificationRunnable(Job job, JobParameters jobParameters, JobExecution jobExecution) {
+            this.job = job;
+            this.jobParameters = jobParameters;
+            this.jobExecution = jobExecution;
+        }
+
+        public void run() {
+            try {
+                log.info("Job: [" + job + "] launched with the following parameters: [" + jobParameters + "]");
+                job.execute(jobExecution);
+                log.info("Job: [" + job + "] completed with the following parameters: [" + jobParameters + "] and the following status: [" +
+                         jobExecution.getStatus() + "]");
+            } catch (Throwable t) {
+                log.info("Job: [" + job + "] failed unexpectedly and fatally with the following parameters: [" + jobParameters + "]", t);
+                rethrow(t);
+            }
+        }
+
+        private void rethrow(Throwable t) {
+            if (t instanceof RuntimeException) {
+                throw (RuntimeException) t;
+            } else if (t instanceof Error) {
+                throw (Error) t;
+            }
+            throw new IllegalStateException(t);
+        }
     }
-  }
 }

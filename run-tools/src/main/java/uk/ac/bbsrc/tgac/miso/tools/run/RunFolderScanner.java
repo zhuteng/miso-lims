@@ -44,31 +44,30 @@ import java.util.regex.Pattern;
  * @since 0.1.2
  */
 public class RunFolderScanner extends DefaultDirectoryScanner {
-  private static final Log log = LogFactory.getLog(RunFolderScanner.class);
+    private static final Log log = LogFactory.getLog(RunFolderScanner.class);
 
-  private Pattern runDirPattern;
+    private Pattern runDirPattern;
 
-  public RunFolderScanner(String runDirRegex) {
-    runDirPattern = Pattern.compile(runDirRegex);
-  }
-
-  @Override
-  protected File[] listEligibleFiles(File directory) throws IllegalArgumentException {
-    File[] rootFiles = directory.listFiles();
-    List<File> files = new ArrayList<File>(rootFiles.length);
-    for (File rootFile : rootFiles) {
-      if (rootFile.isDirectory()) {
-        Matcher rm = runDirPattern.matcher(rootFile.getAbsolutePath());
-        if (rm.matches()) {
-          files.add(rootFile);
-        }
-        else {
-          if (rm.find()) {
-            files.addAll(Arrays.asList(listEligibleFiles(rootFile)));
-          }
-        }
-      }
+    public RunFolderScanner(String runDirRegex) {
+        runDirPattern = Pattern.compile(runDirRegex);
     }
-    return files.toArray(new File[files.size()]);
-  }
+
+    @Override
+    protected File[] listEligibleFiles(File directory) throws IllegalArgumentException {
+        File[] rootFiles = directory.listFiles();
+        List<File> files = new ArrayList<File>(rootFiles.length);
+        for (File rootFile : rootFiles) {
+            if (rootFile.isDirectory()) {
+                Matcher rm = runDirPattern.matcher(rootFile.getAbsolutePath());
+                if (rm.matches()) {
+                    files.add(rootFile);
+                } else {
+                    if (rm.find()) {
+                        files.addAll(Arrays.asList(listEligibleFiles(rootFile)));
+                    }
+                }
+            }
+        }
+        return files.toArray(new File[files.size()]);
+    }
 }

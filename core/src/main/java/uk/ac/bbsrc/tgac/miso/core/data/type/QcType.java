@@ -29,7 +29,7 @@ import javax.persistence.Id;
 import java.io.Serializable;
 
 /**
- * Provides model access to the underlying MISO QcType lookup table. These types should hold manufacturer platform information for QC analysis. 
+ * Provides model access to the underlying MISO QcType lookup table. These types should hold manufacturer platform information for QC analysis.
  * <p/>
  * See:
  *
@@ -37,146 +37,160 @@ import java.io.Serializable;
  * @since 0.0.2
  */
 public class QcType implements Comparable, Serializable {
-  public static final Long UNSAVED_ID = 0L;
+    public static final Long UNSAVED_ID = 0L;
 
-  /** Field libraryTypeId  */
-  @Id
-  @GeneratedValue(strategy = GenerationType.AUTO)
-  private long qcTypeId = QcType.UNSAVED_ID;
-  /** Field name */
-  private String name;
-  /** Field description  */
-  private String description;
-  /** Field qcTarget  */
-  private String qcTarget;
-  /** Field units  */
-  private String units;
+    /**
+     * Field libraryTypeId
+     */
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private long qcTypeId = QcType.UNSAVED_ID;
+    /**
+     * Field name
+     */
+    private String name;
+    /**
+     * Field description
+     */
+    private String description;
+    /**
+     * Field qcTarget
+     */
+    private String qcTarget;
+    /**
+     * Field units
+     */
+    private String units;
 
-  /**
-   * Returns the qcTypeId of this QcType object.
-   *
-   * @return Long qcTypeId.
-   */
-  public Long getQcTypeId() {
-    return qcTypeId;
-  }
-
-  /**
-   * Sets the qcTypeId of this QcType object.
-   *
-   * @param qcTypeId qcTypeId.
-   */
-  public void setQcTypeId(Long qcTypeId) {
-    this.qcTypeId = qcTypeId;
-  }
-
-  /**
-   * Returns the name of this QcType object.
-   *
-   * @return String name.
-   */
-  public String getName() {
-    return name;
-  }
-
-  /**
-   * Sets the name of this QcType object.
-   *
-   * @param name name.
-   */
-  public void setName(String name) {
-    this.name = name;
-  }
-
-  /**
-   * Returns the description of this LibraryType object.
-   *
-   * @return String description.
-   */
-  public String getDescription() {
-    return description;
-  }
-
-  /**
-   * Sets the description of this LibraryType object.
-   *
-   * @param description description.
-   */
-  public void setDescription(String description) {
-    this.description = description;
-  }
-
-  /**
-   * Returns the qcTarget of this QcType object.
-   *
-   * @return String qcTarget.
-   */
-  public String getQcTarget() {
-    return qcTarget;
-  }
-
-  /**
-   * Sets the qcTarget of this QcType object.
-   *
-   * @param qcTarget qcTarget.
-   */
-  public void setQcTarget(String qcTarget) {
-    this.qcTarget = qcTarget;
-  }
-
-  /**
-   * Returns the units of this QcType object.
-   *
-   * @return String units.
-   */
-  public String getUnits() {
-    return units;
-  }
-
-  /**
-   * Sets the units of this QcType object.
-   *
-   * @param units units.
-   */
-  public void setUnits(String units) {
-    this.units = units;
-  }
-
-  @Override
-  public boolean equals(Object obj) {
-    if (obj == null)
-      return false;
-    if (obj == this)
-      return true;
-    if (!(obj instanceof QcType))
-      return false;
-    QcType them = (QcType) obj;
-    // If not saved, then compare resolved actual objects. Otherwise
-    // just compare IDs.
-    return getName().equals(them.getName());
-  }
-
-  @Override
-  public int hashCode() {
-    if (getQcTypeId() != UNSAVED_ID) {
-      return getQcTypeId().intValue();
+    /**
+     * Returns the qcTypeId of this QcType object.
+     *
+     * @return Long qcTypeId.
+     */
+    public Long getQcTypeId() {
+        return qcTypeId;
     }
-    else {
-      int hashcode = -1;
-      if (getName() != null) hashcode = 37 * hashcode + getName().hashCode();
-      if (getDescription() != null) hashcode = 37 * hashcode + getDescription().hashCode();
-      return hashcode;
+
+    /**
+     * Sets the qcTypeId of this QcType object.
+     *
+     * @param qcTypeId qcTypeId.
+     */
+    public void setQcTypeId(Long qcTypeId) {
+        this.qcTypeId = qcTypeId;
     }
-  }
 
-  @Override
-  public int compareTo(Object o) {
-    QcType t = (QcType)o;
-    int name = getName().compareTo(t.getName());
-    if (name != 0) return name;
+    /**
+     * Returns the name of this QcType object.
+     *
+     * @return String name.
+     */
+    public String getName() {
+        return name;
+    }
 
-    if (getQcTypeId() < t.getQcTypeId()) return -1;
-    if (getQcTypeId() > t.getQcTypeId()) return 1;
-    return 0;
-  }
+    /**
+     * Sets the name of this QcType object.
+     *
+     * @param name name.
+     */
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    /**
+     * Returns the description of this LibraryType object.
+     *
+     * @return String description.
+     */
+    public String getDescription() {
+        return description;
+    }
+
+    /**
+     * Sets the description of this LibraryType object.
+     *
+     * @param description description.
+     */
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    /**
+     * Returns the qcTarget of this QcType object.
+     *
+     * @return String qcTarget.
+     */
+    public String getQcTarget() {
+        return qcTarget;
+    }
+
+    /**
+     * Sets the qcTarget of this QcType object.
+     *
+     * @param qcTarget qcTarget.
+     */
+    public void setQcTarget(String qcTarget) {
+        this.qcTarget = qcTarget;
+    }
+
+    /**
+     * Returns the units of this QcType object.
+     *
+     * @return String units.
+     */
+    public String getUnits() {
+        return units;
+    }
+
+    /**
+     * Sets the units of this QcType object.
+     *
+     * @param units units.
+     */
+    public void setUnits(String units) {
+        this.units = units;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null)
+            return false;
+        if (obj == this)
+            return true;
+        if (!(obj instanceof QcType))
+            return false;
+        QcType them = (QcType) obj;
+        // If not saved, then compare resolved actual objects. Otherwise
+        // just compare IDs.
+        return getName().equals(them.getName());
+    }
+
+    @Override
+    public int hashCode() {
+        if (getQcTypeId() != UNSAVED_ID) {
+            return getQcTypeId().intValue();
+        } else {
+            int hashcode = -1;
+            if (getName() != null)
+                hashcode = 37 * hashcode + getName().hashCode();
+            if (getDescription() != null)
+                hashcode = 37 * hashcode + getDescription().hashCode();
+            return hashcode;
+        }
+    }
+
+    @Override
+    public int compareTo(Object o) {
+        QcType t = (QcType) o;
+        int name = getName().compareTo(t.getName());
+        if (name != 0)
+            return name;
+
+        if (getQcTypeId() < t.getQcTypeId())
+            return -1;
+        if (getQcTypeId() > t.getQcTypeId())
+            return 1;
+        return 0;
+    }
 }

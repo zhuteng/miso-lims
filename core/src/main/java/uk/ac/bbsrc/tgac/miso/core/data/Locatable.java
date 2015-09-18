@@ -31,17 +31,17 @@ package uk.ac.bbsrc.tgac.miso.core.data;
  * @since 0.0.2
  */
 public interface Locatable {
-  /**
-   * Returns the locationBarcode of this Locatable object.
-   *
-   * @return String locationBarcode.
-   */
-  public String getLocationBarcode();
+    /**
+     * Returns the locationBarcode of this Locatable object.
+     *
+     * @return String locationBarcode.
+     */
+    public String getLocationBarcode();
 
-  /**
-   * Sets the locationBarcode of this Locatable object.
-   *
-   * @param locationBarcode locationBarcode.
-   */
-  public void setLocationBarcode(String locationBarcode);
+    /**
+     * Sets the locationBarcode of this Locatable object.
+     *
+     * @param locationBarcode locationBarcode.
+     */
+    public void setLocationBarcode(String locationBarcode);
 }

@@ -10,11 +10,11 @@ package uk.ac.bbsrc.tgac.miso.core.workflow;
  * @since 0.2.0
  */
 public interface WorkflowProcessDefinition {
-  public String getName();
-  public String getDescription();
+    public String getName();
+    public String getDescription();
 
-  public boolean requiresPreviousProcessComplete();
+    public boolean requiresPreviousProcessComplete();
 
-  public WorkflowProcessDefinition processBefore();
-  public WorkflowProcessDefinition processAfter();
+    public WorkflowProcessDefinition processBefore();
+    public WorkflowProcessDefinition processAfter();
 }

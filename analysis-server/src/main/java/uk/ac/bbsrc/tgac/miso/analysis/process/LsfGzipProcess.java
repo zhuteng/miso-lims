@@ -46,48 +46,48 @@ import java.util.Map;
  */
 @ServiceProvider
 public class LsfGzipProcess extends AbstractTgacLsfProcess {
-  private Logger log = LoggerFactory.getLogger(getClass());
+    private Logger log = LoggerFactory.getLogger(getClass());
 
-  private final Collection<ConanParameter> parameters;
-  private final PathCreatingPathParameter fileParameter;
-  private final FlagParameter compressionParameter;
+    private final Collection<ConanParameter> parameters;
+    private final PathCreatingPathParameter fileParameter;
+    private final FlagParameter compressionParameter;
 
-  public LsfGzipProcess() {
-    setQueueName("lsf_testing");
+    public LsfGzipProcess() {
+        setQueueName("lsf_testing");
 
-    // set this to your own bsub path!
-    setBsubPath("/path/to/bsub");
+        // set this to your own bsub path!
+        setBsubPath("/path/to/bsub");
 
-    fileParameter = new PathCreatingPathParameter("file");
-    compressionParameter = new FlagParameter("compression");
+        fileParameter = new PathCreatingPathParameter("file");
+        compressionParameter = new FlagParameter("compression");
 
-    parameters = new ArrayList<ConanParameter>();
-    parameters.add(fileParameter);
-    parameters.add(compressionParameter);
-  }
+        parameters = new ArrayList<ConanParameter>();
+        parameters.add(fileParameter);
+        parameters.add(compressionParameter);
+    }
 
-  protected Logger getLog() {
-    return log;
-  }
+    protected Logger getLog() {
+        return log;
+    }
 
-  @Override
-  protected String getComponentName() {
-    return LSFProcess.UNSPECIFIED_COMPONENT_NAME;
-  }
+    @Override
+    protected String getComponentName() {
+        return LSFProcess.UNSPECIFIED_COMPONENT_NAME;
+    }
 
-  @Override
-  protected String getCommand(Map<ConanParameter, String> parameters) throws IllegalArgumentException {
-    getLog().debug("Executing " + getName() + " with the following parameters: " + parameters.toString());
-    return "gzip -" + parameters.get(compressionParameter) + " " + parameters.get(fileParameter);
-  }
+    @Override
+    protected String getCommand(Map<ConanParameter, String> parameters) throws IllegalArgumentException {
+        getLog().debug("Executing " + getName() + " with the following parameters: " + parameters.toString());
+        return "gzip -" + parameters.get(compressionParameter) + " " + parameters.get(fileParameter);
+    }
 
-  @Override
-  public String getName() {
-    return "lsf_gzip";
-  }
+    @Override
+    public String getName() {
+        return "lsf_gzip";
+    }
 
-  @Override
-  public Collection<ConanParameter> getParameters() {
-    return parameters;
-  }
+    @Override
+    public Collection<ConanParameter> getParameters() {
+        return parameters;
+    }
 }

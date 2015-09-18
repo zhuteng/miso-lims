@@ -10,20 +10,22 @@ import net.sf.json.JSONObject;
  * @since 0.2.1-SNAPSHOT
  */
 public class RestUtils {
-  public static JSONObject error(String error, String objectKey, String objectValue) {
-    JSONObject o = new JSONObject();
-    o.put("error", error);
-    o.put(objectKey, objectValue);
-    return o;
-  }
+    public static JSONObject error(String error, String objectKey, String objectValue) {
+        JSONObject o = new JSONObject();
+        o.put("error", error);
+        o.put(objectKey, objectValue);
+        return o;
+    }
 
-  public static JSONObject objectify(Object obj) {
-    if (obj != null) return JSONObject.fromObject(obj);
-    return new JSONObject();
-  }
+    public static JSONObject objectify(Object obj) {
+        if (obj != null)
+            return JSONObject.fromObject(obj);
+        return new JSONObject();
+    }
 
-  public static String stringify(Object obj) {
-    if (obj != null) return objectify(obj).toString();
-    return "{}";
-  }
+    public static String stringify(Object obj) {
+        if (obj != null)
+            return objectify(obj).toString();
+        return "{}";
+    }
 }

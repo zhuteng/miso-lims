@@ -44,95 +44,90 @@ import java.util.*;
  * @since 0.1.5
  */
 public class NotificationUtils {
-  protected static final Logger log = LoggerFactory.getLogger(NotificationUtils.class);
+    protected static final Logger log = LoggerFactory.getLogger(NotificationUtils.class);
 
-  private int splitterBatchSize = 5;
+    private int splitterBatchSize = 5;
 
-  public void setSplitterBatchSize(int splitterBatchSize) {
-    this.splitterBatchSize = splitterBatchSize;
-  }
+    public void setSplitterBatchSize(int splitterBatchSize) {
+        this.splitterBatchSize = splitterBatchSize;
+    }
 
-  public static <T> Message<T> buildSimpleMultipartMessage(T payload) {
-    Message<T> message = MessageBuilder.withPayload(payload).setHeader("Content-Type", "multipart/form-data").build();
-    return message;
-  }
+    public static <T> Message<T> buildSimpleMultipartMessage(T payload) {
+        Message<T> message = MessageBuilder.withPayload(payload).setHeader("Content-Type", "multipart/form-data").build();
+        return message;
+    }
 
-  public static <T> Message<T> buildSimplePostMessage(T payload) {
-    Message<T> message = MessageBuilder.withPayload(payload).setHeader("Content-Type", "x-www-form-urlencoded").build();
-    return message;
-  }
+    public static <T> Message<T> buildSimplePostMessage(T payload) {
+        Message<T> message = MessageBuilder.withPayload(payload).setHeader("Content-Type", "x-www-form-urlencoded").build();
+        return message;
+    }
 
-  public static <T> Message<T> buildSimpleMessage(T payload) {
-    return MessageBuilder.withPayload(payload).build();
-  }
+    public static <T> Message<T> buildSimpleMessage(T payload) {
+        return MessageBuilder.withPayload(payload).build();
+    }
 
-  public Set<Map<String, String>> splitMessage(Message<Map<String, String>> message) {
-    Set<Map<String, String>> outset = new HashSet<Map<String, String>>();
-    Map<String, String> payload = message.getPayload();
-    //key is run status
-    for (String key : payload.keySet()) {
-      //each map value is a JSONArray string
-      JSONArray a = JSONArray.fromObject(payload.get(key));
-      List<JSONObject> all = a.subList(0, a.size());
-      //for (JSONObject o : (Iterable<JSONObject>)a) {
-      for (List<JSONObject> chunk : NotificationUtils.chunkList(all, splitterBatchSize)) {
-        Map<String, String> runMap = new HashMap<String, String>();
-        JSONArray aa = new JSONArray();
-        for (JSONObject o : chunk) {
-          aa.add(o);
+    public Set<Map<String, String>> splitMessage(Message<Map<String, String>> message) {
+        Set<Map<String, String>> outset = new HashSet<Map<String, String>>();
+        Map<String, String> payload = message.getPayload();
+        //key is run status
+        for (String key : payload.keySet()) {
+            //each map value is a JSONArray string
+            JSONArray a = JSONArray.fromObject(payload.get(key));
+            List<JSONObject> all = a.subList(0, a.size());
+            //for (JSONObject o : (Iterable<JSONObject>)a) {
+            for (List<JSONObject> chunk : NotificationUtils.chunkList(all, splitterBatchSize)) {
+                Map<String, String> runMap = new HashMap<String, String>();
+                JSONArray aa = new JSONArray();
+                for (JSONObject o : chunk) {
+                    aa.add(o);
+                }
+                runMap.put(key, aa.toString());
+                outset.add(runMap);
+            }
         }
-        runMap.put(key, aa.toString());
-        outset.add(runMap);
-      }
-    }
-    log.info("Split a single message payload into " + outset.size() + "-mer chunked set...");
-    return outset;
-  }
-
-  // chops a list into non-view sublists of length L
-  public static <T> List<List<T>> chunkList(List<T> list, final int L) {
-    List<List<T>> parts = new ArrayList<List<T>>();
-    final int N = list.size();
-    for (int i = 0; i < N; i += L) {
-      parts.add(new ArrayList<T>(
-        list.subList(i, Math.min(N, i + L)))
-      );
-    }
-    return parts;
-  }
-
-  public Map<String, Object> signMessageHeaders(Message<?> message) {
-    MessageHeaders headers = message.getHeaders();
-    String url = headers.get(SignatureHelper.URL_X_HEADER, String.class);
-
-    Map<String, Object> newheaders = new HashMap<String, Object>();
-    newheaders.put("Accept", "*/*");
-    newheaders.put(SignatureHelper.URL_X_HEADER, url);
-    newheaders.put(SignatureHelper.USER_HEADER, "notification");
-    newheaders.put(SignatureHelper.TIMESTAMP_HEADER, "\"" + System.currentTimeMillis() + "\"");
-
-    //sign only those headers that are Strings
-    Map<String, List<String>> stringHeaders = new HashMap<String, List<String>>();
-    for (String key : headers.keySet()) {
-      if (headers.get(key) instanceof String) {
-        List<String> ss = new ArrayList<String>();
-        ss.add(headers.get(key, String.class));
-        stringHeaders.put(key, ss);
-      }
-      newheaders.put(key, headers.get(key));
+        log.info("Split a single message payload into " + outset.size() + "-mer chunked set...");
+        return outset;
     }
 
-    try {
-      log.debug("HEADERS -> " + stringHeaders + ":" + url + ":" + "notification");
-
-      newheaders.put(SignatureHelper.SIGNATURE_HEADER,
-                     SignatureHelper.createSignature(
-                             stringHeaders,
-                             url,
-                             SignatureHelper.PUBLIC_KEY));
-    } catch (Exception e) {
-       e.printStackTrace();
+    // chops a list into non-view sublists of length L
+    public static <T> List<List<T>> chunkList(List<T> list, final int L) {
+        List<List<T>> parts = new ArrayList<List<T>>();
+        final int N = list.size();
+        for (int i = 0; i < N; i += L) {
+            parts.add(new ArrayList<T>(list.subList(i, Math.min(N, i + L))));
+        }
+        return parts;
     }
-    return newheaders;
-  }
+
+    public Map<String, Object> signMessageHeaders(Message<?> message) {
+        MessageHeaders headers = message.getHeaders();
+        String url = headers.get(SignatureHelper.URL_X_HEADER, String.class);
+
+        Map<String, Object> newheaders = new HashMap<String, Object>();
+        newheaders.put("Accept", "*/*");
+        newheaders.put(SignatureHelper.URL_X_HEADER, url);
+        newheaders.put(SignatureHelper.USER_HEADER, "notification");
+        newheaders.put(SignatureHelper.TIMESTAMP_HEADER, "\"" + System.currentTimeMillis() + "\"");
+
+        //sign only those headers that are Strings
+        Map<String, List<String>> stringHeaders = new HashMap<String, List<String>>();
+        for (String key : headers.keySet()) {
+            if (headers.get(key) instanceof String) {
+                List<String> ss = new ArrayList<String>();
+                ss.add(headers.get(key, String.class));
+                stringHeaders.put(key, ss);
+            }
+            newheaders.put(key, headers.get(key));
+        }
+
+        try {
+            log.debug("HEADERS -> " + stringHeaders + ":" + url + ":" + "notification");
+
+            newheaders
+                .put(SignatureHelper.SIGNATURE_HEADER, SignatureHelper.createSignature(stringHeaders, url, SignatureHelper.PUBLIC_KEY));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return newheaders;
+    }
 }

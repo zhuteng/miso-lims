@@ -43,28 +43,28 @@ import java.util.HashSet;
  */
 @Deprecated
 public class DefaultRunListener implements MisoListener {
-  protected static final Logger log = LoggerFactory.getLogger(DefaultRunListener.class);
-  private Collection<? extends ResponderService> responderServices = new HashSet<ResponderService>();
+    protected static final Logger log = LoggerFactory.getLogger(DefaultRunListener.class);
+    private Collection<? extends ResponderService> responderServices = new HashSet<ResponderService>();
 
-  @Override
-  public Collection<? extends ResponderService> getResponderServices() {
-    return responderServices;
-  }
-
-  public void setResponderServices(Collection<? extends ResponderService> responderServices) {
-    this.responderServices = responderServices;
-  }
-
-  @Override
-  public void setBaseURL(String baseURL) {
-  }
-
-  @Override
-  public void stateChanged(Event event) {
-    for (ResponderService responder : getResponderServices()) {
-      if (responder.respondsTo(event)) {
-        responder.generateResponse(event);
-      }
+    @Override
+    public Collection<? extends ResponderService> getResponderServices() {
+        return responderServices;
     }
-  }
+
+    public void setResponderServices(Collection<? extends ResponderService> responderServices) {
+        this.responderServices = responderServices;
+    }
+
+    @Override
+    public void setBaseURL(String baseURL) {
+    }
+
+    @Override
+    public void stateChanged(Event event) {
+        for (ResponderService responder : getResponderServices()) {
+            if (responder.respondsTo(event)) {
+                responder.generateResponse(event);
+            }
+        }
+    }
 }

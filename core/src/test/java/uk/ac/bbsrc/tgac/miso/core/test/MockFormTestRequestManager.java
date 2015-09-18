@@ -23,90 +23,90 @@ import java.util.Date;
  * @since 0.1.8
  */
 public class MockFormTestRequestManager extends MisoRequestManager {
-  @Override
-  public LibraryType getLibraryTypeByDescriptionAndPlatform(String description, PlatformType platformType) {
-    LibraryType lt = new LibraryType();
-    lt.setLibraryTypeId(1L);
-    lt.setDescription("Paired End");
-    lt.setPlatformType("Illumina");
-    return lt;
-  }
+    @Override
+    public LibraryType getLibraryTypeByDescriptionAndPlatform(String description, PlatformType platformType) {
+        LibraryType lt = new LibraryType();
+        lt.setLibraryTypeId(1L);
+        lt.setDescription("Paired End");
+        lt.setPlatformType("Illumina");
+        return lt;
+    }
 
-  @Override
-  public LibrarySelectionType getLibrarySelectionTypeByName(String name) {
-    LibrarySelectionType lst = new LibrarySelectionType();
-    lst.setLibrarySelectionTypeId(3L);
-    lst.setName("PCR");
-    lst.setDescription("Source material was selected by designed primers");
-    return lst;
-  }
+    @Override
+    public LibrarySelectionType getLibrarySelectionTypeByName(String name) {
+        LibrarySelectionType lst = new LibrarySelectionType();
+        lst.setLibrarySelectionTypeId(3L);
+        lst.setName("PCR");
+        lst.setDescription("Source material was selected by designed primers");
+        return lst;
+    }
 
-  @Override
-  public LibraryStrategyType getLibraryStrategyTypeByName(String name) {
-    LibraryStrategyType lst = new LibraryStrategyType();
-    lst.setLibraryStrategyTypeId(1L);
-    lst.setName("WGS");
-    lst.setDescription("Whole genome shotgun");
-    return lst;
-  }
+    @Override
+    public LibraryStrategyType getLibraryStrategyTypeByName(String name) {
+        LibraryStrategyType lst = new LibraryStrategyType();
+        lst.setLibraryStrategyTypeId(1L);
+        lst.setName("WGS");
+        lst.setDescription("Whole genome shotgun");
+        return lst;
+    }
 
-  @Override
-  public Collection<Sample> listSamplesByAlias(String alias) {
-    final Sample s = new SampleImpl();
-    s.setId(1L);
-    s.setName("SAM1");
-    s.setAlias("RD_S1_MockSample");
-    s.setAccession("");
-    s.setDescription("Mock Sample 1");
-    s.setScientificName("Homo sapiens");
-    s.setTaxonIdentifier("9606");
-    s.setIdentificationBarcode("SAM1::RD_S1_MockSample");
-    s.setLocationBarcode("Freezer1");
-    s.setSampleType("GENOMIC");
-    s.setReceivedDate(new Date());
+    @Override
+    public Collection<Sample> listSamplesByAlias(String alias) {
+        final Sample s = new SampleImpl();
+        s.setId(1L);
+        s.setName("SAM1");
+        s.setAlias("RD_S1_MockSample");
+        s.setAccession("");
+        s.setDescription("Mock Sample 1");
+        s.setScientificName("Homo sapiens");
+        s.setTaxonIdentifier("9606");
+        s.setIdentificationBarcode("SAM1::RD_S1_MockSample");
+        s.setLocationBarcode("Freezer1");
+        s.setSampleType("GENOMIC");
+        s.setReceivedDate(new Date());
 
-    s.setSecurityProfile(new SecurityProfile());
+        s.setSecurityProfile(new SecurityProfile());
 
-    Project p = new ProjectImpl();
-    p.setProjectId(1L);
-    p.setAlias("MockInputProject");
-    s.setProject(p);
+        Project p = new ProjectImpl();
+        p.setProjectId(1L);
+        p.setAlias("MockInputProject");
+        s.setProject(p);
 
-    return new ArrayList<Sample>(){{add(s);}};
-  }
+        return new ArrayList<Sample>() {{add(s);}};
+    }
 
-  @Override
-  public QcType getSampleQcTypeByName(String name) {
-    QcType qt = new QcType();
-    qt.setQcTypeId(1L);
-    qt.setName("QuBit");
-    qt.setDescription("Quantitation of DNA, RNA and protein, manufacturered by Invitrogen");
-    qt.setUnits("ng/&#181;l");
-    return qt;
-  }
+    @Override
+    public QcType getSampleQcTypeByName(String name) {
+        QcType qt = new QcType();
+        qt.setQcTypeId(1L);
+        qt.setName("QuBit");
+        qt.setDescription("Quantitation of DNA, RNA and protein, manufacturered by Invitrogen");
+        qt.setUnits("ng/&#181;l");
+        return qt;
+    }
 
-  @Override
-  public QcType getLibraryQcTypeByName(String name) {
-    QcType qt = new QcType();
-    qt.setQcTypeId(2L);
-    qt.setName("Bioanalyzer");
-    qt.setDescription("Chip-based capillary electrophoresis machine to analyse RNA, DNA, and protein, manufactured by Agilent");
-    qt.setUnits("nM");
-    return qt;
-  }
+    @Override
+    public QcType getLibraryQcTypeByName(String name) {
+        QcType qt = new QcType();
+        qt.setQcTypeId(2L);
+        qt.setName("Bioanalyzer");
+        qt.setDescription("Chip-based capillary electrophoresis machine to analyse RNA, DNA, and protein, manufactured by Agilent");
+        qt.setUnits("nM");
+        return qt;
+    }
 
-  @Override
-  public Collection<TagBarcode> listAllTagBarcodesByStrategyName(String name) {
-    final TagBarcode tb = new TagBarcodeImpl();
-    tb.setId(1L);
-    tb.setName("Index 1");
-    tb.setSequence("");
-    tb.setPlatformType(PlatformType.ILLUMINA);
-    tb.setStrategyName("TruSeq Single Index");
-    return new ArrayList<TagBarcode>(){{add(tb);}};
-  }
+    @Override
+    public Collection<TagBarcode> listAllTagBarcodesByStrategyName(String name) {
+        final TagBarcode tb = new TagBarcodeImpl();
+        tb.setId(1L);
+        tb.setName("Index 1");
+        tb.setSequence("");
+        tb.setPlatformType(PlatformType.ILLUMINA);
+        tb.setStrategyName("TruSeq Single Index");
+        return new ArrayList<TagBarcode>() {{add(tb);}};
+    }
 
-  public Collection<Library> listAllLibrariesBySampleId(long sampleId) {
-    return Collections.emptyList();
-  }
+    public Collection<Library> listAllLibrariesBySampleId(long sampleId) {
+        return Collections.emptyList();
+    }
 }

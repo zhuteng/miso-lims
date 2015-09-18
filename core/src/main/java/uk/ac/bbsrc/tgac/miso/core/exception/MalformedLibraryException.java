@@ -32,14 +32,14 @@ package uk.ac.bbsrc.tgac.miso.core.exception;
  * @since 0.0.2
  */
 public class MalformedLibraryException extends Exception {
-  public MalformedLibraryException(String s) {
-    super(s);
-  }
-
-  public MalformedLibraryException(String s, Throwable cause) {
-    super(s);
-    if (cause != null) {
-        initCause(cause);
+    public MalformedLibraryException(String s) {
+        super(s);
     }
-  }
+
+    public MalformedLibraryException(String s, Throwable cause) {
+        super(s);
+        if (cause != null) {
+            initCause(cause);
+        }
+    }
 }

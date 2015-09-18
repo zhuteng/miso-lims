@@ -17,13 +17,11 @@ import java.io.IOException;
  * @since 0.1.9
  */
 public class LibrarySerializer extends JsonSerializer<Library> {
-  @Override
-  public void serialize(Library library, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException {
-    jsonGenerator.writeStartObject();
-    //jsonGenerator.writeStringField("username", user.getUsername());
+    @Override
+    public void serialize(Library library, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException {
+        jsonGenerator.writeStartObject();
+        //jsonGenerator.writeStringField("username", user.getUsername());
 
-
-
-    jsonGenerator.writeEndObject();
-  }
+        jsonGenerator.writeEndObject();
+    }
 }

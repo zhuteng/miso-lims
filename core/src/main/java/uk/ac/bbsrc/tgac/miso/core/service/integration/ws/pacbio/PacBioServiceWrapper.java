@@ -40,25 +40,24 @@ import java.net.URI;
  * @since 0.1.6
  */
 public class PacBioServiceWrapper {
-  private String machineName;
-  private URI restLocation;
-  private PacBioService pacbioService;
+    private String machineName;
+    private URI restLocation;
+    private PacBioService pacbioService;
 
-  public PacBioServiceWrapper(String machineName, URI restLocation) {
-    this.machineName = machineName;
-    this.restLocation = restLocation;
+    public PacBioServiceWrapper(String machineName, URI restLocation) {
+        this.machineName = machineName;
+        this.restLocation = restLocation;
 
-    if (LimsUtils.isUrlValid(restLocation)) {
-      this.pacbioService = new PacBioService(restLocation);
+        if (LimsUtils.isUrlValid(restLocation)) {
+            this.pacbioService = new PacBioService(restLocation);
+        }
     }
-  }
 
-  public PacBioService getPacBioService() throws InterrogationException {
-    if (pacbioService != null) {
-      return pacbioService;
+    public PacBioService getPacBioService() throws InterrogationException {
+        if (pacbioService != null) {
+            return pacbioService;
+        } else {
+            throw new InterrogationException("Couldn't contact PacBio machine " + machineName + " at " + restLocation.toString());
+        }
     }
-    else {
-      throw new InterrogationException("Couldn't contact PacBio machine " + machineName + " at " + restLocation.toString());
-    }
-  }
 }

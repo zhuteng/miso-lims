@@ -39,10 +39,10 @@ import uk.ac.bbsrc.tgac.miso.core.exception.AlertingException;
  * @since 0.1.2
  */
 public class MockLogAlerterService implements AlerterService {
-  protected static final Logger log = LoggerFactory.getLogger(MockLogAlerterService.class);
+    protected static final Logger log = LoggerFactory.getLogger(MockLogAlerterService.class);
 
-  @Override
-  public void raiseAlert(Alert a) throws AlertingException {
-    log.info("Raising alert -> " + a.toString());
-  }
+    @Override
+    public void raiseAlert(Alert a) throws AlertingException {
+        log.info("Raising alert -> " + a.toString());
+    }
 }

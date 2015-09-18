@@ -38,5 +38,5 @@ import org.springframework.util.MultiValueMap;
  */
 public interface Ls454StatusGateway {
     @Gateway(requestChannel = "ls454StatusChannel")
-    void consume(Message<MultiValueMap<String, String>> message);  
+    void consume(Message<MultiValueMap<String, String>> message);
 }

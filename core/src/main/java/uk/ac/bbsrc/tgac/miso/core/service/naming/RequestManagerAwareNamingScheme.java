@@ -13,4 +13,5 @@ import uk.ac.bbsrc.tgac.miso.core.service.RequestManagerAware;
  * @since 0.1.7
  */
 @Spi
-public interface RequestManagerAwareNamingScheme<T> extends MisoNamingScheme<T>, RequestManagerAware { }
+public interface RequestManagerAwareNamingScheme<T> extends MisoNamingScheme<T>, RequestManagerAware {
+}

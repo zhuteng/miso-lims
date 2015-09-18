@@ -41,16 +41,16 @@ import java.util.Map;
  * @since version
  */
 public class IlluminaFastQcStatsHandler {
-  private Logger log = LoggerFactory.getLogger(getClass());
+    private Logger log = LoggerFactory.getLogger(getClass());
 
-  @Autowired
-  private RequestManager requestManager;
+    @Autowired
+    private RequestManager requestManager;
 
-  public void setRequestManager(RequestManager requestManager) {
-    this.requestManager = requestManager;
-  }
+    public void setRequestManager(RequestManager requestManager) {
+        this.requestManager = requestManager;
+    }
 
-  public void parseStatsMessage(Message<Map<String, String>> message) {
-    Map<String, String> stats = message.getPayload();
-  }
+    public void parseStatsMessage(Message<Map<String, String>> message) {
+        Map<String, String> stats = message.getPayload();
+    }
 }

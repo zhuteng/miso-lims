@@ -38,37 +38,37 @@ import uk.ac.bbsrc.tgac.miso.core.event.type.MisoEventType;
  * @since 0.1.6
  */
 public class PoolEvent implements Event<Pool> {
-  private Pool pool;
-  private String message;
-  private MisoEventType eventType;
-  private JSONObject eventContext = new JSONObject();
+    private Pool pool;
+    private String message;
+    private MisoEventType eventType;
+    private JSONObject eventContext = new JSONObject();
 
-  public PoolEvent(Pool pool, MisoEventType eventType, String message) {
-    this.pool = pool;
-    this.message = message;
-    this.eventType = eventType;
-  }
+    public PoolEvent(Pool pool, MisoEventType eventType, String message) {
+        this.pool = pool;
+        this.message = message;
+        this.eventType = eventType;
+    }
 
-  public Pool getEventObject() {
-    return this.pool;
-  }
+    public Pool getEventObject() {
+        return this.pool;
+    }
 
-  @Override
-  public MisoEventType getEventType() {
-    return eventType;
-  }
+    @Override
+    public MisoEventType getEventType() {
+        return eventType;
+    }
 
-  @Override
-  public String getEventMessage() {
-    return message;
-  }
+    @Override
+    public String getEventMessage() {
+        return message;
+    }
 
-  @Override
-  public JSONObject getEventContext() {
-    return eventContext;
-  }
+    @Override
+    public JSONObject getEventContext() {
+        return eventContext;
+    }
 
-  public void setEventContext(JSONObject eventContext) {
-    this.eventContext = eventContext;
-  }
+    public void setEventContext(JSONObject eventContext) {
+        this.eventContext = eventContext;
+    }
 }

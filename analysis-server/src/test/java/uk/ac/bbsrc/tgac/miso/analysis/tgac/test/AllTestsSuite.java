@@ -37,8 +37,6 @@ import org.junit.runners.Suite;
  * @since version
  */
 @RunWith(Suite.class)
-@Suite.SuiteClasses({
-  LocalTask.class
-})
+@Suite.SuiteClasses({ LocalTask.class })
 public class AllTestsSuite {
 }

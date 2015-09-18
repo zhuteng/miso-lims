@@ -37,7 +37,6 @@ public class FTPUploadJob implements UploadJob {
     private File file;
     private UploadListener uploadListener = new UploadListener();
 
-
     public FTPUploadJob(File file) {
         this.file = file;
 
@@ -45,7 +44,8 @@ public class FTPUploadJob implements UploadJob {
 
     @Override
     public void setFile(File file) {
-        this.file=file;    }
+        this.file = file;
+    }
 
     @Override
     public File getFile() {
@@ -59,19 +59,21 @@ public class FTPUploadJob implements UploadJob {
 
     @Override
     public int getPercentageTransferred() {
-        if(file!=null){
-            return 100*(int)(uploadListener.getTotalBT()/uploadListener.getStreamSize());
-        }
-        else return 0;  //To change body of implemented methods use File | Settings | File Templates.
+        if (file != null) {
+            return 100 * (int) (uploadListener.getTotalBT() / uploadListener.getStreamSize());
+        } else
+            return 0;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
     @Override
     public boolean isComplete() {
-        if (getPercentageTransferred()==100) return true;
-        else return false;  //To change body of implemented methods use File | Settings | File Templates.
+        if (getPercentageTransferred() == 100)
+            return true;
+        else
+            return false;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
-    public UploadListener getListener(){
+    public UploadListener getListener() {
         return this.uploadListener;
     }
 }

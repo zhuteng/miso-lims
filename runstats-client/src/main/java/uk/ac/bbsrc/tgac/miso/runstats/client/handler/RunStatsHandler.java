@@ -37,21 +37,21 @@ import uk.ac.bbsrc.tgac.miso.runstats.client.manager.RunStatsManager;
  * @since 0.1.3
  */
 public class RunStatsHandler {
-  @Autowired
-  private RunstatsStore runStatsStore;
+    @Autowired
+    private RunstatsStore runStatsStore;
 
-  @Autowired
-  private RunStatsManager runStatsManager;
+    @Autowired
+    private RunStatsManager runStatsManager;
 
-  public void setRunStatsStore(RunstatsStore runStatsStore) {
-    this.runStatsStore = runStatsStore;
-  }
+    public void setRunStatsStore(RunstatsStore runStatsStore) {
+        this.runStatsStore = runStatsStore;
+    }
 
-  public void setRunStatsManager(RunStatsManager runStatsManager) {
-    this.runStatsManager = runStatsManager;
-  }
+    public void setRunStatsManager(RunStatsManager runStatsManager) {
+        this.runStatsManager = runStatsManager;
+    }
 
-  public void persist() {
+    public void persist() {
 
-  }
+    }
 }

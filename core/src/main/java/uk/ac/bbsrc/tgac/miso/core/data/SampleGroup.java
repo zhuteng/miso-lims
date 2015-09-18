@@ -12,10 +12,10 @@ import java.util.Set;
  * @since 0.2.1-SNAPSHOT
  */
 public interface SampleGroup<T extends Nameable> extends Nameable {
-  public T getParent();
-  public void setParent(T overview);
+    public T getParent();
+    public void setParent(T overview);
 
-  public Set<Sample> getSamples();
-  public void setSamples(Set<Sample> samples);
-  public void addSample(Sample sample);
+    public Set<Sample> getSamples();
+    public void setSamples(Set<Sample> samples);
+    public void addSample(Sample sample);
 }

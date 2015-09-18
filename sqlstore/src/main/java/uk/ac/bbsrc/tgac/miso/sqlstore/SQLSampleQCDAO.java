@@ -68,261 +68,233 @@ import java.util.List;
  * @since 0.0.2
  */
 public class SQLSampleQCDAO implements SampleQcStore {
-  private static final String TABLE_NAME = "SampleQC";
+    private static final String TABLE_NAME = "SampleQC";
 
-  public static final String SAMPLE_QC =
-          "SELECT qcId, sample_sampleId, qcUserName, qcDate, qcMethod, results " +
-          "FROM "+TABLE_NAME;
+    public static final String SAMPLE_QC = "SELECT qcId, sample_sampleId, qcUserName, qcDate, qcMethod, results " +
+                                           "FROM " + TABLE_NAME;
 
-  public static final String SAMPLE_QC_SELECT_BY_ID =
-         SAMPLE_QC + " WHERE qcId=?";
+    public static final String SAMPLE_QC_SELECT_BY_ID = SAMPLE_QC + " WHERE qcId=?";
 
-  public static final String SAMPLE_QC_SELECT_BY_SAMPLE_ID =
-          SAMPLE_QC + " WHERE sample_sampleId=? " +
-          "ORDER BY qcDate ASC";
-  
-  public static final String SAMPLE_QC_UPDATE =
-          "UPDATE "+TABLE_NAME+" " +
-          "SET sample_sampleId=:sample_sampleId, qcUserName=:qcUserName, qcDate=:qcDate, qcMethod=:qcMethod, results=:results " +
-          "WHERE qcId=:qcId";
+    public static final String SAMPLE_QC_SELECT_BY_SAMPLE_ID = SAMPLE_QC + " WHERE sample_sampleId=? " +
+                                                               "ORDER BY qcDate ASC";
 
-  public static final String SAMPLE_QC_TYPE_SELECT =
-          "SELECT qcTypeId, name, description, qcTarget, units " +
-          "FROM QCType WHERE qcTarget = 'Sample'";  
+    public static final String SAMPLE_QC_UPDATE = "UPDATE " + TABLE_NAME + " " +
+                                                  "SET sample_sampleId=:sample_sampleId, qcUserName=:qcUserName, qcDate=:qcDate, qcMethod=:qcMethod, results=:results " +
+                                                  "WHERE qcId=:qcId";
 
-  public static final String SAMPLE_QC_TYPE_SELECT_BY_ID =
-          SAMPLE_QC_TYPE_SELECT + " AND qcTypeId = ?";
+    public static final String SAMPLE_QC_TYPE_SELECT = "SELECT qcTypeId, name, description, qcTarget, units " +
+                                                       "FROM QCType WHERE qcTarget = 'Sample'";
 
-  public static final String SAMPLE_QC_TYPE_SELECT_BY_NAME =
-          SAMPLE_QC_TYPE_SELECT + " AND name = ?";
+    public static final String SAMPLE_QC_TYPE_SELECT_BY_ID = SAMPLE_QC_TYPE_SELECT + " AND qcTypeId = ?";
 
-  public static final String SAMPLE_QC_DELETE =
-          "DELETE FROM "+TABLE_NAME+" WHERE qcId=:qcId";
+    public static final String SAMPLE_QC_TYPE_SELECT_BY_NAME = SAMPLE_QC_TYPE_SELECT + " AND name = ?";
 
-  protected static final Logger log = LoggerFactory.getLogger(SQLSampleQCDAO.class);
+    public static final String SAMPLE_QC_DELETE = "DELETE FROM " + TABLE_NAME + " WHERE qcId=:qcId";
 
-  private JdbcTemplate template;
-  private SampleStore sampleDAO;
-  private CascadeType cascadeType;
+    protected static final Logger log = LoggerFactory.getLogger(SQLSampleQCDAO.class);
 
-  @Autowired
-  private CacheManager cacheManager;
+    private JdbcTemplate template;
+    private SampleStore sampleDAO;
+    private CascadeType cascadeType;
 
-  public void setCacheManager(CacheManager cacheManager) {
-    this.cacheManager = cacheManager;
-  }
+    @Autowired
+    private CacheManager cacheManager;
 
-  @Autowired
-  private DataObjectFactory dataObjectFactory;
+    public void setCacheManager(CacheManager cacheManager) {
+        this.cacheManager = cacheManager;
+    }
 
-  public void setDataObjectFactory(DataObjectFactory dataObjectFactory) {
-    this.dataObjectFactory = dataObjectFactory;
-  }  
+    @Autowired
+    private DataObjectFactory dataObjectFactory;
 
-  public void setSampleDAO(SampleStore sampleDAO) {
-    this.sampleDAO = sampleDAO;
-  }
-  
-  public JdbcTemplate getJdbcTemplate() {
-    return template;
-  }
+    public void setDataObjectFactory(DataObjectFactory dataObjectFactory) {
+        this.dataObjectFactory = dataObjectFactory;
+    }
 
-  public void setJdbcTemplate(JdbcTemplate template) {
-    this.template = template;
-  }
+    public void setSampleDAO(SampleStore sampleDAO) {
+        this.sampleDAO = sampleDAO;
+    }
 
-  public void setCascadeType(CascadeType cascadeType) {
-    this.cascadeType = cascadeType;
-  }
+    public JdbcTemplate getJdbcTemplate() {
+        return template;
+    }
 
-  @Transactional(readOnly = false, rollbackFor = IOException.class)
-  @TriggersRemove(cacheName={"sampleQCCache", "lazySampleQCCache"},
+    public void setJdbcTemplate(JdbcTemplate template) {
+        this.template = template;
+    }
+
+    public void setCascadeType(CascadeType cascadeType) {
+        this.cascadeType = cascadeType;
+    }
+
+    @Transactional(readOnly = false, rollbackFor = IOException.class)
+    @TriggersRemove(cacheName = { "sampleQCCache", "lazySampleQCCache" },
+                    keyGenerator = @KeyGenerator(
+                        name = "HashCodeCacheKeyGenerator",
+                        properties = { @Property(name = "includeMethod",
+                                                 value = "false"), @Property(
+                            name = "includeParameterTypes",
+                            value = "false") }))
+    public long save(SampleQC sampleQC) throws IOException {
+        MapSqlParameterSource params = new MapSqlParameterSource();
+        params.addValue("sample_sampleId", sampleQC.getSample().getId()).addValue("qcUserName", sampleQC.getQcCreator())
+              .addValue("qcDate", sampleQC.getQcDate()).addValue("qcMethod", sampleQC.getQcType().getQcTypeId())
+              .addValue("results", sampleQC.getResults());
+
+        if (sampleQC.getId() == AbstractSampleQC.UNSAVED_ID) {
+            SimpleJdbcInsert insert = new SimpleJdbcInsert(template).withTableName(TABLE_NAME).usingGeneratedKeyColumns("qcId");
+            Number newId = insert.executeAndReturnKey(params);
+            sampleQC.setId(newId.longValue());
+        } else {
+            params.addValue("qcId", sampleQC.getId());
+            NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
+            namedTemplate.update(SAMPLE_QC_UPDATE, params);
+        }
+
+        if (this.cascadeType != null) {
+            Sample s = sampleQC.getSample();
+            if (this.cascadeType.equals(CascadeType.PERSIST)) {
+                if (s != null)
+                    sampleDAO.save(s);
+            } else if (this.cascadeType.equals(CascadeType.REMOVE)) {
+                if (s != null) {
+                    //Cache pc = cacheManager.getCache("sampleCache");
+                    //pc.remove(DbUtils.hashCodeCacheKeyFor(s.getId()));
+                    DbUtils.updateCaches(cacheManager, s, Sample.class);
+                }
+            } else if (this.cascadeType.equals(CascadeType.ALL)) {
+                if (s != null) {
+                    sampleDAO.save(s);
+                    //Cache pc = cacheManager.getCache("sampleCache");
+                    //pc.remove(DbUtils.hashCodeCacheKeyFor(s.getId()));
+                    DbUtils.updateCaches(cacheManager, s, Sample.class);
+                }
+            }
+        }
+        return sampleQC.getId();
+    }
+
+    @Cacheable(cacheName = "sampleQCCache",
+               keyGenerator = @KeyGenerator(
+                   name = "HashCodeCacheKeyGenerator",
+                   properties = { @Property(name = "includeMethod", value = "false"),
+                                  @Property(name = "includeParameterTypes", value = "false") }))
+    public SampleQC get(long qcId) throws IOException {
+        List eResults = template.query(SAMPLE_QC_SELECT_BY_ID, new Object[] { qcId }, new SampleQcMapper());
+        SampleQC e = eResults.size() > 0 ? (SampleQC) eResults.get(0) : null;
+        return e;
+    }
+
+    public SampleQC lazyGet(long qcId) throws IOException {
+        List eResults = template.query(SAMPLE_QC_SELECT_BY_ID, new Object[] { qcId }, new SampleQcMapper(true));
+        SampleQC e = eResults.size() > 0 ? (SampleQC) eResults.get(0) : null;
+        return e;
+    }
+
+    public Collection<SampleQC> listBySampleId(long sampleId) throws IOException {
+        return new LinkedList(template.query(SAMPLE_QC_SELECT_BY_SAMPLE_ID, new Object[] { sampleId }, new SampleQcMapper(true)));
+    }
+
+    public Collection<SampleQC> listAll() throws IOException {
+        return template.query(SAMPLE_QC, new SampleQcMapper(true));
+    }
+
+    @Override
+    public int count() throws IOException {
+        return template.queryForInt("SELECT count(*) FROM " + TABLE_NAME);
+    }
+
+    @TriggersRemove(
+        cacheName = { "sampleQCCache", "lazySampleQCCache" },
         keyGenerator = @KeyGenerator(
-              name = "HashCodeCacheKeyGenerator",
-              properties = {
-                      @Property(name="includeMethod", value="false"),
-                      @Property(name="includeParameterTypes", value="false")
-              }
-        )
-  )
-  public long save(SampleQC sampleQC) throws IOException {
-    MapSqlParameterSource params = new MapSqlParameterSource();
-    params.addValue("sample_sampleId", sampleQC.getSample().getId())
-            .addValue("qcUserName", sampleQC.getQcCreator())
-            .addValue("qcDate", sampleQC.getQcDate())
-            .addValue("qcMethod", sampleQC.getQcType().getQcTypeId())
-            .addValue("results", sampleQC.getResults());
-
-    if (sampleQC.getId() == AbstractSampleQC.UNSAVED_ID) {
-      SimpleJdbcInsert insert = new SimpleJdbcInsert(template)
-                              .withTableName(TABLE_NAME)
-                              .usingGeneratedKeyColumns("qcId");
-      Number newId = insert.executeAndReturnKey(params);
-      sampleQC.setId(newId.longValue());
-    }
-    else {
-      params.addValue("qcId", sampleQC.getId());
-      NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
-      namedTemplate.update(SAMPLE_QC_UPDATE, params);
-    }
-
-    if (this.cascadeType != null) {
-      Sample s = sampleQC.getSample();
-      if (this.cascadeType.equals(CascadeType.PERSIST)) {
-        if (s!=null) sampleDAO.save(s);
-      }
-      else if (this.cascadeType.equals(CascadeType.REMOVE)) {
-        if (s != null) {
-          //Cache pc = cacheManager.getCache("sampleCache");
-          //pc.remove(DbUtils.hashCodeCacheKeyFor(s.getId()));
-          DbUtils.updateCaches(cacheManager, s, Sample.class);
+            name = "HashCodeCacheKeyGenerator",
+            properties = { @Property(name = "includeMethod", value = "false"),
+                           @Property(name = "includeParameterTypes", value = "false") }))
+    public boolean remove(SampleQC qc) throws IOException {
+        NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
+        if (qc.isDeletable() && (namedTemplate.update(SAMPLE_QC_DELETE, new MapSqlParameterSource().addValue("qcId", qc.getId())) == 1)) {
+            Sample s = qc.getSample();
+            if (this.cascadeType.equals(CascadeType.PERSIST)) {
+                if (s != null)
+                    sampleDAO.save(s);
+            } else if (this.cascadeType.equals(CascadeType.REMOVE)) {
+                if (s != null) {
+                    DbUtils.updateCaches(cacheManager, s, Sample.class);
+                }
+            }
+            return true;
         }
-      }
-      else if (this.cascadeType.equals(CascadeType.ALL)) {
-        if (s!=null) {
-          sampleDAO.save(s);
-          //Cache pc = cacheManager.getCache("sampleCache");
-          //pc.remove(DbUtils.hashCodeCacheKeyFor(s.getId()));
-          DbUtils.updateCaches(cacheManager, s, Sample.class);
+        return false;
+    }
+
+    public class SampleQcMapper extends CacheAwareRowMapper<SampleQC> {
+        public SampleQcMapper() {
+            super(SampleQC.class);
         }
-      }
-    }
-    return sampleQC.getId();
-  }
 
-  @Cacheable(cacheName="sampleQCCache",
-      keyGenerator = @KeyGenerator(
-              name = "HashCodeCacheKeyGenerator",
-              properties = {
-                      @Property(name="includeMethod", value="false"),
-                      @Property(name="includeParameterTypes", value="false")
-              }
-      )
-  )
-  public SampleQC get(long qcId) throws IOException {
-    List eResults = template.query(SAMPLE_QC_SELECT_BY_ID, new Object[]{qcId}, new SampleQcMapper());
-    SampleQC e = eResults.size() > 0 ? (SampleQC) eResults.get(0) : null;
-    return e;
-  }
-
-  public SampleQC lazyGet(long qcId) throws IOException {
-    List eResults = template.query(SAMPLE_QC_SELECT_BY_ID, new Object[]{qcId}, new SampleQcMapper(true));
-    SampleQC e = eResults.size() > 0 ? (SampleQC) eResults.get(0) : null;
-    return e;
-  }
-
-  public Collection<SampleQC> listBySampleId(long sampleId) throws IOException {
-    return new LinkedList(template.query(SAMPLE_QC_SELECT_BY_SAMPLE_ID, new Object[]{sampleId}, new SampleQcMapper(true)));
-  }
-
-  public Collection<SampleQC> listAll() throws IOException {
-    return template.query(SAMPLE_QC, new SampleQcMapper(true));
-  }
-
-  @Override
-  public int count() throws IOException {
-    return template.queryForInt("SELECT count(*) FROM "+TABLE_NAME);
-  }
-
-  @TriggersRemove(
-          cacheName={"sampleQCCache", "lazySampleQCCache"},
-          keyGenerator = @KeyGenerator (
-              name = "HashCodeCacheKeyGenerator",
-              properties = {
-                      @Property(name="includeMethod", value="false"),
-                      @Property(name="includeParameterTypes", value="false")
-              }
-          )
-  )
-  public boolean remove(SampleQC qc) throws IOException {
-    NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
-    if (qc.isDeletable() &&
-           (namedTemplate.update(SAMPLE_QC_DELETE,
-                                 new MapSqlParameterSource().addValue("qcId", qc.getId())) == 1)) {
-      Sample s = qc.getSample();
-      if (this.cascadeType.equals(CascadeType.PERSIST)) {
-        if (s!=null) sampleDAO.save(s);
-      }
-      else if (this.cascadeType.equals(CascadeType.REMOVE)) {
-        if (s != null) {
-          DbUtils.updateCaches(cacheManager, s, Sample.class);
+        public SampleQcMapper(boolean lazy) {
+            super(SampleQC.class, lazy);
         }
-      }
-      return true;
-    }
-    return false;
-  }
 
-  public class SampleQcMapper extends CacheAwareRowMapper<SampleQC> {
-    public SampleQcMapper() {
-      super(SampleQC.class);
-    }
+        public SampleQC mapRow(ResultSet rs, int rowNum) throws SQLException {
+            long id = rs.getLong("qcId");
 
-    public SampleQcMapper(boolean lazy) {
-      super(SampleQC.class, lazy);
-    }
+            if (isCacheEnabled() && lookupCache(cacheManager) != null) {
+                Element element;
+                if ((element = lookupCache(cacheManager).get(DbUtils.hashCodeCacheKeyFor(id))) != null) {
+                    return (SampleQC) element.getObjectValue();
+                }
+            }
+            SampleQC s = dataObjectFactory.getSampleQC();
+            s.setId(id);
+            s.setQcCreator(rs.getString("qcUserName"));
+            s.setQcDate(rs.getDate("qcDate"));
+            s.setResults(rs.getDouble("results"));
 
-    public SampleQC mapRow(ResultSet rs, int rowNum) throws SQLException {
-      long id = rs.getLong("qcId");
+            try {
+                s.setQcType(getSampleQcTypeById(rs.getLong("qcMethod")));
 
-      if (isCacheEnabled() && lookupCache(cacheManager) != null) {
-        Element element;
-        if ((element = lookupCache(cacheManager).get(DbUtils.hashCodeCacheKeyFor(id))) != null) {
-          return (SampleQC)element.getObjectValue();
+                if (!isLazy()) {
+                    s.setSample(sampleDAO.get(rs.getLong("sample_sampleId")));
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (MalformedSampleException e) {
+                e.printStackTrace();
+            }
+
+            if (isCacheEnabled() && lookupCache(cacheManager) != null) {
+                lookupCache(cacheManager).put(new Element(DbUtils.hashCodeCacheKeyFor(id), s));
+            }
+
+            return s;
         }
-      }
-      SampleQC s = dataObjectFactory.getSampleQC();
-      s.setId(id);
-      s.setQcCreator(rs.getString("qcUserName"));
-      s.setQcDate(rs.getDate("qcDate"));
-      s.setResults(rs.getDouble("results"));
+    }
 
-      try {
-        s.setQcType(getSampleQcTypeById(rs.getLong("qcMethod")));
+    public Collection<QcType> listAllSampleQcTypes() throws IOException {
+        return template.query(SAMPLE_QC_TYPE_SELECT, new SampleQcTypeMapper());
+    }
 
-        if (!isLazy()) {
-          s.setSample(sampleDAO.get(rs.getLong("sample_sampleId")));
+    public QcType getSampleQcTypeById(long qcTypeId) throws IOException {
+        List eResults = template.query(SAMPLE_QC_TYPE_SELECT_BY_ID, new Object[] { qcTypeId }, new SampleQcTypeMapper());
+        QcType e = eResults.size() > 0 ? (QcType) eResults.get(0) : null;
+        return e;
+    }
+
+    public QcType getSampleQcTypeByName(String qcName) throws IOException {
+        List eResults = template.query(SAMPLE_QC_TYPE_SELECT_BY_NAME, new Object[] { qcName }, new SampleQcTypeMapper());
+        QcType e = eResults.size() > 0 ? (QcType) eResults.get(0) : null;
+        return e;
+    }
+
+    public class SampleQcTypeMapper implements RowMapper<QcType> {
+        public QcType mapRow(ResultSet rs, int rowNum) throws SQLException {
+            QcType qt = new QcType();
+            qt.setQcTypeId(rs.getLong("qcTypeId"));
+            qt.setName(rs.getString("name"));
+            qt.setDescription(rs.getString("description"));
+            qt.setUnits(rs.getString("units"));
+            return qt;
         }
-      }
-      catch (IOException e) {
-        e.printStackTrace();
-      }
-      catch (MalformedSampleException e) {
-        e.printStackTrace();
-      }
-
-      if (isCacheEnabled() && lookupCache(cacheManager) != null) {
-        lookupCache(cacheManager).put(new Element(DbUtils.hashCodeCacheKeyFor(id) ,s));
-      }
-
-      return s;
     }
-  }
-
-  public Collection<QcType> listAllSampleQcTypes() throws IOException {
-    return template.query(SAMPLE_QC_TYPE_SELECT, new SampleQcTypeMapper());
-  }
-
-  public QcType getSampleQcTypeById(long qcTypeId) throws IOException {
-    List eResults = template.query(SAMPLE_QC_TYPE_SELECT_BY_ID, new Object[]{qcTypeId}, new SampleQcTypeMapper());
-    QcType e = eResults.size() > 0 ? (QcType) eResults.get(0) : null;
-    return e;
-  }
-
-  public QcType getSampleQcTypeByName(String qcName) throws IOException {
-    List eResults = template.query(SAMPLE_QC_TYPE_SELECT_BY_NAME, new Object[]{qcName}, new SampleQcTypeMapper());
-    QcType e = eResults.size() > 0 ? (QcType) eResults.get(0) : null;
-    return e;
-  }  
-
-  public class SampleQcTypeMapper implements RowMapper<QcType> {
-    public QcType mapRow(ResultSet rs, int rowNum) throws SQLException {
-      QcType qt = new QcType();
-      qt.setQcTypeId(rs.getLong("qcTypeId"));
-      qt.setName(rs.getString("name"));
-      qt.setDescription(rs.getString("description"));
-      qt.setUnits(rs.getString("units"));
-      return qt;
-    }
-  }
 }

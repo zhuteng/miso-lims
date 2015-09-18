@@ -43,36 +43,36 @@ import java.util.HashSet;
  * @since 0.1.2
  */
 public class DefaultListener implements MisoListener {
-  protected static final Logger log = LoggerFactory.getLogger(DefaultListener.class);
-  private Collection<? extends ResponderService> responderServices = new HashSet<ResponderService>();
+    protected static final Logger log = LoggerFactory.getLogger(DefaultListener.class);
+    private Collection<? extends ResponderService> responderServices = new HashSet<ResponderService>();
 
-  private String baseURL = "";
+    private String baseURL = "";
 
-  public void setBaseURL(String baseURL) {
-    this.baseURL = baseURL;
-  }
-
-  @Override
-  public Collection<? extends ResponderService> getResponderServices() {
-    return responderServices;
-  }
-
-  public void setResponderServices(Collection<? extends ResponderService> responderServices) {
-    this.responderServices = responderServices;
-  }
-
-  @Override
-  public void stateChanged(Event event) {
-    if (!LimsUtils.isStringEmptyOrNull(baseURL)) {
-      event.getEventContext().put("baseURL", baseURL);
+    public void setBaseURL(String baseURL) {
+        this.baseURL = baseURL;
     }
 
-    log.info("State change detected: " + event.getEventType() + ". Checking "+getResponderServices().size()+" responders");
-    for (ResponderService responder : getResponderServices()) {
-      if (responder.respondsTo(event)) {
-        log.info("Responding via " + responder.toString());
-        responder.generateResponse(event);
-      }
+    @Override
+    public Collection<? extends ResponderService> getResponderServices() {
+        return responderServices;
     }
-  }
+
+    public void setResponderServices(Collection<? extends ResponderService> responderServices) {
+        this.responderServices = responderServices;
+    }
+
+    @Override
+    public void stateChanged(Event event) {
+        if (!LimsUtils.isStringEmptyOrNull(baseURL)) {
+            event.getEventContext().put("baseURL", baseURL);
+        }
+
+        log.info("State change detected: " + event.getEventType() + ". Checking " + getResponderServices().size() + " responders");
+        for (ResponderService responder : getResponderServices()) {
+            if (responder.respondsTo(event)) {
+                log.info("Responding via " + responder.toString());
+                responder.generateResponse(event);
+            }
+        }
+    }
 }

@@ -46,40 +46,39 @@ import java.io.Serializable;
 @Entity
 public class StudyImpl extends AbstractStudy implements Serializable {
 
-  /**
-   * Construct a new Study with a default empty SecurityProfile
-   */
-  public StudyImpl() {
-    setSecurityProfile(new SecurityProfile());
-  }
-
-  /**
-   * Construct a new Study with a SecurityProfile owned by the given User
-   *
-   * @param user of type User
-   */
-  public StudyImpl(User user) {
-    setSecurityProfile(new SecurityProfile(user));
-  }
-
-  /**
-   * If the given User can read the parent Project, construct a new Study with a SecurityProfile inherited from the parent Project.
-   * If not, construct a new Study with a SecurityProfile owned by the given User
-   *
-   * @param project of type Project
-   * @param user of type User
-   */
-  public StudyImpl(Project project, User user) {
-    if (project.userCanRead(user)) {
-      setProject(project);
-      setSecurityProfile(project.getSecurityProfile());
+    /**
+     * Construct a new Study with a default empty SecurityProfile
+     */
+    public StudyImpl() {
+        setSecurityProfile(new SecurityProfile());
     }
-    else {
-      setSecurityProfile(new SecurityProfile(user));
-    }
-  }
 
-  public void buildSubmission() {
+    /**
+     * Construct a new Study with a SecurityProfile owned by the given User
+     *
+     * @param user of type User
+     */
+    public StudyImpl(User user) {
+        setSecurityProfile(new SecurityProfile(user));
+    }
+
+    /**
+     * If the given User can read the parent Project, construct a new Study with a SecurityProfile inherited from the parent Project.
+     * If not, construct a new Study with a SecurityProfile owned by the given User
+     *
+     * @param project of type Project
+     * @param user    of type User
+     */
+    public StudyImpl(Project project, User user) {
+        if (project.userCanRead(user)) {
+            setProject(project);
+            setSecurityProfile(project.getSecurityProfile());
+        } else {
+            setSecurityProfile(new SecurityProfile(user));
+        }
+    }
+
+    public void buildSubmission() {
     /*
     try {
       DocumentBuilder docBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
@@ -90,5 +89,5 @@ public class StudyImpl extends AbstractStudy implements Serializable {
     }
     ERASubmissionFactory.generateStudySubmissionXML(submissionDocument, this);
     */
-  }
+    }
 }

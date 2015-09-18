@@ -56,447 +56,441 @@ import java.util.regex.Pattern;
  */
 @Ajaxified
 public class ExperimentControllerHelperService {
-  protected static final Logger log = LoggerFactory.getLogger(PoolControllerHelperService.class);
-  @Autowired
-  private SecurityManager securityManager;
-  @Autowired
-  private RequestManager requestManager;
+    protected static final Logger log = LoggerFactory.getLogger(PoolControllerHelperService.class);
+    @Autowired
+    private SecurityManager securityManager;
+    @Autowired
+    private RequestManager requestManager;
 
-  public JSONObject lookupKitByIdentificationBarcode(HttpSession session, JSONObject json) {
-    try {
-      if (json.has("barcode")) {
-        String barcode = json.getString("barcode");
-        Kit kit = requestManager.getKitByIdentificationBarcode(barcode);
-        if (kit != null) {
-          return JSONUtils.SimpleJSONResponse(kit.toString());
-        }
-        else {
-          //new kit?
-          Pattern ls454KitPattern = Pattern.compile("([\\d]{11})([\\d]{8})([\\d]{6})"); //05365473001 93765920 102010
-          Pattern illuminaKitPattern = Pattern.compile("([A-Z0-9]{3}-[\\d]{7})"); // RGT-0520823 - outer kit barcode // 15003926 - partNumber // 5454482 - lotNumber
-          Pattern solidKitPattern = Pattern.compile("foo"); //05365473001 93765920 102010
+    public JSONObject lookupKitByIdentificationBarcode(HttpSession session, JSONObject json) {
+        try {
+            if (json.has("barcode")) {
+                String barcode = json.getString("barcode");
+                Kit kit = requestManager.getKitByIdentificationBarcode(barcode);
+                if (kit != null) {
+                    return JSONUtils.SimpleJSONResponse(kit.toString());
+                } else {
+                    //new kit?
+                    Pattern ls454KitPattern = Pattern.compile("([\\d]{11})([\\d]{8})([\\d]{6})"); //05365473001 93765920 102010
+                    Pattern illuminaKitPattern = Pattern.compile(
+                        "([A-Z0-9]{3}-[\\d]{7})"); // RGT-0520823 - outer kit barcode // 15003926 - partNumber // 5454482 - lotNumber
+                    Pattern solidKitPattern = Pattern.compile("foo"); //05365473001 93765920 102010
 
-          if (ls454KitPattern.matcher(barcode).matches()) {
-            return JSONUtils.SimpleJSONResponse("Looks like a 454 kit");
-          }
-          else if (illuminaKitPattern.matcher(barcode).matches()) {
-            return JSONUtils.SimpleJSONResponse("Looks like an Illumina kit");
-          }
-          else if (solidKitPattern.matcher(barcode).matches()) {
-            return JSONUtils.SimpleJSONResponse("Looks like a SOLiD kit");
-          }
-          else {
-            return JSONUtils.SimpleJSONError("Unrecognised barcode");
-          }
-        }
-      }
-    }
-    catch (Exception e) {
-      log.debug("Failed to lookup kit: ", e);
-      return JSONUtils.SimpleJSONError("Failed to lookup kit");
-    }
-    return JSONUtils.SimpleJSONError("Cannot process kit barcode");
-  }
-
-  public JSONObject lookupKitByLotNumber(HttpSession session, JSONObject json) {
-    try {
-      if (json.has("lotNumber")) {
-        String lotNumber = json.getString("lotNumber");
-        //String platform = json.getString("platform");
-        Kit kit = requestManager.getKitByLotNumber(lotNumber);
-        if (kit != null) {
-          return JSONUtils.SimpleJSONResponse(kit.toString());
-        }
-        else {
-          Pattern ls454KitPattern = Pattern.compile("([\\d]{11})([\\d]{8})([\\d]{6})"); //05365473001 93765920 102010
-          Matcher ls454Matcher = ls454KitPattern.matcher(lotNumber);
-          Pattern illuminaKitPattern = Pattern.compile("([0-9]{7})"); // 5454482 - lotNumber
-          Matcher illuminaMatcher = illuminaKitPattern.matcher(lotNumber);
-          Pattern solidKitPattern = Pattern.compile("foo"); //05365473001 93765920 102010
-          Matcher solidMatcher = solidKitPattern.matcher(lotNumber);
-
-          if (ls454Matcher.matches()) {
-            log.info("Looks like a 454 kit - getting lot number");
-            lotNumber = ls454Matcher.group(2);
-          }
-          else if (illuminaMatcher.matches()) {
-            log.info("Looks like an Illumina kit - getting lot number");
-            lotNumber = illuminaMatcher.group(1);
-          }
-          else if (solidMatcher.matches()) {
-            log.info("Looks like a SOLiD kit - getting lot number");
-            lotNumber = solidMatcher.group(1);
-          }
-          else {
-            return JSONUtils.SimpleJSONError("Unrecognised barcode");
-          }
-        }
-      }
-    }
-    catch (Exception e) {
-      log.debug("Failed to lookup kit: ", e);
-      return JSONUtils.SimpleJSONError("Failed to lookup kit");
-    }
-    return JSONUtils.SimpleJSONError("Cannot process kit barcode");
-  }
-
-  public JSONObject lookupKitDescriptorByPartNumber(HttpSession session, JSONObject json) {
-    try {
-      if (json.has("partNumber")) {
-        String partNumber = json.getString("partNumber");
-        //String platform = json.getString("platform");
-
-        Pattern fullLs454KitPattern = Pattern.compile("([\\d]{11})([\\d]{8})([\\d]{6})"); //05365473001 93765920 102010
-        Matcher fullLs454Matcher = fullLs454KitPattern.matcher(partNumber);
-
-        Pattern ls454KitPattern = Pattern.compile("([\\d]{11})"); //05365473001 93765920 102010
-        Matcher ls454Matcher = ls454KitPattern.matcher(partNumber);
-
-        Pattern illuminaKitPattern = Pattern.compile("([0-9]{8})"); // 15003926 - partNumber
-        Matcher illuminaMatcher = illuminaKitPattern.matcher(partNumber);
-
-        Pattern solidKitPattern = Pattern.compile("foo"); //05365473001 93765920 102010
-        Matcher solidMatcher = solidKitPattern.matcher(partNumber);
-
-        if (fullLs454Matcher.matches()) {
-          log.info("Looks like a 454 kit - getting part number");
-          partNumber = fullLs454Matcher.group(1);
-        }
-        else if (ls454Matcher.matches()) {
-          log.info("Looks like an 454 kit - getting part number");
-          partNumber = ls454Matcher.group(1);
-        }
-        else if (illuminaMatcher.matches()) {
-          log.info("Looks like an Illumina kit - getting part number");
-          partNumber = illuminaMatcher.group(1);
-        }
-        else if (solidMatcher.matches()) {
-          log.info("Looks like a SOLiD kit - getting part number");
-          partNumber = solidMatcher.group(1);          
-        }
-        else {
-          return null;
-        }
-        
-        KitDescriptor kitDescriptor = requestManager.getKitDescriptorByPartNumber(partNumber);
-        if (kitDescriptor != null) {
-          Map<String, Object> m = new HashMap<String, Object>();
-          m.put("id", kitDescriptor.getKitDescriptorId());
-          m.put("name", kitDescriptor.getName());
-          return JSONUtils.JSONObjectResponse(m);
-        }
-      }
-    }
-    catch (Exception e) {
-      log.debug("Failed to lookup kit: ", e);
-      return JSONUtils.SimpleJSONError("Failed to lookup kit");
-    }
-    return JSONUtils.SimpleJSONError("Cannot process kit barcode");
-  }
-
-//library
-  public JSONObject getLibraryKitDescriptors(HttpSession session, JSONObject json) {
-    try {
-      if (json.has("experimentId")) {
-        String experimentId = json.getString("experimentId");
-        String multiplexed = json.getString("multiplexed");
-        Experiment e = requestManager.getExperimentById(new Long(experimentId));
-
-        Collection<KitDescriptor> kits = requestManager.listKitDescriptorsByType(KitType.LIBRARY);
-        StringBuilder lkits = new StringBuilder();
-        lkits.append("[");
-        int count = 0;
-        for (KitDescriptor k : kits) {
-          if (e.getPlatform().getPlatformType().equals(k.getPlatformType())) {
-            lkits.append("{'name':'"+k.getName()+"', 'id':'"+k.getKitDescriptorId()+"', 'partNumber':'"+k.getPartNumber()+"'}");
-            if (count < kits.size()) lkits.append(",");
-            count++;
-          }
-        }
-        lkits.append("]");
-
-        StringBuilder mkits = null;
-        if (multiplexed.equals("true")) {
-          mkits = new StringBuilder();
-          Collection<KitDescriptor> mkitds = requestManager.listKitDescriptorsByType(KitType.MULTIPLEXING);
-          mkits.append("[");
-          count = 0;
-          for (KitDescriptor k : mkitds) {
-            if (e.getPlatform().getPlatformType().equals(k.getPlatformType())) {
-              mkits.append("{'name':'"+k.getName()+"', 'id':'"+k.getKitDescriptorId()+"', 'partNumber':'"+k.getPartNumber()+"'}");
-              if (count < mkitds.size()) mkits.append(",");
-              count++;
+                    if (ls454KitPattern.matcher(barcode).matches()) {
+                        return JSONUtils.SimpleJSONResponse("Looks like a 454 kit");
+                    } else if (illuminaKitPattern.matcher(barcode).matches()) {
+                        return JSONUtils.SimpleJSONResponse("Looks like an Illumina kit");
+                    } else if (solidKitPattern.matcher(barcode).matches()) {
+                        return JSONUtils.SimpleJSONResponse("Looks like a SOLiD kit");
+                    } else {
+                        return JSONUtils.SimpleJSONError("Unrecognised barcode");
+                    }
+                }
             }
-          }
-          mkits.append("]");
+        } catch (Exception e) {
+            log.debug("Failed to lookup kit: ", e);
+            return JSONUtils.SimpleJSONError("Failed to lookup kit");
         }
+        return JSONUtils.SimpleJSONError("Cannot process kit barcode");
+    }
 
-        //return JSONUtils.JSONObjectResponse("{'experimentId':'"+experimentId+"', 'multiplexed':'"+multiplexed+"', "+sb.toString()+"}");
-        Map<String, Object> m = new HashMap<String, Object>();
-        m.put("experimentId", experimentId);
-        m.put("multiplexed", multiplexed);
-        m.put("libraryKitDescriptors", JSONArray.fromObject(lkits.toString()));
-        if (mkits != null) {
-          m.put("multiplexKitDescriptors", JSONArray.fromObject(mkits.toString()));
+    public JSONObject lookupKitByLotNumber(HttpSession session, JSONObject json) {
+        try {
+            if (json.has("lotNumber")) {
+                String lotNumber = json.getString("lotNumber");
+                //String platform = json.getString("platform");
+                Kit kit = requestManager.getKitByLotNumber(lotNumber);
+                if (kit != null) {
+                    return JSONUtils.SimpleJSONResponse(kit.toString());
+                } else {
+                    Pattern ls454KitPattern = Pattern.compile("([\\d]{11})([\\d]{8})([\\d]{6})"); //05365473001 93765920 102010
+                    Matcher ls454Matcher = ls454KitPattern.matcher(lotNumber);
+                    Pattern illuminaKitPattern = Pattern.compile("([0-9]{7})"); // 5454482 - lotNumber
+                    Matcher illuminaMatcher = illuminaKitPattern.matcher(lotNumber);
+                    Pattern solidKitPattern = Pattern.compile("foo"); //05365473001 93765920 102010
+                    Matcher solidMatcher = solidKitPattern.matcher(lotNumber);
+
+                    if (ls454Matcher.matches()) {
+                        log.info("Looks like a 454 kit - getting lot number");
+                        lotNumber = ls454Matcher.group(2);
+                    } else if (illuminaMatcher.matches()) {
+                        log.info("Looks like an Illumina kit - getting lot number");
+                        lotNumber = illuminaMatcher.group(1);
+                    } else if (solidMatcher.matches()) {
+                        log.info("Looks like a SOLiD kit - getting lot number");
+                        lotNumber = solidMatcher.group(1);
+                    } else {
+                        return JSONUtils.SimpleJSONError("Unrecognised barcode");
+                    }
+                }
+            }
+        } catch (Exception e) {
+            log.debug("Failed to lookup kit: ", e);
+            return JSONUtils.SimpleJSONError("Failed to lookup kit");
         }
-        return JSONUtils.JSONObjectResponse(m);
-      }
+        return JSONUtils.SimpleJSONError("Cannot process kit barcode");
     }
-    catch (Exception e) {
-      log.debug("Failed to generate kit selection: ", e);
-      return JSONUtils.SimpleJSONError("Failed to generate kit selection");
-    }
-    return JSONUtils.SimpleJSONError("Cannot select library kits");
-  }
 
-  public JSONObject addLibraryKit(HttpSession session, JSONObject json) {
-    try {
-      if (json.has("experimentId")) {
-        String experimentId = json.getString("experimentId");
-        String kitDescriptor = json.getString("kitDescriptor");
-        String lotNumber = json.getString("lotNumber");
+    public JSONObject lookupKitDescriptorByPartNumber(HttpSession session, JSONObject json) {
+        try {
+            if (json.has("partNumber")) {
+                String partNumber = json.getString("partNumber");
+                //String platform = json.getString("platform");
 
-        LibraryKit lk = new LibraryKit();
-        KitDescriptor kd = requestManager.getKitDescriptorById(new Long(kitDescriptor));
-        lk.setKitDescriptor(kd);
-        lk.setLotNumber(lotNumber);
-        if (!json.has("kitDate") || json.getString("kitDate").equals("")) {
-          lk.setKitDate(new Date());
+                Pattern fullLs454KitPattern = Pattern.compile("([\\d]{11})([\\d]{8})([\\d]{6})"); //05365473001 93765920 102010
+                Matcher fullLs454Matcher = fullLs454KitPattern.matcher(partNumber);
+
+                Pattern ls454KitPattern = Pattern.compile("([\\d]{11})"); //05365473001 93765920 102010
+                Matcher ls454Matcher = ls454KitPattern.matcher(partNumber);
+
+                Pattern illuminaKitPattern = Pattern.compile("([0-9]{8})"); // 15003926 - partNumber
+                Matcher illuminaMatcher = illuminaKitPattern.matcher(partNumber);
+
+                Pattern solidKitPattern = Pattern.compile("foo"); //05365473001 93765920 102010
+                Matcher solidMatcher = solidKitPattern.matcher(partNumber);
+
+                if (fullLs454Matcher.matches()) {
+                    log.info("Looks like a 454 kit - getting part number");
+                    partNumber = fullLs454Matcher.group(1);
+                } else if (ls454Matcher.matches()) {
+                    log.info("Looks like an 454 kit - getting part number");
+                    partNumber = ls454Matcher.group(1);
+                } else if (illuminaMatcher.matches()) {
+                    log.info("Looks like an Illumina kit - getting part number");
+                    partNumber = illuminaMatcher.group(1);
+                } else if (solidMatcher.matches()) {
+                    log.info("Looks like a SOLiD kit - getting part number");
+                    partNumber = solidMatcher.group(1);
+                } else {
+                    return null;
+                }
+
+                KitDescriptor kitDescriptor = requestManager.getKitDescriptorByPartNumber(partNumber);
+                if (kitDescriptor != null) {
+                    Map<String, Object> m = new HashMap<String, Object>();
+                    m.put("id", kitDescriptor.getKitDescriptorId());
+                    m.put("name", kitDescriptor.getName());
+                    return JSONUtils.JSONObjectResponse(m);
+                }
+            }
+        } catch (Exception e) {
+            log.debug("Failed to lookup kit: ", e);
+            return JSONUtils.SimpleJSONError("Failed to lookup kit");
         }
-
-        Experiment e = requestManager.getExperimentById(new Long(experimentId));
-        e.addKit(lk);
-        requestManager.saveExperiment(e);
-        Integer newStock = kd.getStockLevel()-1;
-        kd.setStockLevel(newStock);
-        requestManager.saveKitDescriptor(kd);
-      }
-      return JSONUtils.SimpleJSONResponse("Saved kit!");
+        return JSONUtils.SimpleJSONError("Cannot process kit barcode");
     }
-    catch (IOException e) {
-      e.printStackTrace();
-      return JSONUtils.SimpleJSONError("Failed to save library kit");
-    }
-  }
 
-// empcr
-  public JSONObject getEmPcrKitDescriptors(HttpSession session, JSONObject json) {
-    try {
-      if (json.has("experimentId")) {
-        String experimentId = json.getString("experimentId");
-        Experiment e = requestManager.getExperimentById(new Long(experimentId));
-        
-        Collection<KitDescriptor> kits = requestManager.listKitDescriptorsByType(KitType.EMPCR);
-        StringBuilder sb = new StringBuilder();
-        sb.append("[");
-        int count = 0;
-        for (KitDescriptor k : kits) {
-          if (e.getPlatform().getPlatformType().equals(k.getPlatformType())) {
-            sb.append("{'name':'"+k.getName()+"', 'id':'"+k.getKitDescriptorId()+"', 'partNumber':'"+k.getPartNumber()+"'}");
-            if (count < kits.size()) sb.append(",");
-            count++;
-          }
+    //library
+    public JSONObject getLibraryKitDescriptors(HttpSession session, JSONObject json) {
+        try {
+            if (json.has("experimentId")) {
+                String experimentId = json.getString("experimentId");
+                String multiplexed = json.getString("multiplexed");
+                Experiment e = requestManager.getExperimentById(new Long(experimentId));
+
+                Collection<KitDescriptor> kits = requestManager.listKitDescriptorsByType(KitType.LIBRARY);
+                StringBuilder lkits = new StringBuilder();
+                lkits.append("[");
+                int count = 0;
+                for (KitDescriptor k : kits) {
+                    if (e.getPlatform().getPlatformType().equals(k.getPlatformType())) {
+                        lkits.append(
+                            "{'name':'" + k.getName() + "', 'id':'" + k.getKitDescriptorId() + "', 'partNumber':'" + k.getPartNumber() +
+                            "'}");
+                        if (count < kits.size())
+                            lkits.append(",");
+                        count++;
+                    }
+                }
+                lkits.append("]");
+
+                StringBuilder mkits = null;
+                if (multiplexed.equals("true")) {
+                    mkits = new StringBuilder();
+                    Collection<KitDescriptor> mkitds = requestManager.listKitDescriptorsByType(KitType.MULTIPLEXING);
+                    mkits.append("[");
+                    count = 0;
+                    for (KitDescriptor k : mkitds) {
+                        if (e.getPlatform().getPlatformType().equals(k.getPlatformType())) {
+                            mkits.append(
+                                "{'name':'" + k.getName() + "', 'id':'" + k.getKitDescriptorId() + "', 'partNumber':'" + k.getPartNumber() +
+                                "'}");
+                            if (count < mkitds.size())
+                                mkits.append(",");
+                            count++;
+                        }
+                    }
+                    mkits.append("]");
+                }
+
+                //return JSONUtils.JSONObjectResponse("{'experimentId':'"+experimentId+"', 'multiplexed':'"+multiplexed+"', "+sb.toString()+"}");
+                Map<String, Object> m = new HashMap<String, Object>();
+                m.put("experimentId", experimentId);
+                m.put("multiplexed", multiplexed);
+                m.put("libraryKitDescriptors", JSONArray.fromObject(lkits.toString()));
+                if (mkits != null) {
+                    m.put("multiplexKitDescriptors", JSONArray.fromObject(mkits.toString()));
+                }
+                return JSONUtils.JSONObjectResponse(m);
+            }
+        } catch (Exception e) {
+            log.debug("Failed to generate kit selection: ", e);
+            return JSONUtils.SimpleJSONError("Failed to generate kit selection");
         }
-        sb.append("]");
-
-        //return JSONUtils.JSONObjectResponse("{'experimentId':'"+experimentId+"', "+sb.toString()+"}");
-        Map<String, Object> m = new HashMap<String, Object>();
-        m.put("experimentId", experimentId);
-        m.put("emPcrKitDescriptors", JSONArray.fromObject(sb.toString()));
-        return JSONUtils.JSONObjectResponse(m);
-      }
+        return JSONUtils.SimpleJSONError("Cannot select library kits");
     }
-    catch (Exception e) {
-      log.debug("Failed to generate kit selection: ", e);
-      return JSONUtils.SimpleJSONError("Failed to generate kit selection");
-    }
-    return JSONUtils.SimpleJSONError("Cannot select EmPCR kits");
-  }
 
-  public JSONObject addEmPcrKit(HttpSession session, JSONObject json) {
-    try {
-      if (json.has("experimentId")) {
-        String experimentId = json.getString("experimentId");
-        String kitDescriptor = json.getString("kitDescriptor");
-        String lotNumber = json.getString("lotNumber");
+    public JSONObject addLibraryKit(HttpSession session, JSONObject json) {
+        try {
+            if (json.has("experimentId")) {
+                String experimentId = json.getString("experimentId");
+                String kitDescriptor = json.getString("kitDescriptor");
+                String lotNumber = json.getString("lotNumber");
 
-        EmPcrKit lk = new EmPcrKit();
-        KitDescriptor kd = requestManager.getKitDescriptorById(new Long(kitDescriptor));
-        lk.setKitDescriptor(kd);
-        lk.setLotNumber(lotNumber);
-        if (!json.has("kitDate") || json.getString("kitDate").equals("")) {
-          lk.setKitDate(new Date());
+                LibraryKit lk = new LibraryKit();
+                KitDescriptor kd = requestManager.getKitDescriptorById(new Long(kitDescriptor));
+                lk.setKitDescriptor(kd);
+                lk.setLotNumber(lotNumber);
+                if (!json.has("kitDate") || json.getString("kitDate").equals("")) {
+                    lk.setKitDate(new Date());
+                }
+
+                Experiment e = requestManager.getExperimentById(new Long(experimentId));
+                e.addKit(lk);
+                requestManager.saveExperiment(e);
+                Integer newStock = kd.getStockLevel() - 1;
+                kd.setStockLevel(newStock);
+                requestManager.saveKitDescriptor(kd);
+            }
+            return JSONUtils.SimpleJSONResponse("Saved kit!");
+        } catch (IOException e) {
+            e.printStackTrace();
+            return JSONUtils.SimpleJSONError("Failed to save library kit");
         }
-
-        Experiment e = requestManager.getExperimentById(new Long(experimentId));
-        e.addKit(lk);
-        requestManager.saveExperiment(e);
-        Integer newStock = kd.getStockLevel()-1;
-        kd.setStockLevel(newStock);
-        requestManager.saveKitDescriptor(kd);
-      }
-      return JSONUtils.SimpleJSONResponse("Saved kit!");
     }
-    catch (IOException e) {
-      e.printStackTrace();
-      return JSONUtils.SimpleJSONError("Failed to save EmPCR kit");
-    }
-  }
 
-//clustering
-  public JSONObject getClusteringKitDescriptors(HttpSession session, JSONObject json) {
-    try {
-      if (json.has("experimentId")) {
-        String experimentId = json.getString("experimentId");
-        Experiment e = requestManager.getExperimentById(new Long(experimentId));
-        
-        Collection<KitDescriptor> kits = requestManager.listKitDescriptorsByType(KitType.CLUSTERING);
-        StringBuilder sb = new StringBuilder();
-        sb.append("[");
-        int count = 0;
-        for (KitDescriptor k : kits) {
-          if (e.getPlatform().getPlatformType().equals(k.getPlatformType())) {
-            sb.append("{'name':'"+k.getName()+"', 'id':'"+k.getKitDescriptorId()+"', 'partNumber':'"+k.getPartNumber()+"'}");
-            if (count < kits.size()) sb.append(",");
-            count++;
-          }
+    // empcr
+    public JSONObject getEmPcrKitDescriptors(HttpSession session, JSONObject json) {
+        try {
+            if (json.has("experimentId")) {
+                String experimentId = json.getString("experimentId");
+                Experiment e = requestManager.getExperimentById(new Long(experimentId));
+
+                Collection<KitDescriptor> kits = requestManager.listKitDescriptorsByType(KitType.EMPCR);
+                StringBuilder sb = new StringBuilder();
+                sb.append("[");
+                int count = 0;
+                for (KitDescriptor k : kits) {
+                    if (e.getPlatform().getPlatformType().equals(k.getPlatformType())) {
+                        sb.append(
+                            "{'name':'" + k.getName() + "', 'id':'" + k.getKitDescriptorId() + "', 'partNumber':'" + k.getPartNumber() +
+                            "'}");
+                        if (count < kits.size())
+                            sb.append(",");
+                        count++;
+                    }
+                }
+                sb.append("]");
+
+                //return JSONUtils.JSONObjectResponse("{'experimentId':'"+experimentId+"', "+sb.toString()+"}");
+                Map<String, Object> m = new HashMap<String, Object>();
+                m.put("experimentId", experimentId);
+                m.put("emPcrKitDescriptors", JSONArray.fromObject(sb.toString()));
+                return JSONUtils.JSONObjectResponse(m);
+            }
+        } catch (Exception e) {
+            log.debug("Failed to generate kit selection: ", e);
+            return JSONUtils.SimpleJSONError("Failed to generate kit selection");
         }
-        sb.append("]");
-
-        //return JSONUtils.JSONObjectResponse("{'experimentId':'"+experimentId+"', "+sb.toString()+"}");
-        Map<String, Object> m = new HashMap<String, Object>();
-        m.put("experimentId", experimentId);
-        m.put("clusteringKitDescriptors", JSONArray.fromObject(sb.toString()));
-        return JSONUtils.JSONObjectResponse(m);
-      }
+        return JSONUtils.SimpleJSONError("Cannot select EmPCR kits");
     }
-    catch (Exception e) {
-      log.debug("Failed to generate kit selection: ", e);
-      return JSONUtils.SimpleJSONError("Failed to generate kit selection");
-    }
-    return JSONUtils.SimpleJSONError("Cannot select clustering kits");
-  }
 
-  public JSONObject addClusteringKit(HttpSession session, JSONObject json) {
-    try {
-      if (json.has("experimentId")) {
-        String experimentId = json.getString("experimentId");
-        String kitDescriptor = json.getString("kitDescriptor");
-        String lotNumber = json.getString("lotNumber");
+    public JSONObject addEmPcrKit(HttpSession session, JSONObject json) {
+        try {
+            if (json.has("experimentId")) {
+                String experimentId = json.getString("experimentId");
+                String kitDescriptor = json.getString("kitDescriptor");
+                String lotNumber = json.getString("lotNumber");
 
-        ClusterKit lk = new ClusterKit();
-        KitDescriptor kd = requestManager.getKitDescriptorById(new Long(kitDescriptor));
-        lk.setKitDescriptor(kd);
-        lk.setLotNumber(lotNumber);
-        if (!json.has("kitDate") || json.getString("kitDate").equals("")) {
-          lk.setKitDate(new Date());
+                EmPcrKit lk = new EmPcrKit();
+                KitDescriptor kd = requestManager.getKitDescriptorById(new Long(kitDescriptor));
+                lk.setKitDescriptor(kd);
+                lk.setLotNumber(lotNumber);
+                if (!json.has("kitDate") || json.getString("kitDate").equals("")) {
+                    lk.setKitDate(new Date());
+                }
+
+                Experiment e = requestManager.getExperimentById(new Long(experimentId));
+                e.addKit(lk);
+                requestManager.saveExperiment(e);
+                Integer newStock = kd.getStockLevel() - 1;
+                kd.setStockLevel(newStock);
+                requestManager.saveKitDescriptor(kd);
+            }
+            return JSONUtils.SimpleJSONResponse("Saved kit!");
+        } catch (IOException e) {
+            e.printStackTrace();
+            return JSONUtils.SimpleJSONError("Failed to save EmPCR kit");
         }
-
-        Experiment e = requestManager.getExperimentById(new Long(experimentId));
-        e.addKit(lk);
-        requestManager.saveExperiment(e);
-        Integer newStock = kd.getStockLevel()-1;
-        kd.setStockLevel(newStock);
-        requestManager.saveKitDescriptor(kd);
-      }
-      return JSONUtils.SimpleJSONResponse("Saved kit!");
     }
-    catch (IOException e) {
-      e.printStackTrace();
-      return JSONUtils.SimpleJSONError("Failed to save clustering kit");
-    }
-  }
 
-//sequencing
-  public JSONObject getSequencingKitDescriptors(HttpSession session, JSONObject json) {
-    try {
-      if (json.has("experimentId")) {
-        String experimentId = json.getString("experimentId");
-        Experiment e = requestManager.getExperimentById(new Long(experimentId));
-        
-        Collection<KitDescriptor> kits = requestManager.listKitDescriptorsByType(KitType.SEQUENCING);
-        StringBuilder sb = new StringBuilder();
-        sb.append("[");
-        int count = 0;
-        for (KitDescriptor k : kits) {
-          if (e.getPlatform().getPlatformType().equals(k.getPlatformType())) {
-            sb.append("{'name':'"+k.getName()+"', 'id':'"+k.getKitDescriptorId()+"', 'partNumber':'"+k.getPartNumber()+"'}");
-            if (count < kits.size()) sb.append(",");
-            count++;
-          }
+    //clustering
+    public JSONObject getClusteringKitDescriptors(HttpSession session, JSONObject json) {
+        try {
+            if (json.has("experimentId")) {
+                String experimentId = json.getString("experimentId");
+                Experiment e = requestManager.getExperimentById(new Long(experimentId));
+
+                Collection<KitDescriptor> kits = requestManager.listKitDescriptorsByType(KitType.CLUSTERING);
+                StringBuilder sb = new StringBuilder();
+                sb.append("[");
+                int count = 0;
+                for (KitDescriptor k : kits) {
+                    if (e.getPlatform().getPlatformType().equals(k.getPlatformType())) {
+                        sb.append(
+                            "{'name':'" + k.getName() + "', 'id':'" + k.getKitDescriptorId() + "', 'partNumber':'" + k.getPartNumber() +
+                            "'}");
+                        if (count < kits.size())
+                            sb.append(",");
+                        count++;
+                    }
+                }
+                sb.append("]");
+
+                //return JSONUtils.JSONObjectResponse("{'experimentId':'"+experimentId+"', "+sb.toString()+"}");
+                Map<String, Object> m = new HashMap<String, Object>();
+                m.put("experimentId", experimentId);
+                m.put("clusteringKitDescriptors", JSONArray.fromObject(sb.toString()));
+                return JSONUtils.JSONObjectResponse(m);
+            }
+        } catch (Exception e) {
+            log.debug("Failed to generate kit selection: ", e);
+            return JSONUtils.SimpleJSONError("Failed to generate kit selection");
         }
-        sb.append("]");
-
-        //return JSONUtils.JSONObjectResponse("{'experimentId':'"+experimentId+"', "+sb.toString()+"}");
-        Map<String, Object> m = new HashMap<String, Object>();
-        m.put("experimentId", experimentId);
-        m.put("sequencingKitDescriptors", JSONArray.fromObject(sb.toString()));
-        return JSONUtils.JSONObjectResponse(m);
-      }
+        return JSONUtils.SimpleJSONError("Cannot select clustering kits");
     }
-    catch (Exception e) {
-      log.debug("Failed to generate kit selection: ", e);
-      return JSONUtils.SimpleJSONError("Failed to generate kit selection");
-    }
-    return JSONUtils.SimpleJSONError("Cannot select sequencing kits");
-  }
 
-  public JSONObject addSequencingKit(HttpSession session, JSONObject json) {
-    try {
-      if (json.has("experimentId")) {
-        String experimentId = json.getString("experimentId");
-        String kitDescriptor = json.getString("kitDescriptor");
-        String lotNumber = json.getString("lotNumber");
+    public JSONObject addClusteringKit(HttpSession session, JSONObject json) {
+        try {
+            if (json.has("experimentId")) {
+                String experimentId = json.getString("experimentId");
+                String kitDescriptor = json.getString("kitDescriptor");
+                String lotNumber = json.getString("lotNumber");
 
-        SequencingKit lk = new SequencingKit();
-        KitDescriptor kd = requestManager.getKitDescriptorById(new Long(kitDescriptor));
-        lk.setKitDescriptor(kd);
-        lk.setLotNumber(lotNumber);
-        if (!json.has("kitDate") || json.getString("kitDate").equals("")) {
-          lk.setKitDate(new Date());
+                ClusterKit lk = new ClusterKit();
+                KitDescriptor kd = requestManager.getKitDescriptorById(new Long(kitDescriptor));
+                lk.setKitDescriptor(kd);
+                lk.setLotNumber(lotNumber);
+                if (!json.has("kitDate") || json.getString("kitDate").equals("")) {
+                    lk.setKitDate(new Date());
+                }
+
+                Experiment e = requestManager.getExperimentById(new Long(experimentId));
+                e.addKit(lk);
+                requestManager.saveExperiment(e);
+                Integer newStock = kd.getStockLevel() - 1;
+                kd.setStockLevel(newStock);
+                requestManager.saveKitDescriptor(kd);
+            }
+            return JSONUtils.SimpleJSONResponse("Saved kit!");
+        } catch (IOException e) {
+            e.printStackTrace();
+            return JSONUtils.SimpleJSONError("Failed to save clustering kit");
         }
-
-        Experiment e = requestManager.getExperimentById(new Long(experimentId));
-        e.addKit(lk);
-        requestManager.saveExperiment(e);
-        Integer newStock = kd.getStockLevel()-1;
-        kd.setStockLevel(newStock);
-        requestManager.saveKitDescriptor(kd);
-      }
-      return JSONUtils.SimpleJSONResponse("Saved kit!");
     }
-    catch (IOException e) {
-      e.printStackTrace();
-      return JSONUtils.SimpleJSONError("Failed to save sequencing kit");
+
+    //sequencing
+    public JSONObject getSequencingKitDescriptors(HttpSession session, JSONObject json) {
+        try {
+            if (json.has("experimentId")) {
+                String experimentId = json.getString("experimentId");
+                Experiment e = requestManager.getExperimentById(new Long(experimentId));
+
+                Collection<KitDescriptor> kits = requestManager.listKitDescriptorsByType(KitType.SEQUENCING);
+                StringBuilder sb = new StringBuilder();
+                sb.append("[");
+                int count = 0;
+                for (KitDescriptor k : kits) {
+                    if (e.getPlatform().getPlatformType().equals(k.getPlatformType())) {
+                        sb.append(
+                            "{'name':'" + k.getName() + "', 'id':'" + k.getKitDescriptorId() + "', 'partNumber':'" + k.getPartNumber() +
+                            "'}");
+                        if (count < kits.size())
+                            sb.append(",");
+                        count++;
+                    }
+                }
+                sb.append("]");
+
+                //return JSONUtils.JSONObjectResponse("{'experimentId':'"+experimentId+"', "+sb.toString()+"}");
+                Map<String, Object> m = new HashMap<String, Object>();
+                m.put("experimentId", experimentId);
+                m.put("sequencingKitDescriptors", JSONArray.fromObject(sb.toString()));
+                return JSONUtils.JSONObjectResponse(m);
+            }
+        } catch (Exception e) {
+            log.debug("Failed to generate kit selection: ", e);
+            return JSONUtils.SimpleJSONError("Failed to generate kit selection");
+        }
+        return JSONUtils.SimpleJSONError("Cannot select sequencing kits");
     }
-  }
 
-  public JSONObject listExperimentsDataTable(HttpSession session, JSONObject json) {
-    try {
-      JSONObject j = new JSONObject();
-      JSONArray jsonArray = new JSONArray();
-      for (Experiment experiment : requestManager.listAllExperiments()) {
-        jsonArray.add("['" + experiment.getName() + "','" +
-                      experiment.getAlias() + "','" +
-                      experiment.getDescription() + "','" +
-                      experiment.getPlatform().getPlatformType().getKey() + " "+ experiment.getPlatform().getInstrumentModel()+ "','" +
-                      "<a href=\"/miso/experiment/" + experiment.getId() + "\"><span class=\"ui-icon ui-icon-pencil\"></span></a>" + "']");
+    public JSONObject addSequencingKit(HttpSession session, JSONObject json) {
+        try {
+            if (json.has("experimentId")) {
+                String experimentId = json.getString("experimentId");
+                String kitDescriptor = json.getString("kitDescriptor");
+                String lotNumber = json.getString("lotNumber");
 
-      }
-      j.put("experimentsArray", jsonArray);
-      return j;
+                SequencingKit lk = new SequencingKit();
+                KitDescriptor kd = requestManager.getKitDescriptorById(new Long(kitDescriptor));
+                lk.setKitDescriptor(kd);
+                lk.setLotNumber(lotNumber);
+                if (!json.has("kitDate") || json.getString("kitDate").equals("")) {
+                    lk.setKitDate(new Date());
+                }
+
+                Experiment e = requestManager.getExperimentById(new Long(experimentId));
+                e.addKit(lk);
+                requestManager.saveExperiment(e);
+                Integer newStock = kd.getStockLevel() - 1;
+                kd.setStockLevel(newStock);
+                requestManager.saveKitDescriptor(kd);
+            }
+            return JSONUtils.SimpleJSONResponse("Saved kit!");
+        } catch (IOException e) {
+            e.printStackTrace();
+            return JSONUtils.SimpleJSONError("Failed to save sequencing kit");
+        }
     }
-    catch (IOException e) {
-      log.debug("Failed", e);
-      return JSONUtils.SimpleJSONError("Failed: " + e.getMessage());
+
+    public JSONObject listExperimentsDataTable(HttpSession session, JSONObject json) {
+        try {
+            JSONObject j = new JSONObject();
+            JSONArray jsonArray = new JSONArray();
+            for (Experiment experiment : requestManager.listAllExperiments()) {
+                jsonArray.add("['" + experiment.getName() + "','" +
+                              experiment.getAlias() + "','" +
+                              experiment.getDescription() + "','" +
+                              experiment.getPlatform().getPlatformType().getKey() + " " + experiment.getPlatform().getInstrumentModel() +
+                              "','" +
+                              "<a href=\"/miso/experiment/" + experiment.getId() + "\"><span class=\"ui-icon ui-icon-pencil\"></span></a>" +
+                              "']");
+
+            }
+            j.put("experimentsArray", jsonArray);
+            return j;
+        } catch (IOException e) {
+            log.debug("Failed", e);
+            return JSONUtils.SimpleJSONError("Failed: " + e.getMessage());
+        }
     }
-  }
 
-  public void setSecurityManager(SecurityManager securityManager) {
-    this.securityManager = securityManager;
-  }
+    public void setSecurityManager(SecurityManager securityManager) {
+        this.securityManager = securityManager;
+    }
 
-  public void setRequestManager(RequestManager requestManager) {
-    this.requestManager = requestManager;
-  }
+    public void setRequestManager(RequestManager requestManager) {
+        this.requestManager = requestManager;
+    }
 }

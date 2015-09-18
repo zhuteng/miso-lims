@@ -38,101 +38,108 @@ import java.io.Serializable;
  * @since 0.0.2
  */
 public class LibraryType implements Comparable, Serializable {
-  public static final Long UNSAVED_ID = 0L;
+    public static final Long UNSAVED_ID = 0L;
 
-  /** Field libraryTypeId  */
-  @Id
-  @GeneratedValue(strategy = GenerationType.AUTO)
-  private long libraryTypeId = LibraryType.UNSAVED_ID;
-  /** Field description  */
-  private String description;
-  /** Field platformType  */
-  private String platformType;
+    /**
+     * Field libraryTypeId
+     */
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private long libraryTypeId = LibraryType.UNSAVED_ID;
+    /**
+     * Field description
+     */
+    private String description;
+    /**
+     * Field platformType
+     */
+    private String platformType;
 
-  /**
-   * Returns the libraryTypeId of this LibraryType object.
-   *
-   * @return Long libraryTypeId.
-   */
-  public Long getLibraryTypeId() {
-    return libraryTypeId;
-  }
-
-  /**
-   * Sets the libraryTypeId of this LibraryType object.
-   *
-   * @param libraryTypeId libraryTypeId.
-   */
-  public void setLibraryTypeId(Long libraryTypeId) {
-    this.libraryTypeId = libraryTypeId;
-  }
-
-  /**
-   * Returns the description of this LibraryType object.
-   *
-   * @return String description.
-   */
-  public String getDescription() {
-    return description;
-  }
-
-  /**
-   * Sets the description of this LibraryType object.
-   *
-   * @param description description.
-   */
-  public void setDescription(String description) {
-    this.description = description;
-  }
-
-  /**
-   * Returns the platformType of this LibraryType object.
-   *
-   * @return String platformType.
-   */
-  public String getPlatformType() {
-    return platformType;
-  }
-
-  /**
-   * Sets the platformType of this LibraryType object.
-   *
-   * @param platformType platformType.
-   */
-  public void setPlatformType(String platformType) {
-    this.platformType = platformType;
-  }
-
-  @Override
-  public boolean equals(Object obj) {
-    if (obj == null)
-      return false;
-    if (obj == this)
-      return true;
-    if (!(obj instanceof LibraryType))
-      return false;
-    LibraryType them = (LibraryType) obj;
-    // If not saved, then compare resolved actual objects. Otherwise
-    // just compare IDs.
-    return getDescription().equals(them.getDescription());
-  }
-
-  @Override
-  public int hashCode() {
-    if (getLibraryTypeId() != UNSAVED_ID) {
-      return getLibraryTypeId().intValue();
+    /**
+     * Returns the libraryTypeId of this LibraryType object.
+     *
+     * @return Long libraryTypeId.
+     */
+    public Long getLibraryTypeId() {
+        return libraryTypeId;
     }
-    else {
-      int hashcode = -1;
-      if (getDescription() != null) hashcode = 37 * hashcode + getDescription().hashCode();
-      if (getPlatformType() != null) hashcode = 37 * hashcode + getPlatformType().hashCode();
-      return hashcode;
-    }
-  }
 
-  @Override
-  public int compareTo(Object o) {
-    LibraryType t = (LibraryType)o;
-    return getDescription().compareTo(t.getDescription());
-  }
+    /**
+     * Sets the libraryTypeId of this LibraryType object.
+     *
+     * @param libraryTypeId libraryTypeId.
+     */
+    public void setLibraryTypeId(Long libraryTypeId) {
+        this.libraryTypeId = libraryTypeId;
+    }
+
+    /**
+     * Returns the description of this LibraryType object.
+     *
+     * @return String description.
+     */
+    public String getDescription() {
+        return description;
+    }
+
+    /**
+     * Sets the description of this LibraryType object.
+     *
+     * @param description description.
+     */
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    /**
+     * Returns the platformType of this LibraryType object.
+     *
+     * @return String platformType.
+     */
+    public String getPlatformType() {
+        return platformType;
+    }
+
+    /**
+     * Sets the platformType of this LibraryType object.
+     *
+     * @param platformType platformType.
+     */
+    public void setPlatformType(String platformType) {
+        this.platformType = platformType;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null)
+            return false;
+        if (obj == this)
+            return true;
+        if (!(obj instanceof LibraryType))
+            return false;
+        LibraryType them = (LibraryType) obj;
+        // If not saved, then compare resolved actual objects. Otherwise
+        // just compare IDs.
+        return getDescription().equals(them.getDescription());
+    }
+
+    @Override
+    public int hashCode() {
+        if (getLibraryTypeId() != UNSAVED_ID) {
+            return getLibraryTypeId().intValue();
+        } else {
+            int hashcode = -1;
+            if (getDescription() != null)
+                hashcode = 37 * hashcode + getDescription().hashCode();
+            if (getPlatformType() != null)
+                hashcode = 37 * hashcode + getPlatformType().hashCode();
+            return hashcode;
+        }
+    }
+
+    @Override
+    public int compareTo(Object o) {
+        LibraryType t = (LibraryType) o;
+        return getDescription().compareTo(t.getDescription());
+    }
 }

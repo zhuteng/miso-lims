@@ -44,78 +44,77 @@ import java.util.Map;
  * @since 0.0.3
  */
 public class TestLsfProcess implements ConanProcess {
-  protected static final Logger log = LoggerFactory.getLogger(TestLsfProcess.class);
+    protected static final Logger log = LoggerFactory.getLogger(TestLsfProcess.class);
 
-  public static void main(String[] args) {
-    log.info("Setting up TestLsfProcess");
-    TestLsfProcess tlsfp = new TestLsfProcess();
-    try {
-      Map<ConanParameter, String> testParams = new HashMap<ConanParameter, String>();
-      testParams.put(new ConanParameter() {
-        @Override
-        public String getName() {
-          return "foo";
+    public static void main(String[] args) {
+        log.info("Setting up TestLsfProcess");
+        TestLsfProcess tlsfp = new TestLsfProcess();
+        try {
+            Map<ConanParameter, String> testParams = new HashMap<ConanParameter, String>();
+            testParams.put(new ConanParameter() {
+                @Override
+                public String getName() {
+                    return "foo";
+                }
+
+                @Override
+                public String getDescription() {
+                    return "foo";
+                }
+
+                @Override
+                public boolean isBoolean() {
+                    return false;
+                }
+
+                @Override
+                public boolean validateParameterValue(String s) {
+                    return s != null;
+                }
+            }, "foo");
+
+            testParams.put(new ConanParameter() {
+                @Override
+                public String getName() {
+                    return "bar";
+                }
+
+                @Override
+                public String getDescription() {
+                    return "bar";
+                }
+
+                @Override
+                public boolean isBoolean() {
+                    return false;
+                }
+
+                @Override
+                public boolean validateParameterValue(String s) {
+                    return s != null;
+                }
+            }, "bar");
+
+            log.info("Parameters set. Executing...");
+            boolean foo = tlsfp.execute(testParams);
+            log.info("Result: " + foo);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ProcessExecutionException e) {
+            e.printStackTrace();
         }
-
-        @Override
-        public String getDescription() {
-          return "foo";
-        }
-
-        @Override
-        public boolean isBoolean() {
-          return false;
-        }
-
-        @Override
-        public boolean validateParameterValue(String s) {
-          return s != null;
-        }
-      }, "foo");
-
-      testParams.put(new ConanParameter() {
-        @Override
-        public String getName() {
-          return "bar";
-        }
-
-        @Override
-        public String getDescription() {
-          return "bar";
-        }
-
-        @Override
-        public boolean isBoolean() {
-          return false;
-        }
-
-        @Override
-        public boolean validateParameterValue(String s) {
-          return s != null;
-        }
-      }, "bar");
-
-      log.info("Parameters set. Executing...");
-      boolean foo = tlsfp.execute(testParams);
-      log.info("Result: " + foo);
     }
-    catch (InterruptedException e) {
-      e.printStackTrace();
+
+    public boolean execute(Map<ConanParameter, String> parameters)
+        throws IllegalArgumentException, ProcessExecutionException, InterruptedException {
+        return new TestLsfTask().execute(parameters);
     }
-    catch (ProcessExecutionException e) {
-      e.printStackTrace();
+
+    public String getName() {
+        return "TestLsfProcess";
     }
-  }
 
-  public boolean execute(Map<ConanParameter, String> parameters) throws IllegalArgumentException, ProcessExecutionException, InterruptedException {
-    return new TestLsfTask().execute(parameters);
-  }
-
-  public String getName() {
-    return "TestLsfProcess";
-  }
-
-  public Collection<ConanParameter> getParameters() {
-    return new ArrayList<ConanParameter>();
-  }
+    public Collection<ConanParameter> getParameters() {
+        return new ArrayList<ConanParameter>();
+    }
 }

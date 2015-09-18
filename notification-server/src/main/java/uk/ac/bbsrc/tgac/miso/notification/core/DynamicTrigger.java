@@ -40,84 +40,82 @@ import java.util.concurrent.TimeUnit;
  * @see org.springframework.scheduling.support.PeriodicTrigger
  */
 public class DynamicTrigger implements Trigger {
-  private static final Log log = LogFactory.getLog(DynamicTrigger.class);
+    private static final Log log = LogFactory.getLog(DynamicTrigger.class);
 
-  private long period;
-  private final TimeUnit timeUnit;
-  private volatile long initialDelay = 0;
-  private volatile boolean fixedRate = false;
+    private long period;
+    private final TimeUnit timeUnit;
+    private volatile long initialDelay = 0;
+    private volatile boolean fixedRate = false;
 
-  /**
-   * Create a trigger with the given period in milliseconds.
-   */
-  public DynamicTrigger(long period) {
-    this(period, null);
-  }
-
-  /**
-   * Create a trigger with the given period and time unit. The time unit will
-   * apply not only to the period but also to any 'initialDelay' value, if
-   * configured on this Trigger later via {@link #setInitialDelay(long)}.
-   */
-  public DynamicTrigger(long period, TimeUnit timeUnit) {
-    Assert.isTrue(period >= 0, "period must not be negative");
-    this.timeUnit = (timeUnit != null) ? timeUnit : TimeUnit.MILLISECONDS;
-    this.period = this.timeUnit.toMillis(period);
-  }
-
-  /**
-   * Specify a new period. Very useful when you try to throttle inbound messages by
-   * modifying the polling rate.
-   */
-  public void setPeriod(long newPeriod) {
-    this.period = newPeriod;
-  }
-
-  /**
-   * Specify the delay for the initial execution. It will be evaluated in
-   * terms of this trigger's {@link TimeUnit}. If no time unit was explicitly
-   * provided upon instantiation, the default is milliseconds.
-   */
-  public void setInitialDelay(long initialDelay) {
-    this.initialDelay = this.timeUnit.toMillis(initialDelay);
-  }
-
-  /**
-   * Specify whether the periodic interval should be measured between the
-   * scheduled start times rather than between actual completion times.
-   * The latter, "fixed delay" behavior, is the default.
-   */
-  public void setFixedRate(boolean fixedRate) {
-    this.fixedRate = fixedRate;
-  }
-
-  /**
-   * Returns the time after which a task should run again.
-   */
-  public Date nextExecutionTime(TriggerContext triggerContext) {
-    log.debug("lastScheduledExecutionTime::" + triggerContext.lastScheduledExecutionTime());
-    if (triggerContext.lastScheduledExecutionTime() == null) {
-      log.debug("nextExecutionTime::" + new Date(System.currentTimeMillis() + this.initialDelay));
-      return new Date(System.currentTimeMillis() + this.initialDelay);
+    /**
+     * Create a trigger with the given period in milliseconds.
+     */
+    public DynamicTrigger(long period) {
+        this(period, null);
     }
-    else if (this.fixedRate) {
-      log.debug("nextExecutionTime::" + new Date(triggerContext.lastScheduledExecutionTime().getTime() + this.period));
-      return new Date(triggerContext.lastScheduledExecutionTime().getTime() + this.period);
-    }
-    log.debug("nextExecutionTime::" + new Date(triggerContext.lastCompletionTime().getTime() + this.period));
-    return new Date(triggerContext.lastCompletionTime().getTime() + this.period);
-  }
 
-  @Override
-  public int hashCode() {
-    final int prime = 31;
-    int result = 1;
-    result = prime * result + (fixedRate ? 1231 : 1237);
-    result = prime * result + (int) (initialDelay ^ (initialDelay >>> 32));
-    result = prime * result + (int) (period ^ (period >>> 32));
-    result = prime * result
-             + ((timeUnit == null) ? 0 : timeUnit.hashCode());
-    return result;
-  }
+    /**
+     * Create a trigger with the given period and time unit. The time unit will
+     * apply not only to the period but also to any 'initialDelay' value, if
+     * configured on this Trigger later via {@link #setInitialDelay(long)}.
+     */
+    public DynamicTrigger(long period, TimeUnit timeUnit) {
+        Assert.isTrue(period >= 0, "period must not be negative");
+        this.timeUnit = (timeUnit != null) ? timeUnit : TimeUnit.MILLISECONDS;
+        this.period = this.timeUnit.toMillis(period);
+    }
+
+    /**
+     * Specify a new period. Very useful when you try to throttle inbound messages by
+     * modifying the polling rate.
+     */
+    public void setPeriod(long newPeriod) {
+        this.period = newPeriod;
+    }
+
+    /**
+     * Specify the delay for the initial execution. It will be evaluated in
+     * terms of this trigger's {@link TimeUnit}. If no time unit was explicitly
+     * provided upon instantiation, the default is milliseconds.
+     */
+    public void setInitialDelay(long initialDelay) {
+        this.initialDelay = this.timeUnit.toMillis(initialDelay);
+    }
+
+    /**
+     * Specify whether the periodic interval should be measured between the
+     * scheduled start times rather than between actual completion times.
+     * The latter, "fixed delay" behavior, is the default.
+     */
+    public void setFixedRate(boolean fixedRate) {
+        this.fixedRate = fixedRate;
+    }
+
+    /**
+     * Returns the time after which a task should run again.
+     */
+    public Date nextExecutionTime(TriggerContext triggerContext) {
+        log.debug("lastScheduledExecutionTime::" + triggerContext.lastScheduledExecutionTime());
+        if (triggerContext.lastScheduledExecutionTime() == null) {
+            log.debug("nextExecutionTime::" + new Date(System.currentTimeMillis() + this.initialDelay));
+            return new Date(System.currentTimeMillis() + this.initialDelay);
+        } else if (this.fixedRate) {
+            log.debug("nextExecutionTime::" + new Date(triggerContext.lastScheduledExecutionTime().getTime() + this.period));
+            return new Date(triggerContext.lastScheduledExecutionTime().getTime() + this.period);
+        }
+        log.debug("nextExecutionTime::" + new Date(triggerContext.lastCompletionTime().getTime() + this.period));
+        return new Date(triggerContext.lastCompletionTime().getTime() + this.period);
+    }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + (fixedRate ? 1231 : 1237);
+        result = prime * result + (int) (initialDelay ^ (initialDelay >>> 32));
+        result = prime * result + (int) (period ^ (period >>> 32));
+        result = prime * result + ((timeUnit == null) ? 0 : timeUnit.hashCode());
+        return result;
+    }
 
 }

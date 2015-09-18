@@ -41,31 +41,30 @@ import java.io.Serializable;
  * @since 0.0.2
  */
 public class LibraryImpl extends AbstractLibrary implements Serializable {
-  protected static final Logger log = LoggerFactory.getLogger(LibraryImpl.class);
+    protected static final Logger log = LoggerFactory.getLogger(LibraryImpl.class);
 
-  /**
-   * Construct a new Library with a default empty SecurityProfile
-   */
-  public LibraryImpl() {
-    setSecurityProfile(new SecurityProfile());
-  }
-
-  /**
-   * Construct a new Library with a SecurityProfile owned by the given User
-   *
-   * @param user of type User
-   */
-  public LibraryImpl(User user) {
-    setSecurityProfile(new SecurityProfile(user));
-  }
-
-  public LibraryImpl(Sample sample, User user) {
-    if (sample.userCanRead(user)) {
-      setSample(sample);
-      setSecurityProfile(sample.getSecurityProfile());
+    /**
+     * Construct a new Library with a default empty SecurityProfile
+     */
+    public LibraryImpl() {
+        setSecurityProfile(new SecurityProfile());
     }
-    else {
-      setSecurityProfile(new SecurityProfile(user));
+
+    /**
+     * Construct a new Library with a SecurityProfile owned by the given User
+     *
+     * @param user of type User
+     */
+    public LibraryImpl(User user) {
+        setSecurityProfile(new SecurityProfile(user));
     }
-  }
+
+    public LibraryImpl(Sample sample, User user) {
+        if (sample.userCanRead(user)) {
+            setSample(sample);
+            setSecurityProfile(sample.getSecurityProfile());
+        } else {
+            setSecurityProfile(new SecurityProfile(user));
+        }
+    }
 }
