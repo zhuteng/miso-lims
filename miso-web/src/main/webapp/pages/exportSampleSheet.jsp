@@ -463,6 +463,16 @@
 <div id="plateformholder" style="display:none;">
 
 <br/>
+<div id="platePage">
+	<form>
+	  <input type="radio" name="fill" id="fill-vertical" value="vertical" checked> Vertical<br>
+	  <input type="radio" name="fill" id="fill-horizontal" value="horizontal"> Horizontal<br>
+	  <input type="button" id="select-all" value="Select All" onclick="ImportExport.checkAll('list-container');"></input>
+	  <input type="button" id="clear-all" value="Clear All" onclick="ImportExport.uncheckAll('list-container');"></input>
+	  <input type="button" id="clear-plate" value="Clear Plate" onclick="ImportExport.clearPlate();"></input>
+	</form>
+	<div id="grid-container"></div>
+</div>
 
 <div id="formbox" style="border:1px solid grey;width:900px;height:500px;" class="ui-corner-all">
 <div id="column1" class="exportcolumn">
@@ -928,5 +938,9 @@
 </div>
 
 </div>
-
+<script>
+if( jQuery('#grid-container').is(':empty') ) {
+  ImportExport.createGrid(8,12);
+}
+</script>
 <%@ include file="../footer.jsp" %>

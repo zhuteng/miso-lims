@@ -23,28 +23,223 @@
 
 var sampleJSONArray = null;
 var librariesPoolsJSON = null;
+var colours = ['#ef5450', '#f06294', '#bb67c9', '#7887cc', '#4fc2f8', '#4fb4a6', '#afd580', '#fff076', '#feb74b', '#ff8863'];
+var colour_index = 0;
 var ImportExport = ImportExport || {
   searchSamples: function (text) {
     jQuery('#sampleList').html("<img src='/styles/images/ajax-loader.gif'/>");
+    console.log('calling import export');
     Fluxion.doAjax(
       'importExportControllerHelperService',
-      'searchSamples',
-      {  
+      'searchSamplesJson',
+      {
         'str': text,
         'url': ajaxurl
       },
       {
         'doOnSuccess': function (json) {
-          jQuery('#sampleList').html(json.html);
+          var html = [];
+          for(var i = 0; i < json.samples.length; ++i) {
+            var sample = json.samples[i];
+            var sampleDivHtml = [];
+            sampleDivHtml.push(
+                "<div class='containerDiv'>",
+                  "<div id='sample", sample.id,
+                    "' class=\"dashboard\">",
+                    "<input type=\"hidden\" id=\"", sample.id,
+                      "\" name=\"", sample.name,
+                      "\" projectname=\"", sample.projectName,
+                      "\" projectalias=\"", sample.ProjectAlias,
+                      "\" samplealias=\"", sample.alias,
+                      "\" dnaOrRNA=\"", sample.dnaOrRna,
+                    "\"/>",
+                    "Name: <b>", sample.name, "</b><br/>",
+                    "Alias: <b>", sample.alias, "</b><br/>",
+                    "From Project: <b>", sample.projectName, "</b><br/>",
+                    "<button type=\"button\" class=\"fg-button ui-state-default ui-corner-all\" onclick=\"ImportExport.insertSampleNextAvailable(jQuery('#sample",                    sample.id, "'));\">Add</button>",
+                  "</div>",
+                  "<div class='dragHandle' id='list-item-",i,"-drag-handle' ",
+                    "draggable='true' ",
+                    "ondragstart='ImportExport.drag(event);' ",
+                    ">&nbsp;</div>",
+                "</div>"
+            );
+            html.push(sampleDivHtml.join(""));
+          }
+          jQuery('#sampleList').html(html.join(""));
           jQuery('#sampleList .dashboard').each(function () {
             var inp = jQuery(this);
             inp.dblclick(function () {
               ImportExport.insertSampleNextAvailable(inp);
             });
           });
+
+          console.log('called!');
+          var isMouseDown = false;
+          jQuery('#sampleList .dashboard').mousedown(function(ev){
+                isMouseDown = true;
+                jQuery(this).toggleClass("list-selected");
+                return false;
+                });
+          jQuery('#sampleList .dashboard').mouseover(function() {
+                if(isMouseDown) {
+                        jQuery(this).toggleClass("list-selected");
+                }
+          });
+          console.log('mouse events added');
+          jQuery(document).mouseup(function(){ isMouseDown = false; });
         }
       }
     );
+  },
+
+
+  allowDrop: function(ev) {
+      ev.preventDefault();
+  },
+
+  drag: function(ev) {
+      ev.dataTransfer.setData("text", ev.target.id);
+  },
+
+  fill: function(firstCellId, vertical) {
+      if (colour_index >= 9) {
+          colour_index = 0;
+      }
+      var numRows = 8;
+      var numCols = 12;
+      var idArr = firstCellId.split("-");
+      var row = idArr[0].match(/\d+/)[0];
+      var col = idArr[1].match(/\d+/)[0];
+      for (var i = 0; i < selected.length; i++) {
+          if (vertical) {
+              if (row >= numRows) {
+                  row = 0;
+                  col++;
+              }
+          } else {
+              if (col >= numCols) {
+                  col = 0;
+                  row++;
+              }
+          }
+
+          var id = "row" + row + "-col" + col;
+          var cell = document.getElementById(id);
+          cell.innerHTML = "";
+          (function(_cell) {
+              cell.addEventListener("click",
+                  function() {
+                      _cell.innerHTML = "";
+                      _cell.style.backgroundColor = 'transparent';
+                  })
+          })(cell);
+
+          cell.innerHTML = document.getElementById(selected[i].id).cloneNode(true).innerHTML;
+          cell.style.backgroundColor = colours[colour_index];
+
+          if (vertical) {
+              row++;
+          } else {
+              col++;
+          }
+      }
+      colour_index = Math.floor(Math.random() * 9) + 0;
+  },
+
+  drop: function(ev) {
+      ev.preventDefault();
+      selected = [];
+      var liNodes = document.querySelectorAll('#sampleList .dashboard');
+      var lis = [];
+
+      for (var i = 0; i < liNodes.length; ++i) {
+          lis[i] = liNodes[i];
+      }
+      for (var i = 0; i < lis.length; i++) {
+          var li = lis[i];
+          if (isCellSelected(li)) {
+              selected.push(li);
+          }
+      }
+      if (document.getElementById('fill-horizontal').checked) {
+          this.fill(ev.target.id, false);
+      } else {
+          this.fill(ev.target.id, true);
+      }
+  },
+
+  createGrid: function (rows, cols) {
+    var i = 0;
+    var grid = document.createElement('table');
+    var tr = document.createElement('tr');
+    grid.className = 'grid';
+    grid.appendChild(tr);
+
+    for (var c = 0; c < cols + 1; ++c) {
+        var cell = document.createElement('th');
+        tr.appendChild(cell);
+        if (c > 0) {
+            cell.innerHTML = c;
+        }
+    }
+
+    for (var r = 0; r < rows; ++r) {
+        var tr = grid.appendChild(document.createElement('tr'));
+        var cell = tr.appendChild(document.createElement('td'));
+        cell.setAttribute("class", "row-head");
+        cell.innerHTML = r + 1;
+
+        for (var c = 0; c < cols; ++c) {
+            var cell = tr.appendChild(document.createElement('td'));
+            cell.innerHTML = " ";
+            cell.setAttribute("ondrop", "ImportExport.drop(event)");
+            cell.setAttribute("ondragover", "ImportExport.allowDrop(event)");
+            cell.setAttribute("class", "not-head");
+            cell.setAttribute("id", "row" + r + "-" + "col" + c);
+        }
+    }
+    document.getElementById("grid-container").appendChild(grid);
+  },
+
+  selectCell: function(id) {
+      document.getElementById(id).className += " list-selected";
+  },
+
+  deselectCell: function(id) {
+      document.getElementById(id).className = "deselected";
+  },
+
+  uncheckAll: function(divid) {
+      var nodes = document.querySelectorAll('#sampleList .dashboard');
+      for (var i = 0; i < nodes.length; i++) {
+          var node = nodes[i];
+          node.className = "dashboard deselected";
+      }
+  },
+
+  checkAll: function(divid) {
+      var nodes = document.querySelectorAll('#sampleList .dashboard');
+      for (var i = 0; i < nodes.length; i++) {
+          var node = nodes[i];
+          node.className = "dashboard list-selected";
+      }
+  },
+
+  elemHasClass: function(element, name) {
+      return (' ' + element.className + ' ').indexOf(' ' + name + ' ') > -1;
+  },
+
+  isCellSelected: function(element) {
+      return elemHasClass(element, 'list-selected');
+  },
+
+  clearPlate: function () {
+      var cells = document.getElementsByClassName("not-head");
+      for (var i = 0; i < cells.length; i++) {
+          cells[i].innerHTML = "";
+          cells[i].style.backgroundColor = 'transparent';
+      }
   },
 
   selectSampleElement: function (elementId, elementName) {
@@ -121,7 +316,7 @@ var ImportExport = ImportExport || {
     jQuery('#samplesheet_statusdiv').html("Processing...");
     ImportExport.processSampleSheetUpload(json.frameId);
   },
-  
+
   processSampleSheetUpload: function (frameId) {
     var iframe = document.getElementById(frameId);
     var iframedoc = iframe.document;
@@ -276,7 +471,7 @@ var ImportExport = ImportExport || {
       'importExportControllerHelperService',
       'changePlatformName',
       {
-        'platform': platform, 
+        'platform': platform,
         'url': ajaxurl
       },
       {

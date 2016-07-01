@@ -82,7 +82,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
  * uk.ac.bbsrc.tgac.miso.spring.ajax
  * <p/>
  * Info
- * 
+ *
  * @author Rob Davey
  * @since 0.1.2
  */
@@ -99,6 +99,50 @@ public class ImportExportControllerHelperService {
   private SecurityManager securityManager;
 
   private static final Pattern digitPattern = Pattern.compile("(^[0-9]+)[\\.0-9]*");
+
+  @SuppressWarnings("unchecked")
+  public JSONObject searchSamplesJson(HttpSession session, JSONObject json) {
+    final String searchStr = json.getString("str");
+    final JSONObject rtn = new JSONObject();
+    final JSONArray rtnArray = new JSONArray();
+    final List<Sample> samples;
+
+    try {
+      if (!isStringEmptyOrNull(searchStr)) {
+        samples = new ArrayList<Sample>(requestManager.listAllSamplesBySearch(searchStr));
+      } else {
+        samples = new ArrayList<Sample>(requestManager.listAllSamplesWithLimit(250));
+      }
+
+      if (samples.size() > 0) {
+        Collections.sort(samples);
+        for (Sample sample : samples) {
+          String dnaOrRna = "O";
+          if ("GENOMIC".equals(sample.getSampleType()) || "METAGENOMIC".equals(sample.getSampleType())) {
+            dnaOrRna = "D";
+          } else if ("NON GENOMIC".equals(sample.getSampleType()) || "VIRAL RNA".equals(sample.getSampleType())
+              || "TRANSCRIPTOMIC".equals(sample.getSampleType()) || "METATRANSCRIPTOMIC".equals(sample.getSampleType())) {
+            dnaOrRna = "R";
+          }
+
+          final JSONObject obj = new JSONObject();
+          obj.put("id", sample.getId());
+          obj.put("name", sample.getName());
+          obj.put("alias", sample.getAlias());
+          obj.put("projectName", sample.getProject().getName());
+          obj.put("projectAlias", sample.getProject().getAlias());
+          obj.put("dnaOrRna", dnaOrRna);
+          rtnArray.add(obj);
+        }
+      }
+      rtn.put("samples", rtnArray);
+      return rtn;
+    } catch (IOException e) {
+      log.debug("Failed", e);
+      return JSONUtils.SimpleJSONError("Failed: " + e.getMessage());
+    }
+  }
+
 
   public JSONObject searchSamples(HttpSession session, JSONObject json) {
     String searchStr = json.getString("str");

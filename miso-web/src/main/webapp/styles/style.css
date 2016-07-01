@@ -1876,3 +1876,56 @@ button.disabled {
 .clear {
 	clear: both;
 }
+
+/*ImportExport Styles*/
+
+.list-selected {
+    background-color: #71B6FD;
+}
+
+.list-selected:hover {
+    background-color: #71B6FD;
+}
+
+.list-deselected {
+
+}
+
+.dragHandle {
+    background-image: url('images/import_export/dndHandle.gif');
+    background-repeat: no-repeat;
+    //background-attachment: fixed;
+    background-position: center;
+    display: inline-block;
+    width: 10%;
+    //float: right;
+}
+
+.not-head {
+    background-image: url('images/import_export/well.png');
+    width: 32px;
+    height: 32px;
+    max-width: 32px;
+    background-repeat:no-repeat;
+    background-size:32px 32px;
+    background-position: center;
+    padding: 0px;
+    text-align: center;
+    overflow-x: hidden;
+    font-size: 5pt;
+    word-wrap:break-word;
+
+}
+.not-head:hover {
+    background-color: #d0e7ff;
+}
+
+.row-head{
+    border: 0px;
+    font-weight: bold;
+}
+#grid-container, #list-container {
+    display: inline-block;
+    vertical-align: text-top;
+    //background-color: aqua;
+}
