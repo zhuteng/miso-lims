@@ -6,6 +6,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.MapsId;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
@@ -24,11 +25,10 @@ public class LibraryAdditionalInfoImpl implements LibraryAdditionalInfo {
   @Id
   private Long libraryId;
 
-  // TODO: enable once Library is migrated to Hibernate.
-  // @OneToOne(targetEntity = LibraryImpl.class)
-  // @JoinColumn(name = "libraryId", nullable = false)
-  // @MapsId
-  @Transient
+  @OneToOne(targetEntity = LibraryImpl.class)
+  @JoinColumn(name = "libraryId", nullable = false)
+  @MapsId
+//  @Transient
   private Library library;
 
   private Long kitDescriptorId;

@@ -132,6 +132,7 @@ public abstract class AbstractLibrary extends AbstractBoxable implements Library
   @JoinColumn(name = "lastModifier", nullable = false)
   private User lastModifier;
 
+  @Transient
   private Date lastModified;
 
   @Transient
