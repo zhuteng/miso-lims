@@ -31,10 +31,10 @@
                         http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.1.xsd
                         http://ehcache-spring-annotations.googlecode.com/svn/schema/ehcache-spring
                         http://ehcache-spring-annotations.googlecode.com/svn/schema/ehcache-spring/ehcache-spring-1.2.xsd
-                        http://www.springframework.org/schema/jee http://www.springframework.org/schema/jee/spring-jee-3.1.xsd 
+                        http://www.springframework.org/schema/jee http://www.springframework.org/schema/jee/spring-jee-3.1.xsd
                         http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd"
        default-autowire="byName">
-  
+
   <bean id="sessionFactory" class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">
     <property name="dataSource" ref="dataSource" />
     <property name="annotatedClasses">
@@ -58,7 +58,9 @@
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.IdentityImpl</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.AbstractProject</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.PoolChangeLog</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.PoolOrderImpl</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.SampleAdditionalInfoImpl</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.SequencingParametersImpl</value>
@@ -98,7 +100,7 @@
     <property name="includeMethod" value="false" />
     <property name="includeParameterTypes" value="false" />
   </bean>
-  
+
   <bean id="dataSource" class="org.springframework.jdbc.datasource.SimpleDriverDataSource">
     <property name="driverClass" value="org.h2.Driver"/>
     <property name="url" value="jdbc:h2:mem:testdb;MODE=MySQL;DB_CLOSE_DELAY=-1;INIT=RUNSCRIPT FROM 'classpath:db/scripts/init_tests.sql';"/>
@@ -117,5 +119,5 @@
     <property name="sqlMigrationSuffix" value=".test.sql"/>
     <property name="locations" value="db/test_migration"/>
   </bean>
-  
+
 </beans>

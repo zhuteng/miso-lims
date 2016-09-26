@@ -34,15 +34,20 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.MappedSuperclass;
 import javax.persistence.OneToOne;
 import javax.persistence.Transient;
 
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 import org.codehaus.jackson.map.annotate.JsonDeserialize;
+import org.hibernate.annotations.Formula;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,6 +55,7 @@ import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 
+import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.event.listener.MisoListener;
 import uk.ac.bbsrc.tgac.miso.core.event.model.PoolEvent;
 import uk.ac.bbsrc.tgac.miso.core.event.type.MisoEventType;
@@ -62,141 +68,71 @@ import uk.ac.bbsrc.tgac.miso.core.util.jackson.PooledElementDeserializer;
 
 /**
  * Skeleton implementation of a Pool
- * 
+ *
  * @author Rob Davey
  * @since 0.0.2
  */
+@MappedSuperclass
 @JsonIgnoreProperties({ "lastModifier", "hasLowQualityMembers" })
 public abstract class AbstractPool<P extends Poolable<?, ?>> extends AbstractBoxable implements Pool<P> {
+  public static final Long UNSAVED_ID = 0L;
+
+  public static final String CONCENTRATION_UNITS = "nM";
+
+  public static final int CONCENTRATION_LENGTH = 17;
+  public static final int NAME_LENGTH = 255;
+  public static final int DESCRIPTION_LENGTH = 255;
+  public static final int ID_BARCODE_LENGTH = 255;
+
   protected static final Logger log = LoggerFactory.getLogger(AbstractPool.class);
 
-  public static final Long UNSAVED_ID = 0L;
-  public static final String CONCENTRATION_UNITS = "nM";
+  @Transient
+  private final Collection<ChangeLog> changeLog = new ArrayList<ChangeLog>();
+  @Column(length = CONCENTRATION_LENGTH)
+  private Double concentration;
+  private Date creationDate;
+  @Column(length = DESCRIPTION_LENGTH)
+  private String description;
+  @Transient
+  private Collection<Experiment> experiments = new HashSet<Experiment>();
+  @Column(length = ID_BARCODE_LENGTH)
+  private String identificationBarcode;
+  @Formula("(SELECT MAX(c.changeTime) FROM PoolChangeLog as c WHERE c.poolId = poolId)")
+  @Column(nullable=true)
+  private Date lastModified;
+  @Transient // unable to serialize
+  private User lastModifier;
+  @Transient
+  private Date lastUpdated;
+
+  @Transient
+  private final Set<MisoListener> listeners = new HashSet<MisoListener>();
+  @Column(length = NAME_LENGTH)
+  private String name;
+  @Transient
+  private Collection<Note> notes = new HashSet<Note>();
+  @Enumerated(EnumType.STRING)
+  private PlatformType platformType;
+
+  @Transient
+  private Collection<P> pooledElements = new HashSet<P>();
 
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
   private long poolId = AbstractPool.UNSAVED_ID;
 
+  @Transient
+  private final Collection<PoolQC> poolQCs = new TreeSet<PoolQC>();
+
+  private Boolean qcPassed;
+
+  @Column(name="ready")
+  private boolean readyToRun = false;
   @OneToOne(cascade = CascadeType.ALL)
   private SecurityProfile securityProfile;
 
-  private String name;
-  private String description;
-
-  private Collection<P> pooledElements = new HashSet<P>();
-  private Collection<Experiment> experiments = new HashSet<Experiment>();
-  private Date creationDate;
-  private Double concentration;
-  private String identificationBarcode;
-  private boolean readyToRun = false;
-
-  private final Collection<PoolQC> poolQCs = new TreeSet<PoolQC>();
-  private Boolean qcPassed;
-
-  private Date lastUpdated;
-
-  // listeners
-  private final Set<MisoListener> listeners = new HashSet<MisoListener>();
-  private Set<User> watchers = new HashSet<User>();
-  private final Collection<ChangeLog> changeLog = new ArrayList<ChangeLog>();
-  private User lastModifier;
-  private Date lastModified;
-
   @Transient
-  private Collection<Note> notes = new HashSet<Note>();
-
-  @Override
-  public User getLastModifier() {
-    return lastModifier;
-  }
-
-  @Override
-  public void setLastModifier(User lastModifier) {
-    this.lastModifier = lastModifier;
-  }
-
-  @Override
-  public Date getLastModified() {
-    return lastModified;
-  }
-
-  @Override
-  public void setLastModified(Date lastModified) {
-    this.lastModified = lastModified;
-  }
-
-  @Override
-  public Collection<ChangeLog> getChangeLog() {
-    return changeLog;
-  }
-
-  @Override
-  public long getId() {
-    return poolId;
-  }
-
-  @Override
-  public void setId(long id) {
-    this.poolId = id;
-  }
-
-  @Override
-  public String getName() {
-    return name;
-  }
-
-  @Override
-  public void setName(String name) {
-    this.name = name;
-  }
-
-  @Override
-  public String getDescription() {
-    return description;
-  }
-
-  @Override
-  public void setDescription(String description) {
-    this.description = description;
-  }
-
-  @Override
-  public void addPoolableElement(P poolable) throws MalformedDilutionException {
-    pooledElements.add(poolable);
-  }
-
-  @SuppressWarnings("unchecked")
-  @Override
-  @JsonDeserialize(using = PooledElementDeserializer.class)
-  public <T extends Poolable> void setPoolableElements(Collection<T> poolables) {
-    if (poolables == null) {
-      this.pooledElements = Collections.emptySet();
-    } else {
-      this.pooledElements = (Collection<P>) poolables;
-    }
-  }
-
-  @Override
-  public Collection<P> getPoolableElements() {
-    return this.pooledElements;
-  }
-
-  /**
-   * Convenience method to return Dilutions from this Pool given that the Pooled Elements may well either be a set of single dilutions, or a
-   * single plate comprising a number of dilutions within that plate, or something else entirely
-   * 
-   * @return Collection<Dilution> dilutions.
-   */
-  @Override
-  public Collection<? extends Dilution> getDilutions() {
-    Set<Dilution> allDilutions = new HashSet<Dilution>();
-    for (Poolable<?, ?> poolable : getPoolableElements()) {
-      if (poolable instanceof Dilution) {
-        allDilutions.add((Dilution) poolable);
-      }
-    }
-    return allDilutions;
-  }
+  private Set<User> watchers = new HashSet<User>();
 
   @Override
   public void addExperiment(Experiment experiment) throws MalformedExperimentException {
@@ -207,70 +143,18 @@ public abstract class AbstractPool<P extends Poolable<?, ?>> extends AbstractBox
   }
 
   @Override
-  public void setExperiments(Collection<Experiment> experiments) {
-    this.experiments = experiments;
-    if (experiments != null) {
-      for (Experiment e : experiments) {
-        if (e != null && e.getPool() == null) {
-          e.setPool(this);
-        }
-      }
-    }
+  public boolean addListener(MisoListener listener) {
+    return listeners.add(listener);
   }
 
   @Override
-  public Collection<Experiment> getExperiments() {
-    return experiments;
+  public void addNote(Note note) {
+    this.notes.add(note);
   }
 
   @Override
-  public Date getCreationDate() {
-    return this.creationDate;
-  }
-
-  @Override
-  public void setCreationDate(Date creationDate) {
-    this.creationDate = creationDate;
-  }
-
-  @Override
-  public Double getConcentration() {
-    return this.concentration;
-  }
-
-  @Override
-  public void setConcentration(Double concentration) {
-    this.concentration = concentration;
-  }
-
-  @Override
-  public String getIdentificationBarcode() {
-    return identificationBarcode;
-  }
-
-  @Override
-  public void setIdentificationBarcode(String identificationBarcode) {
-    this.identificationBarcode = nullifyStringIfBlank(identificationBarcode);
-  }
-
-  @Override
-  public String getLabelText() {
-    return getAlias();
-  }
-
-  @Override
-  public boolean getReadyToRun() {
-    return readyToRun;
-  }
-
-  @Override
-  public void setReadyToRun(boolean readyToRun) {
-    if (!getReadyToRun() && readyToRun) {
-      this.readyToRun = readyToRun;
-      firePoolReadyEvent();
-    } else {
-      this.readyToRun = readyToRun;
-    }
+  public void addPoolableElement(P poolable) throws MalformedDilutionException {
+    pooledElements.add(poolable);
   }
 
   @Override
@@ -284,122 +168,16 @@ public abstract class AbstractPool<P extends Poolable<?, ?>> extends AbstractBox
   }
 
   @Override
-  public Collection<PoolQC> getPoolQCs() {
-    return poolQCs;
-  }
-
-  @Override
-  public Boolean getQcPassed() {
-    return qcPassed;
-  }
-
-  @Override
-  public void setQcPassed(Boolean qcPassed) {
-    this.qcPassed = qcPassed;
-  }
-
-  @Override
-  public Date getLastUpdated() {
-    return lastUpdated;
-  }
-
-  @Override
-  public void setLastUpdated(Date lastUpdated) {
-    this.lastUpdated = lastUpdated;
-  }
-
-  @Override
-  public boolean userCanRead(User user) {
-    return securityProfile.userCanRead(user);
-  }
-
-  @Override
-  public boolean userCanWrite(User user) {
-    return securityProfile.userCanWrite(user);
-  }
-
-  @Override
-  public void setSecurityProfile(SecurityProfile securityProfile) {
-    this.securityProfile = securityProfile;
-  }
-
-  @Override
-  public SecurityProfile getSecurityProfile() {
-    return securityProfile;
-  }
-
-  @Override
-  public void inheritPermissions(SecurableByProfile parent) throws SecurityException {
-    if (parent.getSecurityProfile().getOwner() != null) {
-      setSecurityProfile(parent.getSecurityProfile());
-    } else {
-      throw new SecurityException("Cannot inherit permissions when parent object owner is not set!");
-    }
-  }
-
-  @Override
-  public Set<MisoListener> getListeners() {
-    return this.listeners;
-  }
-
-  @Override
-  public boolean addListener(MisoListener listener) {
-    return listeners.add(listener);
-  }
-
-  @Override
-  public boolean removeListener(MisoListener listener) {
-    return listeners.remove(listener);
-  }
-
-  protected void firePoolReadyEvent() {
-    if (this.getId() != 0L) {
-      PoolEvent pe = new PoolEvent(this, MisoEventType.POOL_READY, "Pool " + getName() + " ready to run");
-      for (MisoListener listener : getListeners()) {
-        listener.stateChanged(pe);
-      }
-    }
-  }
-
-  @Override
-  public Set<User> getWatchers() {
-    return watchers;
-  }
-
-  @Override
-  public void setWatchers(Set<User> watchers) {
-    this.watchers = watchers;
-  }
-
-  @Override
   public void addWatcher(User user) {
     watchers.add(user);
   }
 
   @Override
-  public void removeWatcher(User user) {
-    watchers.remove(user);
-  }
-
-  @Override
-  public String getWatchableIdentifier() {
-    return getName();
-  }
-
-  @Override
-  public boolean isDeletable() {
-    return getId() != AbstractPool.UNSAVED_ID && getPoolableElements().isEmpty();
-  }
-
-  @Override
-  @JsonIgnore
-  public boolean getHasLowQualityMembers() {
-    for (Dilution d : getDilutions()) {
-      if (d.getLibrary().isLowQuality()) {
-        return true;
-      }
-    }
-    return false;
+  public int compareTo(Object o) {
+    Pool<? extends Poolable<?, ?>> t = (Pool<? extends Poolable<?, ?>>) o;
+    if (getId() < t.getId()) return -1;
+    if (getId() > t.getId()) return 1;
+    return 0;
   }
 
   @Override
@@ -417,38 +195,113 @@ public abstract class AbstractPool<P extends Poolable<?, ?>> extends AbstractBox
     }
   }
 
-  @Override
-  public int hashCode() {
-    if (getId() != AbstractPool.UNSAVED_ID) {
-      return (int) getId();
-    } else {
-      final int PRIME = 37;
-      int hashcode = -1;
-      if (getPlatformType() != null) hashcode = PRIME * hashcode + getPlatformType().hashCode();
-      if (getCreationDate() != null) hashcode = PRIME * hashcode + getCreationDate().hashCode();
-      return hashcode;
+  protected void firePoolReadyEvent() {
+    if (this.getId() != 0L) {
+      PoolEvent pe = new PoolEvent(this, MisoEventType.POOL_READY, "Pool " + getName() + " ready to run");
+      for (MisoListener listener : getListeners()) {
+        listener.stateChanged(pe);
+      }
     }
   }
 
   @Override
-  public int compareTo(Object o) {
-    Pool<? extends Poolable<?, ?>> t = (Pool<? extends Poolable<?, ?>>) o;
-    if (getId() < t.getId()) return -1;
-    if (getId() > t.getId()) return 1;
-    return 0;
+  public Collection<ChangeLog> getChangeLog() {
+    return changeLog;
   }
 
   @Override
-  public String toString() {
-    StringBuilder sb = new StringBuilder();
-    sb.append(getId());
-    sb.append(" : ");
-    sb.append(getName());
-    if (!getPoolableElements().isEmpty()) {
-      sb.append(" : ");
-      sb.append(getPoolableElements());
+  public Double getConcentration() {
+    return this.concentration;
+  }
+
+  @Override
+  public Date getCreationDate() {
+    return this.creationDate;
+  }
+
+  @Override
+  public String getDescription() {
+    return description;
+  }
+
+  /**
+   * Convenience method to return Dilutions from this Pool given that the Pooled Elements may well either be a set of single dilutions, or a
+   * single plate comprising a number of dilutions within that plate, or something else entirely
+   *
+   * @return Collection<Dilution> dilutions.
+   */
+  @Override
+  public Collection<? extends Dilution> getDilutions() {
+    Set<Dilution> allDilutions = new HashSet<Dilution>();
+    for (Poolable<?, ?> poolable : getPoolableElements()) {
+      if (poolable instanceof Dilution) {
+        allDilutions.add((Dilution) poolable);
+      }
     }
-    return sb.toString();
+    return allDilutions;
+  }
+
+  @Override
+  public Collection<Experiment> getExperiments() {
+    return experiments;
+  }
+
+  @Override
+  @JsonIgnore
+  public boolean getHasLowQualityMembers() {
+    for (Dilution d : getDilutions()) {
+      if (d.getLibrary().isLowQuality()) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  @Override
+  public long getId() {
+    return poolId;
+  }
+
+  @Override
+  public String getIdentificationBarcode() {
+    return identificationBarcode;
+  }
+
+  @Override
+  @Column(name = "alias")
+  public String getLabelText() {
+    return getAlias();
+  }
+
+  @Override
+  public Date getLastModified() {
+
+    return lastModified;
+  }
+
+  @Override
+  public User getLastModifier() {
+    return lastModifier;
+  }
+
+  @Override
+  public Date getLastUpdated() {
+    return lastUpdated;
+  }
+
+  @Override
+  public Set<MisoListener> getListeners() {
+    return this.listeners;
+  }
+
+  @Override
+  public String getLocationBarcode() {
+    return "";
+  }
+
+  @Override
+  public String getName() {
+    return name;
   }
 
   @Override
@@ -457,18 +310,62 @@ public abstract class AbstractPool<P extends Poolable<?, ?>> extends AbstractBox
   }
 
   @Override
-  public void addNote(Note note) {
-    this.notes.add(note);
+  public PlatformType getPlatformType() {
+    return platformType;
   }
 
   @Override
-  public void setNotes(Collection<Note> notes) {
-    this.notes = notes;
+  public Collection<P> getPoolableElements() {
+    return this.pooledElements;
+  }
+
+  public Collection<P> getPooledElements() {
+    return pooledElements;
+  }
+
+  public long getPoolId() {
+    return poolId;
   }
 
   @Override
-  public String getLocationBarcode() {
-    return "";
+  public Collection<PoolQC> getPoolQCs() {
+    return poolQCs;
+  }
+
+  @Override
+  public Boolean getQcPassed() {
+    return qcPassed;
+  }
+
+  @Override
+  public boolean getReadyToRun() {
+    return readyToRun;
+  }
+
+  @Override
+  public SecurityProfile getSecurityProfile() {
+    return securityProfile;
+  }
+
+  @Override
+  public String getWatchableIdentifier() {
+    return getName();
+  }
+
+  @Override
+  public Set<User> getWatchers() {
+    return watchers;
+  }
+
+  @Override
+  public boolean hasDuplicateIndices() {
+    Set<String> indices = new HashSet<>();
+    for (P item : getPoolableElements()) {
+      if (hasDuplicateIndices(indices, item)) {
+        return true;
+      }
+    }
+    return false;
   }
 
   private boolean hasDuplicateIndices(Set<String> indices, P item) {
@@ -494,13 +391,173 @@ public abstract class AbstractPool<P extends Poolable<?, ?>> extends AbstractBox
   }
 
   @Override
-  public boolean hasDuplicateIndices() {
-    Set<String> indices = new HashSet<>();
-    for (P item : getPoolableElements()) {
-      if (hasDuplicateIndices(indices, item)) {
-        return true;
+  public int hashCode() {
+    if (getId() != AbstractPool.UNSAVED_ID) {
+      return (int) getId();
+    } else {
+      final int PRIME = 37;
+      int hashcode = -1;
+      if (getPlatformType() != null) hashcode = PRIME * hashcode + getPlatformType().hashCode();
+      if (getCreationDate() != null) hashcode = PRIME * hashcode + getCreationDate().hashCode();
+      return hashcode;
+    }
+  }
+
+  @Override
+  public void inheritPermissions(SecurableByProfile parent) throws SecurityException {
+    if (parent.getSecurityProfile().getOwner() != null) {
+      setSecurityProfile(parent.getSecurityProfile());
+    } else {
+      throw new SecurityException("Cannot inherit permissions when parent object owner is not set!");
+    }
+  }
+
+  @Override
+  public boolean isDeletable() {
+    return getId() != AbstractPool.UNSAVED_ID && getPoolableElements().isEmpty();
+  }
+
+  @Override
+  public boolean removeListener(MisoListener listener) {
+    return listeners.remove(listener);
+  }
+
+  @Override
+  public void removeWatcher(User user) {
+    watchers.remove(user);
+  }
+
+  @Override
+  public void setConcentration(Double concentration) {
+    this.concentration = concentration;
+  }
+
+  @Override
+  public void setCreationDate(Date creationDate) {
+    this.creationDate = creationDate;
+  }
+
+  @Override
+  public void setDescription(String description) {
+    this.description = description;
+  }
+
+  @Override
+  public void setExperiments(Collection<Experiment> experiments) {
+    this.experiments = experiments;
+    if (experiments != null) {
+      for (Experiment e : experiments) {
+        if (e != null && e.getPool() == null) {
+          e.setPool(this);
+        }
       }
     }
-    return false;
+  }
+
+  @Override
+  public void setId(long id) {
+    this.poolId = id;
+  }
+
+  @Override
+  public void setIdentificationBarcode(String identificationBarcode) {
+    this.identificationBarcode = nullifyStringIfBlank(identificationBarcode);
+  }
+
+  @Override
+  public void setLastModified(Date lastModified) {
+    this.lastModified = lastModified;
+  }
+
+  @Override
+  public void setLastModifier(User lastModifier) {
+    this.lastModifier = lastModifier;
+  }
+
+  @Override
+  public void setLastUpdated(Date lastUpdated) {
+    this.lastUpdated = lastUpdated;
+  }
+
+  @Override
+  public void setName(String name) {
+    this.name = name;
+  }
+
+  @Override
+  public void setNotes(Collection<Note> notes) {
+    this.notes = notes;
+  }
+
+  @Override
+  public void setPlatformType(PlatformType platformType) {
+    this.platformType = platformType;
+  }
+
+  @SuppressWarnings("unchecked")
+  @Override
+  @JsonDeserialize(using = PooledElementDeserializer.class)
+  public <T extends Poolable> void setPoolableElements(Collection<T> poolables) {
+    if (poolables == null) {
+      this.pooledElements = Collections.emptySet();
+    } else {
+      this.pooledElements = (Collection<P>) poolables;
+    }
+  }
+
+  public void setPooledElements(Collection<P> pooledElements) {
+    this.pooledElements = pooledElements;
+  }
+
+  public void setPoolId(long poolId) {
+    this.poolId = poolId;
+  }
+
+  @Override
+  public void setQcPassed(Boolean qcPassed) {
+    this.qcPassed = qcPassed;
+  }
+
+  @Override
+  public void setReadyToRun(boolean readyToRun) {
+    if (!getReadyToRun() && readyToRun) {
+      this.readyToRun = readyToRun;
+      firePoolReadyEvent();
+    } else {
+      this.readyToRun = readyToRun;
+    }
+  }
+
+  @Override
+  public void setSecurityProfile(SecurityProfile securityProfile) {
+    this.securityProfile = securityProfile;
+  }
+
+  @Override
+  public void setWatchers(Set<User> watchers) {
+    this.watchers = watchers;
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder sb = new StringBuilder();
+    sb.append(getId());
+    sb.append(" : ");
+    sb.append(getName());
+    if (!getPoolableElements().isEmpty()) {
+      sb.append(" : ");
+      sb.append(getPoolableElements());
+    }
+    return sb.toString();
+  }
+
+  @Override
+  public boolean userCanRead(User user) {
+    return securityProfile.userCanRead(user);
+  }
+
+  @Override
+  public boolean userCanWrite(User user) {
+    return securityProfile.userCanWrite(user);
   }
 }

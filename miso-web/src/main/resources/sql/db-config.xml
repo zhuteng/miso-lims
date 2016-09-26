@@ -85,26 +85,25 @@
       <list>
         <value>hibernate/miso.hbm.xml</value>
       </list>
-    </property> 
+    </property>
   </bean>
 
-  <tx:annotation-driven/>
-  <bean id="jpaDialect"
-        class="org.springframework.orm.jpa.vendor.HibernateJpaDialect" />
+  <tx:annotation-driven />
+  <bean id="jpaDialect" class="org.springframework.orm.jpa.vendor.HibernateJpaDialect" />
   <bean class="org.springframework.dao.annotation.PersistenceExceptionTranslationPostProcessor" />
-  <ehcache:annotation-driven cache-manager="cacheManager" proxy-target-class="true"/>
-  <bean id="cacheManager" name="cacheManager" class="org.springframework.cache.ehcache.EhCacheManagerFactoryBean"/>
+  <ehcache:annotation-driven cache-manager="cacheManager" proxy-target-class="true" />
+  <bean id="cacheManager" name="cacheManager" class="org.springframework.cache.ehcache.EhCacheManagerFactoryBean" />
   <bean id="limsHashKeyGenerator" class="com.googlecode.ehcache.annotations.key.HashCodeCacheKeyGenerator">
     <property name="includeMethod" value="false" />
     <property name="includeParameterTypes" value="false" />
   </bean>
-  
+
   <bean id="transactionManager" class="org.springframework.orm.hibernate4.HibernateTransactionManager">
     <property name="sessionFactory" ref="sessionFactory" />
-    <property name="dataSource" ref="dataSource"/>
+    <property name="dataSource" ref="dataSource" />
   </bean>
-  
-  <context:component-scan base-package="uk.ac.bbsrc.tgac.miso.persistence" /> 
+
+  <context:component-scan base-package="uk.ac.bbsrc.tgac.miso.persistence" />
 
   <jee:jndi-lookup id="dataSource" jndi-name="/jdbc/MISODB" resource-ref="true" />
 
@@ -148,7 +147,7 @@
         <entry key="uk.ac.bbsrc.tgac.miso.core.data.SampleQC" value-ref="sampleQcStore" />
         <entry key="uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer" value-ref="sequencerPartitionContainerStore" />
         <entry key="uk.ac.bbsrc.tgac.miso.core.data.SequencerReference" value-ref="sequencerReferenceStore" />
-        <entry key="uk.ac.bbsrc.tgac.miso.core.data.SequencerServiceRecord" value-ref="sequencerServiceRecordStore"/>
+        <entry key="uk.ac.bbsrc.tgac.miso.core.data.SequencerServiceRecord" value-ref="sequencerServiceRecordStore" />
         <entry key="uk.ac.bbsrc.tgac.miso.core.data.Status" value-ref="statusStore" />
         <entry key="uk.ac.bbsrc.tgac.miso.core.data.Study" value-ref="studyStore" />
         <entry key="uk.ac.bbsrc.tgac.miso.core.data.Submission" value-ref="submissionStore" />
@@ -206,7 +205,7 @@
       <value>${miso.autoGenerateIdentificationBarcodes}</value>
     </property>
   </bean>
-  
+
   <bean id="sqlTargetedResequencingDAO" class="uk.ac.bbsrc.tgac.miso.sqlstore.SQLTargetedResequencingDAO">
     <property name="securityDAO" ref="sqlSecurityDAO" />
     <property name="jdbcTemplate" ref="interfaceTemplate" />
@@ -370,6 +369,14 @@
     </property>
   </bean>
 
+  <bean id="hibernatePoolDao" class="uk.ac.bbsrc.tgac.miso.persistence.impl.HibernatePoolDao">
+    <property name="boxDAO" ref="sqlBoxDAO" />
+    <property name="securityProfileDao" ref="sqlSecurityProfileDAO" />
+    <property name="autoGenerateIdentificationBarcodes">
+      <value>${miso.autoGenerateIdentificationBarcodes}</value>
+    </property>
+  </bean>
+
   <bean id="sqlPoolQCDAO" class="uk.ac.bbsrc.tgac.miso.sqlstore.SQLPoolQCDAO">
     <property name="cascadeType">
       <value type="javax.persistence.CascadeType">ALL</value>
@@ -420,11 +427,10 @@
     <property name="jdbcTemplate" ref="interfaceTemplate" />
   </bean>
 
-  <bean id="sqlSequencerServiceRecordDAO"
-        class="uk.ac.bbsrc.tgac.miso.sqlstore.SQLSequencerServiceRecordDAO">
-    <property name="sequencerReferenceDAO" ref="sqlSequencerReferenceDAO"/>
-    <property name="jdbcTemplate" ref="interfaceTemplate"/>
-    <property name="misoFilesManager" ref="misoFileManager"/>
+  <bean id="sqlSequencerServiceRecordDAO" class="uk.ac.bbsrc.tgac.miso.sqlstore.SQLSequencerServiceRecordDAO">
+    <property name="sequencerReferenceDAO" ref="sqlSequencerReferenceDAO" />
+    <property name="jdbcTemplate" ref="interfaceTemplate" />
+    <property name="misoFilesManager" ref="misoFileManager" />
   </bean>
 
   <bean id="sqlKitDAO" class="uk.ac.bbsrc.tgac.miso.sqlstore.SQLKitDAO">
@@ -487,11 +493,11 @@
       </list>
     </property>
   </bean>
-  
+
   <bean id="hibernateSampleAdditionalInfoDao" class="uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSampleAdditionalInfoDao">
     <property name="kitStore" ref="sqlKitDAO" />
   </bean>
-  
+
   <bean id="hibernateLibraryAdditionalInfoDao" class="uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateLibraryAdditionalInfoDao">
     <property name="kitStore" ref="sqlKitDAO" />
   </bean>
@@ -550,7 +556,7 @@
       </list>
     </property>
   </bean>
-  
+
   <bean name="targetedResequencingStore" class="org.springframework.aop.framework.ProxyFactoryBean">
     <property name="proxyInterfaces">
       <value>uk.ac.bbsrc.tgac.miso.core.store.TargetedResequencingStore</value>
@@ -660,7 +666,7 @@
       </list>
     </property>
   </bean>
-  
+
   <bean name="poolStore" class="org.springframework.aop.framework.ProxyFactoryBean">
     <property name="proxyInterfaces">
       <value>uk.ac.bbsrc.tgac.miso.core.store.PoolStore</value>
