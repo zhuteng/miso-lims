@@ -85,7 +85,7 @@
       <list>
         <value>hibernate/miso.hbm.xml</value>
       </list>
-    </property> 
+    </property>
   </bean>
 
   <tx:annotation-driven/>
@@ -98,13 +98,13 @@
     <property name="includeMethod" value="false" />
     <property name="includeParameterTypes" value="false" />
   </bean>
-  
+
   <bean id="transactionManager" class="org.springframework.orm.hibernate4.HibernateTransactionManager">
     <property name="sessionFactory" ref="sessionFactory" />
     <property name="dataSource" ref="dataSource"/>
   </bean>
-  
-  <context:component-scan base-package="uk.ac.bbsrc.tgac.miso.persistence" /> 
+
+  <context:component-scan base-package="uk.ac.bbsrc.tgac.miso.persistence" />
 
   <jee:jndi-lookup id="dataSource" jndi-name="/jdbc/MISODB" resource-ref="true" />
 
@@ -206,7 +206,7 @@
       <value>${miso.autoGenerateIdentificationBarcodes}</value>
     </property>
   </bean>
-  
+
   <bean id="sqlTargetedResequencingDAO" class="uk.ac.bbsrc.tgac.miso.sqlstore.SQLTargetedResequencingDAO">
     <property name="securityDAO" ref="sqlSecurityDAO" />
     <property name="jdbcTemplate" ref="interfaceTemplate" />
@@ -370,6 +370,14 @@
     </property>
   </bean>
 
+  <bean id="hibernatePoolDao" class="uk.ac.bbsrc.tgac.miso.persistence.impl.HibernatePoolDao">
+    <property name="boxDAO" ref="sqlBoxDAO" />
+    <property name="securityProfileDAO" ref="sqlSecurityProfileDAO" />
+    <property name="autoGenerateIdentificationBarcodes">
+      <value>${miso.autoGenerateIdentificationBarcodes}</value>
+    </property>
+  </bean>
+
   <bean id="sqlPoolQCDAO" class="uk.ac.bbsrc.tgac.miso.sqlstore.SQLPoolQCDAO">
     <property name="cascadeType">
       <value type="javax.persistence.CascadeType">ALL</value>
@@ -487,11 +495,11 @@
       </list>
     </property>
   </bean>
-  
+
   <bean id="hibernateDetailedSampleDao" class="uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateDetailedSampleDao">
     <property name="kitStore" ref="sqlKitDAO" />
   </bean>
-  
+
   <bean id="hibernateLibraryAdditionalInfoDao" class="uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateLibraryAdditionalInfoDao">
     <property name="kitStore" ref="sqlKitDAO" />
   </bean>
@@ -550,7 +558,7 @@
       </list>
     </property>
   </bean>
-  
+
   <bean name="targetedResequencingStore" class="org.springframework.aop.framework.ProxyFactoryBean">
     <property name="proxyInterfaces">
       <value>uk.ac.bbsrc.tgac.miso.core.store.TargetedResequencingStore</value>
@@ -660,7 +668,7 @@
       </list>
     </property>
   </bean>
-  
+
   <bean name="poolStore" class="org.springframework.aop.framework.ProxyFactoryBean">
     <property name="proxyInterfaces">
       <value>uk.ac.bbsrc.tgac.miso.core.store.PoolStore</value>

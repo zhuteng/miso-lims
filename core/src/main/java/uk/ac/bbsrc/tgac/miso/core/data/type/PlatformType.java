@@ -23,6 +23,7 @@
 
 package uk.ac.bbsrc.tgac.miso.core.data.type;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.EnumSet;
@@ -33,11 +34,11 @@ import com.google.common.collect.Lists;
 
 /**
  * Enum representing the different platform types available
- * 
+ *
  * @author Rob Davey
  * @since 0.0.2
  */
-public enum PlatformType {
+public enum PlatformType implements Serializable {
   ILLUMINA("Illumina", false, "Flow Cell", "Lane"), LS454("LS454", true, "Plate", "Lane"), SOLID("Solid", true, "Slide", "Lane"),
   IONTORRENT("IonTorrent", false, "Chip", "Chip"), PACBIO("PacBio", false, "SMRT Cell", "SMRT Cell"),
   OXFORDNANOPORE("OxfordNanopore",false, "Flow Cell", "Flow Cell");
@@ -74,7 +75,7 @@ public enum PlatformType {
 
   /**
    * Returns a PlatformType given an enum key
-   * 
+   *
    * @param key
    *          of type String
    * @return PlatformType
@@ -85,7 +86,7 @@ public enum PlatformType {
 
   /**
    * Returns the key of this PlatformType enum.
-   * 
+   *
    * @return String key.
    */
   public String getKey() {
@@ -94,7 +95,7 @@ public enum PlatformType {
 
   /**
    * Returns the keys of this PlatformType enum.
-   * 
+   *
    * @return ArrayList<String> keys.
    */
   public static ArrayList<String> getKeys() {

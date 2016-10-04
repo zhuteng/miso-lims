@@ -25,27 +25,35 @@ package uk.ac.bbsrc.tgac.miso.core.data.impl;
 
 import java.io.Serializable;
 
+import javax.persistence.Entity;
+import javax.persistence.Table;
+import javax.persistence.Transient;
+
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractPool;
 import uk.ac.bbsrc.tgac.miso.core.data.Poolable;
-import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 
 /**
  * Info
- * 
+ *
  * @author Rob Davey
  * @since 0.0.2
  */
+@Entity
+@Table(name = "Pool")
 public class PoolImpl<P extends Poolable<?, ?>> extends AbstractPool<P> implements Serializable {
 
-  private static final long serialVersionUID = 1L;
+  /**
+   *
+   */
+  private static final long serialVersionUID = -7918556470415723005L;
 
   public static final String PREFIX = "MPO";
 
+  @Transient
   private String units = "";
-  private PlatformType platformType;
 
   public PoolImpl() {
     setSecurityProfile(new SecurityProfile());
@@ -61,16 +69,6 @@ public class PoolImpl<P extends Poolable<?, ?>> extends AbstractPool<P> implemen
 
   public void setUnits(String units) {
     this.units = units;
-  }
-
-  @Override
-  public PlatformType getPlatformType() {
-    return platformType;
-  }
-
-  @Override
-  public void setPlatformType(PlatformType platformType) {
-    this.platformType = platformType;
   }
 
   @Override
