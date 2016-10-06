@@ -42,7 +42,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingSchemeAware;
  * @since 0.0.2
  */
 public interface PoolStore extends Store<Pool<? extends Poolable<?, ?>>>, Remover<Pool<? extends Poolable<?, ?>>>,
-    NamingSchemeAware<Pool<? extends Poolable<?, ?>>> {
+NamingSchemeAware<Pool<? extends Poolable<?, ?>>> {
   /**
    * Get a Pool given a barcode and its platform
    *
@@ -169,7 +169,7 @@ public interface PoolStore extends Store<Pool<? extends Poolable<?, ?>>>, Remove
 
   /**
    * List the Pool associated with the given positionId
-   * 
+   *
    * @param positionId
    *          of type long
    * @return Boxable
@@ -189,7 +189,7 @@ public interface PoolStore extends Store<Pool<? extends Poolable<?, ?>>>, Remove
 
   /**
    * List the Pool associated with a given identificationBarcode
-   * 
+   *
    * @param barcode
    *          of type String
    * @return Pool
@@ -205,7 +205,7 @@ public interface PoolStore extends Store<Pool<? extends Poolable<?, ?>>>, Remove
   public Map<String, Integer> getPoolColumnSizes() throws IOException;
 
   /**
-   * 
+   *
    * @param offset of type int
    * @param resultsPerPage of type int
    * @param querystr of type String
@@ -218,7 +218,7 @@ public interface PoolStore extends Store<Pool<? extends Poolable<?, ?>>>, Remove
       String sortDir, String sortCol, PlatformType platform) throws IOException;
 
   /**
-   * 
+   *
    * @param offset of type int
    * @param limit of type int
    * @param sortDir of type String
@@ -230,7 +230,7 @@ public interface PoolStore extends Store<Pool<? extends Poolable<?, ?>>>, Remove
       PlatformType platform) throws IOException;
 
   /**
-   * 
+   *
    * @param platformName of type String
    * @param querystr of type String
    * @return a count of how many pools for given platform match the querystr
@@ -239,10 +239,15 @@ public interface PoolStore extends Store<Pool<? extends Poolable<?, ?>>>, Remove
   long countPoolsBySearch(PlatformType platform, String querystr) throws IOException;
 
   /**
-   * 
+   *
    * @param platform of type PlatformType
    * @return a count of pools for a given platform
    * @throws IOException
    */
   long countPoolsByPlatform(PlatformType platform) throws IOException;
+
+  @SuppressWarnings("rawtypes")
+  public void autoGenerateIdBarcode(Pool pool);
+  public Collection<Pool<? extends Poolable<?, ?>>> getPools();
+  public String updateSortCol(String sortCol);
 }

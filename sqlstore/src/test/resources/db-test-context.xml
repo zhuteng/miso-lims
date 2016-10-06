@@ -58,7 +58,6 @@
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.IdentityImpl</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.AbstractProject</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl</value>
-        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.PoolChangeLog</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.PoolOrderImpl</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl</value>

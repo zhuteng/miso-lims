@@ -22,7 +22,6 @@ import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.eaglegenomics.simlims.core.Note;
@@ -35,7 +34,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Poolable;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
@@ -45,32 +43,23 @@ import uk.ac.bbsrc.tgac.miso.core.store.NoteStore;
 import uk.ac.bbsrc.tgac.miso.core.store.Store;
 import uk.ac.bbsrc.tgac.miso.core.store.WatcherStore;
 import uk.ac.bbsrc.tgac.miso.core.util.CoverageIgnore;
+import uk.ac.bbsrc.tgac.miso.persistence.PoolDao;
+import uk.ac.bbsrc.tgac.miso.sqlstore.SQLChangeLogDAO;
 import uk.ac.bbsrc.tgac.miso.sqlstore.SQLExperimentDAO;
-import uk.ac.bbsrc.tgac.miso.sqlstore.SQLLibraryDilutionDAO;
+import uk.ac.bbsrc.tgac.miso.sqlstore.SQLWatcherDAO;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.interceptors.PoolInterceptor;
 
 @Transactional(rollbackFor = Exception.class)
-@Repository
-public class HibernatePoolDao {
+public class HibernatePoolDao implements PoolDao {
   private static final String TABLE_NAME = "Pool";
-  private static final String POOL_SELECT =
-"SELECT " +
-  "p.poolId as poolId,"+
-  "p.concentration as concentration,"+
-  "p.identificationBarcode as identificationBarcode,"+
-  "p.name as name,"+
-  "p.creationDate as creationDate,"+
-  "p.securityProfile_profileId as securityProfile,"+
-  "p.platformType as platformType,"+
-  "p.ready as readyToRun,"+
-  "p.alias as labelText,"+
-  "bp.boxPositionId as positionId,"+
-  "p.emptied as empty,"+
-  "p.volume as volume,"+
-  "p.qcPassed as qcPassed,"+
-  "p.description as description,"+
-  "pmod.lastModified as lastModified "+"FROM "+TABLE_NAME+" p "+"LEFT JOIN BoxPosition bp ON bp.boxPositionId = p.boxPositionId "+"LEFT JOIN Box b ON b.boxId = bp.boxId "+"LEFT JOIN (SELECT poolId, MAX(changeTime) AS lastModified FROM PoolChangeLog GROUP BY poolId) pmod ON p.poolId = pmod.poolId";
+  private static final String POOL_SELECT = "SELECT " + "p.poolId as poolId," + "p.concentration as concentration,"
+      + "p.identificationBarcode as identificationBarcode," + "p.name as name," + "p.creationDate as creationDate,"
+      + "p.securityProfile_profileId as securityProfile," + "p.platformType as platformType," + "p.ready as readyToRun,"
+      + "p.alias as labelText," + "bp.boxPositionId as positionId," + "p.emptied as empty," + "p.volume as volume,"
+      + "p.qcPassed as qcPassed," + "p.description as description," + "pmod.lastModified as lastModified " + "FROM " + TABLE_NAME + " p "
+      + "LEFT JOIN BoxPosition bp ON bp.boxPositionId = p.boxPositionId " + "LEFT JOIN Box b ON b.boxId = bp.boxId "
+      + "LEFT JOIN (SELECT poolId, MAX(changeTime) AS lastModified FROM PoolChangeLog GROUP BY poolId) pmod ON p.poolId = pmod.poolId";
   public static final String DILUTION_POOL_SELECT_BY_RELATED_PROJECT = POOL_SELECT
       + " WHERE p.poolId IN (SELECT DISTINCT pool_poolId FROM Project p "
 
@@ -104,46 +93,53 @@ public class HibernatePoolDao {
   public static final String POOL_SELECT_FROM_ID_LIST = POOL_SELECT + " WHERE p.poolId IN :ids";
 
   private boolean autoGenerateIdentificationBarcodes;
+  @Autowired
+  private BoxStore sqlBoxDAO;
 
-  private BoxStore boxDAO;
-
-  private PoolInterceptor interceptor = new PoolInterceptor();
+  private final PoolInterceptor interceptor = new PoolInterceptor();
 
   @Autowired
   private MisoNamingScheme<Pool<? extends Poolable<?, ?>>> namingScheme;
-
-  private NoteStore noteDAO;
-
-  private HibernatePoolChangeLogDao poolChangeLogDAO;
-
-  private Store<SecurityProfile> securityProfileDAO;
+  @Autowired
+  private NoteStore sqlNoteDAO;
+  @Autowired
+  private SQLChangeLogDAO sqlChangeLogDAO;
+  @Autowired
+  private Store<SecurityProfile> sqlSecurityProfileDAO;
 
   private Session session;
 
   @Autowired
   private SessionFactory sessionFactory;
+  @Autowired
+  private SQLExperimentDAO sqlExperimentDAO;
+  public SQLExperimentDAO getSqlExperimentDAO() {
+    return sqlExperimentDAO;
+  }
+
+  public void setSqlExperimentDAO(SQLExperimentDAO sqlExperimentDAO) {
+    this.sqlExperimentDAO = sqlExperimentDAO;
+  }
 
   @Autowired
-  private SQLLibraryDilutionDAO libraryDilutionDao;
-
-  @Autowired
-  private SQLExperimentDAO experimentDao;
-
-  private WatcherStore watcherDAO;
+  private SQLWatcherDAO sqlWatcherDAO;
 
   /**
    * Generates a unique barcode. Note that the barcode will change if the Platform is changed.
    *
    * @param pool
    */
+  @Override
+  @SuppressWarnings("rawtypes")
   public void autoGenerateIdBarcode(Pool pool) {
-    String barcode = pool.getName() + "::" + pool.getPlatformType().getKey();
+    final String barcode = pool.getName() + "::" + pool.getPlatformType().getKey();
     pool.setIdentificationBarcode(barcode);
   }
 
-  @SuppressWarnings("rawtypes")
-  public PoolImpl get(long poolId) {
-    return (PoolImpl) getCriteriaForClass(PoolImpl.class).add(Restrictions.eq("poolId", poolId)).uniqueResult();
+  @Override
+  @SuppressWarnings({ "unchecked" })
+  public Pool<? extends Poolable<?, ?>> get(long poolId) {
+    return (Pool<? extends Poolable<?, ?>>) getCriteriaForClass(PoolImpl.class).add(Restrictions.eq("poolId", poolId)).uniqueResult();
   }
 
   @CoverageIgnore
@@ -153,33 +149,38 @@ public class HibernatePoolDao {
 
   @CoverageIgnore
   public BoxStore getBoxDAO() {
-    return boxDAO;
+    return sqlBoxDAO;
   }
 
-  public PoolImpl getByBarcode(String barcode) {
+  @SuppressWarnings({ "rawtypes", "unchecked" })
+  @Override
+  public Pool<? extends Poolable<?, ?>> getByBarcode(String barcode) {
     if (barcode == null) throw new NullPointerException("cannot look up null barcode");
-    @SuppressWarnings("unchecked")
-    List<PoolImpl> eResults = getCriteriaForClass(PoolImpl.class).add(Restrictions.eq("identificationBarcode", barcode)).list();
-    PoolImpl e = eResults.size() > 0 ? (PoolImpl) eResults.get(0) : null;
+    final List<PoolImpl> eResults = getCriteriaForClass(PoolImpl.class).add(Restrictions.eq("identificationBarcode", barcode)).list();
+    final PoolImpl e = eResults.size() > 0 ? (PoolImpl) eResults.get(0) : null;
     return e;
   }
 
+  @Override
   @SuppressWarnings("unchecked")
-  public List<PoolImpl> getByBarcodeList(List<String> barcodeList) {
+  public List<Pool<? extends Poolable<?, ?>>> getByBarcodeList(List<String> barcodeList) {
     return getCriteriaForClass(PoolImpl.class).add(Restrictions.in("identificationBarcode", barcodeList)).list();
   }
 
+  @Override
   public Boxable getByPositionId(long positionId) {
     @SuppressWarnings("unchecked")
-    List<PoolImpl> eResults = getCriteriaForClass(PoolImpl.class).add(Restrictions.eq("positionId", positionId)).list();
+    final
+    List<Pool<? extends Poolable<?, ?>>> eResults = getCriteriaForClass(PoolImpl.class).add(Restrictions.eq("positionId", positionId))
+    .list();
     return eResults.size() > 0 ? eResults.get(0) : null;
   }
 
-  public Criteria getCriteriaForClass(Class<?> clazz) {
+  private Criteria getCriteriaForClass(Class<?> clazz) {
     return getCurrentSession().createCriteria(clazz);
   }
 
-  public Session getCurrentSession() {
+  Session getCurrentSession() {
     if (session == null) {
       session = sessionFactory.withOptions().interceptor(interceptor).openSession();
     }
@@ -187,6 +188,7 @@ public class HibernatePoolDao {
 
   }
 
+  @Override
   @CoverageIgnore
   public MisoNamingScheme<Pool<? extends Poolable<?, ?>>> getNamingScheme() {
     return namingScheme;
@@ -194,20 +196,21 @@ public class HibernatePoolDao {
 
   @CoverageIgnore
   public NoteStore getNoteDAO() {
-    return noteDAO;
+    return sqlNoteDAO;
   }
 
-  // TODO: make the column names constants
-  public PoolImpl getPoolByBarcode(String barcode, PlatformType platformType) throws IOException {
+  @Override
+  public Pool<? extends Poolable<?, ?>> getPoolByBarcode(String barcode, PlatformType platformType) throws IOException {
     if (barcode == null) throw new NullPointerException("cannot look up null barcode");
     if (platformType == null) {
       return getByBarcode(barcode);
     }
-    List<PoolImpl> pools = listAllByPlatformAndSearch(platformType, barcode);
+    final List<Pool<? extends Poolable<?, ?>>> pools = listAllByPlatformAndSearch(platformType, barcode);
     return pools.size() == 1 ? pools.get(0) : null;
   }
 
-  @SuppressWarnings("rawtypes")
+  @Override
+  @SuppressWarnings({ "rawtypes", "unchecked" })
   public Pool getPoolByExperiment(Experiment e) {
     Pool rtn = null;
     if (e.getPlatform() != null) {
@@ -243,12 +246,18 @@ public class HibernatePoolDao {
   }
 
   @CoverageIgnore
-  public HibernatePoolChangeLogDao getPoolChangeLogDAO() {
-    return poolChangeLogDAO;
+  public SQLChangeLogDAO getChangeLogDAO() {
+    return sqlChangeLogDAO;
   }
 
-  @SuppressWarnings("unchecked")
-  public Collection<Pool> getPools() {
+  @CoverageIgnore
+  public SQLChangeLogDAO setChangeLogDAO(SQLChangeLogDAO changeLogDAO) {
+    return this.sqlChangeLogDAO = changeLogDAO;
+  }
+
+  @Override
+  @SuppressWarnings({ "unchecked" })
+  public Collection<Pool<? extends Poolable<?, ?>>> getPools() {
     final Criteria criteria = getCriteriaForClass(Pool.class);
     return criteria.list();
 
@@ -256,7 +265,7 @@ public class HibernatePoolDao {
 
   @CoverageIgnore
   public Store<SecurityProfile> getSecurityProfileDAO() {
-    return securityProfileDAO;
+    return sqlSecurityProfileDAO;
   }
 
   public SessionFactory getSessionFactory() {
@@ -265,30 +274,43 @@ public class HibernatePoolDao {
 
   @CoverageIgnore
   public WatcherStore getWatcherDAO() {
-    return watcherDAO;
+    return sqlWatcherDAO;
   }
 
+  public SQLExperimentDAO getExperimentDAO() {
+    return sqlExperimentDAO;
+  }
+
+  public void setExperimentDao(SQLExperimentDAO experimentDAO) {
+    this.sqlExperimentDAO = experimentDAO;
+  }
+
+  @Override
   @CoverageIgnore
-  @SuppressWarnings("rawtypes")
-  public PoolImpl lazyGet(long poolId) throws IOException {
+  public Pool<? extends Poolable<?, ?>> lazyGet(long poolId) throws IOException {
     return get(poolId);
   }
 
+  @Override
   @SuppressWarnings("unchecked")
-  public List<PoolImpl> listAll() throws IOException {
-    return getCriteriaForClass(PoolImpl.class).list();
+  public List<Pool<? extends Poolable<?, ?>>> listAll() throws IOException {
+    final List<Pool<? extends Poolable<?, ?>>> results = getCriteriaForClass(PoolImpl.class).list();
+    return results;
   }
 
+  @Override
   @SuppressWarnings("unchecked")
   public List<Pool<? extends Poolable<?, ?>>> listAllByPlatform(PlatformType platformType) throws IOException {
     if (platformType == null) {
       throw new NullPointerException("Must supply a platform type.");
     }
-    return getCriteriaForClass(PoolImpl.class).add(Restrictions.eq("platformType", platformType)).list();
+    final List<Pool<? extends Poolable<?, ?>>> results = getCriteriaForClass(PoolImpl.class).add(Restrictions.eq("platformType", platformType)).list();
+    return results;
   }
 
+  @Override
   @SuppressWarnings("unchecked")
-  public List<PoolImpl> listAllByPlatformAndSearch(PlatformType platformType, String search) throws IOException {
+  public List<Pool<? extends Poolable<?, ?>>> listAllByPlatformAndSearch(PlatformType platformType, String search) throws IOException {
     if (platformType == null) {
       throw new NullPointerException("Null platformType");
     }
@@ -300,67 +322,84 @@ public class HibernatePoolDao {
       criteria.add(Restrictions.disjunction().add(Restrictions.ilike("name", search)).add(Restrictions.ilike("alias", search))
           .add(Restrictions.ilike("identificationBarcode", search)).add(Restrictions.ilike("description", search)));
     }
-    return criteria.list();
+    final List<Pool<? extends Poolable<?, ?>>> results =  criteria.list();
+    return results;
   }
 
-  public List<PoolImpl> listByLibraryId(long libraryId) throws IOException {
-    return listByRelated(POOL_ID_SELECT_BY_RELATED_LIBRARY, libraryId);
+  @Override
+  public List<Pool<? extends Poolable<?, ?>>> listByLibraryId(long libraryId) throws IOException {
+    final List<Pool<? extends Poolable<?, ?>>> results =  listByRelated(POOL_ID_SELECT_BY_RELATED_LIBRARY, libraryId);
+    return new ArrayList<Pool<? extends Poolable<?, ?>>>();
+
   }
 
+  @Override
   @SuppressWarnings("unchecked")
-  public List<PoolImpl> listByProjectId(long projectId) throws IOException {
-    List<PoolImpl> lpools = getCurrentSession().createSQLQuery(DILUTION_POOL_SELECT_BY_RELATED_PROJECT)
+  public List<Pool<? extends Poolable<?, ?>>> listByProjectId(long projectId) throws IOException {
+    final List<Pool<? extends Poolable<?, ?>>> lpools = getCurrentSession().createSQLQuery(DILUTION_POOL_SELECT_BY_RELATED_PROJECT)
 
         .setBigInteger(0, BigInteger.valueOf(projectId)).list();
 
-    List<PoolImpl> epools = getCurrentSession().createSQLQuery(EMPCR_POOL_SELECT_BY_RELATED_PROJECT)
+    final List<Pool<? extends Poolable<?, ?>>> epools = getCurrentSession().createSQLQuery(EMPCR_POOL_SELECT_BY_RELATED_PROJECT)
         .setLong(0, projectId).list();
 
-    List<PoolImpl> ppools = getCurrentSession().createSQLQuery(PLATE_POOL_SELECT_BY_RELATED_PROJECT)
+    final List<Pool<? extends Poolable<?, ?>>> ppools = getCurrentSession().createSQLQuery(PLATE_POOL_SELECT_BY_RELATED_PROJECT)
         .setLong(0, projectId).list();
 
     lpools.addAll(epools);
     lpools.addAll(ppools);
+
     return lpools;
   }
 
-  @SuppressWarnings({ "rawtypes", "unchecked" })
-  private List<PoolImpl> listByRelated(String query, long relatedId) throws IOException {
+  @SuppressWarnings({ "unchecked" })
+  private List<Pool<? extends Poolable<?, ?>>> listByRelated(String query, long relatedId) throws IOException {
     final SQLQuery sql = getCurrentSession().createSQLQuery(query);
     sql.setLong(0, relatedId);
-    List<BigInteger> results = sql.list();
-    List<Long> poolIds = new ArrayList<Long>();
-    for(BigInteger binteger: results){
+    final List<BigInteger> results = sql.list();
+    final List<Long> poolIds = new ArrayList<Long>();
+    for (final BigInteger binteger : results) {
       poolIds.add(binteger.longValue());
     }
-    return getCriteriaForClass(PoolImpl.class).add(Restrictions.in("poolId", poolIds)).list();
+    final List<Pool<? extends Poolable<?, ?>>> rtn = getCriteriaForClass(PoolImpl.class).add(Restrictions.in("poolId", poolIds)).list();
+    return rtn;
   }
 
-  public List<PoolImpl> listBySampleId(long sampleId) throws IOException {
-    return listByRelated(POOL_ID_SELECT_BY_RELATED_SAMPLE, sampleId);
+  @Override
+  public List<Pool<? extends Poolable<?, ?>>> listBySampleId(long sampleId) throws IOException {
+    final List<Pool<? extends Poolable<?, ?>>> results = listByRelated(POOL_ID_SELECT_BY_RELATED_SAMPLE, sampleId);
+    return results;
   }
 
+  @Override
   @SuppressWarnings("unchecked")
-  public List<PoolImpl> listReadyByPlatform(PlatformType platformType) {
+  public List<Pool<? extends Poolable<?, ?>>> listReadyByPlatform(PlatformType platformType) {
     if (platformType == null) {
       throw new NullPointerException("Must supply a platform type.");
     }
-    return getCriteriaForClass(PoolImpl.class).add(Restrictions.eq("platformType", platformType)).add(Restrictions.eq("readyToRun", true))
+    final List<Pool<? extends Poolable<?, ?>>> results = getCriteriaForClass(PoolImpl.class).add(Restrictions.eq("platformType", platformType)).add(Restrictions.eq("readyToRun", true))
         .list();
+
+    return results;
   }
 
-  @SuppressWarnings("unchecked")
-  public long save(final PoolImpl pool) throws IOException, MisoNamingException {
+  @Override
+  public long save(final Pool<? extends Poolable<?, ?>> pool) throws IOException {
     Long securityProfileId = pool.getSecurityProfile().getProfileId();
 
     if (securityProfileId == null) {
-      securityProfileId = securityProfileDAO.save(pool.getSecurityProfile());
+      securityProfileId = sqlSecurityProfileDAO.save(pool.getSecurityProfile());
     }
     if (pool.isEmpty()) {
-      boxDAO.removeBoxableFromBox(pool);
+      sqlBoxDAO.removeBoxableFromBox(pool);
       pool.setVolume(0D);
     }
-    namingScheme.validateField("name", pool.getName());
+    try {
+      namingScheme.validateField("name", pool.getName());
+    } catch (final MisoNamingException e) {
+      throw new IOException("Cannot save Pool - issue with naming scheme", e);
+
+    }
     if (autoGenerateIdentificationBarcodes) {
       autoGenerateIdBarcode(pool);
     }
@@ -368,66 +407,76 @@ public class HibernatePoolDao {
     // dwe previously deleted experiments associated with the new pool. For some reason.
     /* poolNamedTemplate.update(POOL_EXPERIMENT_DELETE_BY_POOL_ID, poolparams); */
 
-    watcherDAO.removeWatchedEntityByUser(pool, pool.getLastModifier());
+    sqlWatcherDAO.removeWatchedEntityByUser(pool, pool.getLastModifier());
 
-    for (Object u : pool.getWatchers()) {
-      watcherDAO.saveWatchedEntityUser(pool, (User) u);
+    for (final Object u : pool.getWatchers()) {
+      sqlWatcherDAO.saveWatchedEntityUser(pool, (User) u);
     }
 
     if (!pool.getNotes().isEmpty()) {
       // TODO Replace collections with Lists and Sets!
       final HashSet<Note> notes = (HashSet<Note>) pool.getNotes();
-      for (Note n : notes) {
-        noteDAO.savePoolNote(pool, n);
+      for (final Note n : notes) {
+        sqlNoteDAO.savePoolNote(pool, n);
       }
     }
     getCurrentSession().flush();
-    final PoolChangeLog changeLog = new PoolChangeLog();
     final StringBuilder message = new StringBuilder(pool.getLastModifier().getLoginName());
 
     final Map<String, Map<String, Object>> changes = interceptor.getDifferences();
     if (!changes.isEmpty()) {
       final StringBuilder columnsChanged = new StringBuilder();
       message.append(" changed ");
-      for (Entry<String, Map<String, Object>> entry : changes.entrySet()) {
+      for (final Entry<String, Map<String, Object>> entry : changes.entrySet()) {
         columnsChanged.append(entry.getKey()).append(":");
         message.append(entry.getKey()).append(" from ").append(entry.getValue().get("previous")).append(" to ")
-            .append(entry.getValue().get("current")).append(", ");
+        .append(entry.getValue().get("current")).append(", ");
       }
 
-      changeLog.setPool(pool);
-      changeLog.setUser(pool.getLastModifier());
-      changeLog.setMessage(message.toString());
-      poolChangeLogDAO.save(changeLog);
-      System.out.println(message.toString());
-    }
-    getCurrentSession().saveOrUpdate(pool);
+      pool.getChangeLog().addAll(sqlChangeLogDAO.listAllById(TABLE_NAME, pool.getId()));
 
+    }
+
+    getCurrentSession().saveOrUpdate(pool);
     return pool.getId();
 
   }
 
-  public long count() {
-    return (long) getCriteriaForClass(PoolImpl.class).setProjection(Projections.rowCount()).uniqueResult();
+  @Override
+  public int count() {
+    final Object result = getCriteriaForClass(PoolImpl.class).setProjection(Projections.rowCount()).uniqueResult();
+    return (int)(long)result;
+
   }
 
+  @Override
   public long countPoolsByPlatform(PlatformType platform) throws IOException {
-    return (long) getCriteriaForClass(PoolImpl.class).setProjection(Projections.rowCount()).add(Restrictions.eq("platformType", platform))
-        .uniqueResult();
+    long rtn;
+    if(platform == null){
+      rtn = count();
+    } else {
+      rtn = (long) getCriteriaForClass(PoolImpl.class).setProjection(Projections.rowCount()).add(Restrictions.eq("platformType", platform).ignoreCase())
+          .uniqueResult();
+    }
+    return rtn;
   }
 
+  @Override
   public long countPoolsBySearch(PlatformType platform, String queryStr) throws IOException {
+    long rtn;
     if (isStringEmptyOrNull(queryStr)) {
-      return (PlatformType.ILLUMINA.equals(platform) ? countPoolsByPlatform(platform) : count());
+      rtn = (PlatformType.ILLUMINA.equals(platform) ? countPoolsByPlatform(platform) : count());
     } else {
       queryStr = "%" + queryStr + "%";
-      return (long) getCriteriaForClass(PoolImpl.class).setProjection(Projections.rowCount()).add(Restrictions.eq("platformType", platform))
+      rtn = (long) getCriteriaForClass(PoolImpl.class).setProjection(Projections.rowCount()).add(Restrictions.eq("platformType", platform).ignoreCase())
           .add(Restrictions.disjunction().add(Restrictions.ilike("name", queryStr)).add(Restrictions.ilike("alias", queryStr))
               .add(Restrictions.ilike("identificationBarcode", queryStr)).add(Restrictions.ilike("description", queryStr)))
           .uniqueResult();
     }
+    return rtn;
   }
 
+  @Override
   public Map<String, Integer> getPoolColumnSizes() throws IOException {
     final Map<String, Integer> rtn = new HashMap<String, Integer>();
     rtn.put("description", AbstractPool.DESCRIPTION_LENGTH);
@@ -439,15 +488,17 @@ public class HibernatePoolDao {
     return rtn;
   }
 
+  @Override
   public String updateSortCol(String sortCol) {
     sortCol = sortCol.replaceAll("[^\\w]", "");
     if ("id".equals(sortCol)) sortCol = "poolId";
     return sortCol;
   }
 
+  @Override
   @SuppressWarnings("unchecked")
-  public List<PoolImpl> listByOffsetAndNumResults(int offset, int limit, String sortDir, String sortCol, PlatformType platform)
-      throws IOException {
+  public List<Pool<? extends Poolable<?, ?>>> listByOffsetAndNumResults(int offset, int limit, String sortDir, String sortCol,
+      PlatformType platform) throws IOException {
     sortCol = updateSortCol(sortCol);
     if (offset < 0 || limit < 0) {
       throw new IOException("Limit and Offset must be greater than zero");
@@ -459,15 +510,17 @@ public class HibernatePoolDao {
       criteria.addOrder(Order.desc(sortCol));
     }
 
-    criteria.add(Restrictions.eq("platformType", platform));
+    criteria.add(Restrictions.eq("platformType", platform).ignoreCase());
     criteria.setFirstResult(offset);
     criteria.setMaxResults(limit);
-    return criteria.list();
+    final List<Pool<? extends Poolable<?, ?>>> results = criteria.list();
+    return results;
   }
 
+  @Override
   @SuppressWarnings("unchecked")
-  public List<PoolImpl> listBySearchOffsetAndNumResultsAndPlatform(int offset, int resultsPerPage, String search, String sortDir,
-      String sortCol, PlatformType platform) throws IOException {
+  public List<Pool<? extends Poolable<?, ?>>> listBySearchOffsetAndNumResultsAndPlatform(int offset, int resultsPerPage, String search,
+      String sortDir, String sortCol, PlatformType platform) throws IOException {
     if (isStringEmptyOrNull(search)) {
       return listByOffsetAndNumResults(offset, resultsPerPage, sortDir, sortCol, platform);
     } else {
@@ -482,39 +535,41 @@ public class HibernatePoolDao {
       } else if ("desc".equalsIgnoreCase(sortDir)) {
         criteria.addOrder(Order.desc(sortCol));
       }
-      criteria.add(Restrictions.eq("platformType", platform));
+      criteria.add(Restrictions.eq("platformType", platform).ignoreCase());
       criteria.setFirstResult(offset);
       criteria.setMaxResults(resultsPerPage);
       final String querystr = DbUtils.convertStringToSearchQuery(search);
 
-      criteria.add(Restrictions.eq("platformType", platform));
       criteria.add(
           Restrictions.disjunction().add(Restrictions.ilike("name", querystr)).add(Restrictions.ilike("identificationBarcode", querystr))
-              .add(Restrictions.ilike("alias", querystr)).add(Restrictions.ilike("description", querystr)));
-      return criteria.list();
+          .add(Restrictions.ilike("alias", querystr)).add(Restrictions.ilike("description", querystr)));
+      final List<Pool<? extends Poolable<?, ?>>> results = criteria.list();
+      return results;
     }
   }
 
+  @Override
   @SuppressWarnings("unchecked")
-  public List<PoolImpl> listAllPoolsWithLimit(int limit) throws IOException {
-    List<PoolImpl> rtn;
+  public List<Pool<? extends Poolable<?, ?>>> listAllPoolsWithLimit(int limit) throws IOException {
+    List<Pool<? extends Poolable<?, ?>>> rtn;
     if (limit == 0) {
-      rtn = new ArrayList<PoolImpl>();
+      rtn = new ArrayList<Pool<? extends Poolable<?, ?>>>();
     } else {
       rtn = getCriteriaForClass(PoolImpl.class).setMaxResults(limit).list();
     }
     return rtn;
   }
 
+  @Override
   @SuppressWarnings("unchecked")
   @Deprecated
   @CoverageIgnore
-  public List<PoolImpl> listBySearch(String query) {
-    List<PoolImpl> rtn;
+  public List<Pool<? extends Poolable<?, ?>>> listBySearch(String query) {
+    List<Pool<? extends Poolable<?, ?>>> rtn;
     if (isStringEmptyOrNull(query)) {
       rtn = new ArrayList<>();
     } else {
-      String querystr = DbUtils.convertStringToSearchQuery(query);
+      final String querystr = DbUtils.convertStringToSearchQuery(query);
       final Criteria criteria = getCriteriaForClass(PoolImpl.class);
       criteria.add(Restrictions.disjunction().add(Restrictions.ilike("name", querystr)).add(Restrictions.ilike("alias", querystr))
           .add(Restrictions.ilike("description", querystr)));
@@ -523,21 +578,22 @@ public class HibernatePoolDao {
     return rtn;
   }
 
-  @SuppressWarnings({ "rawtypes", "unchecked" })
-  public boolean remove(PoolImpl pool) throws IOException {
+  @Override
+  public boolean remove(Pool<? extends Poolable<?, ?>> pool) throws IOException {
 
     boolean ok = false;
     if (pool.isDeletable()) {
-      //delete every change log record for this pool id
-      poolChangeLogDAO.deleteByPoolId(pool.getId());
+      // delete every change log record for this pool id
+      sqlChangeLogDAO.deleteAllById(TABLE_NAME, pool.getId());
       // delete related dilutions pool.getPoolableElements()
-      final String deletePoolElementsHql = "DELETE FROM Pool_Elements WHERE pool_poolId=:pool_poolId";;
-      getCurrentSession().createQuery(deletePoolElementsHql).setLong("poolId", pool.getId()).executeUpdate();
+      final String deletePoolElementsHql = "DELETE FROM Pool_Elements WHERE pool_poolId=:pool_poolId";
+      getCurrentSession().createSQLQuery(deletePoolElementsHql).setLong("pool_poolId", pool.getId()).executeUpdate();
       // delete related experiments#
 
-      for(Experiment ex : (List<Experiment>)pool.getExperiments()) {
-        experimentDao.remove(ex);
+      for (final Experiment ex : pool.getExperiments()) {
+        sqlExperimentDAO.remove(ex);
       }
+      getCurrentSession().delete(pool);
       ok = true;
     }
 
@@ -551,9 +607,10 @@ public class HibernatePoolDao {
 
   @CoverageIgnore
   public void setBoxDAO(BoxStore boxDAO) {
-    this.boxDAO = boxDAO;
+    this.sqlBoxDAO = boxDAO;
   }
 
+  @Override
   @CoverageIgnore
   public void setNamingScheme(MisoNamingScheme<Pool<? extends Poolable<?, ?>>> namingScheme) {
     this.namingScheme = namingScheme;
@@ -561,17 +618,14 @@ public class HibernatePoolDao {
 
   @CoverageIgnore
   public void setNoteDAO(NoteStore noteDAO) {
-    this.noteDAO = noteDAO;
+    this.sqlNoteDAO = noteDAO;
   }
 
-  @CoverageIgnore
-  public void setPoolChangeLogDAO(HibernatePoolChangeLogDao poolChangeLogDAO) {
-    this.poolChangeLogDAO = poolChangeLogDAO;
-  }
+
 
   @CoverageIgnore
   public void setSecurityProfileDAO(Store<SecurityProfile> securityProfileDAO) {
-    this.securityProfileDAO = securityProfileDAO;
+    this.sqlSecurityProfileDAO = securityProfileDAO;
   }
 
   public void setSessionFactory(SessionFactory sessionFactory) {
@@ -579,7 +633,28 @@ public class HibernatePoolDao {
   }
 
   @CoverageIgnore
-  public void setWatcherDAO(WatcherStore watcherDAO) {
-    this.watcherDAO = watcherDAO;
+  public void setWatcherDAO(SQLWatcherDAO watcherDAO) {
+    this.sqlWatcherDAO = watcherDAO;
+  }
+
+  @SuppressWarnings("unchecked")
+  @Override
+  public List<Pool<? extends Poolable<?, ?>>> listReadyByPlatformAndSearch(PlatformType platformType, String query) throws IOException {
+    if (platformType == null) {
+      throw new NullPointerException("Null platformType");
+    }
+    final Criteria criteria = getCriteriaForClass(PoolImpl.class);
+    criteria.add(Restrictions.eq("platformType", platformType).ignoreCase());
+
+    criteria.add(Restrictions.eq("readyToRun", true));
+
+    if (query != null) {
+      query = "%" + query + "%";
+
+      criteria.add(Restrictions.disjunction().add(Restrictions.ilike("name", query)).add(Restrictions.ilike("alias", query))
+          .add(Restrictions.ilike("identificationBarcode", query)).add(Restrictions.ilike("description", query)));
+    }
+    final List<Pool<? extends Poolable<?, ?>>> results = criteria.list();
+    return results;
   }
 }

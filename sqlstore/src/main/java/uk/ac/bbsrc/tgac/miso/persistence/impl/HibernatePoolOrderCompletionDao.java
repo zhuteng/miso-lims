@@ -27,7 +27,7 @@ public class HibernatePoolOrderCompletionDao implements PoolOrderCompletionDao {
   private PlatformStore platformStore;
 
   @Autowired
-  private PoolStore poolStore;
+  private PoolStore poolDAO;
 
   private Session currentSession() {
     return sessionFactory.getCurrentSession();
@@ -35,12 +35,12 @@ public class HibernatePoolOrderCompletionDao implements PoolOrderCompletionDao {
 
   private PoolOrderCompletion fetchSqlStore(PoolOrderCompletion completion) throws IOException {
     completion.getSequencingParameters().setPlatform(platformStore.get(completion.getSequencingParameters().getPlatformId()));
-    completion.setPool(poolStore.get(completion.getPoolId()));
+    completion.setPool(poolDAO.get(completion.getPoolId()));
     return completion;
   }
 
   private <T extends Iterable<PoolOrderCompletion>> T fetchSqlStore(T list) throws IOException {
-    for (PoolOrderCompletion completion : list) {
+    for (final PoolOrderCompletion completion : list) {
       fetchSqlStore(completion);
     }
     return list;
@@ -49,7 +49,7 @@ public class HibernatePoolOrderCompletionDao implements PoolOrderCompletionDao {
   @SuppressWarnings("unchecked")
   @Override
   public Collection<PoolOrderCompletion> getForPool(Long poolId) throws HibernateException, IOException {
-    Query query = currentSession().createQuery("from PoolOrderCompletion where poolId = :id");
+    final Query query = currentSession().createQuery("from PoolOrderCompletion where poolId = :id");
     query.setLong("id", poolId);
     return fetchSqlStore(query.list());
   }
@@ -57,7 +57,7 @@ public class HibernatePoolOrderCompletionDao implements PoolOrderCompletionDao {
   @SuppressWarnings("unchecked")
   @Override
   public Collection<PoolOrderCompletion> list() throws HibernateException, IOException {
-    Query query = currentSession().createQuery("from PoolOrderCompletion");
+    final Query query = currentSession().createQuery("from PoolOrderCompletion");
     return fetchSqlStore(query.list());
   }
 

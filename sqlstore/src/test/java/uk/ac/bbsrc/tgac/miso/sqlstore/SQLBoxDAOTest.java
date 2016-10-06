@@ -61,7 +61,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.BoxSize;
 import uk.ac.bbsrc.tgac.miso.core.data.BoxUse;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
-import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.BoxImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
@@ -70,13 +69,13 @@ import uk.ac.bbsrc.tgac.miso.core.factory.TgacDataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.MisoNamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.store.ChangeLogStore;
 import uk.ac.bbsrc.tgac.miso.core.store.NoteStore;
+import uk.ac.bbsrc.tgac.miso.core.store.PoolStore;
 import uk.ac.bbsrc.tgac.miso.core.store.RunQcStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SequencerPartitionContainerStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SequencerReferenceStore;
 import uk.ac.bbsrc.tgac.miso.core.store.StatusStore;
 import uk.ac.bbsrc.tgac.miso.core.store.Store;
 import uk.ac.bbsrc.tgac.miso.core.store.WatcherStore;
-import uk.ac.bbsrc.tgac.miso.persistence.SampleDao;
 import uk.ac.bbsrc.tgac.miso.persistence.impl.HibernateSampleDao;
 
 public class SQLBoxDAOTest extends AbstractDAOTest {
@@ -113,7 +112,7 @@ public class SQLBoxDAOTest extends AbstractDAOTest {
   @Mock
   private HibernateSampleDao sampleDao;
   @Mock
-  private SQLPoolDAO poolDao;
+  private PoolStore poolDao;
 
   @InjectMocks
   private SQLBoxDAO dao;
@@ -127,28 +126,28 @@ public class SQLBoxDAOTest extends AbstractDAOTest {
     dao.setJdbcTemplate(jdbcTemplate);
     dao.setDataObjectFactory(new TgacDataObjectFactory());
 
-    SecurityProfile securityProfile = new SecurityProfile();
+    final SecurityProfile securityProfile = new SecurityProfile();
     when(securityProfileDAO.get(anyLong())).thenReturn(securityProfile);
-    User user = new UserImpl();
+    final User user = new UserImpl();
     user.setUserId(1l);
     when(securityDAO.getUserById(anyLong())).thenReturn(user);
 
     when(namingScheme.validateField(anyString(), anyString())).thenReturn(true);
 
-    CacheManager cacheManager = mock(CacheManager.class);
+    final CacheManager cacheManager = mock(CacheManager.class);
     Mockito.when(cacheManager.getCache(Matchers.anyString())).thenReturn(mock(Cache.class));
     dao.setCacheManager(cacheManager);
   }
 
   @Test
   public void testCount() throws IOException {
-    int runs = dao.count();
+    final int runs = dao.count();
     assertEquals(2, runs);
   }
 
   @Test
   public void testGetBoxById() throws IOException {
-    Box box = dao.get(1);
+    final Box box = dao.get(1);
     assertEquals("box1alias", box.getAlias());
     assertEquals("box1", box.getName());
     assertEquals(1, box.getId());
@@ -159,19 +158,19 @@ public class SQLBoxDAOTest extends AbstractDAOTest {
 
   @Test
   public void testBoxByAlias() throws Exception {
-    Box box = dao.getBoxByAlias("box2alias");
+    final Box box = dao.getBoxByAlias("box2alias");
     assertEquals(2, box.getId());
   }
 
   @Test
   public void testGetUseById() throws Exception {
-    BoxUse boxUse = dao.getUseById(1);
+    final BoxUse boxUse = dao.getUseById(1);
     assertEquals("boxuse1", boxUse.getAlias());
   }
 
   @Test
   public void testLazyGet() throws Exception {
-    Box box = dao.lazyGet(2);
+    final Box box = dao.lazyGet(2);
     assertEquals("box2alias", box.getAlias());
     assertEquals("box2", box.getName());
     assertEquals(2, box.getId());
@@ -182,10 +181,10 @@ public class SQLBoxDAOTest extends AbstractDAOTest {
 
   @Test
   public void testListAll() throws Exception {
-    Collection<Box> boxes = dao.listAll();
+    final Collection<Box> boxes = dao.listAll();
     assertTrue(boxes.size() == 2);
 
-    Iterator<Box> iterator = boxes.iterator();
+    final Iterator<Box> iterator = boxes.iterator();
 
     assertEquals(1, iterator.next().getId());
     assertEquals(2, iterator.next().getId());
@@ -193,20 +192,20 @@ public class SQLBoxDAOTest extends AbstractDAOTest {
 
   @Test
   public void testListAllBoxUses() throws IOException {
-    Collection<BoxUse> boxUses = dao.listAllBoxUses();
+    final Collection<BoxUse> boxUses = dao.listAllBoxUses();
     assertTrue(2 == boxUses.size());
   }
 
   @Test
   public void listALlBoxSizes() throws Exception {
-    Collection<BoxSize> boxSizes = dao.listAllBoxSizes();
+    final Collection<BoxSize> boxSizes = dao.listAllBoxSizes();
     assertTrue(boxSizes.size() == 1);
 
   }
 
   @Test
   public void testListAllBoxUsesStrings() throws Exception {
-    List<String> strings = dao.listAllBoxUsesStrings();
+    final List<String> strings = dao.listAllBoxUsesStrings();
     assertTrue(2 == strings.size());
     assertTrue(strings.contains("boxuse1"));
     assertTrue(strings.contains("boxuse2"));
@@ -214,9 +213,9 @@ public class SQLBoxDAOTest extends AbstractDAOTest {
 
   @Test
   public void testListByAlias() throws Exception {
-    Collection<Box> boxes = dao.listByAlias("box2alias");
+    final Collection<Box> boxes = dao.listByAlias("box2alias");
     assertTrue(boxes.size() == 1);
-    Box box = boxes.iterator().next();
+    final Box box = boxes.iterator().next();
     assertEquals("box2alias", box.getAlias());
     assertEquals("box2", box.getName());
     assertEquals(2, box.getId());
@@ -228,16 +227,16 @@ public class SQLBoxDAOTest extends AbstractDAOTest {
 
   @Test
   public void testListWithLimit() throws Exception {
-    Collection<Box> boxes = dao.listWithLimit(1);
+    final Collection<Box> boxes = dao.listWithLimit(1);
     assertTrue(boxes.size() == 1);
   }
 
   @Test
   public void testRemove() throws Exception {
-    Box box = dao.get(1);
-    boolean remove = dao.remove(box);
+    final Box box = dao.get(1);
+    final boolean remove = dao.remove(box);
     assertTrue(remove);
-    Collection<Box> boxes = dao.listAll();
+    final Collection<Box> boxes = dao.listAll();
     assertTrue(1 == boxes.size());
   }
 
@@ -245,7 +244,7 @@ public class SQLBoxDAOTest extends AbstractDAOTest {
   public void testEmptyAllTubes() throws Exception {
     when(poolDao.getByPositionId(1)).thenReturn(new PoolImpl(new UserImpl()));
     when(poolDao.getByBarcode(null)).thenReturn(new PoolImpl(new UserImpl()));
-    Box box = dao.get(1);
+    final Box box = dao.get(1);
 
     assertTrue("precondition failed", box.getBoxables().values().size() > 0);
     dao.emptyAllTubes(box);
@@ -258,7 +257,7 @@ public class SQLBoxDAOTest extends AbstractDAOTest {
     when(poolDao.getByPositionId(1)).thenReturn(new PoolImpl(new UserImpl()));
     when(poolDao.getByBarcode(null)).thenReturn(new PoolImpl(new UserImpl()));
 
-    Box box = dao.get(1);
+    final Box box = dao.get(1);
 
     assertTrue("precondition failed", box.getBoxables().values().size() > 0);
     dao.emptySingleTube(box, "B02");
@@ -268,22 +267,22 @@ public class SQLBoxDAOTest extends AbstractDAOTest {
 
   @Test
   public void testRemoveBoxableFromBox() throws Exception {
-    Pool pool = new PoolImpl(new UserImpl());
+    final Pool pool = new PoolImpl(new UserImpl());
     pool.setBoxPosition("1");
 
     dao.removeBoxableFromBox(pool);
   }
 
   private void mockAutoIncrement(long value) {
-    Map<String, Object> rs = new HashMap<>();
+    final Map<String, Object> rs = new HashMap<>();
     rs.put("Auto_increment", value);
     Mockito.doReturn(rs).when(jdbcTemplate).queryForMap(Matchers.anyString());
   }
 
   @Test
   public void testSave() throws Exception {
-    Box box = new BoxImpl(new UserImpl());
-    UserImpl user = new UserImpl();
+    final Box box = new BoxImpl(new UserImpl());
+    final UserImpl user = new UserImpl();
     user.setId(1l);
     box.setLastModifier(user);
     box.setDescription("newboxdescription");
@@ -291,21 +290,21 @@ public class SQLBoxDAOTest extends AbstractDAOTest {
     box.setName("newbox");
     box.setLocationBarcode("newlocationbarcode");
 
-    BoxSize boxSize = new BoxSize();
+    final BoxSize boxSize = new BoxSize();
     boxSize.setColumns(2);
     boxSize.setRows(3);
     boxSize.setId(1l);
     box.setSize(boxSize);
-    BoxUse boxuse = dao.getUseById(1);
+    final BoxUse boxuse = dao.getUseById(1);
     box.setUse(boxuse);
 
-    long autoIncrementId = nextAutoIncrementId;
+    final long autoIncrementId = nextAutoIncrementId;
     mockAutoIncrement(autoIncrementId);
 
     when(namingScheme.generateNameFor("name", box)).thenReturn("newbox");
-    long boxId = dao.save(box);
+    final long boxId = dao.save(box);
 
-    Box retrieved = dao.get(boxId);
+    final Box retrieved = dao.get(boxId);
 
     assertEquals(box.getDescription(), retrieved.getDescription());
     assertEquals(box.getAlias(), retrieved.getAlias());
@@ -315,7 +314,7 @@ public class SQLBoxDAOTest extends AbstractDAOTest {
 
   @Test
   public void testGetBoxColumnSizes() throws Exception {
-    Map<String, Integer> boxColumnSizes = dao.getBoxColumnSizes();
+    final Map<String, Integer> boxColumnSizes = dao.getBoxColumnSizes();
 
     assertTrue(10 == boxColumnSizes.size());
   }

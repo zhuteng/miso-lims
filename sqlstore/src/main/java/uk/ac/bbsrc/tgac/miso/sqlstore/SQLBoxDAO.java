@@ -12,8 +12,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import net.sf.ehcache.CacheManager;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.store.SecurityStore;
 
+import net.sf.ehcache.CacheManager;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractBox;
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.BoxSize;
@@ -82,9 +81,9 @@ public class SQLBoxDAO implements BoxStore {
 
           @Override
           public void processRow(ResultSet inner_rs) throws SQLException {
-            long positionId = inner_rs.getLong("boxPositionId");
-            int row = inner_rs.getInt("row");
-            int column = inner_rs.getInt("column");
+            final long positionId = inner_rs.getLong("boxPositionId");
+            final int row = inner_rs.getInt("row");
+            final int column = inner_rs.getInt("column");
             Boxable item;
             if (isLazy()) {
               // don't really care what the item is, but do want an accurate count of how many boxables are in the box
@@ -94,7 +93,7 @@ public class SQLBoxDAO implements BoxStore {
               if (item == null) {
                 try {
                   item = sampleDAO.getByPositionId(positionId);
-                } catch (IOException e) {
+                } catch (final IOException e) {
                   throw new SQLException("Could not get sample.", e);
                 }
               }
@@ -106,7 +105,7 @@ public class SQLBoxDAO implements BoxStore {
           }
         }, box.getId());
         box.getChangeLog().addAll(changeLogDAO.listAllById(TABLE_NAME, rs.getLong("boxId")));
-      } catch (IOException e) {
+      } catch (final IOException e) {
         e.printStackTrace();
       }
       return box;
@@ -121,7 +120,7 @@ public class SQLBoxDAO implements BoxStore {
 
     @Override
     public BoxSize mapRow(ResultSet rs, int rownum) throws SQLException {
-      BoxSize size = new BoxSize();
+      final BoxSize size = new BoxSize();
       size.setId(rs.getLong("boxSizeId"));
       size.setRows(rs.getInt("rows"));
       size.setColumns(rs.getInt("columns"));
@@ -139,7 +138,7 @@ public class SQLBoxDAO implements BoxStore {
 
     @Override
     public BoxUse mapRow(ResultSet rs, int rownum) throws SQLException {
-      BoxUse use = new BoxUse();
+      final BoxUse use = new BoxUse();
       use.setId(rs.getLong("boxUseId"));
       use.setAlias(rs.getString("alias"));
       return use;
@@ -187,7 +186,7 @@ public class SQLBoxDAO implements BoxStore {
   private static final String BOX_DELETE_CONTENTS = "DELETE FROM BoxPosition WHERE boxId = ?";
 
   private static final String BOX_INSERT_CONTENTS = "REPLACE INTO BoxPosition (boxId, `row`, `column`, boxPositionId) VALUES (?, ?, ?, ?)";
-  
+
   private static final String BOX_POSITION_REMOVE_BY_ID = "DELETE FROM BoxPosition WHERE boxPositionId = ?";
 
   @Autowired
@@ -213,19 +212,19 @@ public class SQLBoxDAO implements BoxStore {
 
   @Override
   public Box get(long boxId) throws IOException {
-    List<Box> results = template.query(BOX_SELECT_BY_ID, new Object[] { boxId }, new BoxMapper());
+    final List<Box> results = template.query(BOX_SELECT_BY_ID, new Object[] { boxId }, new BoxMapper());
     return results.size() > 0 ? results.get(0) : null;
   }
 
   @Override
   public Box getBoxByAlias(String alias) throws IOException {
-    List<Box> results = template.query(BOX_SELECT_BY_ALIAS, new Object[] { alias }, new BoxMapper(true));
+    final List<Box> results = template.query(BOX_SELECT_BY_ALIAS, new Object[] { alias }, new BoxMapper(true));
     return results.size() > 0 ? results.get(0) : null;
   }
 
   @Override
   public Box getByBarcode(String barcode) throws IOException {
-    List<Box> results = template.query(BOX_SELECT_BY_ID_BARCODE, new Object[] { barcode }, new BoxMapper(true));
+    final List<Box> results = template.query(BOX_SELECT_BY_ID_BARCODE, new Object[] { barcode }, new BoxMapper(true));
     return results.size() > 0 ? results.get(0) : null;
   }
 
@@ -238,7 +237,7 @@ public class SQLBoxDAO implements BoxStore {
   }
 
   public void autoGenerateIdBarcode(Box box) {
-    String barcode = box.getName() + "::" + box.getAlias();
+    final String barcode = box.getName() + "::" + box.getAlias();
     box.setIdentificationBarcode(barcode);
   } // if !autoGenerateIdentificationBarcodes then the identificationBarcode is set by the user
 
@@ -256,10 +255,6 @@ public class SQLBoxDAO implements BoxStore {
 
   public LibraryStore getLibraryDAO() {
     return libraryDAO;
-  }
-
-  public PoolStore getPoolDAO() {
-    return poolDAO;
   }
 
   public SampleStore getSampleDAO() {
@@ -295,10 +290,6 @@ public class SQLBoxDAO implements BoxStore {
     this.libraryDAO = libraryDAO;
   }
 
-  public void setPoolDAO(PoolStore poolDAO) {
-    this.poolDAO = poolDAO;
-  }
-
   public void setSampleDAO(SampleStore sampleDAO) {
     this.sampleDAO = sampleDAO;
   }
@@ -318,19 +309,19 @@ public class SQLBoxDAO implements BoxStore {
 
   @Override
   public BoxSize getSizeById(long id) throws IOException {
-    List<BoxSize> results = template.query(BOX_SIZE_SELECT_BY_ID, new Object[] { id }, new BoxSizeMapper());
+    final List<BoxSize> results = template.query(BOX_SIZE_SELECT_BY_ID, new Object[] { id }, new BoxSizeMapper());
     return results.size() > 0 ? results.get(0) : null;
   }
 
   @Override
   public BoxUse getUseById(long id) throws IOException {
-    List<BoxUse> results = template.query(BOX_USE_SELECT_BY_ID, new Object[] { id }, new BoxUseMapper());
+    final List<BoxUse> results = template.query(BOX_USE_SELECT_BY_ID, new Object[] { id }, new BoxUseMapper());
     return results.size() > 0 ? results.get(0) : null;
   }
 
   @Override
   public Box lazyGet(long boxId) throws IOException {
-    List<Box> results = template.query(BOX_SELECT_BY_ID, new Object[] { boxId }, new BoxMapper(true));
+    final List<Box> results = template.query(BOX_SELECT_BY_ID, new Object[] { boxId }, new BoxMapper(true));
     return results.size() > 0 ? results.get(0) : null;
   }
 
@@ -367,16 +358,16 @@ public class SQLBoxDAO implements BoxStore {
   @Override
   public boolean remove(Box box) throws IOException {
     template.update(BOX_DELETE_CONTENTS, box.getId());
-    NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
+    final NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
     return namedTemplate.update(BOX_DELETE, new MapSqlParameterSource().addValue("boxId", box.getId())) == 1;
   }
 
   @Override
   public void emptySingleTube(Box box, String position) throws IOException {
-    String barcode = box.getBoxable(position).getIdentificationBarcode();
-    Sample sample = sampleDAO.getByBarcode(barcode);
-    Library library = libraryDAO.getByBarcode(barcode);
-    Pool<? extends Poolable<?,?>> pool = poolDAO.getByBarcode(barcode);
+    final String barcode = box.getBoxable(position).getIdentificationBarcode();
+    final Sample sample = sampleDAO.getByBarcode(barcode);
+    final Library library = libraryDAO.getByBarcode(barcode);
+    final Pool<? extends Poolable<?,?>> pool = poolDAO.getByBarcode(barcode);
 
     if ((sample == null ? 0 : 1) + (library == null ? 0 : 1) + (pool == null ? 0 : 1) > 1) {
       String errorMessage = "";
@@ -394,7 +385,7 @@ public class SQLBoxDAO implements BoxStore {
       try {
         box.removeBoxable(position);
         save(box);
-      } catch (IOException e) {
+      } catch (final IOException e) {
         log.debug("Error saving box", e);
         throw new IOException(e.getMessage());
       }
@@ -414,34 +405,34 @@ public class SQLBoxDAO implements BoxStore {
 
   @Override
   public void emptyAllTubes(Box box) throws IOException {
-    List<String> boxableBarcodes = new ArrayList<String>();
-    for (Boxable boxable : box.getBoxables().values()) {
+    final List<String> boxableBarcodes = new ArrayList<String>();
+    for (final Boxable boxable : box.getBoxables().values()) {
       boxableBarcodes.add(boxable.getIdentificationBarcode());
     }
     try {
       box.removeAllBoxables();
       save(box);
-    } catch (IOException e) {
+    } catch (final IOException e) {
       log.debug("Error emptying box", e);
       throw new IOException("Error emptying box: " + e.getMessage());
     }
 
-    for (String barcode : boxableBarcodes) {
-      Sample sample = sampleDAO.getByBarcode(barcode);
+    for (final String barcode : boxableBarcodes) {
+      final Sample sample = sampleDAO.getByBarcode(barcode);
       if (sample != null) {
         sample.setEmpty(true);
         sampleDAO.save(sample);
         continue;
       }
 
-      Library library = libraryDAO.getByBarcode(barcode);
+      final Library library = libraryDAO.getByBarcode(barcode);
       if (library != null) {
         library.setEmpty(true);
         libraryDAO.save(library);
         continue;
       }
 
-      Pool<? extends Poolable<?,?>> pool = poolDAO.getByBarcode(barcode);
+      final Pool<? extends Poolable<?,?>> pool = poolDAO.getByBarcode(barcode);
       if (pool != null) {
         pool.setEmpty(true);
         poolDAO.save(pool);
@@ -451,7 +442,7 @@ public class SQLBoxDAO implements BoxStore {
       throw new IOException("Could not find a sample or library with barcode " + barcode);
     }
   }
-  
+
   @Override
   public void removeBoxableFromBox(Boxable boxable) throws IOException {
     template.update(BOX_POSITION_REMOVE_BY_ID, boxable.getBoxPositionId());
@@ -464,7 +455,7 @@ public class SQLBoxDAO implements BoxStore {
       securityProfileId = getSecurityProfileDAO().save(box.getSecurityProfile());
     }
 
-    MapSqlParameterSource params = new MapSqlParameterSource();
+    final MapSqlParameterSource params = new MapSqlParameterSource();
     params.addValue("boxSizeId", box.getSize().getId());
     params.addValue("boxUseId", box.getUse().getId());
     params.addValue("alias", box.getAlias());
@@ -474,11 +465,11 @@ public class SQLBoxDAO implements BoxStore {
     params.addValue("lastModifier", box.getLastModifier().getUserId());
 
     if (box.getId() == AbstractBox.UNSAVED_ID) {
-      SimpleJdbcInsert insert = new SimpleJdbcInsert(template).withTableName(TABLE_NAME).usingGeneratedKeyColumns("boxId");
+      final SimpleJdbcInsert insert = new SimpleJdbcInsert(template).withTableName(TABLE_NAME).usingGeneratedKeyColumns("boxId");
       try {
         box.setId(DbUtils.getAutoIncrement(template, TABLE_NAME));
 
-        String name = namingScheme.generateNameFor("name", box);
+        final String name = namingScheme.generateNameFor("name", box);
         box.setName(name);
 
         if (namingScheme.validateField("name", box.getName())) {
@@ -489,7 +480,7 @@ public class SQLBoxDAO implements BoxStore {
           }
           params.addValue("identificationBarcode", box.getIdentificationBarcode());
 
-          Number newId = insert.executeAndReturnKey(params);
+          final Number newId = insert.executeAndReturnKey(params);
           if (newId.longValue() != box.getId()) {
             log.error("Expected Box ID doesn't match returned value from database insert: rolling back...");
             new NamedParameterJdbcTemplate(template).update(BOX_DELETE, new MapSqlParameterSource().addValue("boxId", newId.longValue()));
@@ -498,7 +489,7 @@ public class SQLBoxDAO implements BoxStore {
         } else {
           throw new IOException("Cannot save Box - invalid field:" + box.toString());
         }
-      } catch (MisoNamingException e) {
+      } catch (final MisoNamingException e) {
         throw new IOException("Cannot save Box - issue with naming scheme", e);
       }
 
@@ -512,18 +503,18 @@ public class SQLBoxDAO implements BoxStore {
           params.addValue("boxId", box.getId());
           params.addValue("name", box.getName());
           params.addValue("identificationBarcode", box.getIdentificationBarcode());
-          NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
+          final NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
           namedTemplate.update(BOX_UPDATE, params);
         } else {
           throw new IOException("Cannot save Box - invalid field:" + box.toString());
         }
-      } catch (MisoNamingException e) {
+      } catch (final MisoNamingException e) {
         throw new IOException("Cannot save Box - issue with naming scheme", e);
       }
     }
 
     final Map<Long, String> oldLocations = new HashMap<>();
-    Map<Long, String> newLocations = new HashMap<>();
+    final Map<Long, String> newLocations = new HashMap<>();
     template.query("SELECT * FROM BoxPosition WHERE boxId = ?", new Object[] { box.getId() }, new RowCallbackHandler() {
 
       @Override
@@ -533,35 +524,35 @@ public class SQLBoxDAO implements BoxStore {
     });
 
     template.update(BOX_DELETE_CONTENTS, box.getId());
-    for (Entry<String, Boxable> entry : box.getBoxables().entrySet()) {
+    for (final Entry<String, Boxable> entry : box.getBoxables().entrySet()) {
       if (entry.getValue() == null) continue;
-      int row = BoxUtils.fromRowChar(entry.getKey().charAt(0));
-      int column = Integer.parseInt(entry.getKey().substring(1)) - 1;
+      final int row = BoxUtils.fromRowChar(entry.getKey().charAt(0));
+      final int column = Integer.parseInt(entry.getKey().substring(1)) - 1;
       template.update(BOX_INSERT_CONTENTS, box.getId(), row, column, entry.getValue().getBoxPositionId());
       newLocations.put(entry.getValue().getBoxPositionId(), entry.getKey());
     }
 
-    Set<Long> commonIds = new HashSet<>(oldLocations.keySet());
+    final Set<Long> commonIds = new HashSet<>(oldLocations.keySet());
     commonIds.retainAll(newLocations.keySet());
 
-    Set<Long> addedIds = new HashSet<>(newLocations.keySet());
+    final Set<Long> addedIds = new HashSet<>(newLocations.keySet());
     addedIds.removeAll(commonIds);
-    Set<Long> removedIds = new HashSet<>(oldLocations.keySet());
+    final Set<Long> removedIds = new HashSet<>(oldLocations.keySet());
     removedIds.removeAll(commonIds);
-    Set<Long> movedIds = new HashSet<>();
-    for (Long id : commonIds) {
+    final Set<Long> movedIds = new HashSet<>();
+    for (final Long id : commonIds) {
       if (!oldLocations.get(id).equals(newLocations.get(id))) {
         movedIds.add(id);
       }
     }
 
     if (!addedIds.isEmpty() || !removedIds.isEmpty() || !movedIds.isEmpty()) {
-      String message = box.getLastModifier().getLoginName() + generateChangeLog("added", addedIds)
-          + generateChangeLog("removed", removedIds) + generateChangeLog("moved", movedIds);
+      final String message = box.getLastModifier().getLoginName() + generateChangeLog("added", addedIds)
+      + generateChangeLog("removed", removedIds) + generateChangeLog("moved", movedIds);
       template.update("INSERT INTO BoxChangeLog (boxId, columnsChanged, userId, message) VALUES (?, '', ?, ?)", box.getId(),
           box.getLastModifier().getUserId(), message);
     }
-    for (Class<?> clazz : new Class<?>[] { Library.class, Pool.class, Sample.class }) {
+    for (final Class<?> clazz : new Class<?>[] { Library.class, Pool.class, Sample.class }) {
       // remove all caching for Libraries, Pools and Samples to ensure correct position is displayed
       DbUtils.lookupCache(getCacheManager(), clazz, false).removeAll();
       DbUtils.lookupCache(getCacheManager(), clazz, true).removeAll();
@@ -573,11 +564,11 @@ public class SQLBoxDAO implements BoxStore {
   private String generateChangeLog(String verb, Set<Long> ids) {
     if (ids.isEmpty()) return "";
 
-    StringBuilder query = new StringBuilder();
+    final StringBuilder query = new StringBuilder();
     query.append(
         "SELECT CONCAT(name, '::', alias) AS friendly FROM (SELECT boxPositionId, name, alias FROM Library UNION SELECT boxPositionId, name, alias FROM Pool UNION SELECT boxPositionId, name, alias FROM Sample) AS Boxable WHERE boxpositionId IN (");
     boolean first = true;
-    for (long id : ids) {
+    for (final long id : ids) {
       if (first) {
         first = false;
       } else {
@@ -616,5 +607,9 @@ public class SQLBoxDAO implements BoxStore {
   @Override
   public Map<String, Integer> getBoxColumnSizes() throws IOException {
     return DbUtils.getColumnSizes(template, TABLE_NAME);
+  }
+
+  public void setPoolDAO(PoolStore poolStore){
+    this.poolDAO = poolStore;
   }
 }

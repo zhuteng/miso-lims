@@ -25,7 +25,7 @@ public class DefaultPoolOrderCompletionService implements PoolOrderCompletionSer
   private PoolOrderCompletionDao poolOrderCompletionDao;
 
   @Autowired
-  @Qualifier("sqlPoolDAO")
+  @Qualifier("poolStore")
   private PoolStore poolDao;
 
   @Autowired
@@ -33,7 +33,7 @@ public class DefaultPoolOrderCompletionService implements PoolOrderCompletionSer
 
   @Override
   public Collection<PoolOrderCompletion> getOrderCompletionForPool(long id) throws AuthorizationException, IOException {
-    Pool<? extends Poolable<?, ?>> p = poolDao.get(id);
+    final Pool<? extends Poolable<?, ?>> p = poolDao.get(id);
     authorizationManager.throwIfNotReadable(p);
     return poolOrderCompletionDao.getForPool(id);
   }
