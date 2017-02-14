@@ -9,17 +9,20 @@
         <meta name="description" content="An open-source LIMS for NGS sequencing centres">
 
         <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" rel="stylesheet">
-        <link rel="stylesheet" href="/css/syntax.css">
-        <link rel="stylesheet" href="/css/main.css">
+        <link rel="stylesheet" href="/miso-lims/styles/syntax.css">
+        <link rel="stylesheet" href="/miso-lims/styles/main.css">
     </head>
     <body>
 <a href="https://github.com/TGAC/miso-lims"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/a6677b08c955af8400f44c6298f40e7d19cc5b2d/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f677261795f3664366436642e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png"></a>
+
+
         <div class="container">
             <div class="row">
                 <div id="header" class="col-sm-12">
-                    <h2><a class="brand" href="/"><img src="/images/MISO.png"/>MISO</a>
+                    <h2><a class="brand" href="/miso-lims/"><img src="/miso-lims/images/MISO.png"/>MISO</a>
     <small>An open-source LIMS for NGS sequencing centres</small>
 </h2>
+<span class="badge" style="position: relative;left:20px;bottom:20px;background:#8DBDD8;">Original</span>
 
                 </div>
             </div>
@@ -29,92 +32,41 @@
                 
                     <div id="navigation" class="col-sm-2">
                         <ul class="nav nav-list">
-    <!--<li><a href="/">Home</a></li>-->
-    
-        
-        
-
-        
-    
-        
+    <!--<li><a href="/miso-lims/">Home</a></li>-->
+    <a href="/miso-lims/">Home</a>
+    <hr>
+    <a href="/miso-lims/manuals/developers-manual"><b>Developer's Manual</b></a>
         
 
         
             
-                <li class="nav-header">User Guides</li>
+                <li class="nav-header"></li>
             
-            <li data-order="1"><a href="/usr/user-manual.html">User Manual</a></li>
-        
-    
-        
-        
-
+            <li data-order=""><a href="/miso-lims/dev/rest-testing.html">REST Testing</a></li>
         
             
-                <li class="nav-header">Admin Guides</li>
-            
-            <li data-order=""><a href="/adm/external-webapp.html">Configuring the external webapp</a></li>
+            <li data-order=""><a href="/miso-lims/dev/rest-api.html">REST API</a></li>
         
             
-            <li data-order=""><a href="/adm/admin-manual.html">Administrator's Manual</a></li>
-        
-    
-        
-        
-
+            <li data-order=""><a href="/miso-lims/dev/maven-artifacts.html">Maven artifacts</a></li>
         
             
-                <li class="nav-header">Developer Guides</li>
-            
-            <li data-order=""><a href="/dev/rest-testing.html">REST Testing</a></li>
+            <li data-order=""><a href="/miso-lims/dev/kit-tracking.html">Kit Tracking</a></li>
         
             
-            <li data-order=""><a href="/dev/maven-artifacts.html">Maven artifacts</a></li>
+            <li data-order="2"><a href="/miso-lims/dev/eclipse-code-formatting.html">Eclipse Code Formatting</a></li>
         
             
-            <li data-order=""><a href="/dev/kit-tracking.html">Kit Tracking</a></li>
+            <li data-order="2"><a href="/miso-lims/dev/code-style.html">Code Style</a></li>
         
-            
-            <li data-order=""><a href="/dev/eclipse-code-formatting.html">Eclipse Code Formatting</a></li>
-        
-            
-            <li data-order=""><a href="/dev/code-style.html">Code Style</a></li>
-        
-            
-            <li data-order=""><a href="/dev/developers-manual.html">Developer's Manual</a></li>
-        
-    
-        
-        
-
-        
-            
-                <li class="nav-header">Reference</li>
-            
-            <li data-order=""><a href="/ref/rest-api.html">REST API</a></li>
-        
-    
-        
-        
-
-        
-    
-<!-- List additional links. It is recommended to add a divider
-    e.g. <li class="divider"></li> first to break up the content. -->
 </ul>
 
                     </div>
 
                     <div id="content" class="col-sm-10">
-                        <div class="page-header">
-    <h2>Developer's Manual
-        
-    </h2>
-</div>
+                        <p><img src="/plugins/servlet/confluence/placeholder/macro?definition=e3RvYzpvdXRsaW5lPXRydWV9&amp;locale=en_GB&amp;version=2" alt="" /></p>
 
-<p><img src="/plugins/servlet/confluence/placeholder/macro?definition=e3RvYzpvdXRsaW5lPXRydWV9&amp;locale=en_GB&amp;version=2" alt="" /></p>
-
-<h1 id="introduction">Introduction</h1>
+<h1 id="developers-manual">Developer’s Manual</h1>
 
 <p>This is the “Really Big Index” of all MISO’s major development areas. Some things may be missing here - if so, please <a href="http://tracker.tgac.ac.uk">contact us</a>.</p>
 
@@ -128,7 +80,7 @@
 
 <p>The MISO domain model incorporates those objects which are central to describing the generic core workflow of NGS experiments.</p>
 
-<p><img src="/images/core_model.png" alt="MISO model interfaces" /></p>
+<p><img src="/miso-lims/images/core_model.png" alt="MISO model interfaces" /></p>
 
 <h3 id="core-behavioral-interfaces">Core Behavioral Interfaces</h3>
 
@@ -209,19 +161,20 @@
 
 <p>MISO objects are secured based on a SecurityProfile associated with that object:</p>
 
-<pre><code class="language-java">public class SecurityProfile implements Serializable {
-  ...
+<div class="language-java highlighter-rouge"><pre class="highlight"><code><span class="kd">public</span> <span class="kd">class</span> <span class="nc">SecurityProfile</span> <span class="kd">implements</span> <span class="n">Serializable</span> <span class="o">{</span>
+  <span class="o">...</span>
 
-  private User owner = null;
-  private Collection&lt;User&gt; readUsers = new HashSet&lt;User&gt;();
-  private Collection&lt;User&gt; writeUsers = new HashSet&lt;User&gt;();
-  private Collection&lt;Group&gt; readGroups = new HashSet&lt;Group&gt;();
-  private Collection&lt;Group&gt; writeGroups = new HashSet&lt;Group&gt;();
-  private boolean allowAllInternal = true;
+  <span class="kd">private</span> <span class="n">User</span> <span class="n">owner</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+  <span class="kd">private</span> <span class="n">Collection</span><span class="o">&lt;</span><span class="n">User</span><span class="o">&gt;</span> <span class="n">readUsers</span> <span class="o">=</span> <span class="k">new</span> <span class="n">HashSet</span><span class="o">&lt;</span><span class="n">User</span><span class="o">&gt;();</span>
+  <span class="kd">private</span> <span class="n">Collection</span><span class="o">&lt;</span><span class="n">User</span><span class="o">&gt;</span> <span class="n">writeUsers</span> <span class="o">=</span> <span class="k">new</span> <span class="n">HashSet</span><span class="o">&lt;</span><span class="n">User</span><span class="o">&gt;();</span>
+  <span class="kd">private</span> <span class="n">Collection</span><span class="o">&lt;</span><span class="n">Group</span><span class="o">&gt;</span> <span class="n">readGroups</span> <span class="o">=</span> <span class="k">new</span> <span class="n">HashSet</span><span class="o">&lt;</span><span class="n">Group</span><span class="o">&gt;();</span>
+  <span class="kd">private</span> <span class="n">Collection</span><span class="o">&lt;</span><span class="n">Group</span><span class="o">&gt;</span> <span class="n">writeGroups</span> <span class="o">=</span> <span class="k">new</span> <span class="n">HashSet</span><span class="o">&lt;</span><span class="n">Group</span><span class="o">&gt;();</span>
+  <span class="kd">private</span> <span class="kt">boolean</span> <span class="n">allowAllInternal</span> <span class="o">=</span> <span class="kc">true</span><span class="o">;</span>
 
-  ...
-}
+  <span class="o">...</span>
+<span class="o">}</span>
 </code></pre>
+</div>
 
 <p>SecurityProfiles control access based on a single overarching owner, which always has full access (read/write/delete). Users can then be registered with that object’s SecurityProfile that enable them to read or write information. Similarly, read and write access can be specified at the Group level. The <em>allowAllInternal</em> flag states that any User with the ROLE_INTERNAL role (see LINK User Roles) is able to read and write to this object, regardless of the Group that the User is a part of.</p>
 
@@ -271,11 +224,12 @@
 
 <p>A <a href="https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/service/naming/MisoNamingScheme.java">MisoNamingScheme</a> is typed by a class T that will be represented and returned by the <strong>namingSchemeFor()</strong> method. They also need to be uniquely named so that they can be resolved at runtime (see also <a href="#DeveloperManual-NamingSchemeServices">Naming Scheme Services</a>). Fields in the typed class are mapped to validation regular expressions, and exposed via the <strong>validateField(String field, String entityName)</strong> method. Finally, names can be generated by mapping <a href="https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/service/naming/NameGenerator.java">NameGenerator</a> instances (see below) to the fields from which names need to be generated, in the same fashion as the validation mapping process. A default concrete implementation, <a href="https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/service/naming/DefaultEntityNamingScheme.java">DefaultEntityNamingScheme</a>, is supplied that will generate and validate entity names of the regex below for any instances of the <a href="https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/data/Nameable.java">Nameable</a> class type:</p>
 
-<pre><code class="language-java">...
-type = (Class&lt;T&gt;)Class.forName("uk.ac.bbsrc.tgac.miso.core.data.Nameable");
-validationMap.put("name", Pattern.compile("([A-Z]{3})([0-9]+)"));
-...
+<div class="language-java highlighter-rouge"><pre class="highlight"><code><span class="o">...</span>
+<span class="n">type</span> <span class="o">=</span> <span class="o">(</span><span class="n">Class</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;)</span><span class="n">Class</span><span class="o">.</span><span class="na">forName</span><span class="o">(</span><span class="s">"uk.ac.bbsrc.tgac.miso.core.data.Nameable"</span><span class="o">);</span>
+<span class="n">validationMap</span><span class="o">.</span><span class="na">put</span><span class="o">(</span><span class="s">"name"</span><span class="o">,</span> <span class="n">Pattern</span><span class="o">.</span><span class="na">compile</span><span class="o">(</span><span class="s">"([A-Z]{3})([0-9]+)"</span><span class="o">));</span>
+<span class="o">...</span>
 </code></pre>
+</div>
 
 <p>In this example, the <a href="https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/service/naming/DefaultEntityNamingScheme.java">DefaultEntityNamingScheme</a> will use reflection to retrieve the contents of the <em>name</em> field via the <strong>getName()</strong> method, as mapped by the “name” key (the “get” prefix is added by the implementation). As such, “FOO123” is a valid name, whereas “BA1” and “BAZ1FOO” are not. If you aren’t worried about name collisions for certain fields (which isn’t really helpful and certainly isn’t recommended), then MISO supplies the <a href="https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/service/naming/AllowAnythingEntityNamingScheme.java">AllowAnythingEntityNamingScheme</a> implementation which validates against the (.*) regex and generates names based on the object’s simple class name and ID.</p>
 
@@ -291,24 +245,27 @@ validationMap.put("name", Pattern.compile("([A-Z]{3})([0-9]+)"));
 
 <p>API access to the underlying filesystem is made available through implementors of the <a href="https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/manager/FilesManager.java">FilesManager</a> interface. This interface defines a contract to, based on a properties-supplied base directory (see <a href="#DeveloperManual-Configuration">Web Application Configuration</a> and <a href="https://documentation.tgac.ac.uk/pages/viewpage.action?pageId=950282#Installation&amp;AdministrationManual-Settingupmiso.propertiesfile">Installation Readme</a>), generate temporary files, store files and retrieve files from disk, and list files within a given storage directory. The default file storage path is:</p>
 
-<pre><code>/storage/miso/files
+<div class="highlighter-rouge"><pre class="highlight"><code>/storage/miso/files
 </code></pre>
+</div>
 
 <p>It is very important that all the underlying directories exist and are writable by the user that runs the MISO instance, but at any rate MISO will attempt to check and create these paths if not.</p>
 
 <p>This manager provides a mechanism to standardise file output into specific directories based on Java object types (simple class names, lowercased) and qualifiers. These qualifiers are a simple string which can be kept constant by the implementor for a given field, e.g object entity ID. So, for example, sample delivery forms can be generated and stored under a Project type and qualifier (see LINK Sample Delivery Forms). The code to do this looks something like:</p>
 
-<pre><code class="language-java">File f = misoFileManager.getNewFile(
-           Project.class,
-           projectId.toString(),
-           "SampleDeliveryForm-" + LimsUtils.getCurrentDateAsString() + ".odt");
+<div class="language-java highlighter-rouge"><pre class="highlight"><code><span class="n">File</span> <span class="n">f</span> <span class="o">=</span> <span class="n">misoFileManager</span><span class="o">.</span><span class="na">getNewFile</span><span class="o">(</span>
+           <span class="n">Project</span><span class="o">.</span><span class="na">class</span><span class="o">,</span>
+           <span class="n">projectId</span><span class="o">.</span><span class="na">toString</span><span class="o">(),</span>
+           <span class="s">"SampleDeliveryForm-"</span> <span class="o">+</span> <span class="n">LimsUtils</span><span class="o">.</span><span class="na">getCurrentDateAsString</span><span class="o">()</span> <span class="o">+</span> <span class="s">".odt"</span><span class="o">);</span>
 </code></pre>
+</div>
 
-<pre><code>
+<div class="highlighter-rouge"><pre class="highlight"><code>
 A project with ID 1 and stored in the default file storage directory on the 31st May 2013 will result in the following path structure:
 
 </code></pre>
-<p>/storage/miso/files/project/1/SampleDeliveryForm-20130531.odt<br />
+</div>
+<p>/storage/miso/files/project/1/SampleDeliveryForm-20130531.odt
 ```</p>
 
 <p>MISO also obfuscates the actual filename and path within the web application user interfaces by using the file object’s hashcode.</p>
@@ -327,25 +284,27 @@ A project with ID 1 and stored in the default file storage directory on the 31st
 
 <p>The <a href="https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/service/printing/MisoPrintService.java">MisoPrintService</a> interface acts as the “glue” that wires every other required printing object together and as such is typed accordingly:</p>
 
-<pre><code class="language-java">public interface MisoPrintService&lt;T, S, C extends PrintContext&lt;T&gt;&gt; {
-  ...
-}
+<div class="language-java highlighter-rouge"><pre class="highlight"><code><span class="kd">public</span> <span class="kd">interface</span> <span class="nc">MisoPrintService</span><span class="o">&lt;</span><span class="n">T</span><span class="o">,</span> <span class="n">S</span><span class="o">,</span> <span class="n">C</span> <span class="kd">extends</span> <span class="n">PrintContext</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;&gt;</span> <span class="o">{</span>
+  <span class="o">...</span>
+<span class="o">}</span>
 </code></pre>
+</div>
 
 <p>Various selected methods act on these specified types:</p>
 
-<pre><code class="language-java">  C getPrintContext();
-  void setPrintContext(C pc);
+<div class="language-java highlighter-rouge"><pre class="highlight"><code>  <span class="n">C</span> <span class="nf">getPrintContext</span><span class="o">();</span>
+  <span class="kt">void</span> <span class="nf">setPrintContext</span><span class="o">(</span><span class="n">C</span> <span class="n">pc</span><span class="o">);</span>
 
-  boolean print(T content) throws IOException;
+  <span class="kt">boolean</span> <span class="nf">print</span><span class="o">(</span><span class="n">T</span> <span class="n">content</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">IOException</span><span class="o">;</span>
 
-  void setPrintServiceFor(Class&lt;? extends S&gt; c);
-  Class&lt;? extends S&gt; getPrintServiceFor();
+  <span class="kt">void</span> <span class="nf">setPrintServiceFor</span><span class="o">(</span><span class="n">Class</span><span class="o">&lt;?</span> <span class="kd">extends</span> <span class="n">S</span><span class="o">&gt;</span> <span class="n">c</span><span class="o">);</span>
+  <span class="n">Class</span><span class="o">&lt;?</span> <span class="kd">extends</span> <span class="n">S</span><span class="o">&gt;</span> <span class="nf">getPrintServiceFor</span><span class="o">();</span>
 
-  public T getLabelFor(S b);
-  void setBarcodableSchema(BarcodableSchema&lt;T, S&gt; barcodableSchema);
-  BarcodableSchema getBarcodableSchema();
+  <span class="kd">public</span> <span class="n">T</span> <span class="nf">getLabelFor</span><span class="o">(</span><span class="n">S</span> <span class="n">b</span><span class="o">);</span>
+  <span class="kt">void</span> <span class="nf">setBarcodableSchema</span><span class="o">(</span><span class="n">BarcodableSchema</span><span class="o">&lt;</span><span class="n">T</span><span class="o">,</span> <span class="n">S</span><span class="o">&gt;</span> <span class="n">barcodableSchema</span><span class="o">);</span>
+  <span class="n">BarcodableSchema</span> <span class="nf">getBarcodableSchema</span><span class="o">();</span>
 </code></pre>
+</div>
 
 <p><strong>T</strong> here represents the type that represents the actual label object. This could be a <em>File</em>, <em>String</em>, or other custom object that the <strong>print(T content)</strong> method takes.</p>
 
@@ -353,133 +312,141 @@ A project with ID 1 and stored in the default file storage directory on the 31st
 
 <p>A <a href="https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/service/printing/schema/BarcodableSchema.java">BarcodableSchema</a> represents the way that an object of the domain model class type <strong>S</strong>is converted into the label object <strong>T</strong>:</p>
 
-<pre><code class="language-java">@Spi
-public interface BarcodableSchema&lt;S, T&gt; {
-  Class&lt;T&gt; isStateFor();
-  public String getRawState(T t);
-  public S getPrintableLabel(T t);
-  String getName();
-  public BarcodeLabelFactory&lt;S, T, BarcodableSchema&lt;S, T&gt;&gt; getBarcodeLabelFactory();
-}
+<div class="language-java highlighter-rouge"><pre class="highlight"><code><span class="nd">@Spi</span>
+<span class="kd">public</span> <span class="kd">interface</span> <span class="nc">BarcodableSchema</span><span class="o">&lt;</span><span class="n">S</span><span class="o">,</span> <span class="n">T</span><span class="o">&gt;</span> <span class="o">{</span>
+  <span class="n">Class</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="nf">isStateFor</span><span class="o">();</span>
+  <span class="kd">public</span> <span class="n">String</span> <span class="nf">getRawState</span><span class="o">(</span><span class="n">T</span> <span class="n">t</span><span class="o">);</span>
+  <span class="kd">public</span> <span class="n">S</span> <span class="nf">getPrintableLabel</span><span class="o">(</span><span class="n">T</span> <span class="n">t</span><span class="o">);</span>
+  <span class="n">String</span> <span class="nf">getName</span><span class="o">();</span>
+  <span class="kd">public</span> <span class="n">BarcodeLabelFactory</span><span class="o">&lt;</span><span class="n">S</span><span class="o">,</span> <span class="n">T</span><span class="o">,</span> <span class="n">BarcodableSchema</span><span class="o">&lt;</span><span class="n">S</span><span class="o">,</span> <span class="n">T</span><span class="o">&gt;&gt;</span> <span class="nf">getBarcodeLabelFactory</span><span class="o">();</span>
+<span class="o">}</span>
 </code></pre>
+</div>
 
 <p>A <a href="https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/service/printing/context/PrintContext.java">PrintContext</a> defines the actual printer host (IP address, FQDN, LPR/IPP string, etc) and any access credentials required whereby content is printed to a host via the <strong>print(T content)</strong> method:</p>
 
-<pre><code class="language-java">@Spi
-public interface PrintContext&lt;T&gt; {
-  boolean print(T content) throws IOException;
-  public String getName();
-  public String getDescription();
-  public String getHost();
-}
+<div class="language-java highlighter-rouge"><pre class="highlight"><code><span class="nd">@Spi</span>
+<span class="kd">public</span> <span class="kd">interface</span> <span class="nc">PrintContext</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="o">{</span>
+  <span class="kt">boolean</span> <span class="nf">print</span><span class="o">(</span><span class="n">T</span> <span class="n">content</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">IOException</span><span class="o">;</span>
+  <span class="kd">public</span> <span class="n">String</span> <span class="nf">getName</span><span class="o">();</span>
+  <span class="kd">public</span> <span class="n">String</span> <span class="nf">getDescription</span><span class="o">();</span>
+  <span class="kd">public</span> <span class="n">String</span> <span class="nf">getHost</span><span class="o">();</span>
+<span class="o">}</span>
 </code></pre>
+</div>
 <p>The <strong>print(T content)</strong> method usually delegates to a <a href="https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/service/printing/strategy/PrintStrategy.java">PrintStrategy</a>, thus allowing different printing mechanisms to be used to the same <a href="https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/service/printing/context/PrintContext.java">PrintContext</a>, e.g. the same printer might accept both FTP and spooler jobs. Like a lot of other MISO services, the <a href="https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/service/printing/context/PrintContext.java">PrintContext</a> interface has the @Spi annotation, allowing any custom printing contexts to be automatically resolved at runtime by using the @ServiceProvider annotation on any concrete classes (see <a href="#DeveloperManual-MisoServiceProviders">Miso Service Providers</a>).</p>
 
 <p>The <a href="https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/service/printing/strategy/PrintStrategy.java">PrintStrategy</a> interface defines a single method, <strong>print(T content, C pc)</strong>, which actually initiates whatever mechanism is required to print the label content <strong>T</strong> to the relevant <a href="https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/service/printing/context/PrintContext.java">PrintContext</a> <strong>C</strong>:</p>
 
-<pre><code class="language-java">public interface PrintStrategy&lt;T, C extends PrintContext&gt; {
-  public boolean print(T content, C pc) throws IOException;
-}
+<div class="language-java highlighter-rouge"><pre class="highlight"><code><span class="kd">public</span> <span class="kd">interface</span> <span class="nc">PrintStrategy</span><span class="o">&lt;</span><span class="n">T</span><span class="o">,</span> <span class="n">C</span> <span class="kd">extends</span> <span class="n">PrintContext</span><span class="o">&gt;</span> <span class="o">{</span>
+  <span class="kd">public</span> <span class="kt">boolean</span> <span class="nf">print</span><span class="o">(</span><span class="n">T</span> <span class="n">content</span><span class="o">,</span> <span class="n">C</span> <span class="n">pc</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">IOException</span><span class="o">;</span>
+<span class="o">}</span>
 </code></pre>
+</div>
 
 <p>Phew! So by means of an example, let’s take a MisoPrintService that takes a JSONObject object as content, produces a File that represents barcode label information, and a strategy that knows how to print this file by FTPing it to a printer (this is what actually happens for the Brady IP300/CAB Mach4 printers we have at TGAC, via the <a href="https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/service/printing/CustomPrintService.java">CustomPrintService</a> implementation):</p>
 
-<pre><code class="language-java">@ServiceProvider
-public class CustomPrintService implements MisoPrintService&lt;File, JSONObject, PrintContext&lt;File&gt;&gt; {
-  private BarcodableSchema&lt;File, JSONObject&gt; barcodableSchema;
-  ...
-}
+<div class="language-java highlighter-rouge"><pre class="highlight"><code><span class="nd">@ServiceProvider</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">CustomPrintService</span> <span class="kd">implements</span> <span class="n">MisoPrintService</span><span class="o">&lt;</span><span class="n">File</span><span class="o">,</span> <span class="n">JSONObject</span><span class="o">,</span> <span class="n">PrintContext</span><span class="o">&lt;</span><span class="n">File</span><span class="o">&gt;&gt;</span> <span class="o">{</span>
+  <span class="kd">private</span> <span class="n">BarcodableSchema</span><span class="o">&lt;</span><span class="n">File</span><span class="o">,</span> <span class="n">JSONObject</span><span class="o">&gt;</span> <span class="n">barcodableSchema</span><span class="o">;</span>
+  <span class="o">...</span>
+<span class="o">}</span>
 </code></pre>
+</div>
 
 <p>To generate a label File from the JSONObject content, the class calls on the member <a href="https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/service/printing/schema/BarcodableSchema.java">BarcodableSchema</a>:</p>
 
-<pre><code class="language-java">public File getLabelFor(JSONObject b) {
-  return getBarcodableSchema().getPrintableLabel(b);
-}
+<div class="language-java highlighter-rouge"><pre class="highlight"><code><span class="kd">public</span> <span class="n">File</span> <span class="nf">getLabelFor</span><span class="o">(</span><span class="n">JSONObject</span> <span class="n">b</span><span class="o">)</span> <span class="o">{</span>
+  <span class="k">return</span> <span class="nf">getBarcodableSchema</span><span class="o">().</span><span class="na">getPrintableLabel</span><span class="o">(</span><span class="n">b</span><span class="o">);</span>
+<span class="o">}</span>
 </code></pre>
+</div>
 
 <p>The schema in this case is the <a href="https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/service/printing/schema/impl/BradyCustomStandardTubeBarcodeLabelSchema.java">BradyCustomStandardTubeBarcodeLabelSchema</a> implementation, which is the concrete class that can generate the <a href="https://www.google.co.uk/url?sa=t&amp;rct=j&amp;q=&amp;esrc=s&amp;source=web&amp;cd=3&amp;cad=rja&amp;ved=0CD4QFjAC&amp;url=http%3A%2F%2Fdomino.bradycms.com%2Fbrady%2Folrsv1r0.nsf%2F67493912eb200af0862568cb005367ff%2Ff5cdfc510e26b3f7c12571fc004626e2%2F%24FILE%2FProgman61_Brady.pdf&amp;ei=sLCtUaOGHMm0PLnOgcAK&amp;usg=AFQjCNFUNw75_6OiUFVvpqumm4acpZ0CBg&amp;sig2=ZfdstELqsNIcW4Cr3OaSog">Brady printer’s JScript format</a> from a JSON input string:</p>
 
-<pre><code class="language-java">@ServiceProvider
-public class BradyCustomStandardTubeBarcodeLabelSchema implements BarcodableSchema&lt;File, JSONObject&gt; {
-  private BarcodeLabelFactory&lt;File, JSONObject, BarcodableSchema&lt;File, JSONObject&gt;&gt; barcodeLabelFactory = new FileGeneratingBarcodeLabelFactory&lt;JSONObject&gt;();
-  ...
+<div class="language-java highlighter-rouge"><pre class="highlight"><code><span class="nd">@ServiceProvider</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">BradyCustomStandardTubeBarcodeLabelSchema</span> <span class="kd">implements</span> <span class="n">BarcodableSchema</span><span class="o">&lt;</span><span class="n">File</span><span class="o">,</span> <span class="n">JSONObject</span><span class="o">&gt;</span> <span class="o">{</span>
+  <span class="kd">private</span> <span class="n">BarcodeLabelFactory</span><span class="o">&lt;</span><span class="n">File</span><span class="o">,</span> <span class="n">JSONObject</span><span class="o">,</span> <span class="n">BarcodableSchema</span><span class="o">&lt;</span><span class="n">File</span><span class="o">,</span> <span class="n">JSONObject</span><span class="o">&gt;&gt;</span> <span class="n">barcodeLabelFactory</span> <span class="o">=</span> <span class="k">new</span> <span class="n">FileGeneratingBarcodeLabelFactory</span><span class="o">&lt;</span><span class="n">JSONObject</span><span class="o">&gt;();</span>
+  <span class="o">...</span>
 
-  @Override
-  public String getRawState(JSONObject jsonObject) {
-    StringBuilder sb = new StringBuilder();
-    try {
-      String barcodeit = jsonObject.getString("barcode");
-      String field1 = jsonObject.getString("field1");
-      String alias = jsonObject.getString("field2");
-      String name = jsonObject.getString("field3");
-      if ("yes".equals(barcodeit)) {
-        String barcode = new String(Base64.encodeBase64(field1.getBytes("UTF-8")));
-        sb.append("m m").append("\n");
-        sb.append("J").append("\n");
-        sb.append("S l1;0,0,12,15,38").append("\n");
-        sb.append("B 3,2,0,DATAMATRIX,0.21;").append(barcode).append("\n");
-        sb.append("B 17,1,0,DATAMATRIX+RECT,0.25;").append(barcode).append("\n");
-        sb.append("T 29,2,0,5,pt4;[DATE]").append("\n");
-      }
-      else {
-        sb.append("m m").append("\n");
-        sb.append("J").append("\n");
-        sb.append("S l1;0,0,12,15,38").append("\n");
-        sb.append("T 17,5,0,5,pt6;").append(LimsUtils.unicodeify(field1)).append("\n");
-        sb.append("T 29,2,0,5,pt4;[DATE]").append("\n");
-      }
-      //shorten alias to fit on label if too long
-      if (alias.length() &gt;= 17) {
-        alias = alias.substring(0, 15) + "...";
-      }
-      sb.append("T 17,8,0,5,pt6;").append(LimsUtils.unicodeify(alias)).append("\n");
-      sb.append("T 17,11,0,5,pt6;").append(LimsUtils.unicodeify(name)).append("\n");
-      sb.append("A 1").append("\n");
-    }
-    catch (UnsupportedEncodingException e) {
-      e.printStackTrace();
-    }
-    return sb.toString();
-  }
+  <span class="nd">@Override</span>
+  <span class="kd">public</span> <span class="n">String</span> <span class="nf">getRawState</span><span class="o">(</span><span class="n">JSONObject</span> <span class="n">jsonObject</span><span class="o">)</span> <span class="o">{</span>
+    <span class="n">StringBuilder</span> <span class="n">sb</span> <span class="o">=</span> <span class="k">new</span> <span class="n">StringBuilder</span><span class="o">();</span>
+    <span class="k">try</span> <span class="o">{</span>
+      <span class="n">String</span> <span class="n">barcodeit</span> <span class="o">=</span> <span class="n">jsonObject</span><span class="o">.</span><span class="na">getString</span><span class="o">(</span><span class="s">"barcode"</span><span class="o">);</span>
+      <span class="n">String</span> <span class="n">field1</span> <span class="o">=</span> <span class="n">jsonObject</span><span class="o">.</span><span class="na">getString</span><span class="o">(</span><span class="s">"field1"</span><span class="o">);</span>
+      <span class="n">String</span> <span class="n">alias</span> <span class="o">=</span> <span class="n">jsonObject</span><span class="o">.</span><span class="na">getString</span><span class="o">(</span><span class="s">"field2"</span><span class="o">);</span>
+      <span class="n">String</span> <span class="n">name</span> <span class="o">=</span> <span class="n">jsonObject</span><span class="o">.</span><span class="na">getString</span><span class="o">(</span><span class="s">"field3"</span><span class="o">);</span>
+      <span class="k">if</span> <span class="o">(</span><span class="s">"yes"</span><span class="o">.</span><span class="na">equals</span><span class="o">(</span><span class="n">barcodeit</span><span class="o">))</span> <span class="o">{</span>
+        <span class="n">String</span> <span class="n">barcode</span> <span class="o">=</span> <span class="k">new</span> <span class="n">String</span><span class="o">(</span><span class="n">Base64</span><span class="o">.</span><span class="na">encodeBase64</span><span class="o">(</span><span class="n">field1</span><span class="o">.</span><span class="na">getBytes</span><span class="o">(</span><span class="s">"UTF-8"</span><span class="o">)));</span>
+        <span class="n">sb</span><span class="o">.</span><span class="na">append</span><span class="o">(</span><span class="s">"m m"</span><span class="o">).</span><span class="na">append</span><span class="o">(</span><span class="s">"\n"</span><span class="o">);</span>
+        <span class="n">sb</span><span class="o">.</span><span class="na">append</span><span class="o">(</span><span class="s">"J"</span><span class="o">).</span><span class="na">append</span><span class="o">(</span><span class="s">"\n"</span><span class="o">);</span>
+        <span class="n">sb</span><span class="o">.</span><span class="na">append</span><span class="o">(</span><span class="s">"S l1;0,0,12,15,38"</span><span class="o">).</span><span class="na">append</span><span class="o">(</span><span class="s">"\n"</span><span class="o">);</span>
+        <span class="n">sb</span><span class="o">.</span><span class="na">append</span><span class="o">(</span><span class="s">"B 3,2,0,DATAMATRIX,0.21;"</span><span class="o">).</span><span class="na">append</span><span class="o">(</span><span class="n">barcode</span><span class="o">).</span><span class="na">append</span><span class="o">(</span><span class="s">"\n"</span><span class="o">);</span>
+        <span class="n">sb</span><span class="o">.</span><span class="na">append</span><span class="o">(</span><span class="s">"B 17,1,0,DATAMATRIX+RECT,0.25;"</span><span class="o">).</span><span class="na">append</span><span class="o">(</span><span class="n">barcode</span><span class="o">).</span><span class="na">append</span><span class="o">(</span><span class="s">"\n"</span><span class="o">);</span>
+        <span class="n">sb</span><span class="o">.</span><span class="na">append</span><span class="o">(</span><span class="s">"T 29,2,0,5,pt4;[DATE]"</span><span class="o">).</span><span class="na">append</span><span class="o">(</span><span class="s">"\n"</span><span class="o">);</span>
+      <span class="o">}</span>
+      <span class="k">else</span> <span class="o">{</span>
+        <span class="n">sb</span><span class="o">.</span><span class="na">append</span><span class="o">(</span><span class="s">"m m"</span><span class="o">).</span><span class="na">append</span><span class="o">(</span><span class="s">"\n"</span><span class="o">);</span>
+        <span class="n">sb</span><span class="o">.</span><span class="na">append</span><span class="o">(</span><span class="s">"J"</span><span class="o">).</span><span class="na">append</span><span class="o">(</span><span class="s">"\n"</span><span class="o">);</span>
+        <span class="n">sb</span><span class="o">.</span><span class="na">append</span><span class="o">(</span><span class="s">"S l1;0,0,12,15,38"</span><span class="o">).</span><span class="na">append</span><span class="o">(</span><span class="s">"\n"</span><span class="o">);</span>
+        <span class="n">sb</span><span class="o">.</span><span class="na">append</span><span class="o">(</span><span class="s">"T 17,5,0,5,pt6;"</span><span class="o">).</span><span class="na">append</span><span class="o">(</span><span class="n">LimsUtils</span><span class="o">.</span><span class="na">unicodeify</span><span class="o">(</span><span class="n">field1</span><span class="o">)).</span><span class="na">append</span><span class="o">(</span><span class="s">"\n"</span><span class="o">);</span>
+        <span class="n">sb</span><span class="o">.</span><span class="na">append</span><span class="o">(</span><span class="s">"T 29,2,0,5,pt4;[DATE]"</span><span class="o">).</span><span class="na">append</span><span class="o">(</span><span class="s">"\n"</span><span class="o">);</span>
+      <span class="o">}</span>
+      <span class="c1">//shorten alias to fit on label if too long</span>
+      <span class="k">if</span> <span class="o">(</span><span class="n">alias</span><span class="o">.</span><span class="na">length</span><span class="o">()</span> <span class="o">&gt;=</span> <span class="mi">17</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">alias</span> <span class="o">=</span> <span class="n">alias</span><span class="o">.</span><span class="na">substring</span><span class="o">(</span><span class="mi">0</span><span class="o">,</span> <span class="mi">15</span><span class="o">)</span> <span class="o">+</span> <span class="s">"..."</span><span class="o">;</span>
+      <span class="o">}</span>
+      <span class="n">sb</span><span class="o">.</span><span class="na">append</span><span class="o">(</span><span class="s">"T 17,8,0,5,pt6;"</span><span class="o">).</span><span class="na">append</span><span class="o">(</span><span class="n">LimsUtils</span><span class="o">.</span><span class="na">unicodeify</span><span class="o">(</span><span class="n">alias</span><span class="o">)).</span><span class="na">append</span><span class="o">(</span><span class="s">"\n"</span><span class="o">);</span>
+      <span class="n">sb</span><span class="o">.</span><span class="na">append</span><span class="o">(</span><span class="s">"T 17,11,0,5,pt6;"</span><span class="o">).</span><span class="na">append</span><span class="o">(</span><span class="n">LimsUtils</span><span class="o">.</span><span class="na">unicodeify</span><span class="o">(</span><span class="n">name</span><span class="o">)).</span><span class="na">append</span><span class="o">(</span><span class="s">"\n"</span><span class="o">);</span>
+      <span class="n">sb</span><span class="o">.</span><span class="na">append</span><span class="o">(</span><span class="s">"A 1"</span><span class="o">).</span><span class="na">append</span><span class="o">(</span><span class="s">"\n"</span><span class="o">);</span>
+    <span class="o">}</span>
+    <span class="k">catch</span> <span class="o">(</span><span class="n">UnsupportedEncodingException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+      <span class="n">e</span><span class="o">.</span><span class="na">printStackTrace</span><span class="o">();</span>
+    <span class="o">}</span>
+    <span class="k">return</span> <span class="n">sb</span><span class="o">.</span><span class="na">toString</span><span class="o">();</span>
+  <span class="o">}</span>
 
-  ...
-}
+  <span class="o">...</span>
+<span class="o">}</span>
 </code></pre>
+</div>
 
 <p>The JSON input content needs to be in the following structure:</p>
 
-<pre><code class="language-json">{
-  "field1":"Foo",
-  "field2":"Bar",
-  "field3":"Baz",
-  "barcodeit":"yes" // yes/no boolean representing whether to convert the field1 into a Base64 unicode string that will be used to generate a DataMatrix barcode image
-}
-</code></pre>
+<div class="language-json highlighter-rouge"><pre class="highlight"><code><span class="p">{</span><span class="w">
+  </span><span class="nt">"field1"</span><span class="p">:</span><span class="s2">"Foo"</span><span class="p">,</span><span class="w">
+  </span><span class="nt">"field2"</span><span class="p">:</span><span class="s2">"Bar"</span><span class="p">,</span><span class="w">
+  </span><span class="nt">"field3"</span><span class="p">:</span><span class="s2">"Baz"</span><span class="p">,</span><span class="w">
+  </span><span class="nt">"barcodeit"</span><span class="p">:</span><span class="s2">"yes"</span><span class="w"> </span><span class="err">//</span><span class="w"> </span><span class="err">yes/no</span><span class="w"> </span><span class="err">boolean</span><span class="w"> </span><span class="err">representing</span><span class="w"> </span><span class="err">whether</span><span class="w"> </span><span class="err">to</span><span class="w"> </span><span class="err">convert</span><span class="w"> </span><span class="err">the</span><span class="w"> </span><span class="err">field</span><span class="mi">1</span><span class="w"> </span><span class="err">into</span><span class="w"> </span><span class="err">a</span><span class="w"> </span><span class="err">Base</span><span class="mi">64</span><span class="w"> </span><span class="err">unicode</span><span class="w"> </span><span class="err">string</span><span class="w"> </span><span class="err">that</span><span class="w"> </span><span class="err">will</span><span class="w"> </span><span class="err">be</span><span class="w"> </span><span class="err">used</span><span class="w"> </span><span class="err">to</span><span class="w"> </span><span class="err">generate</span><span class="w"> </span><span class="err">a</span><span class="w"> </span><span class="err">DataMatrix</span><span class="w"> </span><span class="err">barcode</span><span class="w"> </span><span class="err">image</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre>
+</div>
 <p>The <a href="https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/service/printing/schema/impl/BradyCustomStandardTubeBarcodeLabelSchema.java">BradyCustomStandardTubeBarcodeLabelSchema</a> class uses a handy reusable <a href="https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/service/printing/factory/BarcodeLabelFactory.java">BarcodeLabelFactory</a> class, <a href="https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/service/printing/factory/FileGeneratingBarcodeLabelFactory.java">FileGeneratingBarcodeLabelFactory</a>, that knows how to convert the passed in <a href="https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/service/printing/schema/BarcodableSchema.java">BarcodableSchema</a> into the <em>File</em> label:</p>
 
-<pre><code class="language-java">@ServiceProvider
-public class FileGeneratingBarcodeLabelFactory&lt;T&gt; implements BarcodeLabelFactory&lt;File, T, BarcodableSchema&lt;File, T&gt;&gt; {
-  ...
-  @Override
-  public File getLabel(BarcodableSchema&lt;File, T&gt; s,T b) {
-    try {
-      User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
+<div class="language-java highlighter-rouge"><pre class="highlight"><code><span class="nd">@ServiceProvider</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">FileGeneratingBarcodeLabelFactory</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="kd">implements</span> <span class="n">BarcodeLabelFactory</span><span class="o">&lt;</span><span class="n">File</span><span class="o">,</span> <span class="n">T</span><span class="o">,</span> <span class="n">BarcodableSchema</span><span class="o">&lt;</span><span class="n">File</span><span class="o">,</span> <span class="n">T</span><span class="o">&gt;&gt;</span> <span class="o">{</span>
+  <span class="o">...</span>
+  <span class="nd">@Override</span>
+  <span class="kd">public</span> <span class="n">File</span> <span class="nf">getLabel</span><span class="o">(</span><span class="n">BarcodableSchema</span><span class="o">&lt;</span><span class="n">File</span><span class="o">,</span> <span class="n">T</span><span class="o">&gt;</span> <span class="n">s</span><span class="o">,</span><span class="n">T</span> <span class="n">b</span><span class="o">)</span> <span class="o">{</span>
+    <span class="k">try</span> <span class="o">{</span>
+      <span class="n">User</span> <span class="n">user</span> <span class="o">=</span> <span class="n">securityManager</span><span class="o">.</span><span class="na">getUserByLoginName</span><span class="o">(</span><span class="n">SecurityContextHolder</span><span class="o">.</span><span class="na">getContext</span><span class="o">().</span><span class="na">getAuthentication</span><span class="o">().</span><span class="na">getName</span><span class="o">());</span>
 
-      String labelScript = s.getRawState(b);
+      <span class="n">String</span> <span class="n">labelScript</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="na">getRawState</span><span class="o">(</span><span class="n">b</span><span class="o">);</span>
 
-      File f = misoFileManager.generateTemporaryFile(user.getLoginName() + "_"+b.getClass().getSimpleName().toLowerCase()+"-", ".printjob");
-      FileUtils.write(f, labelScript);
-      return f;
-    }
-    catch (IOException e) {
-      e.printStackTrace();
-    }
-    return null;
-  }
-  ...
-}
+      <span class="n">File</span> <span class="n">f</span> <span class="o">=</span> <span class="n">misoFileManager</span><span class="o">.</span><span class="na">generateTemporaryFile</span><span class="o">(</span><span class="n">user</span><span class="o">.</span><span class="na">getLoginName</span><span class="o">()</span> <span class="o">+</span> <span class="s">"_"</span><span class="o">+</span><span class="n">b</span><span class="o">.</span><span class="na">getClass</span><span class="o">().</span><span class="na">getSimpleName</span><span class="o">().</span><span class="na">toLowerCase</span><span class="o">()+</span><span class="s">"-"</span><span class="o">,</span> <span class="s">".printjob"</span><span class="o">);</span>
+      <span class="n">FileUtils</span><span class="o">.</span><span class="na">write</span><span class="o">(</span><span class="n">f</span><span class="o">,</span> <span class="n">labelScript</span><span class="o">);</span>
+      <span class="k">return</span> <span class="n">f</span><span class="o">;</span>
+    <span class="o">}</span>
+    <span class="k">catch</span> <span class="o">(</span><span class="n">IOException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+      <span class="n">e</span><span class="o">.</span><span class="na">printStackTrace</span><span class="o">();</span>
+    <span class="o">}</span>
+    <span class="k">return</span> <span class="kc">null</span><span class="o">;</span>
+  <span class="o">}</span>
+  <span class="o">...</span>
+<span class="o">}</span>
 </code></pre>
+</div>
 
 <p>As you can see, the factory uses the <a href="https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/service/printing/schema/BarcodableSchema.java">BarcodableSchema</a>’s <strong>getRawState(JSONObject json)</strong> method (see above). The reason for this seemingly back-to-front redundant architecture is that these factories and schemas can be reused without all the encompassing printing structure, decoupling all the implementations from each other, thus giving the flexibility required to support many different printing platforms and label formats.</p>
 
@@ -495,29 +462,32 @@ public class FileGeneratingBarcodeLabelFactory&lt;T&gt; implements BarcodeLabelF
 
 <p>API access to the submission workflow is made available through implementors of the <a href="https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/manager/SubmissionManager.java">SubmissionManager</a> interface, which is typed according to the input type of the submission, <strong>I</strong>, the submission endpoint, <strong>O</strong>, and the response object type from the submission endpoint, <strong>R</strong>.</p>
 
-<pre><code class="language-java">public interface  SubmissionManager&lt;I, O, R&gt; {
-  ...
-  public void setSubmissionEndPoint(O o);
-  public O getSubmissionEndPoint();
-  public R submit(I i) throws SubmissionException;
-  public Object parseResponse(R response);
+<div class="language-java highlighter-rouge"><pre class="highlight"><code><span class="kd">public</span> <span class="kd">interface</span>  <span class="nc">SubmissionManager</span><span class="o">&lt;</span><span class="n">I</span><span class="o">,</span> <span class="n">O</span><span class="o">,</span> <span class="n">R</span><span class="o">&gt;</span> <span class="o">{</span>
+  <span class="o">...</span>
+  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">setSubmissionEndPoint</span><span class="o">(</span><span class="n">O</span> <span class="n">o</span><span class="o">);</span>
+  <span class="kd">public</span> <span class="n">O</span> <span class="nf">getSubmissionEndPoint</span><span class="o">();</span>
+  <span class="kd">public</span> <span class="n">R</span> <span class="nf">submit</span><span class="o">(</span><span class="n">I</span> <span class="n">i</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">SubmissionException</span><span class="o">;</span>
+  <span class="kd">public</span> <span class="n">Object</span> <span class="nf">parseResponse</span><span class="o">(</span><span class="n">R</span> <span class="n">response</span><span class="o">);</span>
 
-  public void setTransferMethod(TransferMethod transferMethod);
-  ...
-}
+  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">setTransferMethod</span><span class="o">(</span><span class="n">TransferMethod</span> <span class="n">transferMethod</span><span class="o">);</span>
+  <span class="o">...</span>
+<span class="o">}</span>
 </code></pre>
+</div>
 <p>The <a href="https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/service/submission/TransferMethod.java">TransferMethod</a> interface defines just that - the way the <strong>submit(I i)</strong> method actually carries out any data file transfers to an <a href="https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/service/submission/EndPoint.java">EndPoint</a>, which simply wraps up a local or remote destination by means of a typed URI:</p>
 
-<pre><code class="language-java">public interface TransferMethod {
-  public UploadReport uploadSequenceData(Set&lt;File&gt; dataFiles, EndPoint endpoint) throws SubmissionException;
-}
+<div class="language-java highlighter-rouge"><pre class="highlight"><code><span class="kd">public</span> <span class="kd">interface</span> <span class="nc">TransferMethod</span> <span class="o">{</span>
+  <span class="kd">public</span> <span class="n">UploadReport</span> <span class="nf">uploadSequenceData</span><span class="o">(</span><span class="n">Set</span><span class="o">&lt;</span><span class="n">File</span><span class="o">&gt;</span> <span class="n">dataFiles</span><span class="o">,</span> <span class="n">EndPoint</span> <span class="n">endpoint</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">SubmissionException</span><span class="o">;</span>
+<span class="o">}</span>
 </code></pre>
+</div>
 
-<pre><code class="language-java">public interface EndPoint&lt;T extends URI&gt; {
-  public void setDestination(T destination);
-  public T getDestination();
-}
+<div class="language-java highlighter-rouge"><pre class="highlight"><code><span class="kd">public</span> <span class="kd">interface</span> <span class="nc">EndPoint</span><span class="o">&lt;</span><span class="n">T</span> <span class="kd">extends</span> <span class="n">URI</span><span class="o">&gt;</span> <span class="o">{</span>
+  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">setDestination</span><span class="o">(</span><span class="n">T</span> <span class="n">destination</span><span class="o">);</span>
+  <span class="kd">public</span> <span class="n">T</span> <span class="nf">getDestination</span><span class="o">();</span>
+<span class="o">}</span>
 </code></pre>
+</div>
 
 <h2 id="persistence-interfaces">Persistence Interfaces</h2>
 
@@ -525,20 +495,22 @@ public class FileGeneratingBarcodeLabelFactory&lt;T&gt; implements BarcodeLabelF
 
 <p>CRUD functionality in MISO is defined by classes adhering, at their simplest level, to the <a href="https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/store/Store.java">Store</a> interface:</p>
 
-<pre><code class="language-java">public interface Store&lt;T&gt; {
-  public long save(T t) throws IOException;
-  public T get(long id) throws IOException;
-  public Collection&lt;T&gt; listAll() throws IOException;
-  public int count() throws IOException;
-}
+<div class="language-java highlighter-rouge"><pre class="highlight"><code><span class="kd">public</span> <span class="kd">interface</span> <span class="nc">Store</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="o">{</span>
+  <span class="kd">public</span> <span class="kt">long</span> <span class="nf">save</span><span class="o">(</span><span class="n">T</span> <span class="n">t</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">IOException</span><span class="o">;</span>
+  <span class="kd">public</span> <span class="n">T</span> <span class="nf">get</span><span class="o">(</span><span class="kt">long</span> <span class="n">id</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">IOException</span><span class="o">;</span>
+  <span class="kd">public</span> <span class="n">Collection</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="nf">listAll</span><span class="o">()</span> <span class="kd">throws</span> <span class="n">IOException</span><span class="o">;</span>
+  <span class="kd">public</span> <span class="kt">int</span> <span class="nf">count</span><span class="o">()</span> <span class="kd">throws</span> <span class="n">IOException</span><span class="o">;</span>
+<span class="o">}</span>
 </code></pre>
+</div>
 
 <p>You’ll notice that the top-level interface doesn’t support deletion out-of-the-box. This is defined by another interface, <a href="https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/store/Remover.java">Remover</a>. The separation is useful so that a developer could provide a read-only Store implementation easily, and the interface is typed to subinterfaces of Deletable, making sure that only certain objects are eligible for deletion.</p>
 
-<pre><code class="language-java">public interface Remover&lt;T extends Deletable&gt; {
-  public boolean remove(T t) throws IOException;
-}
+<div class="language-java highlighter-rouge"><pre class="highlight"><code><span class="kd">public</span> <span class="kd">interface</span> <span class="nc">Remover</span><span class="o">&lt;</span><span class="n">T</span> <span class="kd">extends</span> <span class="n">Deletable</span><span class="o">&gt;</span> <span class="o">{</span>
+  <span class="kd">public</span> <span class="kt">boolean</span> <span class="nf">remove</span><span class="o">(</span><span class="n">T</span> <span class="n">t</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">IOException</span><span class="o">;</span>
+<span class="o">}</span>
 </code></pre>
+</div>
 
 <p>More interfaces are supplied which wrap up these interfaces, plus more method definitions to add more functionality depending on the object type persisted. The full list of persistence subinterfaces is <a href="https://github.com/TGAC/miso-lims/tree/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/store">on GitHub</a>, and implementations of these can be found in the <a href="#DeveloperManual-DataAccessObjects(DAOs)">Data Access Objects</a> section.</p>
 
@@ -602,19 +574,20 @@ public class FileGeneratingBarcodeLabelFactory&lt;T&gt; implements BarcodeLabelF
 
 <p>When saving a parent object, sometimes it’s necessary to persist any child objects too. For example, in the <a href="https://github.com/TGAC/miso-lims/blob/develop/sqlstore/src/main/java/uk/ac/bbsrc/tgac/miso/sqlstore/SQLSampleDAO.java">SQLSampleDAO</a> (and most other relevant <a href="https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/security/SecurableByProfile.java">SecurableByProfile</a> implementors), we’d like to persist the SecurityProfile at the time of <a href="https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/data/Sample.java">Sample</a> persistence:</p>
 
-<pre><code class="language-java">...
+<div class="language-java highlighter-rouge"><pre class="highlight"><code><span class="o">...</span>
 
-public long save(Sample sample) throws IOException {
-  Long securityProfileId = sample.getSecurityProfile().getProfileId();
-  if (this.cascadeType != null) {
-    securityProfileId = securityProfileDAO.save(sample.getSecurityProfile());
-  }
+<span class="kd">public</span> <span class="kt">long</span> <span class="nf">save</span><span class="o">(</span><span class="n">Sample</span> <span class="n">sample</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">IOException</span> <span class="o">{</span>
+  <span class="n">Long</span> <span class="n">securityProfileId</span> <span class="o">=</span> <span class="n">sample</span><span class="o">.</span><span class="na">getSecurityProfile</span><span class="o">().</span><span class="na">getProfileId</span><span class="o">();</span>
+  <span class="k">if</span> <span class="o">(</span><span class="k">this</span><span class="o">.</span><span class="na">cascadeType</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+    <span class="n">securityProfileId</span> <span class="o">=</span> <span class="n">securityProfileDAO</span><span class="o">.</span><span class="na">save</span><span class="o">(</span><span class="n">sample</span><span class="o">.</span><span class="na">getSecurityProfile</span><span class="o">());</span>
+  <span class="o">}</span>
 
-  ...
-}
+  <span class="o">...</span>
+<span class="o">}</span>
 
-...
+<span class="o">...</span>
 </code></pre>
+</div>
 
 <p>So, in any case where the CascadeType is set, the SecurityProfile associated with this Sample will also be saved.</p>
 
@@ -622,35 +595,36 @@ public long save(Sample sample) throws IOException {
 
 <p>Likewise, when saving a child object, sometimes it’s necessary to persist the parent object too. Using the same <a href="https://github.com/TGAC/miso-lims/blob/develop/sqlstore/src/main/java/uk/ac/bbsrc/tgac/miso/sqlstore/SQLSampleDAO.java">SQLSampleDAO</a> example as above, we want to ensure the parent <a href="https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/data/Project.java">Project</a> is managed correctly:</p>
 
-<pre><code class="language-java">...
+<div class="language-java highlighter-rouge"><pre class="highlight"><code><span class="o">...</span>
 
-public long save(Sample sample) throws IOException {
-  ...
+<span class="kd">public</span> <span class="kt">long</span> <span class="nf">save</span><span class="o">(</span><span class="n">Sample</span> <span class="n">sample</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">IOException</span> <span class="o">{</span>
+  <span class="o">...</span>
 
-  if (this.cascadeType != null) {
-    Project p = sample.getProject();
-    if (this.cascadeType.equals(CascadeType.PERSIST)) {
-      if (p!=null) {
-        projectDAO.save(p);
-      }
-    }
-    else if (this.cascadeType.equals(CascadeType.REMOVE)) {
-      if (p != null) {
-        DbUtils.updateCaches(cacheManager, p, Project.class);
-      }
-    }
+  <span class="k">if</span> <span class="o">(</span><span class="k">this</span><span class="o">.</span><span class="na">cascadeType</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+    <span class="n">Project</span> <span class="n">p</span> <span class="o">=</span> <span class="n">sample</span><span class="o">.</span><span class="na">getProject</span><span class="o">();</span>
+    <span class="k">if</span> <span class="o">(</span><span class="k">this</span><span class="o">.</span><span class="na">cascadeType</span><span class="o">.</span><span class="na">equals</span><span class="o">(</span><span class="n">CascadeType</span><span class="o">.</span><span class="na">PERSIST</span><span class="o">))</span> <span class="o">{</span>
+      <span class="k">if</span> <span class="o">(</span><span class="n">p</span><span class="o">!=</span><span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">projectDAO</span><span class="o">.</span><span class="na">save</span><span class="o">(</span><span class="n">p</span><span class="o">);</span>
+      <span class="o">}</span>
+    <span class="o">}</span>
+    <span class="k">else</span> <span class="nf">if</span> <span class="o">(</span><span class="k">this</span><span class="o">.</span><span class="na">cascadeType</span><span class="o">.</span><span class="na">equals</span><span class="o">(</span><span class="n">CascadeType</span><span class="o">.</span><span class="na">REMOVE</span><span class="o">))</span> <span class="o">{</span>
+      <span class="k">if</span> <span class="o">(</span><span class="n">p</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">DbUtils</span><span class="o">.</span><span class="na">updateCaches</span><span class="o">(</span><span class="n">cacheManager</span><span class="o">,</span> <span class="n">p</span><span class="o">,</span> <span class="n">Project</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>
+      <span class="o">}</span>
+    <span class="o">}</span>
 
-    if (!sample.getNotes().isEmpty()) {
-      for (Note n : sample.getNotes()) {
-        noteDAO.saveSampleNote(sample, n);
-      }
-    }
-    purgeListCache(sample);
-  }
+    <span class="k">if</span> <span class="o">(!</span><span class="n">sample</span><span class="o">.</span><span class="na">getNotes</span><span class="o">().</span><span class="na">isEmpty</span><span class="o">())</span> <span class="o">{</span>
+      <span class="k">for</span> <span class="o">(</span><span class="n">Note</span> <span class="n">n</span> <span class="o">:</span> <span class="n">sample</span><span class="o">.</span><span class="na">getNotes</span><span class="o">())</span> <span class="o">{</span>
+        <span class="n">noteDAO</span><span class="o">.</span><span class="na">saveSampleNote</span><span class="o">(</span><span class="n">sample</span><span class="o">,</span> <span class="n">n</span><span class="o">);</span>
+      <span class="o">}</span>
+    <span class="o">}</span>
+    <span class="n">purgeListCache</span><span class="o">(</span><span class="n">sample</span><span class="o">);</span>
+  <span class="o">}</span>
 
-  ...
-}
+  <span class="o">...</span>
+<span class="o">}</span>
 </code></pre>
+</div>
 
 <p>If the CascadeType is set to PERSIST, we want to call the parent <a href="https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/data/Project.java">Project</a> DAO’s <strong>save(Project project)</strong> method, passing in the current Sample’s parent Project. If the CascadeType is set to REMOVE, we want to evict the parent Project from it’s cache, so that stale information isn’t presented to any users.</p>
 
@@ -668,78 +642,81 @@ public long save(Sample sample) throws IOException {
 
 <p>When saving objects back to the database, any cache entries need to be removed to ensure that old data is flushed.</p>
 
-<pre><code class="language-java">@TriggersRemove(
-        cacheName = {"projectCache", "lazyProjectCache"},
-        keyGenerator = @KeyGenerator(
-                name = "HashCodeCacheKeyGenerator",
-                properties = {
-                        @Property(name = "includeMethod", value = "false"),
-                        @Property(name = "includeParameterTypes", value = "false")
-                }
-        )
-)
-public long save(Project project) throws IOException {
-  ...
-}
+<div class="language-java highlighter-rouge"><pre class="highlight"><code><span class="nd">@TriggersRemove</span><span class="o">(</span>
+        <span class="n">cacheName</span> <span class="o">=</span> <span class="o">{</span><span class="s">"projectCache"</span><span class="o">,</span> <span class="s">"lazyProjectCache"</span><span class="o">},</span>
+        <span class="n">keyGenerator</span> <span class="o">=</span> <span class="nd">@KeyGenerator</span><span class="o">(</span>
+                <span class="n">name</span> <span class="o">=</span> <span class="s">"HashCodeCacheKeyGenerator"</span><span class="o">,</span>
+                <span class="n">properties</span> <span class="o">=</span> <span class="o">{</span>
+                        <span class="nd">@Property</span><span class="o">(</span><span class="n">name</span> <span class="o">=</span> <span class="s">"includeMethod"</span><span class="o">,</span> <span class="n">value</span> <span class="o">=</span> <span class="s">"false"</span><span class="o">),</span>
+                        <span class="nd">@Property</span><span class="o">(</span><span class="n">name</span> <span class="o">=</span> <span class="s">"includeParameterTypes"</span><span class="o">,</span> <span class="n">value</span> <span class="o">=</span> <span class="s">"false"</span><span class="o">)</span>
+                <span class="o">}</span>
+        <span class="o">)</span>
+<span class="o">)</span>
+<span class="kd">public</span> <span class="kt">long</span> <span class="nf">save</span><span class="o">(</span><span class="n">Project</span> <span class="n">project</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">IOException</span> <span class="o">{</span>
+  <span class="o">...</span>
+<span class="o">}</span>
 </code></pre>
+</div>
 
 <h3 id="retrieving-objects">Retrieving objects</h3>
 
 <p>When retrieving objects from the data store, the ehcache-annotated <strong>get()</strong> and <strong>listAll()</strong> methods check the specified caches for collision on the supplied object. If the objects exists in the cache, the cached version is returned. If not, the method body executes:</p>
 
-<pre><code class="language-java">@Cacheable(cacheName = "projectCache",
-           keyGenerator = @KeyGenerator(
-                   name = "HashCodeCacheKeyGenerator",
-                   properties = {
-                           @Property(name = "includeMethod", value = "false"),
-                           @Property(name = "includeParameterTypes", value = "false")
-                   }
-           )
-)
-public Project get(long projectId) throws IOException {
-  ...
-}
+<div class="language-java highlighter-rouge"><pre class="highlight"><code><span class="nd">@Cacheable</span><span class="o">(</span><span class="n">cacheName</span> <span class="o">=</span> <span class="s">"projectCache"</span><span class="o">,</span>
+           <span class="n">keyGenerator</span> <span class="o">=</span> <span class="nd">@KeyGenerator</span><span class="o">(</span>
+                   <span class="n">name</span> <span class="o">=</span> <span class="s">"HashCodeCacheKeyGenerator"</span><span class="o">,</span>
+                   <span class="n">properties</span> <span class="o">=</span> <span class="o">{</span>
+                           <span class="nd">@Property</span><span class="o">(</span><span class="n">name</span> <span class="o">=</span> <span class="s">"includeMethod"</span><span class="o">,</span> <span class="n">value</span> <span class="o">=</span> <span class="s">"false"</span><span class="o">),</span>
+                           <span class="nd">@Property</span><span class="o">(</span><span class="n">name</span> <span class="o">=</span> <span class="s">"includeParameterTypes"</span><span class="o">,</span> <span class="n">value</span> <span class="o">=</span> <span class="s">"false"</span><span class="o">)</span>
+                   <span class="o">}</span>
+           <span class="o">)</span>
+<span class="o">)</span>
+<span class="kd">public</span> <span class="n">Project</span> <span class="nf">get</span><span class="o">(</span><span class="kt">long</span> <span class="n">projectId</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">IOException</span> <span class="o">{</span>
+  <span class="o">...</span>
+<span class="o">}</span>
 
-@Cacheable(cacheName="projectListCache",
-    keyGenerator = @KeyGenerator(
-            name = "HashCodeCacheKeyGenerator",
-            properties = {
-                    @Property(name="includeMethod", value="false"),
-                    @Property(name="includeParameterTypes", value="false")
-            }
-    )
-)
-public List&lt;Project&gt; listAll() {
-  ...
-}
+<span class="nd">@Cacheable</span><span class="o">(</span><span class="n">cacheName</span><span class="o">=</span><span class="s">"projectListCache"</span><span class="o">,</span>
+    <span class="n">keyGenerator</span> <span class="o">=</span> <span class="nd">@KeyGenerator</span><span class="o">(</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="s">"HashCodeCacheKeyGenerator"</span><span class="o">,</span>
+            <span class="n">properties</span> <span class="o">=</span> <span class="o">{</span>
+                    <span class="nd">@Property</span><span class="o">(</span><span class="n">name</span><span class="o">=</span><span class="s">"includeMethod"</span><span class="o">,</span> <span class="n">value</span><span class="o">=</span><span class="s">"false"</span><span class="o">),</span>
+                    <span class="nd">@Property</span><span class="o">(</span><span class="n">name</span><span class="o">=</span><span class="s">"includeParameterTypes"</span><span class="o">,</span> <span class="n">value</span><span class="o">=</span><span class="s">"false"</span><span class="o">)</span>
+            <span class="o">}</span>
+    <span class="o">)</span>
+<span class="o">)</span>
+<span class="kd">public</span> <span class="n">List</span><span class="o">&lt;</span><span class="n">Project</span><span class="o">&gt;</span> <span class="nf">listAll</span><span class="o">()</span> <span class="o">{</span>
+  <span class="o">...</span>
+<span class="o">}</span>
 </code></pre>
+</div>
 
 <h3 id="row-mapping">Row mapping</h3>
 
 <p>In a typical JDBC ORM scenario, Java would make calls to some form of mapper to convert from the ResultSet fields to a Java domain model object. In MISO, <a href="http://static.springsource.org/spring/docs/current/javadoc-api/org/springframework/jdbc/core/RowMapper.html">RowMapper&lt;T&gt;</a> implementations are used to facilitate this, specifically a custom abstract class called <a href="https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/sqlstore/cache/CacheAwareRowMapper.java">CacheAwareRowMapper&lt;T&gt;</a>:</p>
 
-<pre><code class="language-java">public abstract class CacheAwareRowMapper&lt;T&gt; implements RowMapper&lt;T&gt; {
-  private boolean lazy;
+<div class="language-java highlighter-rouge"><pre class="highlight"><code><span class="kd">public</span> <span class="kd">abstract</span> <span class="kd">class</span> <span class="nc">CacheAwareRowMapper</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="kd">implements</span> <span class="n">RowMapper</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="o">{</span>
+  <span class="kd">private</span> <span class="kt">boolean</span> <span class="n">lazy</span><span class="o">;</span>
 
-  ...
+  <span class="o">...</span>
 
-  public CacheAwareRowMapper(Class&lt;T&gt; clz, boolean lazy) {
-    this.lazy = lazy;
-    if (lazy) {
-      this.cacheName = "lazy"+LimsUtils.capitalise(clz.getSimpleName())+"Cache";
-    }
-    else {
-      this.cacheName = LimsUtils.noddyCamelCaseify(clz.getSimpleName())+"Cache";
-    }
-  }
+  <span class="kd">public</span> <span class="nf">CacheAwareRowMapper</span><span class="o">(</span><span class="n">Class</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="n">clz</span><span class="o">,</span> <span class="kt">boolean</span> <span class="n">lazy</span><span class="o">)</span> <span class="o">{</span>
+    <span class="k">this</span><span class="o">.</span><span class="na">lazy</span> <span class="o">=</span> <span class="n">lazy</span><span class="o">;</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">lazy</span><span class="o">)</span> <span class="o">{</span>
+      <span class="k">this</span><span class="o">.</span><span class="na">cacheName</span> <span class="o">=</span> <span class="s">"lazy"</span><span class="o">+</span><span class="n">LimsUtils</span><span class="o">.</span><span class="na">capitalise</span><span class="o">(</span><span class="n">clz</span><span class="o">.</span><span class="na">getSimpleName</span><span class="o">())+</span><span class="s">"Cache"</span><span class="o">;</span>
+    <span class="o">}</span>
+    <span class="k">else</span> <span class="o">{</span>
+      <span class="k">this</span><span class="o">.</span><span class="na">cacheName</span> <span class="o">=</span> <span class="n">LimsUtils</span><span class="o">.</span><span class="na">noddyCamelCaseify</span><span class="o">(</span><span class="n">clz</span><span class="o">.</span><span class="na">getSimpleName</span><span class="o">())+</span><span class="s">"Cache"</span><span class="o">;</span>
+    <span class="o">}</span>
+  <span class="o">}</span>
 
-  ...
+  <span class="o">...</span>
 
-  public Cache lookupCache(CacheManager cacheManager) throws CacheException, UnsupportedOperationException {
+  <span class="kd">public</span> <span class="n">Cache</span> <span class="nf">lookupCache</span><span class="o">(</span><span class="n">CacheManager</span> <span class="n">cacheManager</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">CacheException</span><span class="o">,</span> <span class="n">UnsupportedOperationException</span> <span class="o">{</span>
 
-  }
-}
+  <span class="o">}</span>
+<span class="o">}</span>
 </code></pre>
+</div>
 
 <p>Class construction, can happen in a number of ways, but the most typical is depicted above, i.e. with a Class and boolean signature. Another important method of note is <strong>lookupCache(CacheManager cacheManager)</strong>. This method ensures the cache specified in the constructor is available in a given CacheManager, avoiding NullPointerExceptions.</p>
 
@@ -753,46 +730,47 @@ public List&lt;Project&gt; listAll() {
 
 <p>Let’s look at a typical implementation of a <a href="https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/sqlstore/cache/CacheAwareRowMapper.java">CacheAwareRowMapper&lt;T&gt;</a>, in this instance for <a href="https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/data/Project.java">Project</a> objects, in the <a href="https://github.com/TGAC/miso-lims/blob/develop/sqlstore/src/main/java/uk/ac/bbsrc/tgac/miso/sqlstore/SQLProjectDAO.java">SQLProjectDAO</a> class:</p>
 
-<pre><code class="language-java">public class ProjectMapper extends CacheAwareRowMapper&lt;Project&gt; {
-  public ProjectMapper() {
-    super(Project.class);
-  }
+<div class="language-java highlighter-rouge"><pre class="highlight"><code><span class="kd">public</span> <span class="kd">class</span> <span class="nc">ProjectMapper</span> <span class="kd">extends</span> <span class="n">CacheAwareRowMapper</span><span class="o">&lt;</span><span class="n">Project</span><span class="o">&gt;</span> <span class="o">{</span>
+  <span class="kd">public</span> <span class="nf">ProjectMapper</span><span class="o">()</span> <span class="o">{</span>
+    <span class="kd">super</span><span class="o">(</span><span class="n">Project</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>
+  <span class="o">}</span>
 
-  public ProjectMapper(boolean lazy) {
-    super(Project.class, lazy);
-  }
+  <span class="kd">public</span> <span class="nf">ProjectMapper</span><span class="o">(</span><span class="kt">boolean</span> <span class="n">lazy</span><span class="o">)</span> <span class="o">{</span>
+    <span class="kd">super</span><span class="o">(</span><span class="n">Project</span><span class="o">.</span><span class="na">class</span><span class="o">,</span> <span class="n">lazy</span><span class="o">);</span>
+  <span class="o">}</span>
 
-  @Override
-  public Project mapRow(ResultSet rs, int rowNum) throws SQLException {
-    long id = rs.getLong("projectId");
-    Project project = null;
-    try {
-      if (isCacheEnabled() &amp;&amp; lookupCache(cacheManager) != null) {
-        Element element;
-        if ((element = lookupCache(cacheManager).get(DbUtils.hashCodeCacheKeyFor(id))) != null) {
-          log.debug("Cache hit on map for Project " + id);
-          return (Project)element.getObjectValue();
-        }
-      }
+  <span class="nd">@Override</span>
+  <span class="kd">public</span> <span class="n">Project</span> <span class="nf">mapRow</span><span class="o">(</span><span class="n">ResultSet</span> <span class="n">rs</span><span class="o">,</span> <span class="kt">int</span> <span class="n">rowNum</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">SQLException</span> <span class="o">{</span>
+    <span class="kt">long</span> <span class="n">id</span> <span class="o">=</span> <span class="n">rs</span><span class="o">.</span><span class="na">getLong</span><span class="o">(</span><span class="s">"projectId"</span><span class="o">);</span>
+    <span class="n">Project</span> <span class="n">project</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+    <span class="k">try</span> <span class="o">{</span>
+      <span class="k">if</span> <span class="o">(</span><span class="n">isCacheEnabled</span><span class="o">()</span> <span class="o">&amp;&amp;</span> <span class="n">lookupCache</span><span class="o">(</span><span class="n">cacheManager</span><span class="o">)</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">Element</span> <span class="n">element</span><span class="o">;</span>
+        <span class="k">if</span> <span class="o">((</span><span class="n">element</span> <span class="o">=</span> <span class="n">lookupCache</span><span class="o">(</span><span class="n">cacheManager</span><span class="o">).</span><span class="na">get</span><span class="o">(</span><span class="n">DbUtils</span><span class="o">.</span><span class="na">hashCodeCacheKeyFor</span><span class="o">(</span><span class="n">id</span><span class="o">)))</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+          <span class="n">log</span><span class="o">.</span><span class="na">debug</span><span class="o">(</span><span class="s">"Cache hit on map for Project "</span> <span class="o">+</span> <span class="n">id</span><span class="o">);</span>
+          <span class="k">return</span> <span class="o">(</span><span class="n">Project</span><span class="o">)</span><span class="n">element</span><span class="o">.</span><span class="na">getObjectValue</span><span class="o">();</span>
+        <span class="o">}</span>
+      <span class="o">}</span>
 
-      // do ORM mapping from ResultSet fields to Project object fields
-      ...
+      <span class="c1">// do ORM mapping from ResultSet fields to Project object fields</span>
+      <span class="o">...</span>
 
-      if (isCacheEnabled() &amp;&amp; lookupCache(cacheManager) != null) {
-        lookupCache(cacheManager).put(new Element(DbUtils.hashCodeCacheKeyFor(id) ,project));
-        log.debug("Cache put for Project " + id);
-      }
-    }
-    catch(net.sf.ehcache.CacheException ce) {
-      ce.printStackTrace();
-    }
-    catch(UnsupportedOperationException uoe) {
-      uoe.printStackTrace();
-    }
-    return project;
-  }
-}
+      <span class="k">if</span> <span class="o">(</span><span class="n">isCacheEnabled</span><span class="o">()</span> <span class="o">&amp;&amp;</span> <span class="n">lookupCache</span><span class="o">(</span><span class="n">cacheManager</span><span class="o">)</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">lookupCache</span><span class="o">(</span><span class="n">cacheManager</span><span class="o">).</span><span class="na">put</span><span class="o">(</span><span class="k">new</span> <span class="n">Element</span><span class="o">(</span><span class="n">DbUtils</span><span class="o">.</span><span class="na">hashCodeCacheKeyFor</span><span class="o">(</span><span class="n">id</span><span class="o">)</span> <span class="o">,</span><span class="n">project</span><span class="o">));</span>
+        <span class="n">log</span><span class="o">.</span><span class="na">debug</span><span class="o">(</span><span class="s">"Cache put for Project "</span> <span class="o">+</span> <span class="n">id</span><span class="o">);</span>
+      <span class="o">}</span>
+    <span class="o">}</span>
+    <span class="k">catch</span><span class="o">(</span><span class="n">net</span><span class="o">.</span><span class="na">sf</span><span class="o">.</span><span class="na">ehcache</span><span class="o">.</span><span class="na">CacheException</span> <span class="n">ce</span><span class="o">)</span> <span class="o">{</span>
+      <span class="n">ce</span><span class="o">.</span><span class="na">printStackTrace</span><span class="o">();</span>
+    <span class="o">}</span>
+    <span class="k">catch</span><span class="o">(</span><span class="n">UnsupportedOperationException</span> <span class="n">uoe</span><span class="o">)</span> <span class="o">{</span>
+      <span class="n">uoe</span><span class="o">.</span><span class="na">printStackTrace</span><span class="o">();</span>
+    <span class="o">}</span>
+    <span class="k">return</span> <span class="n">project</span><span class="o">;</span>
+  <span class="o">}</span>
+<span class="o">}</span>
 </code></pre>
+</div>
 
 <p>As you can see, if a Project instance (lazy or otherwise) with a matching hashcode key (see the <a href="https://github.com/TGAC/miso-lims/blob/develop/sqlstore/src/main/java/uk/ac/bbsrc/tgac/miso/sqlstore/util/DbUtils.java">DBUtils helper class</a>) is already in a given cache, then that object is immediately returned and no object creation and mapping takes place. If not, the mapping takes place, and the resulting object is placed into the cache layer.</p>
 
@@ -928,33 +906,36 @@ public List&lt;Project&gt; listAll() {
 <p>Signing requests requires 3 elements:</p>
 
 <ul>
-  <li>REST API URL of the service you wish to request (see <a href="/ref/rest-api.html">REST API</a> )</li>
+  <li>REST API URL of the service you wish to request (see <a href="/miso-lims/dev/rest-api.html">REST API</a> )</li>
   <li>Your MISO username</li>
   <li>Your MISO API key - this can be found by logging in to MISO as normal, clicking “My Account” and the key is in the top box</li>
 </ul>
 
 <p>Producing HMAC keys from these elements for your request is easy:</p>
 
-<pre><code>echo -n "&lt;REST-url&gt;?x-url=&lt;REST-url&gt;@x-user=&lt;miso_user_name&gt;" | openssl sha1 -binary -hmac "&lt;your_key_from_miso&gt;" | openssl base64 | tr -d = | tr +/ -_
+<div class="highlighter-rouge"><pre class="highlight"><code>echo -n "&lt;REST-url&gt;?x-url=&lt;REST-url&gt;@x-user=&lt;miso_user_name&gt;" | openssl sha1 -binary -hmac "&lt;your_key_from_miso&gt;" | openssl base64 | tr -d = | tr +/ -_
 </code></pre>
+</div>
 
 <p>You can then use curl to initiate the request, using the REST API URL, your username, and the signed fragment produced above:</p>
 
-<pre><code>curl --request GET 'http://&lt;miso_url&gt;/&lt;REST-url&gt;'--header 'x-user:&lt;miso_user_name&gt;'--header 'x-signature:&lt;hmac_string_from_above&gt;'--header 'x-url:&lt;REST-url&gt;'
+<div class="highlighter-rouge"><pre class="highlight"><code>curl --request GET 'http://&lt;miso_url&gt;/&lt;REST-url&gt;'--header 'x-user:&lt;miso_user_name&gt;'--header 'x-signature:&lt;hmac_string_from_above&gt;'--header 'x-url:&lt;REST-url&gt;'
 </code></pre>
+</div>
 
 <p>Putting the two together, here’s an example shell script that can grab a list of libraries associated with a project:</p>
 
-<pre><code>#!/bin/bash
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="c">#!/bin/bash</span>
 
-PROJECTID=$1
-USER=$2
-KEY=$3
+<span class="nv">PROJECTID</span><span class="o">=</span><span class="nv">$1</span>
+<span class="nv">USER</span><span class="o">=</span><span class="nv">$2</span>
+<span class="nv">KEY</span><span class="o">=</span><span class="nv">$3</span>
 
-SIGNATURE=`echo -n "/miso/rest/project/$PROJECTID/libraries?x-url=/miso/rest/project/$PROJECTID/libraries@x-user=$USER" | openssl sha1 -binary -hmac "$KEY" | openssl base64 | tr -d = | tr +/ -_`
+<span class="nv">SIGNATURE</span><span class="o">=</span><span class="sb">`</span><span class="nb">echo</span> -n <span class="s2">"/miso/rest/project/</span><span class="nv">$PROJECTID</span><span class="s2">/libraries?x-url=/miso/rest/project/</span><span class="nv">$PROJECTID</span><span class="s2">/libraries@x-user=</span><span class="nv">$USER</span><span class="s2">"</span> | openssl sha1 -binary -hmac <span class="s2">"</span><span class="nv">$KEY</span><span class="s2">"</span> | openssl base64 | tr -d <span class="o">=</span> | tr +/ -_<span class="sb">`</span>
 
-curl --request GET "http://your.miso.url/miso/rest/project/$PROJECTID/libraries" --header "x-user:$USER" --header "x-signature:$SIGNATURE" --header "x-url:/miso/rest/project/$PROJECTID/libraries"
+curl --request GET <span class="s2">"http://your.miso.url/miso/rest/project/</span><span class="nv">$PROJECTID</span><span class="s2">/libraries"</span> --header <span class="s2">"x-user:</span><span class="nv">$USER</span><span class="s2">"</span> --header <span class="s2">"x-signature:</span><span class="nv">$SIGNATURE</span><span class="s2">"</span> --header <span class="s2">"x-url:/miso/rest/project/</span><span class="nv">$PROJECTID</span><span class="s2">/libraries"</span>
 </code></pre>
+</div>
 
 <h2 id="ajax-beans">AJAX Beans</h2>
 
@@ -988,70 +969,73 @@ curl --request GET "http://your.miso.url/miso/rest/project/$PROJECTID/libraries"
 
 <p>Service interfaces are annotated with the @Spi annotation, which marks them up for automatic discovery (see Service Discovery section below). Services should always have some kind of identifier, exposed via a simple getter, e.g. getName(). This name should be unique, otherwise services will become confused with others when discovered.</p>
 
-<pre><code class="language-java">@Spi
-public interface FooService {
-  String getName();
-  void doSomething();
-}
+<div class="language-java highlighter-rouge"><pre class="highlight"><code><span class="nd">@Spi</span>
+<span class="kd">public</span> <span class="kd">interface</span> <span class="nc">FooService</span> <span class="o">{</span>
+  <span class="n">String</span> <span class="nf">getName</span><span class="o">();</span>
+  <span class="kt">void</span> <span class="nf">doSomething</span><span class="o">();</span>
+<span class="o">}</span>
 </code></pre>
+</div>
 
 <p>Service implementations are annotated with the @ServiceProvider annotation, which the ServiceLoader class uses to expose the concrete instances of @Spi interfaces.</p>
 
-<pre><code class="language-java">@ServiceProvider
-public class FooServiceImpl {
-  String getName() {
-    return "FooServiceImpl";
-  }
+<div class="language-java highlighter-rouge"><pre class="highlight"><code><span class="nd">@ServiceProvider</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">FooServiceImpl</span> <span class="o">{</span>
+  <span class="n">String</span> <span class="nf">getName</span><span class="o">()</span> <span class="o">{</span>
+    <span class="k">return</span> <span class="s">"FooServiceImpl"</span><span class="o">;</span>
+  <span class="o">}</span>
 
-  void doSomething() {
-    System.out.println("Something has been done");
-  }
-}
+  <span class="kt">void</span> <span class="nf">doSomething</span><span class="o">()</span> <span class="o">{</span>
+    <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">"Something has been done"</span><span class="o">);</span>
+  <span class="o">}</span>
+<span class="o">}</span>
 </code></pre>
+</div>
 
 <h2 id="service-discovery">Service Discovery</h2>
 
 <p>Services are discovered via the ServiceLoader class. An example of a class that resolves a given service is below:</p>
 
-<pre><code class="language-java">public class FooServiceResolver {
-  private Map&lt;String, FooService&gt; serviceMap;
+<div class="language-java highlighter-rouge"><pre class="highlight"><code><span class="kd">public</span> <span class="kd">class</span> <span class="nc">FooServiceResolver</span> <span class="o">{</span>
+  <span class="kd">private</span> <span class="n">Map</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span> <span class="n">FooService</span><span class="o">&gt;</span> <span class="n">serviceMap</span><span class="o">;</span>
 
-  public Collection&lt;FooService&gt; discoverServices() {
-    if (serviceMap == null) {
-      //on first call of this method, populate a map of service names to services discovered on the classpath
-      ServiceLoader&lt;FooService&gt; loader = ServiceLoader.load(FooService.class);
-      Iterator&lt;FooService&gt; it = loader.iterator();
+  <span class="kd">public</span> <span class="n">Collection</span><span class="o">&lt;</span><span class="n">FooService</span><span class="o">&gt;</span> <span class="nf">discoverServices</span><span class="o">()</span> <span class="o">{</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">serviceMap</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+      <span class="c1">//on first call of this method, populate a map of service names to services discovered on the classpath</span>
+      <span class="n">ServiceLoader</span><span class="o">&lt;</span><span class="n">FooService</span><span class="o">&gt;</span> <span class="n">loader</span> <span class="o">=</span> <span class="n">ServiceLoader</span><span class="o">.</span><span class="na">load</span><span class="o">(</span><span class="n">FooService</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>
+      <span class="n">Iterator</span><span class="o">&lt;</span><span class="n">FooService</span><span class="o">&gt;</span> <span class="n">it</span> <span class="o">=</span> <span class="n">loader</span><span class="o">.</span><span class="na">iterator</span><span class="o">();</span>
 
-      serviceMap = new HashMap&lt;String, FooService&gt;();
+      <span class="n">serviceMap</span> <span class="o">=</span> <span class="k">new</span> <span class="n">HashMap</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span> <span class="n">FooService</span><span class="o">&gt;();</span>
 
-      while (it.hasNext()) {
-        FooService s = it.next();
-        if (!serviceMap.containsKey(s.getName())) {
-          serviceMap.put(s.getName(), s);
-        }
-        else {
-          if (serviceMap.get(s.getName()) != s) {
-            String msg = "Multiple different FooServices with the same service name " +
-            "('" + s.getName() + "') are present on the classpath. Service names must be unique.";            
-            throw new ServiceConfigurationError(msg);
-          }
-        }
-      }
-    }
-    return serviceMap.values();
-  }
+      <span class="k">while</span> <span class="o">(</span><span class="n">it</span><span class="o">.</span><span class="na">hasNext</span><span class="o">())</span> <span class="o">{</span>
+        <span class="n">FooService</span> <span class="n">s</span> <span class="o">=</span> <span class="n">it</span><span class="o">.</span><span class="na">next</span><span class="o">();</span>
+        <span class="k">if</span> <span class="o">(!</span><span class="n">serviceMap</span><span class="o">.</span><span class="na">containsKey</span><span class="o">(</span><span class="n">s</span><span class="o">.</span><span class="na">getName</span><span class="o">()))</span> <span class="o">{</span>
+          <span class="n">serviceMap</span><span class="o">.</span><span class="na">put</span><span class="o">(</span><span class="n">s</span><span class="o">.</span><span class="na">getName</span><span class="o">(),</span> <span class="n">s</span><span class="o">);</span>
+        <span class="o">}</span>
+        <span class="k">else</span> <span class="o">{</span>
+          <span class="k">if</span> <span class="o">(</span><span class="n">serviceMap</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="n">s</span><span class="o">.</span><span class="na">getName</span><span class="o">())</span> <span class="o">!=</span> <span class="n">s</span><span class="o">)</span> <span class="o">{</span>
+            <span class="n">String</span> <span class="n">msg</span> <span class="o">=</span> <span class="s">"Multiple different FooServices with the same service name "</span> <span class="o">+</span>
+            <span class="s">"('"</span> <span class="o">+</span> <span class="n">s</span><span class="o">.</span><span class="na">getName</span><span class="o">()</span> <span class="o">+</span> <span class="s">"') are present on the classpath. Service names must be unique."</span><span class="o">;</span>            
+            <span class="k">throw</span> <span class="k">new</span> <span class="nf">ServiceConfigurationError</span><span class="o">(</span><span class="n">msg</span><span class="o">);</span>
+          <span class="o">}</span>
+        <span class="o">}</span>
+      <span class="o">}</span>
+    <span class="o">}</span>
+    <span class="k">return</span> <span class="n">serviceMap</span><span class="o">.</span><span class="na">values</span><span class="o">();</span>
+  <span class="o">}</span>
 
-  public FooService getFooService(String serviceName) {
-    for (FooService s : discoverServices()) {
-      if (s.getName().equals(serviceName)) {
-        return s;
-      }
-    }
-    log.warn("No service called '" + serviceName + "' was available on the classpath");
-    return null;
-  }
-}
+  <span class="kd">public</span> <span class="n">FooService</span> <span class="nf">getFooService</span><span class="o">(</span><span class="n">String</span> <span class="n">serviceName</span><span class="o">)</span> <span class="o">{</span>
+    <span class="k">for</span> <span class="o">(</span><span class="n">FooService</span> <span class="n">s</span> <span class="o">:</span> <span class="n">discoverServices</span><span class="o">())</span> <span class="o">{</span>
+      <span class="k">if</span> <span class="o">(</span><span class="n">s</span><span class="o">.</span><span class="na">getName</span><span class="o">().</span><span class="na">equals</span><span class="o">(</span><span class="n">serviceName</span><span class="o">))</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="n">s</span><span class="o">;</span>
+      <span class="o">}</span>
+    <span class="o">}</span>
+    <span class="n">log</span><span class="o">.</span><span class="na">warn</span><span class="o">(</span><span class="s">"No service called '"</span> <span class="o">+</span> <span class="n">serviceName</span> <span class="o">+</span> <span class="s">"' was available on the classpath"</span><span class="o">);</span>
+    <span class="k">return</span> <span class="kc">null</span><span class="o">;</span>
+  <span class="o">}</span>
+<span class="o">}</span>
 </code></pre>
+</div>
 
 <p>You would realistically have one such class for each service type interface, and wire these into relevant beans via Spring configuration.</p>
 
@@ -1071,7 +1055,6 @@ public class FooServiceImpl {
 
 <h1 id="analysis-modules">Analysis Modules</h1>
 
-
                     </div>
                 
             </div>
@@ -1086,55 +1069,8 @@ public class FooServiceImpl {
             </div>
         </div>
 
-        <script>
-            function orderNav() {
-                var list,
-                    section,
-                    header,
-                    sections = [],
-                    lists = {},
-                    headers = {};
+        <script src="/miso-lims/styles/navigation.js"></script>
 
-                var navUl = document.querySelectorAll('#navigation ul')[0],
-                    navLis = document.querySelectorAll('#navigation ul li');
-
-                if (!navUl) return;
-
-                for (var i = 0; i < navLis.length; i++) {
-                    var order, li = navLis[i];
-
-                    if (li.classList.contains('nav-header')) {
-                        section = li.textContent || li.innerText;
-                        sections.push(section);
-                        headers[section] = li;
-                        continue;
-                    }
-
-                    if (!lists[section]) {
-                        lists[section] = [];
-                    }
-
-                    order = parseFloat(li.getAttribute('data-order'))
-                    lists[section].push([order, li]);
-                }
-
-                for (var i = 0; i < sections.length; i++) {
-                    section = sections[i];
-                    list = lists[section].sort(function(a, b) {
-                        return a[0] - b[0];
-                    });
-
-                    if (header = headers[section]) {
-                        navUl.appendChild(header);
-                    }
-                    for (var j = 0; j < list.length; j++) {
-                        navUl.appendChild(list[j][1]);
-                    }
-                }
-            }
-
-            if (document.querySelectorAll) orderNav();
-        </script>
         
     </body>
 </html>
