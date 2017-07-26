@@ -72,6 +72,7 @@ import uk.ac.bbsrc.tgac.miso.service.SequencerReferenceService;
 import uk.ac.bbsrc.tgac.miso.service.SequencingParametersService;
 import uk.ac.bbsrc.tgac.miso.service.impl.PartitionQCService;
 import uk.ac.bbsrc.tgac.miso.service.impl.RunService;
+import uk.ac.bbsrc.tgac.miso.webapp.service.statsdb.StatsDbSource;
 import uk.ac.bbsrc.tgac.miso.webapp.util.ExperimentListConfiguration;
 import uk.ac.bbsrc.tgac.miso.webapp.util.JsonArrayCollector;
 import uk.ac.bbsrc.tgac.miso.webapp.util.RunMetricsSource;
@@ -88,7 +89,7 @@ public class EditRunController {
    * Normally, metrics collected by run scanner are stored in the MISO database, but it is possible to provide others here.
    */
   public Stream<RunMetricsSource> getSources() {
-    return Stream.of(Run::getMetrics);
+    return Stream.of(Run::getMetrics, StatsDbSource.INSTANCE);
   }
 
   @Autowired

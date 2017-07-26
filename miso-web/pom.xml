@@ -272,6 +272,11 @@
       <artifactId>fluxion-ajax-3</artifactId>
     </dependency>
     <dependency>
+      <groupId>uk.ac.tgac.statsdb</groupId>
+      <artifactId>statsdb-api</artifactId>
+    </dependency>
+
+    <dependency>
       <!-- Do not remove - used by container -->
       <groupId>xml-apis</groupId>
       <artifactId>xml-apis</artifactId>
