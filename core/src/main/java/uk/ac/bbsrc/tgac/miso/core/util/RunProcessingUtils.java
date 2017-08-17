@@ -23,23 +23,75 @@
 
 package uk.ac.bbsrc.tgac.miso.core.util;
 
-import uk.ac.bbsrc.tgac.miso.core.data.Index;
-import uk.ac.bbsrc.tgac.miso.core.data.Partition;
-import uk.ac.bbsrc.tgac.miso.core.data.Pool;
-import uk.ac.bbsrc.tgac.miso.core.data.Run;
-import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
+import uk.ac.bbsrc.tgac.miso.core.data.*;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.view.PoolableElementView;
+import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 
 /**
- * uk.ac.bbsrc.tgac.miso.core.util
- * <p/>
- * Info
+ * Utility class to build sample sheets from run information
  * 
  * @author Rob Davey
- * @date 28/03/12
- * @since 0.1.6
+ * @date 17/08/17
+ * @since 0.2.73
  */
 public class RunProcessingUtils {
+  public static String getSampleSheetByPlatform(Run r, SequencerPartitionContainer f, String platform, String type, String userName) {
+    StringBuilder sb = new StringBuilder();
+    if (PlatformType.ILLUMINA.getKey().equals(platform) && !"IEM".equals(type)) {
+      // build casava samplesheet
+      return buildIlluminaDemultiplexCSV(r, f, type, userName);
+    }
+    //Lane,SampleID,Sample_Name,Sample_Plate,Sample_Well,i7_index_ID,Index,i5_index_ID,Index2,Sample_Project,Description,Library,TaxID
+    else if (PlatformType.ILLUMINA.getKey().equals(platform) && "IEM".equals(type)) {
+      sb.append("[Data]").append("\n");
+      sb.append("Lane,").append("Sample_ID,").append("Sample_Name,").append("Sample_Plate,").append("Sample_Well,")
+              .append("i7_index_ID,").append("Index1_Sequence,").append("i5_index_ID,").append("Index2_Sequence,")
+              .append("Sample_Project_ID,").append("Description,").append("Library_ID,").append("Sample_Scientific_Name,")
+              .append("NCBI_Taxon_ID")
+              .append("\n");
+      for (Partition l : f.getPartitions()) {
+        Pool p = l.getPool();
+        if (p != null) {
+          for (PoolableElementView ld : p.getPoolableElementViews()) {
+            sb.append(l.getPartitionNumber()).append(",")
+                    .append(ld.getSampleId()).append(",")
+                    .append(ld.getSampleName()).append(",")
+                    .append(p.getBox() != null ? p.getBox().getId() : "").append(",")
+                    .append(p.getBox() != null ? p.getBoxPosition() : "").append(",");
+
+            if (ld.getIndices() != null && !ld.getIndices().isEmpty()) {
+              if (ld.getIndices().size() == 2) {
+                for (Index index : ld.getIndices()) {
+                  sb.append(index.getName())
+                          .append(",")
+                          .append(index.getSequence());
+                  sb.append(",");
+                }
+              }
+              else {
+                Index index = ld.getIndices().get(0);
+                sb.append(index.getName())
+                        .append(",")
+                        .append(index.getSequence())
+                        .append(",,,");
+              }
+            } else {
+              sb.append(",,,,");
+            }
+
+            sb.append(ld.getProjectId()).append(",")
+                    .append(ld.getProjectAlias()).append(",")
+                    .append(ld.getLibraryId()).append(",")
+                    .append(ld.getSampleScientificName()).append(",")
+                    .append(ld.getSampleTaxonId()).append(",")
+                    .append("\n");
+          }
+        }
+      }
+    }
+    return sb.toString();
+  }
+
   public static String buildIlluminaDemultiplexCSV(Run r, SequencerPartitionContainer f, String casavaVersion,
       String userName) {
     boolean newCasava = false;

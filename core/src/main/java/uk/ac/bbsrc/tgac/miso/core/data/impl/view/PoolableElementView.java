@@ -83,6 +83,10 @@ public class PoolableElementView implements Serializable, Comparable<PoolableEle
 
   private String sampleType;
 
+  private String sampleScientificName;
+
+  private String sampleTaxonId;
+
   private Long projectId;
 
   private String projectName;
@@ -142,6 +146,8 @@ public class PoolableElementView implements Serializable, Comparable<PoolableEle
         v.setSampleId(sam.getId());
         v.setSampleName(sam.getName());
         v.setSampleType(sam.getSampleType());
+        v.setSampleScientificName(sam.getScientificName());
+        v.setSampleTaxonId(sam.getTaxonIdentifier());
         
         Project proj = sam.getProject();
         if (proj != null) {
@@ -365,6 +371,22 @@ public class PoolableElementView implements Serializable, Comparable<PoolableEle
 
   public void setSampleType(String sampleType) {
     this.sampleType = sampleType;
+  }
+
+  public String getSampleScientificName() {
+    return sampleScientificName;
+  }
+
+  public void setSampleScientificName(String sampleScientificName) {
+    this.sampleScientificName = sampleScientificName;
+  }
+
+  public String getSampleTaxonId() {
+    return sampleTaxonId;
+  }
+
+  public void setSampleTaxonId(String sampleTaxonId) {
+    this.sampleTaxonId = sampleTaxonId;
   }
 
   public Date getLastModified() {

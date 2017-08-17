@@ -127,6 +127,21 @@ public class RunRestController extends RestController {
     return RunProcessingUtils.buildIlluminaDemultiplexCSV(r, conts.iterator().next(), "1.8", user.getLoginName());
   }
 
+  @RequestMapping(value = "{runAlias}/samplesheet/platform/{platform}/type/{type}", method = RequestMethod.GET)
+  public @ResponseBody String getSampleSheetByType(@PathVariable String runAlias, @PathVariable String platform, @PathVariable String type) throws IOException {
+    Run r = runService.getRunByAlias(runAlias);
+    User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
+    if (r == null) {
+      throw new RestException("No run found with alias: " + runAlias, Status.NOT_FOUND);
+    }
+    Collection<SequencerPartitionContainer> conts = r.getSequencerPartitionContainers();
+    if (conts.isEmpty() || conts.size() != 1) {
+      throw new RestException("Expected 1 sequencing container for run " + runAlias + ", but found " + (conts == null ? 0 : conts.size()));
+    }
+    return RunProcessingUtils.getSampleSheetByPlatform(r, conts.iterator().next(), platform, type, user.getLoginName());
+//    return RunProcessingUtils.buildIlluminaDemultiplexCSV(r, conts.iterator().next(), "1.8", user.getLoginName());
+  }
+
   @RequestMapping(method = RequestMethod.GET, produces = "application/json")
   public @ResponseBody String listAllRuns() throws IOException {
     Collection<Run> lr = runService.list();
