@@ -83,7 +83,7 @@ public class RunProcessingUtils {
                     .append(ld.getProjectAlias()).append(",")
                     .append(ld.getLibraryId()).append(",")
                     .append(ld.getSampleScientificName()).append(",")
-                    .append(ld.getSampleTaxonId()).append(",")
+                    .append(ld.getSampleTaxonIdentifier()).append(",")
                     .append("\n");
           }
         }
