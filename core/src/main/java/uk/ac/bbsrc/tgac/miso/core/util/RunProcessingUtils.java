@@ -43,7 +43,6 @@ public class RunProcessingUtils {
     }
     //Lane,SampleID,Sample_Name,Sample_Plate,Sample_Well,i7_index_ID,Index,i5_index_ID,Index2,Sample_Project,Description,Library,TaxID
     else if (PlatformType.ILLUMINA.getKey().equals(platform) && "IEM".equals(type)) {
-      sb.append("[Data]").append("\n");
       sb.append("Lane,").append("Sample_ID,").append("Sample_Name,").append("Sample_Plate,").append("Sample_Well,")
               .append("i7_index_ID,").append("Index1_Sequence,").append("i5_index_ID,").append("Index2_Sequence,")
               .append("Sample_Project_ID,").append("Description,").append("Library_ID,").append("Sample_Scientific_Name,")
@@ -54,7 +53,7 @@ public class RunProcessingUtils {
         if (p != null) {
           for (PoolableElementView ld : p.getPoolableElementViews()) {
             sb.append(l.getPartitionNumber()).append(",")
-                    .append(ld.getSampleId()).append(",")
+                    .append(ld.getSampleName()).append(",")
                     .append(ld.getSampleAlias()).append(",")
                     .append(p.getBox() != null ? p.getBox().getId() : "").append(",")
                     .append(p.getBox() != null ? p.getBoxPosition() : "").append(",");
@@ -83,7 +82,7 @@ public class RunProcessingUtils {
                     .append(ld.getProjectAlias()).append(",")
                     .append(ld.getLibraryId()).append(",")
                     .append(ld.getSampleScientificName()).append(",")
-                    .append(ld.getSampleTaxonIdentifier())
+                    .append(ld.getSampleTaxonIdentifier() != null ? ld.getSampleTaxonIdentifier() : "")
                     .append("\n");
           }
         }
