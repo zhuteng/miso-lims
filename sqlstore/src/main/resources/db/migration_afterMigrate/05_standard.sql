@@ -1150,6 +1150,8 @@ AS SELECT
     s.description AS sampleDescription,
     s.accession AS sampleAccession,
     s.sampleType AS sampleType,
+    s.scientificName AS sampleScientificName,
+    s.taxonIdentifier AS sampleTaxonIdentifier,
     p.projectId AS projectId,
     p.name AS projectName,
     p.shortName AS projectShortName,
