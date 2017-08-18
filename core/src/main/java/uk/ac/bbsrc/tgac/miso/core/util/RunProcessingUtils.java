@@ -42,7 +42,7 @@ public class RunProcessingUtils {
       return buildIlluminaDemultiplexCSV(r, f, type, userName);
     }
     //Lane,SampleID,Sample_Name,Sample_Plate,Sample_Well,i7_index_ID,Index,i5_index_ID,Index2,Sample_Project,Description,Library,TaxID
-    else if (PlatformType.ILLUMINA.getKey().equals(platform) && "IEM".equals(type)) {
+    else if (platform != null && PlatformType.ILLUMINA.getKey().toLowerCase().equals(platform.toLowerCase()) && "IEM".equals(type)) {
       sb.append("Lane,").append("Sample_ID,").append("Sample_Name,").append("Sample_Plate,").append("Sample_Well,")
               .append("i7_index_ID,").append("Index1_Sequence,").append("i5_index_ID,").append("Index2_Sequence,")
               .append("Sample_Project_ID,").append("Description,").append("Library_ID,").append("Sample_Scientific_Name,")
