@@ -55,7 +55,7 @@ public class RunProcessingUtils {
           for (PoolableElementView ld : p.getPoolableElementViews()) {
             sb.append(l.getPartitionNumber()).append(",")
                     .append(ld.getSampleId()).append(",")
-                    .append(ld.getSampleName()).append(",")
+                    .append(ld.getSampleAlias()).append(",")
                     .append(p.getBox() != null ? p.getBox().getId() : "").append(",")
                     .append(p.getBox() != null ? p.getBoxPosition() : "").append(",");
 
