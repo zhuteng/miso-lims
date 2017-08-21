@@ -127,18 +127,24 @@ public class RunRestController extends RestController {
     return RunProcessingUtils.buildIlluminaDemultiplexCSV(r, conts.iterator().next(), "1.8", user.getLoginName());
   }
 
-  @RequestMapping(value = "{runAlias}/samplesheet/type/{type}", method = RequestMethod.GET)
-  public @ResponseBody String getSampleSheetByType(@PathVariable String runAlias, @PathVariable String type) throws IOException {
-    Run r = runService.getRunByAlias(runAlias);
+  @RequestMapping(value = "/id/{runId}/samplesheet/type/{type}", method = RequestMethod.GET)
+  public @ResponseBody String getSampleSheetByType(@PathVariable Long runId, @PathVariable String type) throws IOException {
+    Run r = runService.get(runId);
     User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
     if (r == null) {
-      throw new RestException("No run found with alias: " + runAlias, Status.NOT_FOUND);
+      throw new RestException("No run found with ID: " + runId, Status.NOT_FOUND);
     }
     Collection<SequencerPartitionContainer> conts = r.getSequencerPartitionContainers();
     if (conts.isEmpty() || conts.size() != 1) {
-      throw new RestException("Expected 1 sequencing container for run " + runAlias + ", but found " + (conts == null ? 0 : conts.size()));
+      throw new RestException("Expected 1 sequencing container for run " + runId + ", but found " + (conts == null ? 0 : conts.size()));
     }
     return RunProcessingUtils.getSampleSheetByPlatform(r, conts.iterator().next(), type, user.getLoginName());
+  }
+
+  @RequestMapping(value = "/alias/{runAlias}/samplesheet/type/{type}", method = RequestMethod.GET)
+  public @ResponseBody String getSampleSheetByType(@PathVariable String runAlias, @PathVariable String type) throws IOException {
+    Run r = runService.getRunByAlias(runAlias);
+    return getSampleSheetByType(r.getId(), type);
   }
 
   @RequestMapping(method = RequestMethod.GET, produces = "application/json")
