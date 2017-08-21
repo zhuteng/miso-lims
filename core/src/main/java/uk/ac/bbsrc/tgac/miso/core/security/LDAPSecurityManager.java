@@ -83,7 +83,7 @@ public class LDAPSecurityManager extends AbstractSecurityManager {
     long id = super.saveUser(user);
 
     // then update the used password as per LDAP
-    if (propagateLdapPasswords) {
+//    if (propagateLdapPasswords) {
       User jdbcUser = super.getUserByLoginName(user.getLoginName());
       if (jdbcUser != null) {
         if (!isStringEmptyOrNull(user.getPassword())) {
@@ -135,7 +135,7 @@ public class LDAPSecurityManager extends AbstractSecurityManager {
         }
         return jdbcUser.getUserId();
       }
-    }
+//    }
     return id;
   }
 
