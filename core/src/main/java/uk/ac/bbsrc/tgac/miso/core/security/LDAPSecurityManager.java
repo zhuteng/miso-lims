@@ -23,8 +23,20 @@
 
 package uk.ac.bbsrc.tgac.miso.core.security;
 
+import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
+
+import java.io.IOException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.ldap.userdetails.InetOrgPerson;
+import org.springframework.security.ldap.userdetails.LdapUserDetailsManager;
+
+import com.eaglegenomics.simlims.core.User;
+
+import uk.ac.bbsrc.tgac.miso.core.security.util.LimsSecurityUtils;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.eaglegenomics.simlims.core.manager.AbstractSecurityManager;
@@ -41,20 +53,103 @@ public class LDAPSecurityManager extends AbstractSecurityManager {
   /** Field log */
   protected static final Logger log = LoggerFactory.getLogger(LDAPSecurityManager.class);
 
-  private boolean allowMutablePasswords = false;
+  private boolean propagateLdapPasswords = false;
+
+  @Autowired
+  private LdapUserDetailsManager ldapUserManager;
+
+  @Autowired
+  private PasswordCodecService passwordCodecService;
+
+  public void setLdapUserManager(LdapUserDetailsManager ldapUserManager) {
+    this.ldapUserManager = ldapUserManager;
+  }
+
+  public void setPasswordCodecService(PasswordCodecService passwordCodecService) {
+    this.passwordCodecService = passwordCodecService;
+  }
+
+  /**
+   * Saves the User to the MISO database
+   *
+   * @param user
+   *          of type User
+   * @throws IOException
+   *           when the User cannot be saved
+   */
+  @Override
+  public long saveUser(User user) throws IOException {
+    // firstly, save the user as per the superclass
+    long id = super.saveUser(user);
+
+    // then update the used password as per LDAP
+    if (propagateLdapPasswords) {
+      User jdbcUser = super.getUserByLoginName(user.getLoginName());
+      if (jdbcUser != null) {
+        if (!isStringEmptyOrNull(user.getPassword())) {
+          if (SecurityContextHolder.getContext().getAuthentication() != null
+                  && SecurityContextHolder.getContext().getAuthentication().isAuthenticated()) {
+            if (SecurityContextHolder.getContext().getAuthentication().getName().equals(user.getLoginName())) {
+              // this should be the case if the user has already logged in and is wishing to update details, rather than create
+              Object p = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+              if (p instanceof InetOrgPerson) {
+                User ldapUser = LimsSecurityUtils.fromLdapUser((InetOrgPerson) p);
+                if (ldapUser.getPassword().equals(user.getPassword())
+                        || passwordCodecService.getEncoder().isPasswordValid(ldapUser.getPassword(), user.getPassword(), null)) {
+                } else {
+                  // if the existing LDAP pass and this pass are different
+                  ldapUserManager.changePassword(ldapUser.getPassword(),
+                          passwordCodecService.getEncoder().encodePassword(user.getPassword(), null));
+                }
+              }
+            }
+
+            if (user.getUserId() == null) {
+              // this will happen if the user auths against LDAP and the user exists in the DB
+              // i.e. when they log into the LIMS for the very first time
+              user.setUserId(jdbcUser.getUserId());
+            }
+
+            if (isStringEmptyOrNull(user.getFullName())) {
+              throw new IOException("Cannot save user with no full name / display name.");
+            }
+
+            if (isStringEmptyOrNull(user.getEmail())) {
+              throw new IOException("Cannot save user with no email.");
+            }
+
+            if (isStringEmptyOrNull(user.getLoginName())) {
+              throw new IOException("Cannot save user with no login name.");
+            }
+
+            if (isStringEmptyOrNull(user.getPassword())) {
+              // infer that the password is going to be the same, not set to null
+              user.setPassword(jdbcUser.getPassword());
+            }
+
+            return super.saveUser(user);
+          } else {
+            // probably attempting registration, i.e. no auth session and user exists in LDAP and LIMS
+            throw new IOException("User with supplied login name already exists");
+          }
+        }
+        return jdbcUser.getUserId();
+      }
+    }
+    return id;
+  }
 
   @Override
   public boolean canCreateNewUser() {
     return false;
   }
 
-  public void setAllowMutablePasswords(boolean allowMutablePasswords) {
-    log.debug("Setting mutable passwords to: " + allowMutablePasswords);
-    this.allowMutablePasswords = allowMutablePasswords;
-  }
-
   @Override
   public boolean isPasswordMutable() {
-    return allowMutablePasswords;
+    return false;
+  }
+
+  public void setPropagateLdapPasswords(boolean propagateLdapPasswords) {
+    this.propagateLdapPasswords = propagateLdapPasswords;
   }
 }

@@ -33,7 +33,7 @@
   default-autowire="byName">
 
   <bean id="securityManager" name="securityManager" class="uk.ac.bbsrc.tgac.miso.core.security.LDAPSecurityManager">
-    <property name="allowMutablePasswords" value="${security.ldap.allowMutablePasswords}" />
+    <property name="allowMutablePasswords" value="${security.ldap.propagateLdapPasswords}" />
   </bean>
 
   <security:global-method-security secured-annotations="enabled" jsr250-annotations="enabled" />
