@@ -41,13 +41,19 @@ public class LDAPSecurityManager extends AbstractSecurityManager {
   /** Field log */
   protected static final Logger log = LoggerFactory.getLogger(LDAPSecurityManager.class);
 
+  private boolean allowMutablePasswords = false;
+
   @Override
   public boolean canCreateNewUser() {
     return false;
   }
 
+  public void setAllowMutablePasswords(boolean allowMutablePasswords) {
+    this.allowMutablePasswords = allowMutablePasswords;
+  }
+
   @Override
   public boolean isPasswordMutable() {
-    return false;
+    return allowMutablePasswords;
   }
 }
