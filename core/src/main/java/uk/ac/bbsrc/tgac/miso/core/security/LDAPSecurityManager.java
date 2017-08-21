@@ -49,6 +49,7 @@ public class LDAPSecurityManager extends AbstractSecurityManager {
   }
 
   public void setAllowMutablePasswords(boolean allowMutablePasswords) {
+    log.debug("Setting mutable passwords to: " + allowMutablePasswords);
     this.allowMutablePasswords = allowMutablePasswords;
   }
 
