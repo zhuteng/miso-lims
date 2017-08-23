@@ -195,7 +195,7 @@ public class MenuController implements ServletContextAware {
       model.put("title", "My Account");
       model.put("userRealName", realName);
       model.put("userId", user.getUserId());
-      model.put("apiKey", SignatureHelper.generatePrivateUserKey((user.getLoginName() + "::" + user.getPassword()).getBytes("UTF-8")));
+      model.put("apiKey", SignatureHelper.generatePrivateUserKey((user.getLoginName() + "::" + user.getUserId() + "::" + user.getEmail()).getBytes("UTF-8")));
       model.put("userGroups", groups.toString());
       return new ModelAndView("/pages/myAccount.jsp", model);
     } catch (IOException e) {

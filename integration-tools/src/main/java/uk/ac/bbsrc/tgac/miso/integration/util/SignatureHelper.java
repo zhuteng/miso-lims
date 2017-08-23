@@ -64,6 +64,7 @@ public class SignatureHelper {
   private static final List<String> SIGNATURE_KEYWORDS = Arrays.asList(USER_HEADER, TIMESTAMP_HEADER, URL_X_HEADER);
   private static final String DSA_ALGORITHM = "DSA";
   private static final String HMAC_SHA1_ALGORITHM = "HmacSHA1";
+  private static final String HMAC_SHA256_ALGORITHM = "HmacSHA256";
 
   public static String createSignature(Map<String, List<String>> headersAndParams, String url, String privateKey) throws Exception {
     TreeMap<String, String> sortedHeaders = new TreeMap<>();
@@ -74,15 +75,11 @@ public class SignatureHelper {
     }
 
     String sortedUrl = createSortedUrl(url, sortedHeaders);
-
-    log.debug("CREATING SIGNATURE FROM SUPPLIED HEADERS: " + sortedUrl + " :: " + privateKey);
     return calculateHMAC(sortedUrl, privateKey);
   }
 
   private static String createSignatureFromRequest(HttpServletRequest request, String privateKey) throws Exception {
     String sortedUrl = createSortedUrl(request);
-
-    log.debug("CREATING SIGNATURE FROM REQUEST: " + sortedUrl + " :: " + privateKey);
     return calculateHMAC(sortedUrl, privateKey);
   }
 
@@ -123,11 +120,8 @@ public class SignatureHelper {
   private static String calculateHMAC(String data, String key) throws java.security.SignatureException {
     String result;
     try {
-      // get an hmac_sha1 key from the raw key bytes
-      SecretKeySpec signingKey = new SecretKeySpec(key.getBytes(), HMAC_SHA1_ALGORITHM);
-
-      // get an hmac_sha1 Mac instance and initialize with the signing key
-      Mac mac = Mac.getInstance(HMAC_SHA1_ALGORITHM);
+      SecretKeySpec signingKey = new SecretKeySpec(key.getBytes(), HMAC_SHA256_ALGORITHM);
+      Mac mac = Mac.getInstance(HMAC_SHA256_ALGORITHM);
       mac.init(signingKey);
 
       // compute the hmac on input data bytes
@@ -147,9 +141,6 @@ public class SignatureHelper {
     if (request == null || signature == null || publicKey == null) {
       throw new InvalidKeyException("Cannot verify signature when request or signature are null!");
     }
-
-    log.debug("VERIFYING HMAC: " + signature + " vs " + createSignatureFromRequest(request, publicKey));
-
     return signature.equals(createSignatureFromRequest(request, publicKey));
   }
 
