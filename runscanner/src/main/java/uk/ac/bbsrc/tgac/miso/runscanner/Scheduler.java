@@ -6,6 +6,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -143,27 +144,46 @@ public class Scheduler {
     }
   }
 
+  private static class UnreadableDirectories implements Predicate<File> {
+    private final Set<File> rejects = new HashSet<>();
+
+    public Set<File> getRejects() {
+      return rejects;
+    }
+
+    @Override
+    public boolean test(File directory) {
+      boolean result = directory.canRead() && directory.canExecute();
+      if (!result) rejects.add(directory);
+      return result;
+    }
+  }
+
   private static final Gauge acceptedDirectories = Gauge.build().name("miso_runscanner_directories_accepted")
       .help("The number of directories that were readable and sent for processing in the last pass.").register();
+
   private static final Gauge attemptedDirectories = Gauge.build().name("miso_runscanner_directories_attempted")
       .help("The number of directories that were considered in the last pass.").register();
 
   private static final Gauge configurationEntries = Gauge.build().name("miso_runscanner_configuration_entries")
       .help("The number of entries from the last configuration.").register();
-
   private static final Gauge configurationTimestamp = Gauge.build().name("miso_runscanner_configuration_timestamp")
       .help("The epoch time when the configuration was last read.").register();
   private static final Gauge configurationValid = Gauge.build().name("miso_runscanner_configuration_valid")
       .help("Whether the configuration loaded from disk is valid.").register();
+
   private static final Gauge epochGauge = Gauge.build().name("miso_runscanner_epoch")
       .help("The current round of processing done for keeping the client in sync when progressively scanning.").register();
 
   private static final Counter errors = Counter.build().name("miso_runscanner_errors").help("The number of bad directories encountered.")
       .labelNames("platform").register();
-
   private static Logger log = LoggerFactory.getLogger(Scheduler.class);
   private static final Gauge newRunsScanned = Gauge.build().name("miso_runscanner_new_runs_scanned")
       .help("The number of runs discovered in the last pass.").register();
+
+  private static final Gauge processingRuns = Gauge.build().name("miso_runscanner_processing_runs").labelNames("platform").help(
+      "The number of runs currently being processed.").register();
+
   private static final Histogram processTime = Histogram.build().buckets(1, 5, 10, 30, 60, 300, 600, 3600)
       .name("miso_runscanner_directory_process_time").help("Time to process a run directories in seconds.")
       .labelNames("platform", "instrument").register();
@@ -173,6 +193,8 @@ public class Scheduler {
 
   private static final LatencyHistogram scanTime = new LatencyHistogram("miso_runscanner_directory_scan_time",
       "Time to scan the run directories in seconds.");
+  private static final Gauge waitingRuns = Gauge.build().name("miso_runscanner_waiting_runs").help(
+      "The number of runs waiting to be processed.").labelNames("platform").register();
 
   private File configurationFile;
 
@@ -199,8 +221,9 @@ public class Scheduler {
   private Instant scanLastStarted = null;
 
   private boolean scanningNow = false;
-
   private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+
+  private UnreadableDirectories unreadableDirectories;
   private final ExecutorService workPool = Executors.newWorkStealingPool();
 
   // The paths that need to be processed (and the corresponding processor).
@@ -250,8 +273,8 @@ public class Scheduler {
     return workToDo;
   }
 
-  private boolean isAcceptable(File directory) {
-    return directory.canRead() && directory.canExecute();
+  public Set<File> getUnreadableDirectories() {
+    return unreadableDirectories.getRejects();
   }
 
   public boolean isConfigurationGood() {
@@ -282,10 +305,13 @@ public class Scheduler {
    */
   private void queueDirectory(final File directory, final RunProcessor processor, final TimeZone tz) {
     workToDo.add(directory);
+    waitingRuns.labels(processor.getPlatformType().name()).inc();
     workPool.submit(() -> {
       Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
       processing.add(directory);
+      processingRuns.labels(processor.getPlatformType().name()).inc();
       workToDo.remove(directory);
+      waitingRuns.labels(processor.getPlatformType().name()).dec();
 
       long runStartTime = System.nanoTime();
       String instrumentName = "unknown";
@@ -306,6 +332,7 @@ public class Scheduler {
       }
       processTime.labels(processor.getPlatformType().name(), instrumentName).observe((System.nanoTime() - runStartTime) / 1e9);
       processing.remove(directory);
+      processingRuns.labels(processor.getPlatformType().name()).dec();
     });
   }
 
@@ -362,6 +389,7 @@ public class Scheduler {
           readConfiguration();
         }
         scanLastStarted = Instant.now();
+        UnreadableDirectories newUnreadableDirectories = new UnreadableDirectories();
         try (StreamCountSpy<Pair<File, Configuration>> newRuns = new StreamCountSpy<>(newRunsScanned);
             StreamCountSpy<Pair<File, Configuration>> attempted = new StreamCountSpy<>(attemptedDirectories);
             StreamCountSpy<Pair<File, Configuration>> accepted = new StreamCountSpy<>(acceptedDirectories);
@@ -370,7 +398,7 @@ public class Scheduler {
               .filter(Configuration::isValid)//
               .flatMap(Configuration::getRuns)//
               .peek(attempted)//
-              .filter(entry -> isAcceptable(entry.getKey()))//
+              .filter(entry -> newUnreadableDirectories.test(entry.getKey()))//
               .peek(accepted)//
               .filter(entry -> isUnprocessed(entry.getKey()))//
               .peek(newRuns)//
@@ -380,6 +408,7 @@ public class Scheduler {
         } catch (Exception e) {
           log.error("Error scanning directory.", e);
         }
+        unreadableDirectories = newUnreadableDirectories;
         scanningNow = false;
       }, 1, 15, TimeUnit.MINUTES);
     }

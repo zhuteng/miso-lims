@@ -8,12 +8,10 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.function.Consumer;
-import java.util.function.IntFunction;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -38,6 +36,7 @@ import com.google.common.collect.Lists;
 
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractQC;
 import uk.ac.bbsrc.tgac.miso.core.data.Barcodable;
+import uk.ac.bbsrc.tgac.miso.core.data.GetLaneContents;
 import uk.ac.bbsrc.tgac.miso.core.data.IlluminaRun;
 import uk.ac.bbsrc.tgac.miso.core.data.LS454Run;
 import uk.ac.bbsrc.tgac.miso.core.data.PacBioRun;
@@ -529,7 +528,7 @@ public class DefaultRunService implements RunService, AuthorizedPaginatedDataSou
 
   @Override
   public boolean processNotification(Run source, int laneCount, String containerSerialNumber, String sequencerName,
-      Predicate<SequencingParameters> filterParameters, IntFunction<Optional<String>> getLaneContents)
+      Predicate<SequencingParameters> filterParameters, GetLaneContents getLaneContents)
       throws IOException, MisoNamingException {
     final Date now = new Date();
     User user = securityManager.getUserByLoginName("notification");
@@ -557,10 +556,9 @@ public class DefaultRunService implements RunService, AuthorizedPaginatedDataSou
 
     target.setLastModifier(user);
     boolean isMutated = false;
-    isMutated |= updateField(source.getCompletionDate(), target.getCompletionDate(), target::setCompletionDate);
     isMutated |= updateMetricsFromNotification(source, target);
     isMutated |= updateField(source.getFilePath(), target.getFilePath(), target::setFilePath);
-    isMutated |= updateField(source.getStartDate(), target.getCompletionDate(), target::setCompletionDate);
+    isMutated |= updateField(source.getStartDate(), target.getStartDate(), target::setStartDate);
 
     final SequencerReference sequencer = sequencerReferenceService.getByName(sequencerName);
     if (sequencer == null) {
@@ -688,7 +686,7 @@ public class DefaultRunService implements RunService, AuthorizedPaginatedDataSou
   }
 
   private boolean updateContainerFromNotification(final Run target, User user, int laneCount, String containerSerialNumber,
-      final SequencerReference sequencer, final IntFunction<Optional<String>> getLaneContents) throws IOException {
+      final SequencerReference sequencer, final GetLaneContents getLaneContents) throws IOException {
     final Collection<SequencerPartitionContainer> containers = containerService.listByBarcode(containerSerialNumber);
     switch (containers.size()) {
     case 0:
@@ -699,7 +697,7 @@ public class DefaultRunService implements RunService, AuthorizedPaginatedDataSou
       newContainer.setPartitionLimit(laneCount);
       newContainer
           .setPartitions(
-              IntStream.range(0, laneCount).mapToObj((i) -> new PartitionImpl(newContainer, i)).collect(Collectors.toList()));
+              IntStream.range(0, laneCount).mapToObj((i) -> new PartitionImpl(newContainer, i + 1)).collect(Collectors.toList()));
       updatePartitionContents(getLaneContents, newContainer);
       target.setSequencerPartitionContainers(Collections.singletonList(containerService.create(newContainer)));
       return true;
@@ -721,9 +719,9 @@ public class DefaultRunService implements RunService, AuthorizedPaginatedDataSou
     return false;
   }
 
-  private void updatePartitionContents(final IntFunction<Optional<String>> getLaneContents, SequencerPartitionContainer newContainer) {
+  private void updatePartitionContents(final GetLaneContents getLaneContents, SequencerPartitionContainer newContainer) {
     newContainer.getPartitions().stream().filter(partition -> partition.getPool() == null)
-        .forEach(partition -> getLaneContents.apply(partition.getPartitionNumber())
+        .forEach(partition -> getLaneContents.getLaneContents(partition.getPartitionNumber()).filter(s -> !LimsUtils.isStringBlankOrNull(s))
             .map(WhineyFunction.log(log, poolService::getByBarcode)).ifPresent(partition::setPool));
   }
 
@@ -735,12 +733,14 @@ public class DefaultRunService implements RunService, AuthorizedPaginatedDataSou
       // If it is sending us (effectively) an error, don't update the health if we have something already.
       if (target.getHealth() == null) {
         target.setHealth(source.getHealth());
+        target.setCompletionDate(source.getHealth().isDone() ? source.getCompletionDate() : null);
         return true;
       }
     } else {
       if (!target.didSomeoneElseChangeColumn("health", user) && target.getHealth() != source.getHealth()) {
         // A human user has never change the health of this run, so we will.
         target.setHealth(source.getHealth());
+        target.setCompletionDate(source.getHealth().isDone() ? source.getCompletionDate() : null);
         return true;
       }
     }

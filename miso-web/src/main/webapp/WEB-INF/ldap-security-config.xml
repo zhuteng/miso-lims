@@ -32,7 +32,7 @@
                       http://www.springframework.org/schema/security/spring-security.xsd"
   default-autowire="byName">
 
-  <bean id="securityManager" name="securityManager" class="uk.ac.bbsrc.tgac.miso.core.security.LDAPSecurityManager" />
+  <bean id="securityManager" name="securityManager" class="uk.ac.bbsrc.tgac.miso.core.security.LDAPSecurityManager"/>
 
   <security:global-method-security secured-annotations="enabled" jsr250-annotations="enabled" />
 

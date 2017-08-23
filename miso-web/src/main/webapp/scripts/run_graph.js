@@ -33,12 +33,28 @@ var RunGraph = (function() {
       var node = document.createElement('P');
       return {
         dom : node,
+        span : false, // Indicator of whether the graph spans the entire width
+        // of the row.
         render : function() {
           // Callback to render the graph after the DOM node is inserted.
           node.innerText = 'Look at me. I am gorgeous.';
         }
       };
       
+    });
+  };
+  var errorMessage = function(metrics, width) {
+    return metrics.filter(function(metric) {
+      return metric.type == 'message';
+    }).map(function(metric) {
+      var node = document.createElement('P');
+      node.setAttribute('class', 'parsley-error');
+      node.innerText = metric.message;
+      return {
+        dom : node,
+        render : function() {
+        }
+      };
     });
   };
   var externalLink = function(metrics, width) {
@@ -51,6 +67,7 @@ var RunGraph = (function() {
       link.target = "_blank";
       return {
         dom : link,
+        span : false,
         render : function() {
         }
       };
@@ -64,6 +81,7 @@ var RunGraph = (function() {
       var node = document.createElement('TABLE');
       return {
         dom : node,
+        span : false,
         render : function() {
           jQuery(node).dataTable({
             'bJQueryUI' : true,
@@ -88,29 +106,32 @@ var RunGraph = (function() {
   var summaryTable = function(metrics, width, renamePartitions) {
     return metrics.filter(function(metric) {
       return metric.type == 'table';
-    }).map(function(metric) {
-      var node = document.createElement('TABLE');
-      return {
-        dom : node,
-        render : function() {
-          var dt = jQuery(node).dataTable({
-            'bJQueryUI' : true,
-            'aoColumns' : metric.columns.map(function(column) {
-              return {
-                "sTitle" : column.name,
-                "mData" : column.property,
-                "mRender" : function(data) {
-                  return renamePartitions(data, false);
-                }
-              };
-            }),
-            'sDom' : '<"datatable-scroll"t><"F"ip>',
-            'aaData' : metric.rows
-          });
-          dt.parents("div.dataTables_wrapper").css("width", width + "px");
-        }
-      };
-    });
+    }).map(
+        function(metric) {
+          var node = document.createElement('TABLE');
+          return {
+            dom : node,
+            span : true,
+            render : function() {
+              var dt = jQuery(node).dataTable({
+                'bJQueryUI' : true,
+                'aoColumns' : metric.columns.map(function(column) {
+                  return {
+                    "sTitle" : column.name,
+                    "mData" : column.property,
+                    "mRender" : function(data) {
+                      return renamePartitions(data, false);
+                    }
+                  };
+                }),
+                'sDom' : '<"datatable-scroll"t><"F"ip>',
+                'aaData' : metric.rows
+              });
+              dt.parents("div.dataTables_wrapper").css("width",
+                  (width * 2) + "px");
+            }
+          };
+        });
   };
   var lineGraph = function(typeName, title, yLabel) {
     return function(metrics, width, renamePartitions) {
@@ -124,6 +145,7 @@ var RunGraph = (function() {
         var node = document.createElement('DIV');
         return {
           dom : node,
+          span : false,
           render : function() {
             new Highcharts.Chart({
               chart : {
@@ -175,6 +197,7 @@ var RunGraph = (function() {
         var node = document.createElement('DIV');
         return {
           dom : node,
+          span : false,
           render : function() {
             new Highcharts.Chart({
               chart : {
@@ -225,6 +248,7 @@ var RunGraph = (function() {
     var node = document.createElement('DIV');
     return {
       dom : node,
+      span : false,
       render : function() {
         new Highcharts.Chart({
           chart : {
@@ -297,6 +321,7 @@ var RunGraph = (function() {
     metricProcessors : [
         example,
         externalLink,
+        errorMessage,
         chart,
         summaryTable,
         illuminaPerCyclePlot('illumina-q30-by-cycle', '> Q30', '% Bases >Q30'),
@@ -314,7 +339,9 @@ var RunGraph = (function() {
         while (container.hasChildNodes()) {
           container.removeChild(container.lastChild);
         }
-        var width = Math.round(jQuery(container).width() * 0.49);
+        var realWidth = jQuery(container).width();
+        var forceSpan = realWidth < 550;
+        var width = forceSpan ? realWidth : Math.round(realWidth * 0.49);
         // Start with graphs we know how to make (see the example for a
         // template). Then filter them as appropriate for the data we have.
         var graphs = RunGraph.metricProcessors.map(
@@ -327,8 +354,7 @@ var RunGraph = (function() {
                     return (includePrefix ? "Lane " + partitionNumber + ": "
                         : "") + partitionNames[index];
                   } else {
-                    return includePrefix ? ("Lane " + partitionNumber)
-                        : "N/A";
+                    return includePrefix ? ("Lane " + partitionNumber) : "N/A";
                   }
                 });
               });
@@ -347,7 +373,12 @@ var RunGraph = (function() {
           var cell = document.createElement('TD');
           cell.style.cssText = css;
           cell.appendChild(graph.dom);
-          if (row == null) {
+          if (graph.span || forceSpan) {
+            cell.colSpan = 2;
+            var spanRow = document.createElement('TR');
+            spanRow.appendChild(cell);
+            table.appendChild(spanRow);
+          } else if (row == null) {
             row = document.createElement('TR');
             row.appendChild(cell);
             table.appendChild(row);

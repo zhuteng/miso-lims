@@ -26,7 +26,6 @@ package uk.ac.bbsrc.tgac.miso.core.security;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
-
 import com.eaglegenomics.simlims.core.manager.AbstractSecurityManager;
 
 /**

@@ -55,9 +55,9 @@ import uk.ac.bbsrc.tgac.miso.webapp.controller.rest.RestExceptionHandler;
 import uk.ac.bbsrc.tgac.miso.webapp.controller.rest.RestExceptionHandler.RestError;
 
 /**
- * Authentication filter for REST requests. If authentication headers are found in the request, signature authentication will be 
- * attempted. Otherwise, forms authentication will be checked. Lastly, if unauthenticated mode is enabled and neither previous 
- * authentication option has been attempted, the request will be authenticated using the unauthenticated mode user. If authentication 
+ * Authentication filter for REST requests. If authentication headers are found in the request, signature authentication will be
+ * attempted. Otherwise, forms authentication will be checked. Lastly, if unauthenticated mode is enabled and neither previous
+ * authentication option has been attempted, the request will be authenticated using the unauthenticated mode user. If authentication
  * fails or any other exception occurs, the error data is returned in JSON (see {@link RestError}) and the request is blocked.
  */
 public class RestSignatureFilter extends OncePerRequestFilter {
@@ -65,7 +65,7 @@ public class RestSignatureFilter extends OncePerRequestFilter {
   AuthenticationManager authenticationManager;
   @Autowired
   SecurityManager securityManager;
-  
+
   /** Used during development only. Set this to true to use REST resources without authentication. Good for manual testing/exploration. */
   private static boolean UNAUTHENTICATED_MODE = false;
   /** Resources created (POST) and modified (PUT) will be associated with this user in UNAUTHENTICATED_MODE. This user must exist. */
@@ -82,7 +82,7 @@ public class RestSignatureFilter extends OncePerRequestFilter {
 
   /**
    * Creates a new RestSignatureFilter instance with a defined SecurityContextRepository
-   * 
+   *
    * @param securityContextRepository
    *          of type SecurityContextRepository
    */
@@ -94,7 +94,7 @@ public class RestSignatureFilter extends OncePerRequestFilter {
   public void setSecurityManager(SecurityManager securityManager) {
     this.securityManager = securityManager;
   }
-  
+
   @Override
   protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
       throws ServletException, IOException {
@@ -111,7 +111,7 @@ public class RestSignatureFilter extends OncePerRequestFilter {
         }
         throw new RestException("Cannot enact RESTful request without a user specified!", Status.UNAUTHORIZED);
       }
-      
+
       // Attempt authentication via username and signature headers
       checkSignature(request, response, filterChain);
     } catch (Exception e) {
@@ -124,19 +124,19 @@ public class RestSignatureFilter extends OncePerRequestFilter {
       }
     }
   }
-  
+
   /**
    * Checks if the user is already authenticated via form and passes the request/response pair through the filter if so
-   * 
+   *
    * @param request the request being handled
    * @param response the response being served
    * @param filterChain the filter chain containing this filter, which is being executed
-   * @return true if the user is authenticated; false otherwise. If true, the filter has already been passed, and no further 
+   * @return true if the user is authenticated; false otherwise. If true, the filter has already been passed, and no further
    * action should be taken.
    * @throws IOException
    * @throws ServletException
    */
-  private boolean checkFormLogin(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) 
+  private boolean checkFormLogin(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
       throws IOException, ServletException {
     SecurityContext sc = securityContextRepository.loadContext(new HttpRequestResponseHolder(request, response));
     if (sc != null && sc.getAuthentication() != null) {
@@ -147,11 +147,11 @@ public class RestSignatureFilter extends OncePerRequestFilter {
     }
     return false;
   }
-  
+
   /**
-   * Forces authentication as the unauthenticated mode user and passes the request/response pair through the filter. 
+   * Forces authentication as the unauthenticated mode user and passes the request/response pair through the filter.
    * No further action should be taken after this method has been called, as the filter has already been passed.
-   * 
+   *
    * @param request the request being handled
    * @param response the response being served
    * @param filterChain the filter chain containing this filter, which is being executed
@@ -173,15 +173,15 @@ public class RestSignatureFilter extends OncePerRequestFilter {
     if (user != null) {
       userdetails = LimsSecurityUtils.toUserDetails(user);
     }
-    
+
     filterUser(request, response, filterChain, userdetails);
   }
 
   /**
-   * Attempts authentication via username and signature headers in the request. If successful, passes the request/response pair 
-   * through the filter. No further action should be taken after this method has been called, as the filter has already been passed. 
+   * Attempts authentication via username and signature headers in the request. If successful, passes the request/response pair
+   * through the filter. No further action should be taken after this method has been called, as the filter has already been passed.
    * An Exception of some sort is thrown otherwise
-   * 
+   *
    * @param request the request being handled
    * @param response the response being served
    * @param filterChain the filter chain containing this filter, which is being executed
@@ -197,19 +197,19 @@ public class RestSignatureFilter extends OncePerRequestFilter {
       String key = (String) es.nextElement();
       logger.info(key + " -> " + request.getHeader(key));
     }
-    
+
     // get login name
     String loginName = request.getHeader(SignatureHelper.USER_HEADER);
     if (loginName == null) {
       throw new RestException("Cannot enact RESTful request without a user specified!", Status.UNAUTHORIZED);
     }
-    
+
     // get signature
     String signature = request.getHeader(SignatureHelper.SIGNATURE_HEADER);
     if (signature == null) {
       throw new RestException("Cannot enact RESTful request without a signature!", Status.UNAUTHORIZED);
     }
-    
+
     // get user and validate signature
     User userdetails = null;
     boolean validSignature = false;
@@ -222,7 +222,7 @@ public class RestSignatureFilter extends OncePerRequestFilter {
         logger.debug("Incoming user REST API request");
         if (user != null) {
           validSignature = SignatureHelper.validateSignature(request,
-              SignatureHelper.generatePrivateUserKey((user.getLoginName() + "::" + user.getPassword()).getBytes("UTF-8")), signature);
+              SignatureHelper.generatePrivateUserKey((user.getLoginName() + "::" + user.getUserId() + "::" + user.getEmail()).getBytes("UTF-8")), signature);
         }
       }
       userdetails = LimsSecurityUtils.toUserDetails(user);

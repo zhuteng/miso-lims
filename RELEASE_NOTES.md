@@ -1,3 +1,27 @@
+# 0.2.84
+
+Changes:
+
+ * Fix off-by-one error when creating new flow cells from run scanner
+ * Switch to single column when run page is narrow
+
+# 0.2.83
+
+Changes:
+
+ * Add bulk actions to box contents
+ * Add run scanner as replacement for notification server
+ * Handle JDBC and LDAP users for logged in status
+ * Delete runstats/STATDB support
+ * New list pages for projects, sequencers, users, groups, and many edit pages
+ * Fix stacktrace on bulk create Slide
+ * Require enter to search
+ * Fix problems with inferring tissue for tissue processing
+
+Bad:
+
+ * Run Scanner created incorrect partition numbers
+
 # 0.2.81
 
 Changes:

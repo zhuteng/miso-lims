@@ -145,8 +145,9 @@ public class LimsSecurityUtils {
 
   public static org.springframework.security.core.userdetails.User toUserDetails(User user) {
     final Collection<GrantedAuthority> auths = user.getPermissionsAsAuthorities();
-    return new org.springframework.security.core.userdetails.User(user.getLoginName(), user.getPassword(), user.isActive(), user.isActive(),
-        user.isActive(), user.isActive(), auths);
+    return new org.springframework.security.core.userdetails.User(user.getLoginName(),
+            user.getPassword() == null ? "" : user.getPassword(),
+            user.isActive(), user.isActive(), user.isActive(), user.isActive(), auths);
   }
 
   /**

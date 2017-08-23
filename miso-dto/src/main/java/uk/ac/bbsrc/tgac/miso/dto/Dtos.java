@@ -1195,6 +1195,8 @@ public class Dtos {
     dto.setIdentificationBarcode(from.getIdentificationBarcode());
     dto.setName(from.getName());
     dto.setVolume(from.getVolume());
+    dto.setEntityType(from.getId().getTargetType());
+    dto.setSampleClassId(from.getSampleClassId());
     return dto;
   }
 
@@ -1672,6 +1674,10 @@ public class Dtos {
 
   private static void setIlluminaRunValues(IlluminaNotificationDto from, IlluminaRun to) {
     to.setPairedEnd(from.isPairedEndRun());
+    to.setNumCycles(from.getNumCycles());
+    to.setImgCycle(from.getImgCycle());
+    to.setCallCycle(from.getCallCycle());
+    to.setScoreCycle(from.getScoreCycle());
   }
 
   private static void setCommonRunValues(NotificationDto from, Run to) {
