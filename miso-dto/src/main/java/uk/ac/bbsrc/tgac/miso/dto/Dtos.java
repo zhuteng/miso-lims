@@ -443,7 +443,7 @@ public class Dtos {
             SampleSlide slide = new SampleSlideImpl();
             slide.setSampleClass(new SampleClassImpl());
             slide.getSampleClass().setId(lcm.getParentSlideClassId());
-            slide.setSlides(0);
+            slide.setSlides(lcm.getSlidesConsumed());
             slide.setParent(parent);
             parent = slide;
           }
