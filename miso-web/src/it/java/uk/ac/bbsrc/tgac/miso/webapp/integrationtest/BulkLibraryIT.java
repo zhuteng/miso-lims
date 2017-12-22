@@ -717,6 +717,7 @@ public class BulkLibraryIT extends AbstractIT {
 
   @Test
   public void testUndiscardIntoBox() {
+    final String newPosition = "A07";
     Long libId = 100008L;
     DetailedLibrary before = (DetailedLibrary) getSession().get(LibraryImpl.class, libId);
     assertNull(before.getBox());
@@ -728,8 +729,8 @@ public class BulkLibraryIT extends AbstractIT {
     table.enterText(LibColumns.BOX_SEARCH, 0, "BOX100001");
     table.waitForSearch(LibColumns.BOX_ALIAS, 0);
     assertEquals("Bulk Boxables Test", table.getText(LibColumns.BOX_ALIAS, 0));
-    table.enterText(LibColumns.BOX_POSITION, 0, "A04");
-    assertEquals("A04", table.getText(LibColumns.BOX_POSITION, 0));
+    table.enterText(LibColumns.BOX_POSITION, 0, newPosition);
+    assertEquals(newPosition, table.getText(LibColumns.BOX_POSITION, 0));
     assertTrue(table.getInvalidCells(0).contains(LibColumns.DISCARDED));
     table.enterText(LibColumns.DISCARDED, 0, "False");
     assertFalse(table.getInvalidCells(0).contains(LibColumns.DISCARDED));
@@ -738,7 +739,7 @@ public class BulkLibraryIT extends AbstractIT {
     DetailedLibrary after = (DetailedLibrary) getSession().get(LibraryImpl.class, libId);
     assertNotNull(after.getBox());
     assertEquals("BOX100001", after.getBox().getName());
-    assertEquals("A04", after.getBoxPosition());
+    assertEquals(newPosition, after.getBoxPosition());
     assertFalse(after.isDiscarded());
   }
 
